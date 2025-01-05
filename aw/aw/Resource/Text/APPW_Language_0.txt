@@ -1,9 +1,0 @@
-00.0
-0000
-N
-00:00
-0
-Error : Message
-30fps
-Total: 000000km
-Trip: 000.0km
