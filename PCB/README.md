@@ -5,7 +5,8 @@
  PCB : https://a360.co/4acejtW<br>
  3D : https://a360.co/3PSdNs1<br>
 ## LED-Board1
- SCH : https://a360.co/4fYChtY<br>
+ SCH : [FULLMONI-WIDE_LED-Board1_SCH v40.pdf](https://github.com/tomoya723/FULLMONI-WIDE/blob/main/PCB/FULLMONI-WIDE_LED-Board1_SCH%20v40.pdf)<br>
+ https://a360.co/4fYChtY<br>
  PCB : https://a360.co/40t23C2<br>
  3D : https://a360.co/4avyaEV<br>
 ## IF-Board1
