@@ -23,7 +23,7 @@
    4:../src/main.c **** #include "r_smc_entry.h"
    5:../src/main.c **** #include "platform.h"           // Located in the FIT BSP module
    6:../src/main.c **** #include "Generated/Resource.h"
-   7:../src/main.c **** #include "../aw/Source/Generated/Resource.h"
+   7:../src/main.c **** //#include "../aw/Source/Generated/Resource.h"
    8:../src/main.c **** #include "TFTLCD102.h"
    9:../src/main.c **** #include "neopixel.h"
   10:../src/main.c **** #include "can.h"

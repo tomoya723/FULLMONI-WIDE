@@ -20526,7 +20526,7 @@ OUTPUT(FULLMONI_WIDE_official.elf elf32-rx-le)
  .debug_ranges  0x00000000000032a0       0x10 ./aw/Source/CustomCode/ID_SCREEN_02_Slots.o
  .debug_ranges  0x00000000000032b0       0x10 ./aw/Source/APPW_MainTask.o
 
-.debug_macro    0x0000000000000000    0x25305
+.debug_macro    0x0000000000000000    0x25300
  .debug_macro   0x0000000000000000      0x324 ./src/smc_gen/r_pincfg/Pin.o
  .debug_macro   0x0000000000000324      0x62e ./src/smc_gen/r_pincfg/Pin.o
  .debug_macro   0x0000000000000952      0x339 ./src/smc_gen/r_pincfg/Pin.o
@@ -20816,44 +20816,44 @@ OUTPUT(FULLMONI_WIDE_official.elf elf32-rx-le)
  .debug_macro   0x000000000001df7b      0x132 ./src/dataregister.o
  .debug_macro   0x000000000001e0ad       0xa0 ./src/dataregister.o
  .debug_macro   0x000000000001e14d       0x46 ./src/dataregister.o
- .debug_macro   0x000000000001e193      0x770 ./src/main.o
- .debug_macro   0x000000000001e903      0x30c ./src/neopixel.o
- .debug_macro   0x000000000001ec0f      0x37d ./aw/Source/Generated/APPWConf.o
- .debug_macro   0x000000000001ef8c      0x138 ./aw/Source/Generated/APPWConf.o
- .debug_macro   0x000000000001f0c4      0x356 ./aw/Source/Generated/ID_SCREEN_00.o
- .debug_macro   0x000000000001f41a       0x16 ./aw/Source/Generated/ID_SCREEN_00.o
- .debug_macro   0x000000000001f430      0x356 ./aw/Source/Generated/ID_SCREEN_01.o
- .debug_macro   0x000000000001f786      0x356 ./aw/Source/Generated/ID_SCREEN_02.o
- .debug_macro   0x000000000001fadc      0x34d ./aw/Source/Generated/Resource.o
- .debug_macro   0x000000000001fe29       0x1b ./aw/Source/CustomCode/Application.o
- .debug_macro   0x000000000001fe44      0x360 ./aw/Source/CustomCode/ID_SCREEN_00_Slots.o
- .debug_macro   0x00000000000201a4      0x360 ./aw/Source/CustomCode/ID_SCREEN_01_Slots.o
- .debug_macro   0x0000000000020504      0x360 ./aw/Source/CustomCode/ID_SCREEN_02_Slots.o
- .debug_macro   0x0000000000020864      0x34d ./aw/Source/APPW_MainTask.o
- .debug_macro   0x0000000000020bb1      0x33e ./aw/Resource/Text/APPW_Language_0.o
- .debug_macro   0x0000000000020eef      0x33e ./aw/Resource/Image/Back2.o
- .debug_macro   0x000000000002122d      0x33e ./aw/Resource/Image/Marker_red_bar_80x7s.o
- .debug_macro   0x000000000002156b      0x33e ./aw/Resource/Image/fuel1.o
- .debug_macro   0x00000000000218a9      0x33e ./aw/Resource/Image/fuel2.o
- .debug_macro   0x0000000000021be7      0x33e ./aw/Resource/Image/motec.o
- .debug_macro   0x0000000000021f25      0x33e ./aw/Resource/Image/w_back.o
- .debug_macro   0x0000000000022263      0x33e ./aw/Resource/Image/ws_batterywarning.o
- .debug_macro   0x00000000000225a1      0x33e ./aw/Resource/Image/ws_beltwarning.o
- .debug_macro   0x00000000000228df      0x33e ./aw/Resource/Image/ws_breakwarning.o
- .debug_macro   0x0000000000022c1d      0x33e ./aw/Resource/Image/ws_exhaustwarning.o
- .debug_macro   0x0000000000022f5b      0x33e ./aw/Resource/Image/ws_fuelcheck.o
- .debug_macro   0x0000000000023299      0x33e ./aw/Resource/Image/ws_masterwarning.o
- .debug_macro   0x00000000000235d7      0x33e ./aw/Resource/Image/ws_oilpresswarning.o
- .debug_macro   0x0000000000023915      0x33e ./aw/Resource/Image/ws_watarcool.o
- .debug_macro   0x0000000000023c53      0x33e ./aw/Resource/Image/ws_waterwarning.o
- .debug_macro   0x0000000000023f91      0x33e ./aw/Resource/Font/51_20_Normal_EXT.o
- .debug_macro   0x00000000000242cf      0x33e ./aw/Resource/Font/51_30_Normal_EXT.o
- .debug_macro   0x000000000002460d      0x33e ./aw/Resource/Font/51_40_Normal_EXT.o
- .debug_macro   0x000000000002494b      0x33e ./aw/Resource/Font/Arial_16_Bold_EXT.o
- .debug_macro   0x0000000000024c89      0x33e ./aw/Resource/Font/Arial_19_Normal_EXT.o
- .debug_macro   0x0000000000024fc7      0x33e ./aw/Resource/Font/SuiGenerisRg_120_Bold_EXT.o
+ .debug_macro   0x000000000001e193      0x76b ./src/main.o
+ .debug_macro   0x000000000001e8fe      0x30c ./src/neopixel.o
+ .debug_macro   0x000000000001ec0a      0x37d ./aw/Source/Generated/APPWConf.o
+ .debug_macro   0x000000000001ef87      0x138 ./aw/Source/Generated/APPWConf.o
+ .debug_macro   0x000000000001f0bf      0x356 ./aw/Source/Generated/ID_SCREEN_00.o
+ .debug_macro   0x000000000001f415       0x16 ./aw/Source/Generated/ID_SCREEN_00.o
+ .debug_macro   0x000000000001f42b      0x356 ./aw/Source/Generated/ID_SCREEN_01.o
+ .debug_macro   0x000000000001f781      0x356 ./aw/Source/Generated/ID_SCREEN_02.o
+ .debug_macro   0x000000000001fad7      0x34d ./aw/Source/Generated/Resource.o
+ .debug_macro   0x000000000001fe24       0x1b ./aw/Source/CustomCode/Application.o
+ .debug_macro   0x000000000001fe3f      0x360 ./aw/Source/CustomCode/ID_SCREEN_00_Slots.o
+ .debug_macro   0x000000000002019f      0x360 ./aw/Source/CustomCode/ID_SCREEN_01_Slots.o
+ .debug_macro   0x00000000000204ff      0x360 ./aw/Source/CustomCode/ID_SCREEN_02_Slots.o
+ .debug_macro   0x000000000002085f      0x34d ./aw/Source/APPW_MainTask.o
+ .debug_macro   0x0000000000020bac      0x33e ./aw/Resource/Text/APPW_Language_0.o
+ .debug_macro   0x0000000000020eea      0x33e ./aw/Resource/Image/Back2.o
+ .debug_macro   0x0000000000021228      0x33e ./aw/Resource/Image/Marker_red_bar_80x7s.o
+ .debug_macro   0x0000000000021566      0x33e ./aw/Resource/Image/fuel1.o
+ .debug_macro   0x00000000000218a4      0x33e ./aw/Resource/Image/fuel2.o
+ .debug_macro   0x0000000000021be2      0x33e ./aw/Resource/Image/motec.o
+ .debug_macro   0x0000000000021f20      0x33e ./aw/Resource/Image/w_back.o
+ .debug_macro   0x000000000002225e      0x33e ./aw/Resource/Image/ws_batterywarning.o
+ .debug_macro   0x000000000002259c      0x33e ./aw/Resource/Image/ws_beltwarning.o
+ .debug_macro   0x00000000000228da      0x33e ./aw/Resource/Image/ws_breakwarning.o
+ .debug_macro   0x0000000000022c18      0x33e ./aw/Resource/Image/ws_exhaustwarning.o
+ .debug_macro   0x0000000000022f56      0x33e ./aw/Resource/Image/ws_fuelcheck.o
+ .debug_macro   0x0000000000023294      0x33e ./aw/Resource/Image/ws_masterwarning.o
+ .debug_macro   0x00000000000235d2      0x33e ./aw/Resource/Image/ws_oilpresswarning.o
+ .debug_macro   0x0000000000023910      0x33e ./aw/Resource/Image/ws_watarcool.o
+ .debug_macro   0x0000000000023c4e      0x33e ./aw/Resource/Image/ws_waterwarning.o
+ .debug_macro   0x0000000000023f8c      0x33e ./aw/Resource/Font/51_20_Normal_EXT.o
+ .debug_macro   0x00000000000242ca      0x33e ./aw/Resource/Font/51_30_Normal_EXT.o
+ .debug_macro   0x0000000000024608      0x33e ./aw/Resource/Font/51_40_Normal_EXT.o
+ .debug_macro   0x0000000000024946      0x33e ./aw/Resource/Font/Arial_16_Bold_EXT.o
+ .debug_macro   0x0000000000024c84      0x33e ./aw/Resource/Font/Arial_19_Normal_EXT.o
+ .debug_macro   0x0000000000024fc2      0x33e ./aw/Resource/Font/SuiGenerisRg_120_Bold_EXT.o
 
-.debug_line     0x0000000000000000    0x50f08
+.debug_line     0x0000000000000000    0x50edc
  .debug_line    0x0000000000000000      0xa5a ./src/smc_gen/r_pincfg/Pin.o
  .debug_line    0x0000000000000a5a      0x7ac ./src/smc_gen/r_pincfg/r_can_rx_pinset.o
  .debug_line    0x0000000000001206      0x880 ./src/smc_gen/r_pincfg/r_glcdc_rx_pinset.o
@@ -20953,40 +20953,40 @@ OUTPUT(FULLMONI_WIDE_official.elf elf32-rx-le)
  .debug_line    0x0000000000040d86      0xd14 ./src/can.o
  .debug_line    0x0000000000041a9a      0x7d4 ./src/cmt_dev.o
  .debug_line    0x000000000004226e     0x1491 ./src/dataregister.o
- .debug_line    0x00000000000436ff     0x15ae ./src/main.o
- .debug_line    0x0000000000044cad      0xbec ./src/neopixel.o
- .debug_line    0x0000000000045899      0x5e9 ./aw/Source/Generated/APPWConf.o
- .debug_line    0x0000000000045e82      0x5c7 ./aw/Source/Generated/ID_SCREEN_00.o
- .debug_line    0x0000000000046449      0x5c7 ./aw/Source/Generated/ID_SCREEN_01.o
- .debug_line    0x0000000000046a10      0x5c7 ./aw/Source/Generated/ID_SCREEN_02.o
- .debug_line    0x0000000000046fd7      0x5c9 ./aw/Source/Generated/Resource.o
- .debug_line    0x00000000000475a0       0x57 ./aw/Source/CustomCode/Application.o
- .debug_line    0x00000000000475f7      0x670 ./aw/Source/CustomCode/ID_SCREEN_00_Slots.o
- .debug_line    0x0000000000047c67      0xa4a ./aw/Source/CustomCode/ID_SCREEN_01_Slots.o
- .debug_line    0x00000000000486b1      0x61c ./aw/Source/CustomCode/ID_SCREEN_02_Slots.o
- .debug_line    0x0000000000048ccd      0x5ea ./aw/Source/APPW_MainTask.o
- .debug_line    0x00000000000492b7      0x5a7 ./aw/Resource/Text/APPW_Language_0.o
- .debug_line    0x000000000004985e      0x59e ./aw/Resource/Image/Back2.o
- .debug_line    0x0000000000049dfc      0x5ad ./aw/Resource/Image/Marker_red_bar_80x7s.o
- .debug_line    0x000000000004a3a9      0x59e ./aw/Resource/Image/fuel1.o
- .debug_line    0x000000000004a947      0x59e ./aw/Resource/Image/fuel2.o
- .debug_line    0x000000000004aee5      0x59e ./aw/Resource/Image/motec.o
- .debug_line    0x000000000004b483      0x59f ./aw/Resource/Image/w_back.o
- .debug_line    0x000000000004ba22      0x5aa ./aw/Resource/Image/ws_batterywarning.o
- .debug_line    0x000000000004bfcc      0x5a7 ./aw/Resource/Image/ws_beltwarning.o
- .debug_line    0x000000000004c573      0x5a8 ./aw/Resource/Image/ws_breakwarning.o
- .debug_line    0x000000000004cb1b      0x5aa ./aw/Resource/Image/ws_exhaustwarning.o
- .debug_line    0x000000000004d0c5      0x5a5 ./aw/Resource/Image/ws_fuelcheck.o
- .debug_line    0x000000000004d66a      0x5a9 ./aw/Resource/Image/ws_masterwarning.o
- .debug_line    0x000000000004dc13      0x5ab ./aw/Resource/Image/ws_oilpresswarning.o
- .debug_line    0x000000000004e1be      0x5a5 ./aw/Resource/Image/ws_watarcool.o
- .debug_line    0x000000000004e763      0x5a8 ./aw/Resource/Image/ws_waterwarning.o
- .debug_line    0x000000000004ed0b      0x5a8 ./aw/Resource/Font/51_20_Normal_EXT.o
- .debug_line    0x000000000004f2b3      0x5a8 ./aw/Resource/Font/51_30_Normal_EXT.o
- .debug_line    0x000000000004f85b      0x5a8 ./aw/Resource/Font/51_40_Normal_EXT.o
- .debug_line    0x000000000004fe03      0x5a9 ./aw/Resource/Font/Arial_16_Bold_EXT.o
- .debug_line    0x00000000000503ac      0x5ab ./aw/Resource/Font/Arial_19_Normal_EXT.o
- .debug_line    0x0000000000050957      0x5b1 ./aw/Resource/Font/SuiGenerisRg_120_Bold_EXT.o
+ .debug_line    0x00000000000436ff     0x1582 ./src/main.o
+ .debug_line    0x0000000000044c81      0xbec ./src/neopixel.o
+ .debug_line    0x000000000004586d      0x5e9 ./aw/Source/Generated/APPWConf.o
+ .debug_line    0x0000000000045e56      0x5c7 ./aw/Source/Generated/ID_SCREEN_00.o
+ .debug_line    0x000000000004641d      0x5c7 ./aw/Source/Generated/ID_SCREEN_01.o
+ .debug_line    0x00000000000469e4      0x5c7 ./aw/Source/Generated/ID_SCREEN_02.o
+ .debug_line    0x0000000000046fab      0x5c9 ./aw/Source/Generated/Resource.o
+ .debug_line    0x0000000000047574       0x57 ./aw/Source/CustomCode/Application.o
+ .debug_line    0x00000000000475cb      0x670 ./aw/Source/CustomCode/ID_SCREEN_00_Slots.o
+ .debug_line    0x0000000000047c3b      0xa4a ./aw/Source/CustomCode/ID_SCREEN_01_Slots.o
+ .debug_line    0x0000000000048685      0x61c ./aw/Source/CustomCode/ID_SCREEN_02_Slots.o
+ .debug_line    0x0000000000048ca1      0x5ea ./aw/Source/APPW_MainTask.o
+ .debug_line    0x000000000004928b      0x5a7 ./aw/Resource/Text/APPW_Language_0.o
+ .debug_line    0x0000000000049832      0x59e ./aw/Resource/Image/Back2.o
+ .debug_line    0x0000000000049dd0      0x5ad ./aw/Resource/Image/Marker_red_bar_80x7s.o
+ .debug_line    0x000000000004a37d      0x59e ./aw/Resource/Image/fuel1.o
+ .debug_line    0x000000000004a91b      0x59e ./aw/Resource/Image/fuel2.o
+ .debug_line    0x000000000004aeb9      0x59e ./aw/Resource/Image/motec.o
+ .debug_line    0x000000000004b457      0x59f ./aw/Resource/Image/w_back.o
+ .debug_line    0x000000000004b9f6      0x5aa ./aw/Resource/Image/ws_batterywarning.o
+ .debug_line    0x000000000004bfa0      0x5a7 ./aw/Resource/Image/ws_beltwarning.o
+ .debug_line    0x000000000004c547      0x5a8 ./aw/Resource/Image/ws_breakwarning.o
+ .debug_line    0x000000000004caef      0x5aa ./aw/Resource/Image/ws_exhaustwarning.o
+ .debug_line    0x000000000004d099      0x5a5 ./aw/Resource/Image/ws_fuelcheck.o
+ .debug_line    0x000000000004d63e      0x5a9 ./aw/Resource/Image/ws_masterwarning.o
+ .debug_line    0x000000000004dbe7      0x5ab ./aw/Resource/Image/ws_oilpresswarning.o
+ .debug_line    0x000000000004e192      0x5a5 ./aw/Resource/Image/ws_watarcool.o
+ .debug_line    0x000000000004e737      0x5a8 ./aw/Resource/Image/ws_waterwarning.o
+ .debug_line    0x000000000004ecdf      0x5a8 ./aw/Resource/Font/51_20_Normal_EXT.o
+ .debug_line    0x000000000004f287      0x5a8 ./aw/Resource/Font/51_30_Normal_EXT.o
+ .debug_line    0x000000000004f82f      0x5a8 ./aw/Resource/Font/51_40_Normal_EXT.o
+ .debug_line    0x000000000004fdd7      0x5a9 ./aw/Resource/Font/Arial_16_Bold_EXT.o
+ .debug_line    0x0000000000050380      0x5ab ./aw/Resource/Font/Arial_19_Normal_EXT.o
+ .debug_line    0x000000000005092b      0x5b1 ./aw/Resource/Font/SuiGenerisRg_120_Bold_EXT.o
 
 .debug_str      0x0000000000000000    0x6781a
  .debug_str     0x0000000000000000    0x2eefe ./src/smc_gen/r_pincfg/Pin.o
