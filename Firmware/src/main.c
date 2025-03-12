@@ -4,7 +4,7 @@
 #include "r_smc_entry.h"
 #include "platform.h"           // Located in the FIT BSP module
 #include "Generated/Resource.h"
-#include "../aw/Source/Generated/Resource.h"
+//#include "../aw/Source/Generated/Resource.h"
 #include "TFTLCD102.h"
 #include "neopixel.h"
 #include "can.h"
