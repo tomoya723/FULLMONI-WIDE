@@ -1,0 +1,135 @@
+   1                             		.file	"APPW_MainTask.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.rodata.MainTask.str1.1,"aMS",@progbits,1
+   5                             	.LC0:
+   6 0000 44 3A 2F 65 32 5F 73 74 		.string	"D:/e2_studio/workspace/FULLMONI_WIDE/Firmware/aw"
+   6      75 64 69 6F 2F 77 6F 72 
+   6      6B 73 70 61 63 65 2F 46 
+   6      55 4C 4C 4D 4F 4E 49 5F 
+   6      57 49 44 45 2F 46 69 72 
+   7                             		.section	.text.MainTask,"ax",@progbits
+   8                             		.global	_MainTask
+  10                             	_MainTask:
+  11                             	.LFB0:
+  12                             		.file 1 "../aw/Source/APPW_MainTask.c"
+   1:../aw/Source/APPW_MainTask.c **** /*********************************************************************
+   2:../aw/Source/APPW_MainTask.c **** *                     SEGGER Microcontroller GmbH                    *
+   3:../aw/Source/APPW_MainTask.c **** *        Solutions for real time microcontroller applications        *
+   4:../aw/Source/APPW_MainTask.c **** **********************************************************************
+   5:../aw/Source/APPW_MainTask.c **** *                                                                    *
+   6:../aw/Source/APPW_MainTask.c **** *        (c) 1996 - 2025  SEGGER Microcontroller GmbH                *
+   7:../aw/Source/APPW_MainTask.c **** *                                                                    *
+   8:../aw/Source/APPW_MainTask.c **** *        Internet: www.segger.com    Support:  support@segger.com    *
+   9:../aw/Source/APPW_MainTask.c **** *                                                                    *
+  10:../aw/Source/APPW_MainTask.c **** **********************************************************************
+  11:../aw/Source/APPW_MainTask.c **** ----------------------------------------------------------------------
+  12:../aw/Source/APPW_MainTask.c **** File        : APPW_MainTask.c
+  13:../aw/Source/APPW_MainTask.c **** Purpose     : APPWIZARD application entry point
+  14:../aw/Source/APPW_MainTask.c **** ---------------------------END-OF-HEADER------------------------------
+  15:../aw/Source/APPW_MainTask.c **** */
+  16:../aw/Source/APPW_MainTask.c **** 
+  17:../aw/Source/APPW_MainTask.c **** #include "Generated/Resource.h"
+  18:../aw/Source/APPW_MainTask.c **** 
+  19:../aw/Source/APPW_MainTask.c **** /*********************************************************************
+  20:../aw/Source/APPW_MainTask.c **** *
+  21:../aw/Source/APPW_MainTask.c **** *       MainTask
+  22:../aw/Source/APPW_MainTask.c **** */
+  23:../aw/Source/APPW_MainTask.c **** void MainTask(void) {
+  13                             		.loc 1 23 21 view -0
+  24:../aw/Source/APPW_MainTask.c ****   //
+  25:../aw/Source/APPW_MainTask.c ****   // Setup configuration dependent pointers
+  26:../aw/Source/APPW_MainTask.c ****   //
+  27:../aw/Source/APPW_MainTask.c ****   APPW_X_Setup();
+  14                             		.loc 1 27 3 view .LVU1
+  15 0000 05 00 00 00             		bsr	_APPW_X_Setup
+  16                             	.LVL0:
+  28:../aw/Source/APPW_MainTask.c ****   //
+  29:../aw/Source/APPW_MainTask.c ****   // Initialize AppWizard
+  30:../aw/Source/APPW_MainTask.c ****   //
+  31:../aw/Source/APPW_MainTask.c ****   APPW_Init(APPW_PROJECT_PATH);
+  17                             		.loc 1 31 3 view .LVU2
+  18 0004 FB 12 00 00 00 00       		mov.L	#.LC0, r1
+  19 000a 05 00 00 00             		bsr	_APPW_Init
+  20                             	.LVL1:
+  32:../aw/Source/APPW_MainTask.c ****   //
+  33:../aw/Source/APPW_MainTask.c ****   // Create all persistent screens except initial screen
+  34:../aw/Source/APPW_MainTask.c ****   //
+  35:../aw/Source/APPW_MainTask.c ****   APPW_CreatePersistentScreens();
+  21                             		.loc 1 35 3 view .LVU3
+  22 000e 05 00 00 00             		bsr	_APPW_CreatePersistentScreens
+  23                             	.LVL2:
+  36:../aw/Source/APPW_MainTask.c ****   //
+  37:../aw/Source/APPW_MainTask.c ****   // Create initial screen...
+  38:../aw/Source/APPW_MainTask.c ****   //
+  39:../aw/Source/APPW_MainTask.c ****   APPW_CreateRoot(APPW_INITIAL_SCREEN, WM_HBKWIN);
+  24                             		.loc 1 39 3 view .LVU4
+  25 0012 05 00 00 00             		bsr	_WM_GetDesktopWindow
+  26                             	.LVL3:
+  27 0016 EF 12                   		mov.L	r1, r2
+  28 0018 FB 12 00 00 00 00       		mov.L	#_ID_SCREEN_00_RootInfo, r1
+  29 001e 05 00 00 00             		bsr	_APPW_CreateRoot
+  30                             	.LVL4:
+  31 0022 2E 0C                   		bra	.L2
+  32                             	.L5:
+  40:../aw/Source/APPW_MainTask.c ****   //
+  41:../aw/Source/APPW_MainTask.c ****   // ...and keep it alive
+  42:../aw/Source/APPW_MainTask.c ****   //
+  43:../aw/Source/APPW_MainTask.c ****   while (1) {
+  44:../aw/Source/APPW_MainTask.c ****     while (GUI_Exec1()) {
+  45:../aw/Source/APPW_MainTask.c ****       APPW_Exec();
+  46:../aw/Source/APPW_MainTask.c ****     }
+  47:../aw/Source/APPW_MainTask.c ****     APPW_Exec();
+  33                             		.loc 1 47 5 view .LVU5
+  34 0024 05 00 00 00             		bsr	_APPW_Exec
+  35                             	.LVL5:
+  48:../aw/Source/APPW_MainTask.c ****     GUI_X_Delay(5);
+  36                             		.loc 1 48 5 view .LVU6
+  37 0028 66 51                   		mov.L	#5, r1
+  38 002a 05 00 00 00             		bsr	_GUI_X_Delay
+  39                             	.LVL6:
+  40                             	.L2:
+  44:../aw/Source/APPW_MainTask.c ****       APPW_Exec();
+  41                             		.loc 1 44 12 is_stmt 0 view .LVU7
+  42 002e 05 00 00 00             		bsr	_GUI_Exec1
+  43                             	.LVL7:
+  44:../aw/Source/APPW_MainTask.c ****       APPW_Exec();
+  44                             		.loc 1 44 11 view .LVU8
+  45 0032 61 01                   		cmp	#0, r1
+  46 0034 20 F0                   		beq	.L5
+  45:../aw/Source/APPW_MainTask.c ****     }
+  47                             		.loc 1 45 7 is_stmt 1 view .LVU9
+  48 0036 05 00 00 00             		bsr	_APPW_Exec
+  49                             	.LVL8:
+  50 003a 2E F4                   		bra	.L2
+  51                             	.LFE0:
+  79                             	.Letext0:
+  80                             		.file 2 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\lib\\gcc\\rx-
+  81                             		.file 3 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/LCD
+  82                             		.file 4 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/GUI
+  83                             		.file 5 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/GUI
+  84                             		.file 6 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/WM.
+  85                             		.file 7 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/WID
+  86                             		.file 8 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/KEY
+  87                             		.file 9 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/LCD
+  88                             		.file 10 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/GU
+  89                             		.file 11 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/WM
+  90                             		.file 12 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/BU
+  91                             		.file 13 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/WI
+  92                             		.file 14 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/IM
+  93                             		.file 15 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/TE
+  94                             		.file 16 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/SL
+  95                             		.file 17 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/RO
+  96                             		.file 18 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/SW
+  97                             		.file 19 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/ED
+  98                             		.file 20 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/QR
+  99                             		.file 21 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/GA
+ 100                             		.file 22 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/KE
+ 101                             		.file 23 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/MU
+ 102                             		.file 24 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/SC
+ 103                             		.file 25 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/DR
+ 104                             		.file 26 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/LI
+ 105                             		.file 27 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/LI
+ 106                             		.file 28 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/WH
+ 107                             		.file 29 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/Ap
+ 108                             		.file 30 "../aw/Source/Generated/Resource.h"

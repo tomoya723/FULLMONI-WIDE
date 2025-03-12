@@ -1,0 +1,66 @@
+   1                             		.file	"Resource.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.Resource_C,"ax",@progbits
+   5                             		.global	_Resource_C
+   7                             	_Resource_C:
+   8                             	.LFB0:
+   9                             		.file 1 "../aw/Source/Generated/Resource.c"
+   1:../aw/Source/Generated/Resource.c **** /*********************************************************************
+   2:../aw/Source/Generated/Resource.c **** *                     SEGGER Microcontroller GmbH                    *
+   3:../aw/Source/Generated/Resource.c **** *        Solutions for real time microcontroller applications        *
+   4:../aw/Source/Generated/Resource.c **** **********************************************************************
+   5:../aw/Source/Generated/Resource.c **** *                                                                    *
+   6:../aw/Source/Generated/Resource.c **** *        (c) 1996 - 2025  SEGGER Microcontroller GmbH                *
+   7:../aw/Source/Generated/Resource.c **** *                                                                    *
+   8:../aw/Source/Generated/Resource.c **** *        Internet: www.segger.com    Support:  support@segger.com    *
+   9:../aw/Source/Generated/Resource.c **** *                                                                    *
+  10:../aw/Source/Generated/Resource.c **** **********************************************************************
+  11:../aw/Source/Generated/Resource.c **** ----------------------------------------------------------------------
+  12:../aw/Source/Generated/Resource.c **** File        : Resource.c
+  13:../aw/Source/Generated/Resource.c **** Purpose     : Generated file do NOT edit!
+  14:../aw/Source/Generated/Resource.c **** ---------------------------END-OF-HEADER------------------------------
+  15:../aw/Source/Generated/Resource.c **** */
+  16:../aw/Source/Generated/Resource.c **** 
+  17:../aw/Source/Generated/Resource.c **** #include "Resource.h"
+  18:../aw/Source/Generated/Resource.c **** 
+  19:../aw/Source/Generated/Resource.c **** //
+  20:../aw/Source/Generated/Resource.c **** // Avoid problems with empty object modules
+  21:../aw/Source/Generated/Resource.c **** //
+  22:../aw/Source/Generated/Resource.c **** void Resource_C(void);
+  23:../aw/Source/Generated/Resource.c **** void Resource_C(void) {}
+  10                             		.loc 1 23 23 view -0
+  11                             		.loc 1 23 24 view .LVU1
+  12                             		.loc 1 23 1 is_stmt 0 view .LVU2
+  13 0000 02                      		rts
+  14                             	.LFE0:
+  42                             	.Letext0:
+  43                             		.file 2 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\lib\\gcc\\rx-
+  44                             		.file 3 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/LCD
+  45                             		.file 4 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/GUI
+  46                             		.file 5 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/GUI
+  47                             		.file 6 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/WM.
+  48                             		.file 7 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/WID
+  49                             		.file 8 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/KEY
+  50                             		.file 9 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/LCD
+  51                             		.file 10 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/GU
+  52                             		.file 11 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/WM
+  53                             		.file 12 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/BU
+  54                             		.file 13 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/WI
+  55                             		.file 14 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/IM
+  56                             		.file 15 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/TE
+  57                             		.file 16 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/SL
+  58                             		.file 17 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/RO
+  59                             		.file 18 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/SW
+  60                             		.file 19 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/ED
+  61                             		.file 20 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/QR
+  62                             		.file 21 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/GA
+  63                             		.file 22 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/KE
+  64                             		.file 23 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/MU
+  65                             		.file 24 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/SC
+  66                             		.file 25 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/DR
+  67                             		.file 26 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/LI
+  68                             		.file 27 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/LI
+  69                             		.file 28 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/WH
+  70                             		.file 29 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/Ap
+  71                             		.file 30 "../aw/Source/Generated/Resource.h"

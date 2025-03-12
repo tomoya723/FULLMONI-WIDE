@@ -1,0 +1,79 @@
+   1                             		.file	"dave_base.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.d1_getversionstring,"ax",@progbits
+   5                             		.global	_d1_getversionstring
+   7                             	_d1_getversionstring:
+   8                             	.LFB0:
+   9                             		.file 1 "../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c"
+   1:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** //--------------------------------------------------------------------------
+   2:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** // Project: D/AVE
+   3:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** // File:    dave_base.c (%version: 2 %)
+   4:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** //          created Mon Aug 22 12:46:12 2005 by hh04027
+   5:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** //
+   6:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** // Description:
+   7:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** //  %date_modified: Wed Aug 31 14:06:47 2005 %  (%derived_by:  hh04027 %)
+   8:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** //
+   9:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** //--------------------------------------------------------------------------
+  10:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** 
+  11:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** #include "dave_base.h"
+  12:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** 
+  13:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** //---------------------------------------------------------------------------
+  14:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** // These helper macros are used to stringify a given macro
+  15:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** #define D1_STR(s)           # s
+  16:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** #define D1_XSTR(s)          D1_STR(s)
+  17:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** 
+  18:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** // These helper macros are used to concat two strings with a dot.
+  19:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** #ifdef __CA850__
+  20:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** #define D1_DOT(a,b)         a.b
+  21:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** #else
+  22:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** #define D1_DOT(a,b)         a ## . ## b
+  23:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** #endif
+  24:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** #define D1_XDOT(a,b)        D1_DOT(a,b)
+  25:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** 
+  26:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** //---------------------------------------------------------------------------
+  27:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** // Define the D1_VERSION and D1_VERSION_STRING macros
+  28:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** 
+  29:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** // Build up the D1_VERSION macro 
+  30:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** #define D1_VERSION ((D1_VERSION_MAJOR << 16) | D1_VERSION_MINOR )    
+  31:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** 
+  32:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** // Create the D1_VERSION_STRING macro
+  33:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** #define D1_VERSION_STRING  D1_XSTR( D1_XDOT( D1_VERSION_MAJOR, D1_VERSION_MINOR) )
+  34:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** 
+  35:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** //--------------------------------------------------------------------------
+  36:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** 
+  37:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** static const char g_versionid[] = "V" D1_VERSION_STRING;
+  38:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** 
+  39:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** //--------------------------------------------------------------------------
+  40:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** //
+  41:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** const char * d1_getversionstring()
+  42:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** {
+  10                             		.loc 1 42 1 view -0
+  43:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c ****     return g_versionid;
+  11                             		.loc 1 43 5 view .LVU1
+  44:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** }
+  12                             		.loc 1 44 1 is_stmt 0 view .LVU2
+  13 0000 FB 12 00 00 00 00       		mov.L	#_g_versionid, r1
+  14 0006 02                      		rts
+  15                             	.LFE0:
+  17                             		.section	.text.d1_getversion,"ax",@progbits
+  18                             		.global	_d1_getversion
+  20                             	_d1_getversion:
+  21                             	.LFB1:
+  45:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** 
+  46:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** //--------------------------------------------------------------------------
+  47:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** //
+  48:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** int d1_getversion()
+  49:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** {
+  22                             		.loc 1 49 1 is_stmt 1 view -0
+  50:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c ****     return D1_VERSION;
+  23                             		.loc 1 50 5 view .LVU4
+  51:../src/smc_gen/r_drw2d_rx/src/tes/dave_base.c **** }
+  24                             		.loc 1 51 1 is_stmt 0 view .LVU5
+  25 0000 FB 1E 04 00 01          		mov.L	#0x10004, r1
+  26 0005 02                      		rts
+  27                             	.LFE1:
+  29                             		.section	.rodata.g_versionid,"a"
+  32                             	_g_versionid:
+  33 0000 56 31 2E 34 00          		.string	"V1.4"
+  68                             	.Letext0:

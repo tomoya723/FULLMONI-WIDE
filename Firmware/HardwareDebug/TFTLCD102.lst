@@ -1,0 +1,170 @@
+   1                             		.file	"TFTLCD102.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.LCD_FadeIN,"ax",@progbits
+   5                             		.global	_LCD_FadeIN
+   7                             	_LCD_FadeIN:
+   8                             	.LFB3:
+   9                             		.file 1 "../src/TFTLCD102.c"
+   1:../src/TFTLCD102.c **** /*
+   2:../src/TFTLCD102.c ****  * TFTLCD102.c
+   3:../src/TFTLCD102.c ****  *
+   4:../src/TFTLCD102.c ****  *  Created on: 2021/06/20
+   5:../src/TFTLCD102.c ****  *      Author: tomoya723
+   6:../src/TFTLCD102.c ****  */
+   7:../src/TFTLCD102.c **** #include "r_smc_entry.h"
+   8:../src/TFTLCD102.c **** #include "TFTLCD102.h"
+   9:../src/TFTLCD102.c **** 
+  10:../src/TFTLCD102.c **** // --------------------------------------------------------------------
+  11:../src/TFTLCD102.c **** // TFT LCD FadeIN
+  12:../src/TFTLCD102.c **** // --------------------------------------------------------------------
+  13:../src/TFTLCD102.c **** void LCD_FadeIN(void)
+  14:../src/TFTLCD102.c **** {
+  10                             		.loc 1 14 1 view -0
+  15:../src/TFTLCD102.c **** 	static int y, z;
+  11                             		.loc 1 15 2 view .LVU1
+  16:../src/TFTLCD102.c **** 
+  17:../src/TFTLCD102.c **** 	for(z = 0; z <= 2999; z ++ )			// duty 0→100%
+  12                             		.loc 1 17 2 view .LVU2
+  13                             		.loc 1 17 8 is_stmt 0 view .LVU3
+  14 0000 FB 52 00 00 00 00       		mov.L	#_z.25354, r5
+  15 0006 F8 56 00                		mov.L	#0, [r5]
+  16                             		.loc 1 17 2 view .LVU4
+  17 0009 2E 0C                   		bra	.L2
+  18                             	.L7:
+  19                             		.loc 1 17 26 discriminator 2 view .LVU5
+  20 000b 62 13                   		add	#1, r3
+  21 000d FB 52 00 00 00 00       		mov.L	#_z.25354, r5
+  22 0013 E3 53                   		mov.L	r3, [r5]
+  23                             	.L2:
+  24                             		.loc 1 17 15 discriminator 1 view .LVU6
+  25 0015 FB 52 00 00 00 00       		mov.L	#_z.25354, r5
+  26 001b EC 53                   		mov.L	[r5], r3
+  27                             		.loc 1 17 2 discriminator 1 view .LVU7
+  28 001d 76 03 B7 0B             		cmp	#0xbb7, r3
+  29 0021 2A 2C                   		bgt	.L6
+  18:../src/TFTLCD102.c **** 	{
+  19:../src/TFTLCD102.c **** 		for(y = 0; y <= 500; y ++ )
+  30                             		.loc 1 19 3 is_stmt 1 view .LVU8
+  31                             		.loc 1 19 9 is_stmt 0 view .LVU9
+  32 0023 FB 52 00 00 00 00       		mov.L	#_y.25353, r5
+  33 0029 F8 56 00                		mov.L	#0, [r5]
+  34                             	.L3:
+  35                             		.loc 1 19 16 discriminator 1 view .LVU10
+  36 002c FB 52 00 00 00 00       		mov.L	#_y.25353, r5
+  37 0032 EC 55                   		mov.L	[r5], r5
+  38                             		.loc 1 19 3 discriminator 1 view .LVU11
+  39 0034 76 05 F4 01             		cmp	#0x1f4, r5
+  40 0038 2A D3                   		bgt	.L7
+  20:../src/TFTLCD102.c **** 		{
+  21:../src/TFTLCD102.c **** 			MTU3.TGRD = z & 0xFFFF;
+  41                             		.loc 1 21 4 is_stmt 1 discriminator 3 view .LVU12
+  42                             		.loc 1 21 14 is_stmt 0 discriminator 3 view .LVU13
+  43 003a FB 4E 00 12 0C          		mov.L	#0xc1200, r4
+  44 003f 94 CB                   		mov.W	r3, 38[r4]
+  19:../src/TFTLCD102.c **** 		{
+  45                             		.loc 1 19 26 discriminator 3 view .LVU14
+  46 0041 62 15                   		add	#1, r5
+  47 0043 FB 42 00 00 00 00       		mov.L	#_y.25353, r4
+  48 0049 E3 45                   		mov.L	r5, [r4]
+  49 004b 2E E1                   		bra	.L3
+  50                             	.L6:
+  22:../src/TFTLCD102.c **** 		}
+  23:../src/TFTLCD102.c **** 	}
+  24:../src/TFTLCD102.c **** }
+  51                             		.loc 1 24 1 view .LVU15
+  52 004d 02                      		rts
+  53                             	.LFE3:
+  55                             		.section	.text.LCD_FadeOUT,"ax",@progbits
+  56                             		.global	_LCD_FadeOUT
+  58                             	_LCD_FadeOUT:
+  59                             	.LFB4:
+  25:../src/TFTLCD102.c **** 
+  26:../src/TFTLCD102.c **** // --------------------------------------------------------------------
+  27:../src/TFTLCD102.c **** // TFT LCD FadeOUT
+  28:../src/TFTLCD102.c **** // --------------------------------------------------------------------
+  29:../src/TFTLCD102.c **** void LCD_FadeOUT(void)
+  30:../src/TFTLCD102.c **** {
+  60                             		.loc 1 30 1 is_stmt 1 view -0
+  31:../src/TFTLCD102.c **** 	static int y, z;
+  61                             		.loc 1 31 2 view .LVU17
+  32:../src/TFTLCD102.c **** 
+  33:../src/TFTLCD102.c **** 	for(z = 2999; z >= 0; z -- )			// duty 0→100%
+  62                             		.loc 1 33 2 view .LVU18
+  63                             		.loc 1 33 8 is_stmt 0 view .LVU19
+  64 0000 FB 52 00 00 00 00       		mov.L	#_z.25365, r5
+  65 0006 F8 5A B7 0B             		mov.L	#0xbb7, [r5]
+  66                             		.loc 1 33 2 view .LVU20
+  67 000a 2E 0C                   		bra	.L9
+  68                             	.L14:
+  69                             		.loc 1 33 26 discriminator 2 view .LVU21
+  70 000c 60 13                   		sub	#1, r3
+  71 000e FB 52 00 00 00 00       		mov.L	#_z.25365, r5
+  72 0014 E3 53                   		mov.L	r3, [r5]
+  73                             	.L9:
+  74                             		.loc 1 33 18 discriminator 1 view .LVU22
+  75 0016 FB 52 00 00 00 00       		mov.L	#_z.25365, r5
+  76 001c EC 53                   		mov.L	[r5], r3
+  77                             		.loc 1 33 2 discriminator 1 view .LVU23
+  78 001e 61 03                   		cmp	#0, r3
+  79 0020 29 2C                   		blt	.L13
+  34:../src/TFTLCD102.c **** 	{
+  35:../src/TFTLCD102.c **** 		for(y = 0; y <= 500; y ++ )
+  80                             		.loc 1 35 3 is_stmt 1 view .LVU24
+  81                             		.loc 1 35 9 is_stmt 0 view .LVU25
+  82 0022 FB 52 00 00 00 00       		mov.L	#_y.25364, r5
+  83 0028 F8 56 00                		mov.L	#0, [r5]
+  84                             	.L10:
+  85                             		.loc 1 35 16 discriminator 1 view .LVU26
+  86 002b FB 52 00 00 00 00       		mov.L	#_y.25364, r5
+  87 0031 EC 55                   		mov.L	[r5], r5
+  88                             		.loc 1 35 3 discriminator 1 view .LVU27
+  89 0033 76 05 F4 01             		cmp	#0x1f4, r5
+  90 0037 2A D5                   		bgt	.L14
+  36:../src/TFTLCD102.c **** 		{
+  37:../src/TFTLCD102.c **** 			MTU3.TGRD = z & 0xFFFF;
+  91                             		.loc 1 37 4 is_stmt 1 discriminator 3 view .LVU28
+  92                             		.loc 1 37 14 is_stmt 0 discriminator 3 view .LVU29
+  93 0039 FB 4E 00 12 0C          		mov.L	#0xc1200, r4
+  94 003e 94 CB                   		mov.W	r3, 38[r4]
+  35:../src/TFTLCD102.c **** 		{
+  95                             		.loc 1 35 26 discriminator 3 view .LVU30
+  96 0040 62 15                   		add	#1, r5
+  97 0042 FB 42 00 00 00 00       		mov.L	#_y.25364, r4
+  98 0048 E3 45                   		mov.L	r5, [r4]
+  99 004a 2E E1                   		bra	.L10
+ 100                             	.L13:
+  38:../src/TFTLCD102.c **** 		}
+  39:../src/TFTLCD102.c **** 	}
+  40:../src/TFTLCD102.c **** }
+ 101                             		.loc 1 40 1 view .LVU31
+ 102 004c 02                      		rts
+ 103                             	.LFE4:
+ 105                             		.section	.bss.y.25364,"aw",@nobits
+ 106                             		.balign 4
+ 109                             	_y.25364:
+ 110 0000 00 00 00 00             		.zero	4
+ 111                             		.section	.bss.z.25365,"aw",@nobits
+ 112                             		.balign 4
+ 115                             	_z.25365:
+ 116 0000 00 00 00 00             		.zero	4
+ 117                             		.section	.bss.y.25353,"aw",@nobits
+ 118                             		.balign 4
+ 121                             	_y.25353:
+ 122 0000 00 00 00 00             		.zero	4
+ 123                             		.section	.bss.z.25354,"aw",@nobits
+ 124                             		.balign 4
+ 127                             	_z.25354:
+ 128 0000 00 00 00 00             		.zero	4
+ 163                             	.Letext0:
+ 164                             		.file 2 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 165                             		.file 3 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 166                             		.file 4 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\lib\\gcc\\rx-
+ 167                             		.file 5 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 168                             		.file 6 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 169                             		.file 7 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 170                             		.file 8 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/all/r_rx_compi
+ 171                             		.file 9 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/rx72n/register
+ 172                             		.file 10 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/rx72n/mcu_loc
+ 173                             		.file 11 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\Config_MTU0/Config_MTU0
+ 174                             		.file 12 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\Config_MTU8/Config_MTU8

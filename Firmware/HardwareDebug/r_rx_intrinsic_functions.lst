@@ -1,0 +1,2145 @@
+   1                             		.file	"r_rx_intrinsic_functions.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.bsp_get_bpsw,"ax",@progbits
+   6                             	_bsp_get_bpsw:
+   7                             	.LVL0:
+   8                             	.LFB21:
+   9                             		.file 1 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c"
+   1:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+   2:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * DISCLAIMER
+   3:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * This software is supplied by Renesas Electronics Corporation and is only intended for use with Re
+   4:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * other uses are authorized. This software is owned by Renesas Electronics Corporation and is prote
+   5:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * applicable laws, including copyright laws.
+   6:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+   7:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF 
+   8:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIM
+   9:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AF
+  10:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY RE
+  11:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+  12:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Renesas reserves the right, without notice, to make changes to this software and to discontinue t
+  13:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * this software. By using this software, you agree to the additional terms and conditions found by 
+  14:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * following link:
+  15:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * http://www.renesas.com/disclaimer
+  16:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *
+  17:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Copyright (C) 2019 Renesas Electronics Corporation. All rights reserved.
+  18:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+  19:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+  20:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * File Name    : r_rx_intrinsic_functions.c
+  21:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Defines built-in functions that are in CCRX but not in the GCC and IAR compiler.
+  22:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+  23:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+  24:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * History : DD.MM.YYYY Version  Description
+  25:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *         : 28.02.2019 1.00     First Release
+  26:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *         : 26.07.2019 1.01     Fixed the below functions.
+  27:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - R_BSP_MulAndAccOperation_2byte
+  28:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - R_BSP_MulAndAccOperation_FixedPoint1
+  29:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - R_BSP_MulAndAccOperation_FixedPoint2
+  30:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               Added the below functions.
+  31:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - R_BSP_CalcSine_Cosine
+  32:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - R_BSP_CalcAtan_SquareRoot
+  33:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *         : 31.07.2019 1.02     Modified the compile condition of the below functions.
+  34:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - R_BSP_InitTFU
+  35:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - R_BSP_CalcSine_Cosine
+  36:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - R_BSP_CalcAtan_SquareRoot
+  37:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *         : 10.12.2019 1.03     Fixed the below functions.
+  38:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - R_BSP_MulAndAccOperation_2byte
+  39:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - R_BSP_MulAndAccOperation_FixedPoint1
+  40:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - R_BSP_MulAndAccOperation_FixedPoint2
+  41:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *         : 17.12.2019 1.04     Modified the comment of description.
+  42:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *         : 28.02.2023 1.05     Added the below functions.
+  43:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - R_BSP_CalcSine_Cosine_Fpn
+  44:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - R_BSP_CalcSine_Fpn
+  45:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - R_BSP_CalcCosine_Fpn
+  46:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - R_BSP_CalcAtan_SquareRoot_Fpn
+  47:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - R_BSP_CalcAtan_Fpn
+  48:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - R_BSP_CalcSquareRoot_Fpn
+  49:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - bsp_calc_sine_fsp
+  50:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - bsp_calc_cosine_fsp
+  51:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - bsp_calc_atan_fsp
+  52:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                               - bsp_calc_squareroot_fsp
+  53:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+  54:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+  55:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+  56:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** Includes   <System Includes> , "Project Includes"
+  57:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+  58:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #include "r_rx_compiler.h"
+  59:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #include "r_rx_intrinsic_functions.h"
+  60:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+  61:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+  62:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** Macro definitions
+  63:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+  64:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+  65:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+  66:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** Typedef definitions
+  67:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+  68:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+  69:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+  70:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** Exported global variables (to be accessed by other files)
+  71:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+  72:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+  73:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+  74:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** Private global variables and functions
+  75:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+  76:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_ATTRIB_STATIC_INLINE_ASM void bsp_get_bpsw(uint32_t *data);
+  77:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_ATTRIB_STATIC_INLINE_ASM void bsp_get_bpc(uint32_t *data);
+  78:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #ifdef BSP_MCU_EXCEPTION_TABLE
+  79:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_ATTRIB_STATIC_INLINE_ASM void bsp_get_extb(uint32_t *data);
+  80:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* BSP_MCU_EXCEPTION_TABLE */
+  81:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_ATTRIB_STATIC_INLINE_ASM void bsp_move_from_acc_hi_long(uint32_t *data);
+  82:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_ATTRIB_STATIC_INLINE_ASM void bsp_move_from_acc_mi_long(uint32_t *data);
+  83:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #ifdef BSP_MCU_DOUBLE_PRECISION_FLOATING_POINT
+  84:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #ifdef __DPFPU
+  85:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_ATTRIB_STATIC_INLINE_ASM void bsp_get_dpsw(uint32_t *data);
+  86:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_ATTRIB_STATIC_INLINE_ASM void bsp_get_decnt(uint32_t *data);
+  87:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_ATTRIB_STATIC_INLINE_ASM void bsp_get_depc(uint32_t *ret);
+  88:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* __DPFPU */
+  89:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* BSP_MCU_DOUBLE_PRECISION_FLOATING_POINT */
+  90:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #ifdef BSP_MCU_TRIGONOMETRIC
+  91:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #ifdef __TFU
+  92:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if BSP_MCU_TFU_VERSION == 2
+  93:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_ATTRIB_STATIC_INLINE_ASM void bsp_calc_sine_fsp(int32_t *ret, int32_t fx);
+  94:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_ATTRIB_STATIC_INLINE_ASM void bsp_calc_cosine_fsp(int32_t *ret, int32_t fx);
+  95:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_ATTRIB_STATIC_INLINE_ASM void bsp_calc_atan_fsp(int32_t *ret, int32_t y, int32_t x);
+  96:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_ATTRIB_STATIC_INLINE_ASM void bsp_calc_squareroot_fsp(int32_t *ret, int32_t y, int32_t x);
+  97:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* BSP_MCU_TFU_VERSION == 2 */
+  98:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* __TFU */
+  99:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* BSP_MCU_TRIGONOMETRIC */
+ 100:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 101:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 102:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_Max
+ 103:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Selects the greater of two input values.
+ 104:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data1 - Input value 1.
+ 105:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                data2 - Input value 2.
+ 106:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : The greater value of data1 and data2.
+ 107:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 108:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if defined(__GNUC__)
+ 109:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** signed long R_BSP_Max(signed long data1, signed long data2)
+ 110:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 111:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return (data1 > data2)? data1 : data2;
+ 112:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 113:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 114:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 115:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 116:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_Min
+ 117:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Selects the smaller of two input values.
+ 118:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data1 - Input value 1.
+ 119:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                data2 - Input value 2.
+ 120:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : The smaller value of data1 and data2.
+ 121:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 122:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if defined(__GNUC__)
+ 123:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** signed long R_BSP_Min(signed long data1, signed long data2)
+ 124:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 125:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return (data1 < data2)? data1 : data2;
+ 126:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 127:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 128:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 129:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 130:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_MulAndAccOperation_B
+ 131:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Performs a multiply-and-accumulate operation with the initial value specified by i
+ 132:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                multiply-and-accumulate operations specified by count, and the start addresses of 
+ 133:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                multiplied specified by addr1 and addr2.
+ 134:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : init   - Initial value.
+ 135:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                count  - Count of multiply-and-accumulate operations.
+ 136:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                *addr1 - Start address of values 1 to be multiplied.
+ 137:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                *addr2 - Start address of values 2 to be multiplied.
+ 138:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : result - Lower 64 bits of the init + S(data1[n] * data2[n]) result. (n=0, 1, ..., 
+ 139:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 140:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if defined(__GNUC__)
+ 141:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** long long R_BSP_MulAndAccOperation_B(long long init, unsigned long count, signed char *addr1, signe
+ 142:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 143:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     long long result = init;
+ 144:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     unsigned long index;
+ 145:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     for(index = 0; index < count; index++)
+ 146:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 147:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         result += addr1[index] * addr2[index];
+ 148:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 149:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return result;
+ 150:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 151:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 152:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 153:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 154:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_MulAndAccOperation_W
+ 155:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Performs a multiply-and-accumulate operation with the initial value specified by i
+ 156:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                multiply-and-accumulate operations specified by count, and the start addresses of 
+ 157:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                multiplied specified by addr1 and addr2.
+ 158:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : init   - Initial value.
+ 159:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                count  - Count of multiply-and-accumulate operations.
+ 160:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                *addr1 - Start address of values 1 to be multiplied.
+ 161:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                *addr2 - Start address of values 2 to be multiplied.
+ 162:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : result - Lower 64 bits of the init + S(data1[n] * data2[n]) result. (n=0, 1, ..., 
+ 163:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 164:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if defined(__GNUC__)
+ 165:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** long long R_BSP_MulAndAccOperation_W(long long init, unsigned long count, short *addr1, short *addr
+ 166:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 167:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     long long result = init;
+ 168:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     unsigned long index;
+ 169:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     for(index = 0; index < count; index++)
+ 170:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 171:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         result += addr1[index] * addr2[index];
+ 172:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 173:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return result;
+ 174:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 175:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 176:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 177:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 178:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_MulAndAccOperation_L
+ 179:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Performs a multiply-and-accumulate operation with the initial value specified by i
+ 180:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                multiply-and-accumulate operations specified by count, and the start addresses of 
+ 181:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                multiplied specified by addr1 and addr2.
+ 182:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : init   - Initial value.
+ 183:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                count  - Count of multiply-and-accumulate operations.
+ 184:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                *addr1 - Start address of values 1 to be multiplied.
+ 185:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                *addr2 - Start address of values 2 to be multiplied.
+ 186:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : result - Lower 64 bits of the init + S(data1[n] * data2[n]) result. (n=0, 1, ..., 
+ 187:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 188:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if defined(__GNUC__)
+ 189:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** long long R_BSP_MulAndAccOperation_L(long long init, unsigned long count, long *addr1, long *addr2)
+ 190:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 191:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     long long result = init;
+ 192:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     unsigned long index;
+ 193:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     for(index = 0; index < count; index++)
+ 194:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 195:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         result += addr1[index] * addr2[index];
+ 196:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 197:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return result;
+ 198:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 199:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 200:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 201:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 202:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_RotateLeftWithCarry
+ 203:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Rotates data including the C flag to left by one bit. 
+ 204:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                The bit pushed out of the operand is set to the C flag.
+ 205:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data - Data to be rotated to left.
+ 206:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : data - Result of 1-bit left rotation of data including the C flag.
+ 207:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 208:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if defined(__GNUC__)
+ 209:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** unsigned long R_BSP_RotateLeftWithCarry(unsigned long data)
+ 210:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 211:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __asm("rolc %0":"=r"(data) : "r"(data):); 
+ 212:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return data;
+ 213:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 214:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 215:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 216:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 217:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_RotateRightWithCarry
+ 218:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Rotates data including the C flag to right by one bit.
+ 219:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                The bit pushed out of the operand is set to the C flag.
+ 220:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data - Data to be rotated to right.
+ 221:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : data - Result of 1-bit right rotation of data including the C flag.
+ 222:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 223:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if defined(__GNUC__)
+ 224:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** unsigned long R_BSP_RotateRightWithCarry(unsigned long data)
+ 225:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 226:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __asm("rorc %0":"=r"(data) : "r"(data):);
+ 227:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return data;
+ 228:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 229:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 230:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 231:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 232:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_RotateLeft
+ 233:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Rotates data to left by the specified number of bits.
+ 234:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                The bit pushed out of the operand is set to the C flag.
+ 235:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data - Data to be rotated to left.
+ 236:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                num - Number of bits to be rotated.
+ 237:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : data - Result of num-bit left rotation of data.
+ 238:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 239:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if defined(__GNUC__)
+ 240:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** unsigned long R_BSP_RotateLeft(unsigned long data, unsigned long num)
+ 241:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 242:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __asm("rotl %1, %0":"=r"(data) : "r"(num),"0"(data) :); 
+ 243:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return data;
+ 244:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 245:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 246:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 247:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 248:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_RotateRight
+ 249:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Rotates data to right by the specified number of bits.
+ 250:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                The bit pushed out of the operand is set to the C flag.
+ 251:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data - Data to be rotated to right.
+ 252:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                num - Number of bits to be rotated.
+ 253:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : result - Result of num-bit right rotation of data.
+ 254:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 255:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if defined(__GNUC__)
+ 256:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** unsigned long R_BSP_RotateRight(unsigned long data, unsigned long num)
+ 257:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 258:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __asm("rotr %1, %0":"=r"(data) : "r"(num),"0"(data) :); 
+ 259:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return data;
+ 260:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 261:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 262:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 263:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 264:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_SignedMultiplication
+ 265:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Performs signed multiplication of significant 64 bits.
+ 266:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data 1 - Input value 1.
+ 267:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                data 2 - Input value 2.
+ 268:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : Result of signed multiplication. (signed 64-bit value)
+ 269:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 270:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if defined(__GNUC__) || defined(__ICCRX__)
+ 271:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** signed long long R_BSP_SignedMultiplication(signed long data1, signed long data2)
+ 272:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 273:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return ((signed long long)data1) * ((signed long long)data2);
+ 274:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 275:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) || defined(__ICCRX__)  */
+ 276:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 277:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 278:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_UnsignedMultiplication
+ 279:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Performs unsigned multiplication of significant 64 bits.
+ 280:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data 1 - Input value 1.
+ 281:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                data 2 - Input value 2.
+ 282:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : Result of unsigned multiplication. (unsigned 64-bit value)
+ 283:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 284:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if defined(__GNUC__) || defined(__ICCRX__)
+ 285:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** unsigned long long R_BSP_UnsignedMultiplication(unsigned long data1, unsigned long data2)
+ 286:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 287:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return ((unsigned long long)data1) * ((unsigned long long)data2);
+ 288:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 289:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) || defined(__ICCRX__)  */
+ 290:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 291:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 292:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function name: R_BSP_ChangeToUserMode
+ 293:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Switches to user mode. The PSW will be changed as following.
+ 294:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                Before Execution                                       After Execution
+ 295:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                PSW.PM                 PSW.U                           PSW.PM              PSW.U
+ 296:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                0 (supervisor mode)    0 (interrupt stack)     -->     1 (user mode)       1 (user
+ 297:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                0 (supervisor mode)    1 (user stack)          -->     1 (user mode)       1 (user
+ 298:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                1 (user mode)          1 (user stack)          -->     NO CHANGE
+ 299:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                1 (user mode)          0 (interrupt stack))    <==     N/A
+ 300:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : none
+ 301:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return value : none
+ 302:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 303:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_INLINE_ASM(R_BSP_ChangeToUserMode)
+ 304:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void R_BSP_ChangeToUserMode(void)
+ 305:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 306:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+ 307:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(;_R_BSP_Change_PSW_PM_to_UserMode:                                                   
+ 308:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    PUSH.L  R1          ; push the R1 value                                          
+ 309:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVFC    PSW, R1     ; get the current PSW value                                  
+ 310:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    BTST    #20, R1     ; check PSW.PM                                               
+ 311:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    BNE.B   R_BSP_ASM_LAB_NEXT(0);_psw_pm_is_user_mode                               
+ 312:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(;_psw_pm_is_supervisor_mode:                                                         
+ 313:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    BSET    #20, R1     ; change PM = 0(Supervisor Mode) --> 1(User Mode)            
+ 314:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    PUSH.L  R2          ; push the R2 value                                          
+ 315:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.L   R0, R2      ; move the current SP value to the R2 value                  
+ 316:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    XCHG    8[R2].L, R1 ; exchange the value of R2 destination address and the R1 val
+ 317:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(                        ; (exchange the return address value of caller and the PSW va
+ 318:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    XCHG    4[R2].L, R1 ; exchange the value of R2 destination address and the R1 val
+ 319:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(                        ; (exchange the R1 value of stack and the return address valu
+ 320:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    POP     R2          ; pop the R2 value of stack                                  
+ 321:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    RTE                                                                              
+ 322:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_LAB(0:;_psw_pm_is_user_mode:                                                         
+ 323:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    POP     R1          ; pop the R1 value of stack                                  
+ 324:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    ;RTS                                                                             
+ 325:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 326:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_ChangeToUserMode() */
+ 327:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 328:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 329:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_SetACC
+ 330:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Sets a value to ACC.
+ 331:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data - Value to be set to ACC.
+ 332:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 333:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 334:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if defined(__GNUC__) || defined(__ICCRX__)
+ 335:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void R_BSP_SetACC(signed long long data)
+ 336:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 337:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if defined(__GNUC__)
+ 338:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __builtin_rx_mvtachi(data >> 32);
+ 339:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __builtin_rx_mvtaclo(data & 0xFFFFFFFF);
+ 340:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #elif defined(__ICCRX__)
+ 341:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     int32_t data_hi;
+ 342:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     int32_t data_lo;
+ 343:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 344:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     data_hi = (int32_t)(data >> 32);
+ 345:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     data_lo = (int32_t)(data & 0x00000000FFFFFFFF);
+ 346:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 347:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_MoveToAccHiLong(data_hi);
+ 348:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_MoveToAccLoLong(data_lo);
+ 349:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) || defined(__ICCRX__)  */
+ 350:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 351:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) || defined(__ICCRX__)  */
+ 352:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 353:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 354:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_GetACC
+ 355:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Refers to the ACC value.
+ 356:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : none
+ 357:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : result - ACC value.
+ 358:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 359:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if defined(__GNUC__) || defined(__ICCRX__)
+ 360:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** signed long long R_BSP_GetACC(void)
+ 361:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 362:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if defined(__GNUC__)
+ 363:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     signed long long result = ((signed long long)__builtin_rx_mvfachi()) << 32;
+ 364:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     result |= (((signed long long)__builtin_rx_mvfacmi()) << 16) & 0xFFFF0000;
+ 365:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return result;
+ 366:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #elif defined(__ICCRX__)
+ 367:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     int64_t result;
+ 368:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 369:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     result = ((int64_t)R_BSP_MoveFromAccHiLong()) << 32;
+ 370:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     result |= (((int64_t)R_BSP_MoveFromAccMiLong()) << 16) & 0xFFFF0000;
+ 371:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 372:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return result;
+ 373:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) || defined(__ICCRX__)  */
+ 374:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 375:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) || defined(__ICCRX__)  */
+ 376:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 377:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 378:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_MulAndAccOperation_2byte
+ 379:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Performs a multiply-and-accumulate operation between data of two bytes each and re
+ 380:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                four bytes. The multiply-and-accumulate operation is executed with DSP functional 
+ 381:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                MACLO, and MACHI). Data in the middle of the multiply-and-accumulate operation is 
+ 382:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                48-bit data. After all multiply-and-accumulate operations have finished, the conte
+ 383:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                fetched by the MVFACMI instruction and used as the return value of the intrinsic f
+ 384:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data1 - Start address of values 1 to be multiplied.
+ 385:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                data2 - Start address of values 2 to be multiplied.
+ 386:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                count - Count of multiply-and-accumulate operations.
+ 387:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : S(data1[n] * data2[n]) result.
+ 388:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 389:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if defined(__GNUC__)
+ 390:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** long R_BSP_MulAndAccOperation_2byte(short* data1, short* data2, unsigned long count)
+ 391:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 392:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     register signed long *ldata1 = (signed long *)data1;
+ 393:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     register signed long *ldata2 = (signed long *)data2;
+ 394:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     /* this is much more then an "intrinsic", no inline asm because of loop */
+ 395:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     /* will implement this.. interesting function as described in ccrx manual */
+ 396:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __builtin_rx_mullo(0, 0);
+ 397:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     while (count > 1)
+ 398:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 399:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         __builtin_rx_maclo(*ldata1, *ldata2);
+ 400:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         __builtin_rx_machi(*ldata1, *ldata2);
+ 401:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         ldata1++;
+ 402:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         ldata2++;
+ 403:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         count -= 2;
+ 404:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 405:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     if (count != 0) __builtin_rx_maclo(*(short*)ldata1, *(short*)ldata2);
+ 406:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return __builtin_rx_mvfacmi();
+ 407:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 408:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 409:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 410:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 411:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_MulAndAccOperation_FixedPoint1
+ 412:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Performs a multiply-and-accumulate operation between data of two bytes each and re
+ 413:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                two bytes. The multiply-and-accumulate operation is executed with DSP functional i
+ 414:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                MACLO, and MACHI). Data in the middle of the multiply-and-accumulate operation is 
+ 415:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                48-bit data. After all multiply-and-accumulate operations have finished, rounding 
+ 416:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                multiply-and-accumulate operation result of ACC.
+ 417:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                The macw1 function performs rounding with the "RACW #1" instruction.
+ 418:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data1 - Start address of values 1 to be multiplied.
+ 419:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                data2 - Start address of values 2 to be multiplied.
+ 420:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                count - Count of multiply-and-accumulate operations.
+ 421:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : Value obtained by rounding the multiply-and-accumulate operation result with the R
+ 422:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 423:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if defined(__GNUC__)
+ 424:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** short R_BSP_MulAndAccOperation_FixedPoint1(short* data1, short* data2, unsigned long count)
+ 425:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 426:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     register signed long *ldata1 = (signed long *)data1;
+ 427:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     register signed long *ldata2 = (signed long *)data2;
+ 428:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     /* this is much more then an "intrinsic", no inline asm because of loop */
+ 429:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     /* will implement this.. interesting function as described in ccrx manual */
+ 430:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __builtin_rx_mullo(0, 0);
+ 431:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     while (count > 1)
+ 432:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 433:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         __builtin_rx_maclo(*ldata1, *ldata2);
+ 434:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         __builtin_rx_machi(*ldata1, *ldata2);
+ 435:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         ldata1++;
+ 436:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         ldata2++;
+ 437:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         count -= 2;
+ 438:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 439:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     if (count != 0) __builtin_rx_maclo(*(short*)ldata1, *(short*)ldata2);
+ 440:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __builtin_rx_racw(1);
+ 441:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return __builtin_rx_mvfachi();
+ 442:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 443:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 444:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 445:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 446:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_MulAndAccOperation_FixedPoint2
+ 447:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Performs a multiply-and-accumulate operation between data of two bytes each and re
+ 448:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                two bytes. The multiply-and-accumulate operation is executed with DSP functional i
+ 449:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                MACLO, and MACHI). Data in the middle of the multiply-and-accumulate operation is 
+ 450:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                48-bit data. After all multiply-and-accumulate operations have finished, rounding 
+ 451:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                multiply-and-accumulate operation result of ACC.
+ 452:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                the macw2 function performs rounding with the "RACW #2" instruction.
+ 453:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data1 - Start address of values 1 to be multiplied.
+ 454:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                data2 - Start address of values 2 to be multiplied.
+ 455:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                count - Count of multiply-and-accumulate operations.
+ 456:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : Value obtained by rounding the multiply-and-accumulate operation result with the R
+ 457:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 458:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if defined(__GNUC__)
+ 459:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** short R_BSP_MulAndAccOperation_FixedPoint2(short* data1, short* data2, unsigned long count)
+ 460:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 461:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     register signed long *ldata1 = (signed long *)data1;
+ 462:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     register signed long *ldata2 = (signed long *)data2;
+ 463:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     /* this is much more then an "intrinsic", no inline asm because of loop */
+ 464:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     /* will implement this.. interesting function as described in ccrx manual */
+ 465:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __builtin_rx_mullo(0, 0);
+ 466:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     while (count > 1)
+ 467:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 468:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         __builtin_rx_maclo(*ldata1, *ldata2);
+ 469:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         __builtin_rx_machi(*ldata1, *ldata2);
+ 470:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         ldata1++;
+ 471:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         ldata2++;
+ 472:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         count -= 2;
+ 473:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 474:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     if (count != 0) __builtin_rx_maclo(*(short*)ldata1, *(short*)ldata2);
+ 475:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __builtin_rx_racw(2);
+ 476:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return __builtin_rx_mvfachi();
+ 477:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 478:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 479:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 480:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 481:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_SetBPSW
+ 482:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Sets a value to BPSW.
+ 483:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data - Value to be set.
+ 484:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 485:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 486:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_INLINE_ASM(R_BSP_SetBPSW)
+ 487:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void R_BSP_SetBPSW(uint32_t data)
+ 488:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 489:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(data)
+ 490:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 491:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+ 492:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVTC    R1, BPSW    )
+ 493:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 494:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_SetBPSW() */
+ 495:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 496:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 497:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: bsp_get_bpsw
+ 498:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Refers to the BPSW value.
+ 499:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : ret - Return value address.
+ 500:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 501:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 502:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_STATIC_INLINE_ASM(bsp_get_bpsw)
+ 503:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void bsp_get_bpsw(uint32_t *ret)
+ 504:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+  10                             		.loc 1 504 1 view -0
+  11                             		; Note: Naked Function
+ 505:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(ret)
+  12                             		.loc 1 505 5 view .LVU1
+ 506:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 507:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+  13                             		.loc 1 507 5 view .LVU2
+  14                             	 ; 507 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+  15 0000 7E A2                   		PUSH.L R2
+  16 0002 FD 6A 82                	MVFC BPSW, R2
+  17 0005 E3 12                   	MOV.L R2, [R1]
+  18 0007 7E B2                   	POP R2
+  19 0009 02                      	rts
+  20                             	
+  21                             	 ; 0 "" 2
+ 508:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    PUSH.L     R2           )
+ 509:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVFC       BPSW, R2     )
+ 510:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.L      R2, [R1]     )
+ 511:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    POP        R2           )
+ 512:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 513:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function bsp_get_bpsw() */
+  22                             		.loc 1 513 1 is_stmt 0 view .LVU3
+  23                             		; Naked function: epilogue provided by programmer.
+  24                             	.LFE21:
+  26                             		.section	.text.bsp_get_bpc,"ax",@progbits
+  28                             	_bsp_get_bpc:
+  29                             	.LVL1:
+  30                             	.LFB24:
+ 514:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 515:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 516:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_GetBPSW
+ 517:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Refers to the BPSW value.
+ 518:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : none
+ 519:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : BPSW value.
+ 520:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Note         : This function exists to avoid code analysis errors. Because, when inline assembler
+ 521:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                a return value, the error of "No return, in function returning non-void" occurs.
+ 522:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 523:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** uint32_t R_BSP_GetBPSW(void)
+ 524:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 525:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     uint32_t ret;
+ 526:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 527:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     /* Casting is valid because it matches the type to the right side or argument. */
+ 528:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     bsp_get_bpsw((uint32_t *)&ret);
+ 529:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return ret;
+ 530:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_GetBPSW() */
+ 531:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 532:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 533:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_SetBPC
+ 534:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Sets a value to BPC.
+ 535:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data - Value to be set.
+ 536:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 537:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 538:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_INLINE_ASM(R_BSP_SetBPC)
+ 539:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void R_BSP_SetBPC(void *data)
+ 540:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 541:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(data)
+ 542:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 543:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+ 544:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVTC    R1, BPC    )
+ 545:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 546:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_SetBPC() */
+ 547:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 548:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 549:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: bsp_get_bpc
+ 550:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Refers to the BPC value.
+ 551:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : ret - Return value address.
+ 552:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 553:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 554:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_STATIC_INLINE_ASM(bsp_get_bpc)
+ 555:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void bsp_get_bpc(uint32_t *ret)
+ 556:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+  31                             		.loc 1 556 1 is_stmt 1 view -0
+  32                             		; Note: Naked Function
+ 557:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(ret)
+  33                             		.loc 1 557 5 view .LVU5
+ 558:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 559:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+  34                             		.loc 1 559 5 view .LVU6
+  35                             	 ; 559 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+  36 0000 7E A2                   		PUSH.L R2
+  37 0002 FD 6A 92                	MVFC BPC, R2
+  38 0005 E3 12                   	MOV.L R2, [R1]
+  39 0007 7E B2                   	POP R2
+  40 0009 02                      	rts
+  41                             	
+  42                             	 ; 0 "" 2
+ 560:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    PUSH.L     R2           )
+ 561:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVFC       BPC, R2      )
+ 562:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.L      R2, [R1]     )
+ 563:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    POP        R2           )
+ 564:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 565:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function bsp_get_bpc() */
+  43                             		.loc 1 565 1 is_stmt 0 view .LVU7
+  44                             		; Naked function: epilogue provided by programmer.
+  45                             	.LFE24:
+  47                             		.section	.text.bsp_get_extb,"ax",@progbits
+  49                             	_bsp_get_extb:
+  50                             	.LVL2:
+  51                             	.LFB27:
+ 566:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 567:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 568:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_GetBPC
+ 569:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Refers to the BPC value.
+ 570:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : none
+ 571:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : BPC value
+ 572:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Note         : This function exists to avoid code analysis errors. Because, when inline assembler
+ 573:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                a return value, the error of "No return, in function returning non-void" occurs.
+ 574:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 575:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void *R_BSP_GetBPC(void)
+ 576:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 577:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     uint32_t ret;
+ 578:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 579:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     /* Casting is valid because it matches the type to the right side or argument. */
+ 580:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     bsp_get_bpc((uint32_t *)&ret);
+ 581:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 582:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     /* Casting is valid because it matches the type to the right side or return. */
+ 583:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return (void *)ret;
+ 584:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_GetBPC() */
+ 585:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 586:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #ifdef BSP_MCU_EXCEPTION_TABLE
+ 587:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 588:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_SetEXTB
+ 589:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Sets a value for EXTB.
+ 590:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data - Value to be set.
+ 591:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 592:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 593:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_INLINE_ASM(R_BSP_SetEXTB)
+ 594:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void R_BSP_SetEXTB(void *data)
+ 595:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 596:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(data)
+ 597:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 598:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+ 599:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVTC    R1, EXTB    )
+ 600:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 601:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_SetEXTB() */
+ 602:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 603:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 604:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: bsp_get_extb
+ 605:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Refers to the EXTB value.
+ 606:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : ret - Return value address.
+ 607:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 608:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 609:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_STATIC_INLINE_ASM(bsp_get_extb)
+ 610:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void bsp_get_extb(uint32_t *ret)
+ 611:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+  52                             		.loc 1 611 1 is_stmt 1 view -0
+  53                             		; Note: Naked Function
+ 612:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(ret)
+  54                             		.loc 1 612 5 view .LVU9
+ 613:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 614:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+  55                             		.loc 1 614 5 view .LVU10
+  56                             	 ; 614 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+  57 0000 7E A2                   		PUSH.L R2
+  58 0002 FD 6A D2                	MVFC EXTB, R2
+  59 0005 E3 12                   	MOV.L R2, [R1]
+  60 0007 7E B2                   	POP R2
+  61 0009 02                      	rts
+  62                             	
+  63                             	 ; 0 "" 2
+ 615:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    PUSH.L     R2           )
+ 616:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVFC       EXTB, R2     )
+ 617:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.L      R2, [R1]     )
+ 618:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    POP        R2           )
+ 619:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 620:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function bsp_get_extb() */
+  64                             		.loc 1 620 1 is_stmt 0 view .LVU11
+  65                             		; Naked function: epilogue provided by programmer.
+  66                             	.LFE27:
+  68                             		.section	.text.bsp_move_from_acc_hi_long,"ax",@progbits
+  70                             	_bsp_move_from_acc_hi_long:
+  71                             	.LVL3:
+  72                             	.LFB31:
+ 621:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 622:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 623:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_GetEXTB
+ 624:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Refers to the EXTB value.
+ 625:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : none
+ 626:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : EXTB value.
+ 627:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Note         : This function exists to avoid code analysis errors. Because, when inline assembler
+ 628:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                a return value, the error of "No return, in function returning non-void" occurs.
+ 629:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 630:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void *R_BSP_GetEXTB(void)
+ 631:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 632:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     uint32_t ret;
+ 633:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 634:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     /* Casting is valid because it matches the type to the right side or argument. */
+ 635:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     bsp_get_extb((uint32_t *)&ret);
+ 636:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 637:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     /* Casting is valid because it matches the type to the right side or return. */
+ 638:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return (void *)ret;
+ 639:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_GetEXTB() */
+ 640:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* BSP_MCU_EXCEPTION_TABLE */
+ 641:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 642:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 643:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_MoveToAccHiLong
+ 644:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : This function moves the contents of src to the higher-order 32 bits of the accumul
+ 645:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data - Input value.
+ 646:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 647:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 648:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_INLINE_ASM(R_BSP_MoveToAccHiLong)
+ 649:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void R_BSP_MoveToAccHiLong(int32_t data)
+ 650:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 651:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(data)
+ 652:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 653:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+ 654:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVTACHI    R1    )
+ 655:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 656:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_MoveToAccHiLong() */
+ 657:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 658:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 659:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_MoveToAccLoLong
+ 660:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : This function moves the contents of src to the lower-order 32 bits of the accumula
+ 661:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data - Input value.
+ 662:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 663:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 664:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_INLINE_ASM(R_BSP_MoveToAccLoLong)
+ 665:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void R_BSP_MoveToAccLoLong(int32_t data)
+ 666:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 667:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(data)
+ 668:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 669:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+ 670:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVTACLO    R1    )
+ 671:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 672:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_MoveToAccLoLong() */
+ 673:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 674:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 675:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: bsp_move_from_acc_hi_long
+ 676:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : This function moves the higher-order 32 bits of the accumulator to dest.
+ 677:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : ret - Return value address.
+ 678:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 679:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 680:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_STATIC_INLINE_ASM(bsp_move_from_acc_hi_long)
+ 681:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void bsp_move_from_acc_hi_long(uint32_t *ret)
+ 682:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+  73                             		.loc 1 682 1 is_stmt 1 view -0
+  74                             		; Note: Naked Function
+ 683:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(ret)
+  75                             		.loc 1 683 5 view .LVU13
+ 684:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 685:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+  76                             		.loc 1 685 5 view .LVU14
+  77                             	 ; 685 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+  78 0000 7E A2                   		PUSH.L R2
+  79 0002 FD 1F 02                	MVFACHI R2
+  80 0005 E3 12                   	MOV.L R2, [R1]
+  81 0007 7E B2                   	POP R2
+  82 0009 02                      	rts
+  83                             	
+  84                             	 ; 0 "" 2
+ 686:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    PUSH.L     R2           )
+ 687:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVFACHI    R2           )
+ 688:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.L      R2, [R1]     )
+ 689:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    POP        R2           )
+ 690:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 691:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function bsp_move_from_acc_hi_long() */
+  85                             		.loc 1 691 1 is_stmt 0 view .LVU15
+  86                             		; Naked function: epilogue provided by programmer.
+  87                             	.LFE31:
+  89                             		.section	.text.bsp_move_from_acc_mi_long,"ax",@progbits
+  91                             	_bsp_move_from_acc_mi_long:
+  92                             	.LVL4:
+  93                             	.LFB33:
+ 692:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 693:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 694:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_MoveFromAccHiLong
+ 695:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : This function moves the higher-order 32 bits of the accumulator to dest.
+ 696:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : none
+ 697:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : The higher-order 32 bits of the accumulator.
+ 698:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Note         : This function exists to avoid code analysis errors. Because, when inline assembler
+ 699:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                a return value, the error of "No return, in function returning non-void" occurs.
+ 700:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 701:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** int32_t R_BSP_MoveFromAccHiLong(void)
+ 702:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 703:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     int32_t ret;
+ 704:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 705:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     /* Casting is valid because it matches the type to the right side or argument. */
+ 706:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     bsp_move_from_acc_hi_long((uint32_t *)&ret);
+ 707:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return ret;
+ 708:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_MoveFromAccHiLong() */
+ 709:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 710:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 711:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: bsp_move_from_acc_mi_long
+ 712:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : This function moves the contents of bits 47 to 16 of the accumulator to dest.
+ 713:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : ret - Return value address.
+ 714:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 715:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 716:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_STATIC_INLINE_ASM(bsp_move_from_acc_mi_long)
+ 717:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void bsp_move_from_acc_mi_long(uint32_t *ret)
+ 718:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+  94                             		.loc 1 718 1 is_stmt 1 view -0
+  95                             		; Note: Naked Function
+ 719:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(ret)
+  96                             		.loc 1 719 5 view .LVU17
+ 720:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 721:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+  97                             		.loc 1 721 5 view .LVU18
+  98                             	 ; 721 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+  99 0000 7E A2                   		PUSH.L R2
+ 100 0002 FD 1F 22                	MVFACMI R2
+ 101 0005 E3 12                   	MOV.L R2, [R1]
+ 102 0007 7E B2                   	POP R2
+ 103 0009 02                      	rts
+ 104                             	
+ 105                             	 ; 0 "" 2
+ 722:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    PUSH.L     R2           )
+ 723:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVFACMI    R2           )
+ 724:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.L      R2, [R1]     )
+ 725:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    POP        R2           )
+ 726:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 727:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function bsp_move_from_acc_mi_long() */
+ 106                             		.loc 1 727 1 is_stmt 0 view .LVU19
+ 107                             		; Naked function: epilogue provided by programmer.
+ 108                             	.LFE33:
+ 110                             		.section	.text.R_BSP_Max,"ax",@progbits
+ 111                             		.global	_R_BSP_Max
+ 113                             	_R_BSP_Max:
+ 114                             	.LVL5:
+ 115                             	.LFB3:
+ 110:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return (data1 > data2)? data1 : data2;
+ 116                             		.loc 1 110 1 is_stmt 1 view -0
+ 111:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 117                             		.loc 1 111 5 view .LVU21
+ 112:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 118                             		.loc 1 112 1 is_stmt 0 view .LVU22
+ 119 0000 FC 13 21                		max	r2, r1
+ 120                             	.LVL6:
+ 112:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 121                             		.loc 1 112 1 view .LVU23
+ 122 0003 02                      		rts
+ 123                             	.LFE3:
+ 125                             		.section	.text.R_BSP_Min,"ax",@progbits
+ 126                             		.global	_R_BSP_Min
+ 128                             	_R_BSP_Min:
+ 129                             	.LVL7:
+ 130                             	.LFB4:
+ 124:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return (data1 < data2)? data1 : data2;
+ 131                             		.loc 1 124 1 is_stmt 1 view -0
+ 125:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 132                             		.loc 1 125 5 view .LVU25
+ 126:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 133                             		.loc 1 126 1 is_stmt 0 view .LVU26
+ 134 0000 FC 17 21                		min	r2, r1
+ 135                             	.LVL8:
+ 126:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 136                             		.loc 1 126 1 view .LVU27
+ 137 0003 02                      		rts
+ 138                             	.LFE4:
+ 140                             		.section	.text.R_BSP_MulAndAccOperation_B,"ax",@progbits
+ 141                             		.global	_R_BSP_MulAndAccOperation_B
+ 143                             	_R_BSP_MulAndAccOperation_B:
+ 144                             	.LVL9:
+ 145                             	.LFB5:
+ 142:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     long long result = init;
+ 146                             		.loc 1 142 1 is_stmt 1 view -0
+ 142:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     long long result = init;
+ 147                             		.loc 1 142 1 is_stmt 0 view .LVU29
+ 148 0000 6E 6A                   		pushm	r6-r10
+ 149                             	.LCFI0:
+ 142:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     long long result = init;
+ 150                             		.loc 1 142 1 view .LVU30
+ 151 0002 60 40                   		sub	#4, r0
+ 152                             	.LCFI1:
+ 153 0004 A9 8F                   		mov.L	28[r0], r7
+ 143:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     unsigned long index;
+ 154                             		.loc 1 143 5 is_stmt 1 view .LVU31
+ 155                             	.LVL10:
+ 144:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     for(index = 0; index < count; index++)
+ 156                             		.loc 1 144 5 view .LVU32
+ 145:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 157                             		.loc 1 145 5 view .LVU33
+ 145:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 158                             		.loc 1 145 15 is_stmt 0 view .LVU34
+ 159 0006 66 0E                   		mov.L	#0, r14
+ 160                             	.LVL11:
+ 161                             	.L9:
+ 145:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 162                             		.loc 1 145 5 discriminator 1 view .LVU35
+ 163 0008 47 3E                   		cmp	r3, r14
+ 164 000a 22 19                   		bgeu	.L12
+ 147:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 165                             		.loc 1 147 9 is_stmt 1 discriminator 3 view .LVU36
+ 147:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 166                             		.loc 1 147 24 is_stmt 0 discriminator 3 view .LVU37
+ 167 000c FE 4E 45                		mov.B	[r14,r4], r5
+ 147:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 168                             		.loc 1 147 39 discriminator 3 view .LVU38
+ 169 000f FE 4E 7F                		mov.B	[r14,r7], r15
+ 147:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 170                             		.loc 1 147 32 discriminator 3 view .LVU39
+ 171 0012 4F F5                   		mul	r15, r5
+ 172 0014 FD BF 5F                		shar	#31, r5, r15
+ 147:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 173                             		.loc 1 147 16 discriminator 3 view .LVU40
+ 174 0017 FF 26 51                		add	r5, r1, r6
+ 175 001a FC 0B F2                		adc	r15, r2
+ 176                             	.LVL12:
+ 147:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 177                             		.loc 1 147 16 discriminator 3 view .LVU41
+ 178 001d EF 61                   		mov.L	r6, r1
+ 179                             	.LVL13:
+ 145:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 180                             		.loc 1 145 40 discriminator 3 view .LVU42
+ 181 001f 62 1E                   		add	#1, r14
+ 182                             	.LVL14:
+ 145:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 183                             		.loc 1 145 40 discriminator 3 view .LVU43
+ 184 0021 2E E7                   		bra	.L9
+ 185                             	.L12:
+ 150:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 186                             		.loc 1 150 1 view .LVU44
+ 187 0023 3F 6A 06                		rtsd	#24, r6-r10
+ 188                             	.LFE5:
+ 190                             		.section	.text.R_BSP_MulAndAccOperation_W,"ax",@progbits
+ 191                             		.global	_R_BSP_MulAndAccOperation_W
+ 193                             	_R_BSP_MulAndAccOperation_W:
+ 194                             	.LVL15:
+ 195                             	.LFB6:
+ 166:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     long long result = init;
+ 196                             		.loc 1 166 1 is_stmt 1 view -0
+ 166:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     long long result = init;
+ 197                             		.loc 1 166 1 is_stmt 0 view .LVU46
+ 198 0000 6E 6A                   		pushm	r6-r10
+ 199                             	.LCFI2:
+ 166:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     long long result = init;
+ 200                             		.loc 1 166 1 view .LVU47
+ 201 0002 60 40                   		sub	#4, r0
+ 202                             	.LCFI3:
+ 203 0004 A9 8F                   		mov.L	28[r0], r7
+ 167:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     unsigned long index;
+ 204                             		.loc 1 167 5 is_stmt 1 view .LVU48
+ 205                             	.LVL16:
+ 168:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     for(index = 0; index < count; index++)
+ 206                             		.loc 1 168 5 view .LVU49
+ 169:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 207                             		.loc 1 169 5 view .LVU50
+ 169:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 208                             		.loc 1 169 15 is_stmt 0 view .LVU51
+ 209 0006 66 0E                   		mov.L	#0, r14
+ 210                             	.LVL17:
+ 211                             	.L14:
+ 169:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 212                             		.loc 1 169 5 discriminator 1 view .LVU52
+ 213 0008 47 3E                   		cmp	r3, r14
+ 214 000a 22 1F                   		bgeu	.L17
+ 171:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 215                             		.loc 1 171 9 is_stmt 1 discriminator 3 view .LVU53
+ 171:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 216                             		.loc 1 171 24 is_stmt 0 discriminator 3 view .LVU54
+ 217 000c FF 2F EE                		add	r14, r14, r15
+ 218 000f FF 25 F4                		add	r15, r4, r5
+ 219 0012 DC 55                   		mov.W	[r5], r5
+ 171:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 220                             		.loc 1 171 39 discriminator 3 view .LVU55
+ 221 0014 4B 7F                   		add	r7, r15
+ 222 0016 DC FF                   		mov.W	[r15], r15
+ 171:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 223                             		.loc 1 171 32 discriminator 3 view .LVU56
+ 224 0018 4F F5                   		mul	r15, r5
+ 225 001a FD BF 5F                		shar	#31, r5, r15
+ 171:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 226                             		.loc 1 171 16 discriminator 3 view .LVU57
+ 227 001d FF 26 51                		add	r5, r1, r6
+ 228 0020 FC 0B F2                		adc	r15, r2
+ 229                             	.LVL18:
+ 171:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 230                             		.loc 1 171 16 discriminator 3 view .LVU58
+ 231 0023 EF 61                   		mov.L	r6, r1
+ 232                             	.LVL19:
+ 169:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 233                             		.loc 1 169 40 discriminator 3 view .LVU59
+ 234 0025 62 1E                   		add	#1, r14
+ 235                             	.LVL20:
+ 169:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 236                             		.loc 1 169 40 discriminator 3 view .LVU60
+ 237 0027 2E E1                   		bra	.L14
+ 238                             	.L17:
+ 174:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 239                             		.loc 1 174 1 view .LVU61
+ 240 0029 3F 6A 06                		rtsd	#24, r6-r10
+ 241                             	.LFE6:
+ 243                             		.section	.text.R_BSP_MulAndAccOperation_L,"ax",@progbits
+ 244                             		.global	_R_BSP_MulAndAccOperation_L
+ 246                             	_R_BSP_MulAndAccOperation_L:
+ 247                             	.LVL21:
+ 248                             	.LFB7:
+ 190:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     long long result = init;
+ 249                             		.loc 1 190 1 is_stmt 1 view -0
+ 190:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     long long result = init;
+ 250                             		.loc 1 190 1 is_stmt 0 view .LVU63
+ 251 0000 6E 6A                   		pushm	r6-r10
+ 252                             	.LCFI4:
+ 190:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     long long result = init;
+ 253                             		.loc 1 190 1 view .LVU64
+ 254 0002 60 40                   		sub	#4, r0
+ 255                             	.LCFI5:
+ 256 0004 A9 8F                   		mov.L	28[r0], r7
+ 191:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     unsigned long index;
+ 257                             		.loc 1 191 5 is_stmt 1 view .LVU65
+ 258                             	.LVL22:
+ 192:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     for(index = 0; index < count; index++)
+ 259                             		.loc 1 192 5 view .LVU66
+ 193:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 260                             		.loc 1 193 5 view .LVU67
+ 193:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 261                             		.loc 1 193 15 is_stmt 0 view .LVU68
+ 262 0006 66 0F                   		mov.L	#0, r15
+ 263                             	.LVL23:
+ 264                             	.L19:
+ 193:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 265                             		.loc 1 193 5 discriminator 1 view .LVU69
+ 266 0008 47 3F                   		cmp	r3, r15
+ 267 000a 22 1F                   		bgeu	.L22
+ 195:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 268                             		.loc 1 195 9 is_stmt 1 discriminator 3 view .LVU70
+ 195:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 269                             		.loc 1 195 24 is_stmt 0 discriminator 3 view .LVU71
+ 270 000c FD C2 FE                		shll	#2, r15, r14
+ 271 000f FF 25 E4                		add	r14, r4, r5
+ 272 0012 EC 55                   		mov.L	[r5], r5
+ 195:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 273                             		.loc 1 195 39 discriminator 3 view .LVU72
+ 274 0014 4B 7E                   		add	r7, r14
+ 275 0016 EC EE                   		mov.L	[r14], r14
+ 195:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 276                             		.loc 1 195 32 discriminator 3 view .LVU73
+ 277 0018 4F E5                   		mul	r14, r5
+ 278 001a FD BF 5E                		shar	#31, r5, r14
+ 195:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 279                             		.loc 1 195 16 discriminator 3 view .LVU74
+ 280 001d FF 26 51                		add	r5, r1, r6
+ 281 0020 FC 0B E2                		adc	r14, r2
+ 282                             	.LVL24:
+ 195:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 283                             		.loc 1 195 16 discriminator 3 view .LVU75
+ 284 0023 EF 61                   		mov.L	r6, r1
+ 285                             	.LVL25:
+ 193:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 286                             		.loc 1 193 40 discriminator 3 view .LVU76
+ 287 0025 62 1F                   		add	#1, r15
+ 288                             	.LVL26:
+ 193:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 289                             		.loc 1 193 40 discriminator 3 view .LVU77
+ 290 0027 2E E1                   		bra	.L19
+ 291                             	.L22:
+ 198:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 292                             		.loc 1 198 1 view .LVU78
+ 293 0029 3F 6A 06                		rtsd	#24, r6-r10
+ 294                             	.LFE7:
+ 296                             		.section	.text.R_BSP_RotateLeftWithCarry,"ax",@progbits
+ 297                             		.global	_R_BSP_RotateLeftWithCarry
+ 299                             	_R_BSP_RotateLeftWithCarry:
+ 300                             	.LVL27:
+ 301                             	.LFB8:
+ 210:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __asm("rolc %0":"=r"(data) : "r"(data):); 
+ 302                             		.loc 1 210 1 is_stmt 1 view -0
+ 211:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return data;
+ 303                             		.loc 1 211 5 view .LVU80
+ 304                             	 ; 211 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+ 305 0000 7E 51                   		rolc r1
+ 306                             	 ; 0 "" 2
+ 307                             	.LVL28:
+ 212:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 308                             		.loc 1 212 5 view .LVU81
+ 213:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 309                             		.loc 1 213 1 is_stmt 0 view .LVU82
+ 310 0002 02                      		rts
+ 311                             	.LFE8:
+ 313                             		.section	.text.R_BSP_RotateRightWithCarry,"ax",@progbits
+ 314                             		.global	_R_BSP_RotateRightWithCarry
+ 316                             	_R_BSP_RotateRightWithCarry:
+ 317                             	.LVL29:
+ 318                             	.LFB9:
+ 225:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __asm("rorc %0":"=r"(data) : "r"(data):);
+ 319                             		.loc 1 225 1 is_stmt 1 view -0
+ 226:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return data;
+ 320                             		.loc 1 226 5 view .LVU84
+ 321                             	 ; 226 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+ 322 0000 7E 41                   		rorc r1
+ 323                             	 ; 0 "" 2
+ 324                             	.LVL30:
+ 227:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 325                             		.loc 1 227 5 view .LVU85
+ 228:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 326                             		.loc 1 228 1 is_stmt 0 view .LVU86
+ 327 0002 02                      		rts
+ 328                             	.LFE9:
+ 330                             		.section	.text.R_BSP_RotateLeft,"ax",@progbits
+ 331                             		.global	_R_BSP_RotateLeft
+ 333                             	_R_BSP_RotateLeft:
+ 334                             	.LVL31:
+ 335                             	.LFB10:
+ 241:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __asm("rotl %1, %0":"=r"(data) : "r"(num),"0"(data) :); 
+ 336                             		.loc 1 241 1 is_stmt 1 view -0
+ 242:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return data;
+ 337                             		.loc 1 242 5 view .LVU88
+ 338                             	 ; 242 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+ 339 0000 FD 66 21                		rotl r2, r1
+ 340                             	 ; 0 "" 2
+ 341                             	.LVL32:
+ 243:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 342                             		.loc 1 243 5 view .LVU89
+ 244:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 343                             		.loc 1 244 1 is_stmt 0 view .LVU90
+ 344 0003 02                      		rts
+ 345                             	.LFE10:
+ 347                             		.section	.text.R_BSP_RotateRight,"ax",@progbits
+ 348                             		.global	_R_BSP_RotateRight
+ 350                             	_R_BSP_RotateRight:
+ 351                             	.LVL33:
+ 352                             	.LFB11:
+ 257:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __asm("rotr %1, %0":"=r"(data) : "r"(num),"0"(data) :); 
+ 353                             		.loc 1 257 1 is_stmt 1 view -0
+ 258:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return data;
+ 354                             		.loc 1 258 5 view .LVU92
+ 355                             	 ; 258 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+ 356 0000 FD 64 21                		rotr r2, r1
+ 357                             	 ; 0 "" 2
+ 358                             	.LVL34:
+ 259:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 359                             		.loc 1 259 5 view .LVU93
+ 260:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 360                             		.loc 1 260 1 is_stmt 0 view .LVU94
+ 361 0003 02                      		rts
+ 362                             	.LFE11:
+ 364                             		.section	.text.R_BSP_SignedMultiplication,"ax",@progbits
+ 365                             		.global	_R_BSP_SignedMultiplication
+ 367                             	_R_BSP_SignedMultiplication:
+ 368                             	.LVL35:
+ 369                             	.LFB12:
+ 272:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return ((signed long long)data1) * ((signed long long)data2);
+ 370                             		.loc 1 272 1 is_stmt 1 view -0
+ 272:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return ((signed long long)data1) * ((signed long long)data2);
+ 371                             		.loc 1 272 1 is_stmt 0 view .LVU96
+ 372 0000 6E 78                   		pushm	r7-r8
+ 373                             	.LCFI6:
+ 273:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 374                             		.loc 1 273 5 is_stmt 1 view .LVU97
+ 273:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 375                             		.loc 1 273 13 is_stmt 0 view .LVU98
+ 376 0002 FD BF 15                		shar	#31, r1, r5
+ 273:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 377                             		.loc 1 273 41 view .LVU99
+ 378 0005 FD BF 24                		shar	#31, r2, r4
+ 273:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 379                             		.loc 1 273 38 view .LVU100
+ 380 0008 4F 25                   		mul	r2, r5
+ 381 000a 4F 14                   		mul	r1, r4
+ 382 000c 4B 45                   		add	r4, r5
+ 383 000e EF 17                   		mov.L	r1, r7
+ 384 0010 FC 1F 27                		emulu	r2, r7
+ 385 0013 FF 22 85                		add	r8, r5, r2
+ 386                             	.LVL36:
+ 274:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) || defined(__ICCRX__)  */
+ 387                             		.loc 1 274 1 view .LVU101
+ 388 0016 EF 71                   		mov.L	r7, r1
+ 389                             	.LVL37:
+ 274:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) || defined(__ICCRX__)  */
+ 390                             		.loc 1 274 1 view .LVU102
+ 391 0018 3F 78 02                		rtsd	#8, r7-r8
+ 392                             	.LFE12:
+ 394                             		.section	.text.R_BSP_UnsignedMultiplication,"ax",@progbits
+ 395                             		.global	_R_BSP_UnsignedMultiplication
+ 397                             	_R_BSP_UnsignedMultiplication:
+ 398                             	.LVL38:
+ 399                             	.LFB13:
+ 286:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return ((unsigned long long)data1) * ((unsigned long long)data2);
+ 400                             		.loc 1 286 1 is_stmt 1 view -0
+ 287:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 401                             		.loc 1 287 5 view .LVU104
+ 287:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 402                             		.loc 1 287 40 is_stmt 0 view .LVU105
+ 403 0000 FC 1F 12                		emulu	r1, r2
+ 404                             	.LVL39:
+ 288:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) || defined(__ICCRX__)  */
+ 405                             		.loc 1 288 1 view .LVU106
+ 406 0003 EF 21                   		mov.L	r2, r1
+ 407                             	.LVL40:
+ 288:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) || defined(__ICCRX__)  */
+ 408                             		.loc 1 288 1 view .LVU107
+ 409 0005 EF 32                   		mov.L	r3, r2
+ 410 0007 02                      		rts
+ 411                             	.LFE13:
+ 413                             		.section	.text.R_BSP_ChangeToUserMode,"ax",@progbits
+ 414                             		.global	_R_BSP_ChangeToUserMode
+ 416                             	_R_BSP_ChangeToUserMode:
+ 417                             	.LFB14:
+ 305:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+ 418                             		.loc 1 305 1 is_stmt 1 view -0
+ 419                             		; Note: Naked Function
+ 306:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(;_R_BSP_Change_PSW_PM_to_UserMode:                                                   
+ 420                             		.loc 1 306 5 view .LVU109
+ 421                             	 ; 306 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+ 422                             		;_R_BSP_Change_PSW_PM_to_UserMode:
+ 423 0000 7E A1                   	PUSH.L R1 ; push the R1 value
+ 424 0002 FD 6A 01                	MVFC PSW, R1 ; get the current PSW value
+ 425 0005 7D 41                   	BTST #20, R1 ; check PSW.PM
+ 426 0007 21 16                   	BNE.B ?+;_psw_pm_is_user_mode
+ 427                             	;_psw_pm_is_supervisor_mode:
+ 428 0009 79 41                   	BSET #20, R1 ; change PM = 0(Supervisor Mode) --> 1(User Mode)
+ 429 000b 7E A2                   	PUSH.L R2 ; push the R2 value
+ 430 000d EF 02                   	MOV.L R0, R2 ; move the current SP value to the R2 value
+ 431 000f 06 A1 10 21 02          	XCHG 8[R2].L, R1 ; exchange the value of R2 destination address and the R1 value
+ 432                             	; (exchange the return address value of caller and the PSW value)
+ 433 0014 06 A1 10 21 01          	XCHG 4[R2].L, R1 ; exchange the value of R2 destination address and the R1 value
+ 434                             	; (exchange the R1 value of stack and the return address value of caller)
+ 435 0019 7E B2                   	POP R2 ; pop the R2 value of stack
+ 436 001b 7F 95                   	RTE
+ 437                             	?:
+ 438 001d 7E B1                   	POP R1 ; pop the R1 value of stack
+ 439                             	;RTS
+ 440 001f 02                      	rts
+ 441                             	
+ 442                             	 ; 0 "" 2
+ 326:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 443                             		.loc 1 326 1 is_stmt 0 view .LVU110
+ 444                             		; Naked function: epilogue provided by programmer.
+ 445                             	.LFE14:
+ 447                             		.section	.text.R_BSP_SetACC,"ax",@progbits
+ 448                             		.global	_R_BSP_SetACC
+ 450                             	_R_BSP_SetACC:
+ 451                             	.LVL41:
+ 452                             	.LFB15:
+ 336:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if defined(__GNUC__)
+ 453                             		.loc 1 336 1 is_stmt 1 view -0
+ 338:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __builtin_rx_mvtaclo(data & 0xFFFFFFFF);
+ 454                             		.loc 1 338 5 view .LVU112
+ 455 0000 FD 17 02                		mvtachi	r2
+ 339:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #elif defined(__ICCRX__)
+ 456                             		.loc 1 339 5 view .LVU113
+ 457 0003 FD 17 11                		mvtaclo	r1
+ 350:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) || defined(__ICCRX__)  */
+ 458                             		.loc 1 350 1 is_stmt 0 view .LVU114
+ 459 0006 02                      		rts
+ 460                             	.LFE15:
+ 462                             		.section	.text.R_BSP_GetACC,"ax",@progbits
+ 463                             		.global	_R_BSP_GetACC
+ 465                             	_R_BSP_GetACC:
+ 466                             	.LFB16:
+ 361:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if defined(__GNUC__)
+ 467                             		.loc 1 361 1 is_stmt 1 view -0
+ 363:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     result |= (((signed long long)__builtin_rx_mvfacmi()) << 16) & 0xFFFF0000;
+ 468                             		.loc 1 363 5 view .LVU116
+ 363:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     result |= (((signed long long)__builtin_rx_mvfacmi()) << 16) & 0xFFFF0000;
+ 469                             		.loc 1 363 50 is_stmt 0 view .LVU117
+ 470 0000 FD 1F 02                		mvfachi	r2
+ 471                             	.LVL42:
+ 364:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return result;
+ 472                             		.loc 1 364 5 is_stmt 1 view .LVU118
+ 364:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return result;
+ 473                             		.loc 1 364 35 is_stmt 0 view .LVU119
+ 474 0003 FD 1F 21                		mvfacmi	r1
+ 475                             	.LVL43:
+ 365:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #elif defined(__ICCRX__)
+ 476                             		.loc 1 365 5 is_stmt 1 view .LVU120
+ 374:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) || defined(__ICCRX__)  */
+ 477                             		.loc 1 374 1 is_stmt 0 view .LVU121
+ 478 0006 6D 01                   		shll	#16, r1
+ 479                             	.LVL44:
+ 374:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) || defined(__ICCRX__)  */
+ 480                             		.loc 1 374 1 view .LVU122
+ 481 0008 02                      		rts
+ 482                             	.LFE16:
+ 484                             		.section	.text.R_BSP_MulAndAccOperation_2byte,"ax",@progbits
+ 485                             		.global	_R_BSP_MulAndAccOperation_2byte
+ 487                             	_R_BSP_MulAndAccOperation_2byte:
+ 488                             	.LVL45:
+ 489                             	.LFB17:
+ 391:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     register signed long *ldata1 = (signed long *)data1;
+ 490                             		.loc 1 391 1 is_stmt 1 view -0
+ 392:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     register signed long *ldata2 = (signed long *)data2;
+ 491                             		.loc 1 392 5 view .LVU124
+ 393:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     /* this is much more then an "intrinsic", no inline asm because of loop */
+ 492                             		.loc 1 393 5 view .LVU125
+ 396:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     while (count > 1)
+ 493                             		.loc 1 396 5 view .LVU126
+ 494 0000 66 05                   		mov.L	#0, r5
+ 495 0002 66 04                   		mov.L	#0, r4
+ 496 0004 FD 01 54                		mullo	r5, r4
+ 397:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 497                             		.loc 1 397 5 view .LVU127
+ 498                             	.LVL46:
+ 499                             	.L34:
+ 397:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 500                             		.loc 1 397 11 is_stmt 0 view .LVU128
+ 501 0007 61 13                   		cmp	#1, r3
+ 502 0009 25 16                   		bleu	.L37
+ 399:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         __builtin_rx_machi(*ldata1, *ldata2);
+ 503                             		.loc 1 399 9 is_stmt 1 view .LVU129
+ 504 000b EC 15                   		mov.L	[r1], r5
+ 505 000d EC 24                   		mov.L	[r2], r4
+ 506 000f FD 05 54                		maclo	r5, r4
+ 400:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         ldata1++;
+ 507                             		.loc 1 400 9 view .LVU130
+ 508 0012 FD 2A 15                		mov.L	[r1+], r5
+ 509                             	.LVL47:
+ 400:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         ldata1++;
+ 510                             		.loc 1 400 9 is_stmt 0 view .LVU131
+ 511 0015 FD 2A 24                		mov.L	[r2+], r4
+ 512                             	.LVL48:
+ 400:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         ldata1++;
+ 513                             		.loc 1 400 9 view .LVU132
+ 514 0018 FD 04 54                		machi	r5, r4
+ 401:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         ldata2++;
+ 515                             		.loc 1 401 9 is_stmt 1 view .LVU133
+ 516                             	.LVL49:
+ 402:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         count -= 2;
+ 517                             		.loc 1 402 9 view .LVU134
+ 403:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 518                             		.loc 1 403 9 view .LVU135
+ 403:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 519                             		.loc 1 403 15 is_stmt 0 view .LVU136
+ 520 001b 60 23                   		sub	#2, r3
+ 521                             	.LVL50:
+ 403:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 522                             		.loc 1 403 15 view .LVU137
+ 523 001d 2E EA                   		bra	.L34
+ 524                             	.L37:
+ 405:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return __builtin_rx_mvfacmi();
+ 525                             		.loc 1 405 5 is_stmt 1 view .LVU138
+ 405:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return __builtin_rx_mvfacmi();
+ 526                             		.loc 1 405 8 is_stmt 0 view .LVU139
+ 527 001f 61 03                   		cmp	#0, r3
+ 528 0021 10                      		beq	.L36
+ 405:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return __builtin_rx_mvfacmi();
+ 529                             		.loc 1 405 21 is_stmt 1 discriminator 1 view .LVU140
+ 530 0022 DC 15                   		mov.W	[r1], r5
+ 531 0024 DC 24                   		mov.W	[r2], r4
+ 532 0026 FD 05 54                		maclo	r5, r4
+ 533                             	.L36:
+ 406:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 534                             		.loc 1 406 5 view .LVU141
+ 407:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 535                             		.loc 1 407 1 is_stmt 0 view .LVU142
+ 536 0029 FD 1F 21                		mvfacmi	r1
+ 537                             	.LVL51:
+ 407:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 538                             		.loc 1 407 1 view .LVU143
+ 539 002c 02                      		rts
+ 540                             	.LFE17:
+ 542                             		.section	.text.R_BSP_MulAndAccOperation_FixedPoint1,"ax",@progbits
+ 543                             		.global	_R_BSP_MulAndAccOperation_FixedPoint1
+ 545                             	_R_BSP_MulAndAccOperation_FixedPoint1:
+ 546                             	.LVL52:
+ 547                             	.LFB18:
+ 425:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     register signed long *ldata1 = (signed long *)data1;
+ 548                             		.loc 1 425 1 is_stmt 1 view -0
+ 426:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     register signed long *ldata2 = (signed long *)data2;
+ 549                             		.loc 1 426 5 view .LVU145
+ 427:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     /* this is much more then an "intrinsic", no inline asm because of loop */
+ 550                             		.loc 1 427 5 view .LVU146
+ 430:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     while (count > 1)
+ 551                             		.loc 1 430 5 view .LVU147
+ 552 0000 66 05                   		mov.L	#0, r5
+ 553 0002 66 04                   		mov.L	#0, r4
+ 554 0004 FD 01 54                		mullo	r5, r4
+ 431:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 555                             		.loc 1 431 5 view .LVU148
+ 556                             	.LVL53:
+ 557                             	.L39:
+ 431:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 558                             		.loc 1 431 11 is_stmt 0 view .LVU149
+ 559 0007 61 13                   		cmp	#1, r3
+ 560 0009 25 16                   		bleu	.L42
+ 433:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         __builtin_rx_machi(*ldata1, *ldata2);
+ 561                             		.loc 1 433 9 is_stmt 1 view .LVU150
+ 562 000b EC 15                   		mov.L	[r1], r5
+ 563 000d EC 24                   		mov.L	[r2], r4
+ 564 000f FD 05 54                		maclo	r5, r4
+ 434:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         ldata1++;
+ 565                             		.loc 1 434 9 view .LVU151
+ 566 0012 FD 2A 15                		mov.L	[r1+], r5
+ 567                             	.LVL54:
+ 434:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         ldata1++;
+ 568                             		.loc 1 434 9 is_stmt 0 view .LVU152
+ 569 0015 FD 2A 24                		mov.L	[r2+], r4
+ 570                             	.LVL55:
+ 434:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         ldata1++;
+ 571                             		.loc 1 434 9 view .LVU153
+ 572 0018 FD 04 54                		machi	r5, r4
+ 435:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         ldata2++;
+ 573                             		.loc 1 435 9 is_stmt 1 view .LVU154
+ 574                             	.LVL56:
+ 436:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         count -= 2;
+ 575                             		.loc 1 436 9 view .LVU155
+ 437:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 576                             		.loc 1 437 9 view .LVU156
+ 437:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 577                             		.loc 1 437 15 is_stmt 0 view .LVU157
+ 578 001b 60 23                   		sub	#2, r3
+ 579                             	.LVL57:
+ 437:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 580                             		.loc 1 437 15 view .LVU158
+ 581 001d 2E EA                   		bra	.L39
+ 582                             	.L42:
+ 439:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __builtin_rx_racw(1);
+ 583                             		.loc 1 439 5 is_stmt 1 view .LVU159
+ 439:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __builtin_rx_racw(1);
+ 584                             		.loc 1 439 8 is_stmt 0 view .LVU160
+ 585 001f 61 03                   		cmp	#0, r3
+ 586 0021 10                      		beq	.L41
+ 439:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __builtin_rx_racw(1);
+ 587                             		.loc 1 439 21 is_stmt 1 discriminator 1 view .LVU161
+ 588 0022 DC 15                   		mov.W	[r1], r5
+ 589 0024 DC 24                   		mov.W	[r2], r4
+ 590 0026 FD 05 54                		maclo	r5, r4
+ 591                             	.L41:
+ 440:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return __builtin_rx_mvfachi();
+ 592                             		.loc 1 440 5 view .LVU162
+ 593 0029 FD 18 00                		racw	#1
+ 441:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 594                             		.loc 1 441 5 view .LVU163
+ 441:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 595                             		.loc 1 441 12 is_stmt 0 view .LVU164
+ 596 002c FD 1F 01                		mvfachi	r1
+ 597                             	.LVL58:
+ 442:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 598                             		.loc 1 442 1 view .LVU165
+ 599 002f DF 11                   		mov.W	r1, r1
+ 600 0031 02                      		rts
+ 601                             	.LFE18:
+ 603                             		.section	.text.R_BSP_MulAndAccOperation_FixedPoint2,"ax",@progbits
+ 604                             		.global	_R_BSP_MulAndAccOperation_FixedPoint2
+ 606                             	_R_BSP_MulAndAccOperation_FixedPoint2:
+ 607                             	.LVL59:
+ 608                             	.LFB19:
+ 460:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     register signed long *ldata1 = (signed long *)data1;
+ 609                             		.loc 1 460 1 is_stmt 1 view -0
+ 461:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     register signed long *ldata2 = (signed long *)data2;
+ 610                             		.loc 1 461 5 view .LVU167
+ 462:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     /* this is much more then an "intrinsic", no inline asm because of loop */
+ 611                             		.loc 1 462 5 view .LVU168
+ 465:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     while (count > 1)
+ 612                             		.loc 1 465 5 view .LVU169
+ 613 0000 66 05                   		mov.L	#0, r5
+ 614 0002 66 04                   		mov.L	#0, r4
+ 615 0004 FD 01 54                		mullo	r5, r4
+ 466:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 616                             		.loc 1 466 5 view .LVU170
+ 617                             	.LVL60:
+ 618                             	.L44:
+ 466:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     {
+ 619                             		.loc 1 466 11 is_stmt 0 view .LVU171
+ 620 0007 61 13                   		cmp	#1, r3
+ 621 0009 25 16                   		bleu	.L47
+ 468:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         __builtin_rx_machi(*ldata1, *ldata2);
+ 622                             		.loc 1 468 9 is_stmt 1 view .LVU172
+ 623 000b EC 15                   		mov.L	[r1], r5
+ 624 000d EC 24                   		mov.L	[r2], r4
+ 625 000f FD 05 54                		maclo	r5, r4
+ 469:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         ldata1++;
+ 626                             		.loc 1 469 9 view .LVU173
+ 627 0012 FD 2A 15                		mov.L	[r1+], r5
+ 628                             	.LVL61:
+ 469:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         ldata1++;
+ 629                             		.loc 1 469 9 is_stmt 0 view .LVU174
+ 630 0015 FD 2A 24                		mov.L	[r2+], r4
+ 631                             	.LVL62:
+ 469:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         ldata1++;
+ 632                             		.loc 1 469 9 view .LVU175
+ 633 0018 FD 04 54                		machi	r5, r4
+ 470:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         ldata2++;
+ 634                             		.loc 1 470 9 is_stmt 1 view .LVU176
+ 635                             	.LVL63:
+ 471:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****         count -= 2;
+ 636                             		.loc 1 471 9 view .LVU177
+ 472:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 637                             		.loc 1 472 9 view .LVU178
+ 472:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 638                             		.loc 1 472 15 is_stmt 0 view .LVU179
+ 639 001b 60 23                   		sub	#2, r3
+ 640                             	.LVL64:
+ 472:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     }
+ 641                             		.loc 1 472 15 view .LVU180
+ 642 001d 2E EA                   		bra	.L44
+ 643                             	.L47:
+ 474:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __builtin_rx_racw(2);
+ 644                             		.loc 1 474 5 is_stmt 1 view .LVU181
+ 474:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __builtin_rx_racw(2);
+ 645                             		.loc 1 474 8 is_stmt 0 view .LVU182
+ 646 001f 61 03                   		cmp	#0, r3
+ 647 0021 10                      		beq	.L46
+ 474:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     __builtin_rx_racw(2);
+ 648                             		.loc 1 474 21 is_stmt 1 discriminator 1 view .LVU183
+ 649 0022 DC 15                   		mov.W	[r1], r5
+ 650 0024 DC 24                   		mov.W	[r2], r4
+ 651 0026 FD 05 54                		maclo	r5, r4
+ 652                             	.L46:
+ 475:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return __builtin_rx_mvfachi();
+ 653                             		.loc 1 475 5 view .LVU184
+ 654 0029 FD 18 10                		racw	#2
+ 476:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 655                             		.loc 1 476 5 view .LVU185
+ 476:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** }
+ 656                             		.loc 1 476 12 is_stmt 0 view .LVU186
+ 657 002c FD 1F 01                		mvfachi	r1
+ 658                             	.LVL65:
+ 477:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* defined(__GNUC__) */
+ 659                             		.loc 1 477 1 view .LVU187
+ 660 002f DF 11                   		mov.W	r1, r1
+ 661 0031 02                      		rts
+ 662                             	.LFE19:
+ 664                             		.section	.text.R_BSP_SetBPSW,"ax",@progbits
+ 665                             		.global	_R_BSP_SetBPSW
+ 667                             	_R_BSP_SetBPSW:
+ 668                             	.LVL66:
+ 669                             	.LFB20:
+ 488:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(data)
+ 670                             		.loc 1 488 1 is_stmt 1 view -0
+ 671                             		; Note: Naked Function
+ 489:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 672                             		.loc 1 489 5 view .LVU189
+ 491:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVTC    R1, BPSW    )
+ 673                             		.loc 1 491 5 view .LVU190
+ 674                             	 ; 491 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+ 675 0000 FD 68 18                		MVTC R1, BPSW
+ 676 0003 02                      	rts
+ 677                             	
+ 678                             	 ; 0 "" 2
+ 494:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 679                             		.loc 1 494 1 is_stmt 0 view .LVU191
+ 680                             		; Naked function: epilogue provided by programmer.
+ 681                             	.LFE20:
+ 683                             		.section	.text.R_BSP_GetBPSW,"ax",@progbits
+ 684                             		.global	_R_BSP_GetBPSW
+ 686                             	_R_BSP_GetBPSW:
+ 687                             	.LFB22:
+ 524:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     uint32_t ret;
+ 688                             		.loc 1 524 1 is_stmt 1 view -0
+ 689 0000 60 40                   		sub	#4, r0
+ 690                             	.LCFI7:
+ 525:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 691                             		.loc 1 525 5 view .LVU193
+ 528:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return ret;
+ 692                             		.loc 1 528 5 view .LVU194
+ 693 0002 EF 01                   		mov.L	r0, r1
+ 694 0004 05 00 00 00             		bsr	_bsp_get_bpsw
+ 695                             	.LVL67:
+ 529:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_GetBPSW() */
+ 696                             		.loc 1 529 5 view .LVU195
+ 530:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 697                             		.loc 1 530 1 is_stmt 0 view .LVU196
+ 698 0008 EC 01                   		mov.L	[r0], r1
+ 699 000a 67 01                   		rtsd	#4
+ 700                             	.LFE22:
+ 702                             		.section	.text.R_BSP_SetBPC,"ax",@progbits
+ 703                             		.global	_R_BSP_SetBPC
+ 705                             	_R_BSP_SetBPC:
+ 706                             	.LVL68:
+ 707                             	.LFB23:
+ 540:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(data)
+ 708                             		.loc 1 540 1 is_stmt 1 view -0
+ 709                             		; Note: Naked Function
+ 541:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 710                             		.loc 1 541 5 view .LVU198
+ 543:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVTC    R1, BPC    )
+ 711                             		.loc 1 543 5 view .LVU199
+ 712                             	 ; 543 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+ 713 0000 FD 68 19                		MVTC R1, BPC
+ 714 0003 02                      	rts
+ 715                             	
+ 716                             	 ; 0 "" 2
+ 546:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 717                             		.loc 1 546 1 is_stmt 0 view .LVU200
+ 718                             		; Naked function: epilogue provided by programmer.
+ 719                             	.LFE23:
+ 721                             		.section	.text.R_BSP_GetBPC,"ax",@progbits
+ 722                             		.global	_R_BSP_GetBPC
+ 724                             	_R_BSP_GetBPC:
+ 725                             	.LFB25:
+ 576:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     uint32_t ret;
+ 726                             		.loc 1 576 1 is_stmt 1 view -0
+ 727 0000 60 40                   		sub	#4, r0
+ 728                             	.LCFI8:
+ 577:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 729                             		.loc 1 577 5 view .LVU202
+ 580:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 730                             		.loc 1 580 5 view .LVU203
+ 731 0002 EF 01                   		mov.L	r0, r1
+ 732 0004 05 00 00 00             		bsr	_bsp_get_bpc
+ 733                             	.LVL69:
+ 583:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_GetBPC() */
+ 734                             		.loc 1 583 5 view .LVU204
+ 584:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 735                             		.loc 1 584 1 is_stmt 0 view .LVU205
+ 736 0008 EC 01                   		mov.L	[r0], r1
+ 737 000a 67 01                   		rtsd	#4
+ 738                             	.LFE25:
+ 740                             		.section	.text.R_BSP_SetEXTB,"ax",@progbits
+ 741                             		.global	_R_BSP_SetEXTB
+ 743                             	_R_BSP_SetEXTB:
+ 744                             	.LVL70:
+ 745                             	.LFB26:
+ 595:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(data)
+ 746                             		.loc 1 595 1 is_stmt 1 view -0
+ 747                             		; Note: Naked Function
+ 596:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 748                             		.loc 1 596 5 view .LVU207
+ 598:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVTC    R1, EXTB    )
+ 749                             		.loc 1 598 5 view .LVU208
+ 750                             	 ; 598 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+ 751 0000 FD 68 1D                		MVTC R1, EXTB
+ 752 0003 02                      	rts
+ 753                             	
+ 754                             	 ; 0 "" 2
+ 601:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 755                             		.loc 1 601 1 is_stmt 0 view .LVU209
+ 756                             		; Naked function: epilogue provided by programmer.
+ 757                             	.LFE26:
+ 759                             		.section	.text.R_BSP_GetEXTB,"ax",@progbits
+ 760                             		.global	_R_BSP_GetEXTB
+ 762                             	_R_BSP_GetEXTB:
+ 763                             	.LFB28:
+ 631:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     uint32_t ret;
+ 764                             		.loc 1 631 1 is_stmt 1 view -0
+ 765 0000 60 40                   		sub	#4, r0
+ 766                             	.LCFI9:
+ 632:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 767                             		.loc 1 632 5 view .LVU211
+ 635:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 768                             		.loc 1 635 5 view .LVU212
+ 769 0002 EF 01                   		mov.L	r0, r1
+ 770 0004 05 00 00 00             		bsr	_bsp_get_extb
+ 771                             	.LVL71:
+ 638:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_GetEXTB() */
+ 772                             		.loc 1 638 5 view .LVU213
+ 639:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* BSP_MCU_EXCEPTION_TABLE */
+ 773                             		.loc 1 639 1 is_stmt 0 view .LVU214
+ 774 0008 EC 01                   		mov.L	[r0], r1
+ 775 000a 67 01                   		rtsd	#4
+ 776                             	.LFE28:
+ 778                             		.section	.text.R_BSP_MoveToAccHiLong,"ax",@progbits
+ 779                             		.global	_R_BSP_MoveToAccHiLong
+ 781                             	_R_BSP_MoveToAccHiLong:
+ 782                             	.LVL72:
+ 783                             	.LFB29:
+ 650:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(data)
+ 784                             		.loc 1 650 1 is_stmt 1 view -0
+ 785                             		; Note: Naked Function
+ 651:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 786                             		.loc 1 651 5 view .LVU216
+ 653:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVTACHI    R1    )
+ 787                             		.loc 1 653 5 view .LVU217
+ 788                             	 ; 653 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+ 789 0000 FD 17 01                		MVTACHI R1
+ 790 0003 02                      	rts
+ 791                             	
+ 792                             	 ; 0 "" 2
+ 656:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 793                             		.loc 1 656 1 is_stmt 0 view .LVU218
+ 794                             		; Naked function: epilogue provided by programmer.
+ 795                             	.LFE29:
+ 797                             		.section	.text.R_BSP_MoveToAccLoLong,"ax",@progbits
+ 798                             		.global	_R_BSP_MoveToAccLoLong
+ 800                             	_R_BSP_MoveToAccLoLong:
+ 801                             	.LVL73:
+ 802                             	.LFB30:
+ 666:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(data)
+ 803                             		.loc 1 666 1 is_stmt 1 view -0
+ 804                             		; Note: Naked Function
+ 667:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 805                             		.loc 1 667 5 view .LVU220
+ 669:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVTACLO    R1    )
+ 806                             		.loc 1 669 5 view .LVU221
+ 807                             	 ; 669 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+ 808 0000 FD 17 11                		MVTACLO R1
+ 809 0003 02                      	rts
+ 810                             	
+ 811                             	 ; 0 "" 2
+ 672:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 812                             		.loc 1 672 1 is_stmt 0 view .LVU222
+ 813                             		; Naked function: epilogue provided by programmer.
+ 814                             	.LFE30:
+ 816                             		.section	.text.R_BSP_MoveFromAccHiLong,"ax",@progbits
+ 817                             		.global	_R_BSP_MoveFromAccHiLong
+ 819                             	_R_BSP_MoveFromAccHiLong:
+ 820                             	.LFB32:
+ 702:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     int32_t ret;
+ 821                             		.loc 1 702 1 is_stmt 1 view -0
+ 822 0000 60 40                   		sub	#4, r0
+ 823                             	.LCFI10:
+ 703:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 824                             		.loc 1 703 5 view .LVU224
+ 706:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return ret;
+ 825                             		.loc 1 706 5 view .LVU225
+ 826 0002 EF 01                   		mov.L	r0, r1
+ 827 0004 05 00 00 00             		bsr	_bsp_move_from_acc_hi_long
+ 828                             	.LVL74:
+ 707:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_MoveFromAccHiLong() */
+ 829                             		.loc 1 707 5 view .LVU226
+ 708:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 830                             		.loc 1 708 1 is_stmt 0 view .LVU227
+ 831 0008 EC 01                   		mov.L	[r0], r1
+ 832 000a 67 01                   		rtsd	#4
+ 833                             	.LFE32:
+ 835                             		.section	.text.R_BSP_MoveFromAccMiLong,"ax",@progbits
+ 836                             		.global	_R_BSP_MoveFromAccMiLong
+ 838                             	_R_BSP_MoveFromAccMiLong:
+ 839                             	.LFB34:
+ 728:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 729:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 730:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_MoveFromAccMiLong
+ 731:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : This function moves the contents of bits 47 to 16 of the accumulator to dest.
+ 732:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : none
+ 733:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : The contents of bits 47 to 16 of the accumulator.
+ 734:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Note         : This function exists to avoid code analysis errors. Because, when inline assembler
+ 735:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                a return value, the error of "No return, in function returning non-void" occurs.
+ 736:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 737:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** int32_t R_BSP_MoveFromAccMiLong(void)
+ 738:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 840                             		.loc 1 738 1 is_stmt 1 view -0
+ 841 0000 60 40                   		sub	#4, r0
+ 842                             	.LCFI11:
+ 739:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     int32_t ret;
+ 843                             		.loc 1 739 5 view .LVU229
+ 740:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 741:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     /* Casting is valid because it matches the type to the right side or argument. */
+ 742:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     bsp_move_from_acc_mi_long((uint32_t *)&ret);
+ 844                             		.loc 1 742 5 view .LVU230
+ 845 0002 EF 01                   		mov.L	r0, r1
+ 846 0004 05 00 00 00             		bsr	_bsp_move_from_acc_mi_long
+ 847                             	.LVL75:
+ 743:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return ret;
+ 848                             		.loc 1 743 5 view .LVU231
+ 744:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_MoveFromAccMiLong() */
+ 849                             		.loc 1 744 1 is_stmt 0 view .LVU232
+ 850 0008 EC 01                   		mov.L	[r0], r1
+ 851 000a 67 01                   		rtsd	#4
+ 852                             	.LFE34:
+ 854                             		.section	.text.R_BSP_BitSet,"ax",@progbits
+ 855                             		.global	_R_BSP_BitSet
+ 857                             	_R_BSP_BitSet:
+ 858                             	.LVL76:
+ 859                             	.LFB35:
+ 745:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 746:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 747:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_BitSet
+ 748:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Sets the specified one bit in the specified 1-byte area to 1.
+ 749:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data - Address of the target 1-byte area
+ 750:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                bit  - Position of the bit to be manipulated
+ 751:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 752:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 753:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_INLINE_ASM(R_BSP_BitSet)
+ 754:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void R_BSP_BitSet(uint8_t *data, uint32_t bit)
+ 755:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 860                             		.loc 1 755 1 is_stmt 1 view -0
+ 861                             		; Note: Naked Function
+ 756:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(data)
+ 862                             		.loc 1 756 5 view .LVU234
+ 757:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(bit)
+ 863                             		.loc 1 757 5 view .LVU235
+ 758:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 759:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+ 864                             		.loc 1 759 5 view .LVU236
+ 865                             	 ; 759 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+ 866 0000 FC 60 12                		BSET R2, [R1]
+ 867 0003 02                      	rts
+ 868                             	
+ 869                             	 ; 0 "" 2
+ 760:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    BSET    R2, [R1]    )
+ 761:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 762:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_BitSet() */
+ 870                             		.loc 1 762 1 is_stmt 0 view .LVU237
+ 871                             		; Naked function: epilogue provided by programmer.
+ 872                             	.LFE35:
+ 874                             		.section	.text.R_BSP_BitClear,"ax",@progbits
+ 875                             		.global	_R_BSP_BitClear
+ 877                             	_R_BSP_BitClear:
+ 878                             	.LVL77:
+ 879                             	.LFB36:
+ 763:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 764:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 765:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_BitClear
+ 766:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Sets the specified one bit in the specified 1-byte area to 0.
+ 767:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data - Address of the target 1-byte area
+ 768:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                bit  - Position of the bit to be manipulated
+ 769:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 770:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 771:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_INLINE_ASM(R_BSP_BitClear)
+ 772:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void R_BSP_BitClear(uint8_t *data, uint32_t bit)
+ 773:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 880                             		.loc 1 773 1 is_stmt 1 view -0
+ 881                             		; Note: Naked Function
+ 774:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(data)
+ 882                             		.loc 1 774 5 view .LVU239
+ 775:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(bit)
+ 883                             		.loc 1 775 5 view .LVU240
+ 776:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 777:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+ 884                             		.loc 1 777 5 view .LVU241
+ 885                             	 ; 777 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+ 886 0000 FC 64 12                		BCLR R2, [R1]
+ 887 0003 02                      	rts
+ 888                             	
+ 889                             	 ; 0 "" 2
+ 778:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    BCLR    R2, [R1]    )
+ 779:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 780:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_BitClear() */
+ 890                             		.loc 1 780 1 is_stmt 0 view .LVU242
+ 891                             		; Naked function: epilogue provided by programmer.
+ 892                             	.LFE36:
+ 894                             		.section	.text.R_BSP_BitReverse,"ax",@progbits
+ 895                             		.global	_R_BSP_BitReverse
+ 897                             	_R_BSP_BitReverse:
+ 898                             	.LVL78:
+ 899                             	.LFB37:
+ 781:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 782:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 783:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_BitReverse
+ 784:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Reverses the value of the specified one bit in the specified 1-byte area.
+ 785:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data - Address of the target 1-byte area
+ 786:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                bit  - Position of the bit to be manipulated
+ 787:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 788:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 789:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_INLINE_ASM(R_BSP_BitReverse)
+ 790:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void R_BSP_BitReverse(uint8_t *data, uint32_t bit)
+ 791:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 900                             		.loc 1 791 1 is_stmt 1 view -0
+ 901                             		; Note: Naked Function
+ 792:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(data)
+ 902                             		.loc 1 792 5 view .LVU244
+ 793:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(bit)
+ 903                             		.loc 1 793 5 view .LVU245
+ 794:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 795:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+ 904                             		.loc 1 795 5 view .LVU246
+ 905                             	 ; 795 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+ 906 0000 FC 6C 12                		BNOT R2, [R1]
+ 907 0003 02                      	rts
+ 908                             	
+ 909                             	 ; 0 "" 2
+ 796:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    BNOT    R2, [R1]    )
+ 797:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 798:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_BitReverse() */
+ 910                             		.loc 1 798 1 is_stmt 0 view .LVU247
+ 911                             		; Naked function: epilogue provided by programmer.
+ 912                             	.LFE37:
+ 914                             		.section	.text.R_BSP_InitTFU,"ax",@progbits
+ 915                             		.global	_R_BSP_InitTFU
+ 917                             	_R_BSP_InitTFU:
+ 918                             	.LFB38:
+ 799:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 800:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #ifdef BSP_MCU_DOUBLE_PRECISION_FLOATING_POINT
+ 801:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #ifdef __DPFPU
+ 802:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 803:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_SetDPSW
+ 804:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Sets a value to DPSW.
+ 805:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data - Value to be set.
+ 806:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 807:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 808:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_INLINE_ASM(R_BSP_SetDPSW)
+ 809:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void R_BSP_SetDPSW(uint32_t data)
+ 810:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 811:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(data)
+ 812:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 813:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+ 814:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVTDC   R1, DPSW    )
+ 815:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 816:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_SetDPSW() */
+ 817:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 818:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 819:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: bsp_get_dpsw
+ 820:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Refers to the DPSW value.
+ 821:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : ret - Return value address.
+ 822:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 823:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 824:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_STATIC_INLINE_ASM(bsp_get_dpsw)
+ 825:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void bsp_get_dpsw(uint32_t *ret)
+ 826:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 827:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(ret)
+ 828:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 829:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+ 830:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    PUSH.L     R2           )
+ 831:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVFDC      DPSW, R2     )
+ 832:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.L      R2, [R1]     )
+ 833:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    POP        R2           )
+ 834:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 835:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function bsp_get_dpsw() */
+ 836:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 837:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 838:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_GetDPSW
+ 839:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Refers to the DPSW value.
+ 840:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : none
+ 841:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : DPSW value.
+ 842:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Note         : This function exists to avoid code analysis errors. Because, when inline assembler
+ 843:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                a return value, the error of "No return, in function returning non-void" occurs.
+ 844:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 845:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** uint32_t R_BSP_GetDPSW(void)
+ 846:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 847:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     uint32_t ret;
+ 848:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 849:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     /* Casting is valid because it matches the type to the right side or argument. */
+ 850:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     bsp_get_dpsw((uint32_t *)&ret);
+ 851:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return ret;
+ 852:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_GetDPSW() */
+ 853:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 854:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 855:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_SetDECNT
+ 856:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Sets a value to DECNT.
+ 857:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : data - Value to be set.
+ 858:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 859:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 860:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_INLINE_ASM(R_BSP_SetDECNT)
+ 861:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void R_BSP_SetDECNT(uint32_t data)
+ 862:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 863:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(data)
+ 864:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 865:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+ 866:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVTDC   R1, DECNT    )
+ 867:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 868:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_SetDECNT() */
+ 869:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 870:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 871:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: bsp_get_decnt
+ 872:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Refers to the DECNT value.
+ 873:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : ret - Return value address.
+ 874:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 875:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 876:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_STATIC_INLINE_ASM(bsp_get_decnt)
+ 877:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void bsp_get_decnt(uint32_t *ret)
+ 878:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 879:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(ret)
+ 880:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 881:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+ 882:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    PUSH.L     R2           )
+ 883:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVFDC      DECNT, R2    )
+ 884:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.L      R2, [R1]     )
+ 885:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    POP        R2           )
+ 886:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 887:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function bsp_get_decnt() */
+ 888:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 889:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 890:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_GetDECNT
+ 891:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Refers to the DECNT value.
+ 892:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : none
+ 893:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : DECNT value.
+ 894:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Note         : This function exists to avoid code analysis errors. Because, when inline assembler
+ 895:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                a return value, the error of "No return, in function returning non-void" occurs.
+ 896:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 897:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** uint32_t R_BSP_GetDECNT(void)
+ 898:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 899:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     uint32_t ret;
+ 900:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 901:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     /* Casting is valid because it matches the type to the right side or argument. */
+ 902:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     bsp_get_decnt((uint32_t *)&ret);
+ 903:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return ret;
+ 904:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_GetDECNT() */
+ 905:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 906:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 907:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: bsp_get_depc
+ 908:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Refers to the DEPC value.
+ 909:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : ret - Return value address.
+ 910:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 911:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 912:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_STATIC_INLINE_ASM(bsp_get_depc)
+ 913:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void bsp_get_depc(uint32_t *ret)
+ 914:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 915:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(ret)
+ 916:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 917:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+ 918:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    PUSH.L     R2           )
+ 919:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MVFDC      DEPC, R2     )
+ 920:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.L      R2, [R1]     )
+ 921:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    POP        R2           )
+ 922:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 923:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function bsp_get_decnt() */
+ 924:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 925:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 926:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_GetDEPC
+ 927:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Refers to the DEPC value.
+ 928:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : none
+ 929:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : DEPC value.
+ 930:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Note         : This function exists to avoid code analysis errors. Because, when inline assembler
+ 931:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                a return value, the error of "No return, in function returning non-void" occurs.
+ 932:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 933:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void *R_BSP_GetDEPC(void)
+ 934:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 935:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     uint32_t ret;
+ 936:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 937:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     /* Casting is valid because it matches the type to the right side or argument. */
+ 938:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     bsp_get_depc((uint32_t *)&ret);
+ 939:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     return (void *)ret;
+ 940:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_GetDECNT() */
+ 941:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* __DPFPU */
+ 942:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif /* BSP_MCU_DOUBLE_PRECISION_FLOATING_POINT */
+ 943:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 944:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #ifdef BSP_MCU_TRIGONOMETRIC
+ 945:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #ifdef __TFU
+ 946:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #if BSP_MCU_TFU_VERSION == 1
+ 947:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 948:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_InitTFU
+ 949:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Initialize arithmetic unit for trigonometric functions.
+ 950:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : none
+ 951:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 952:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 953:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_INLINE_ASM(R_BSP_InitTFU)
+ 954:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void R_BSP_InitTFU(void)
+ 955:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 919                             		.loc 1 955 1 is_stmt 1 view -0
+ 920                             		; Note: Naked Function
+ 956:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+ 921                             		.loc 1 956 5 view .LVU249
+ 922                             	 ; 956 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+ 923 0000 7E A1                   		PUSH.L R1
+ 924 0002 FB 1E 00 14 08          	MOV.L #81400H, R1
+ 925 0007 F8 14 07                	MOV.B #7, [R1]
+ 926 000a 3C 11 07                	MOV.B #7, 1[R1]
+ 927 000d 7E B1                   	POP R1
+ 928 000f 02                      	rts
+ 929                             	
+ 930                             	 ; 0 "" 2
+ 957:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    PUSH.L    R1             )
+ 958:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.L     #81400H, R1    )
+ 959:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.B     #7, [R1]       )
+ 960:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.B     #7, 1[R1]      )
+ 961:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    POP       R1             )
+ 962:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 963:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_InitTFU() */
+ 931                             		.loc 1 963 1 is_stmt 0 view .LVU250
+ 932                             		; Naked function: epilogue provided by programmer.
+ 933                             	.LFE38:
+ 935                             		.section	.text.R_BSP_CalcSine_Cosine,"ax",@progbits
+ 936                             		.global	_R_BSP_CalcSine_Cosine
+ 938                             	_R_BSP_CalcSine_Cosine:
+ 939                             	.LVL79:
+ 940                             	.LFB39:
+ 964:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #endif
+ 965:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** #ifdef __FPU
+ 966:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 967:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_CalcSine_Cosine
+ 968:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Uses the trigonometric function unit to calculate the sine and cosine of an angle 
+ 969:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                (single precision).
+ 970:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : f - Value in radians from which to calculate the sine and cosine
+ 971:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *              : sin - Address for storing the result of the sine operation
+ 972:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *              : cos - Address for storing the result of the cosine operation
+ 973:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 974:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 975:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_INLINE_ASM(R_BSP_CalcSine_Cosine)
+ 976:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void R_BSP_CalcSine_Cosine(float f, float *sin, float *cos)
+ 977:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 941                             		.loc 1 977 1 is_stmt 1 view -0
+ 942                             		; Note: Naked Function
+ 978:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+ 943                             		.loc 1 978 5 view .LVU252
+ 944                             	 ; 978 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+ 945 0000 7E A4                   		PUSH.L R4
+ 946 0002 FB 4E 10 14 08          	MOV.L #81410H, R4
+ 947 0007 A0 49                   	MOV.L R1, 4[R4]
+ 948 0009 E1 42 01                	MOV.L 4[R4], [R2]
+ 949 000c E0 43                   	MOV.L [R4], [R3]
+ 950 000e 7E B4                   	POP R4
+ 951 0010 02                      	rts
+ 952                             	
+ 953                             	 ; 0 "" 2
+ 979:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    PUSH.L    R4             )
+ 980:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.L     #81410H, R4    )
+ 981:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.L     R1, 4[R4]      )
+ 982:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.L     4[R4], [R2]    )
+ 983:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.L     [R4], [R3]     )
+ 984:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    POP       R4             )
+ 985:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+ 986:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_CalcSine_Cosine() */
+ 954                             		.loc 1 986 1 is_stmt 0 view .LVU253
+ 955                             		; Naked function: epilogue provided by programmer.
+ 956                             	.LFE39:
+ 958                             		.section	.text.R_BSP_CalcAtan_SquareRoot,"ax",@progbits
+ 959                             		.global	_R_BSP_CalcAtan_SquareRoot
+ 961                             	_R_BSP_CalcAtan_SquareRoot:
+ 962                             	.LVL80:
+ 963                             	.LFB40:
+ 987:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+ 988:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** /**************************************************************************************************
+ 989:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Function Name: R_BSP_CalcAtan_SquareRoot
+ 990:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Description  : Uses the trigonometric function unit to calculate the arc tangent of x and y and t
+ 991:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                the sum of squares of these values at the same time (single precision).
+ 992:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Arguments    : y - Coordinate y (the numerator of the tangent)
+ 993:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                x - Coordinate x (the denominator of the tangent)
+ 994:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                atan2 - Address for storing the result of the arc tangent operation for y/x
+ 995:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** *                hypot - Address for storing the result of the square root of the sum of squares of
+ 996:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** * Return Value : none
+ 997:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** ***************************************************************************************************
+ 998:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** R_BSP_PRAGMA_INLINE_ASM(R_BSP_CalcAtan_SquareRoot)
+ 999:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** void R_BSP_CalcAtan_SquareRoot(float y, float x, float *atan2, float *hypot)
+1000:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** {
+ 964                             		.loc 1 1000 1 is_stmt 1 view -0
+ 965                             		; Note: Naked Function
+1001:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(y)
+ 966                             		.loc 1 1001 5 view .LVU255
+1002:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(x)
+ 967                             		.loc 1 1002 5 view .LVU256
+1003:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(atan2)
+ 968                             		.loc 1 1003 5 view .LVU257
+1004:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_INTERNAL_USED(hypot)
+ 969                             		.loc 1 1004 5 view .LVU258
+1005:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** 
+1006:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_BEGIN
+ 970                             		.loc 1 1006 5 view .LVU259
+ 971                             	 ; 1006 "../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c" 1
+ 972 0000 6E 56                   		PUSHM R5-R6
+ 973 0002 FB 5E 18 14 08          	MOV.L #81418H, R5
+ 974 0007 E3 52                   	MOV.L R2, [R5]
+ 975 0009 A0 59                   	MOV.L R1, 4[R5]
+ 976 000b E1 53 01                	MOV.L 4[R5], [R3]
+ 977 000e EC 56                   	MOV.L [R5], R6
+ 978 0010 FD 72 36 EE 74 1B 3F    	FMUL #3F1B74EEH, R6
+ 979 0017 E3 46                   	MOV.L R6, [R4]
+ 980 0019 6F 56                   	POPM R5-R6
+ 981 001b 02                      	rts
+ 982                             	
+ 983                             	 ; 0 "" 2
+1007:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    PUSHM     R5-R6              )
+1008:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.L     #81418H, R5        )
+1009:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.L     R2, [R5]           )
+1010:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.L     R1, 4[R5]          )
+1011:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.L     4[R5], [R3]        )
+1012:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.L     [R5], R6           )
+1013:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    FMUL      #3F1B74EEH, R6     )
+1014:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    MOV.L     R6, [R4]           )
+1015:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM(    POPM      R5-R6              )
+1016:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c ****     R_BSP_ASM_END
+1017:../src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.c **** } /* End of function R_BSP_CalcAtan_SquareRoot() */
+ 984                             		.loc 1 1017 1 is_stmt 0 view .LVU260
+ 985                             		; Naked function: epilogue provided by programmer.
+ 986                             	.LFE40:
+ 1392                             	.Letext0:
+ 1393                             		.file 2 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 1394                             		.file 3 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 1395                             		.file 4 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\lib\\gcc\\rx-
+ 1396                             		.file 5 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 1397                             		.file 6 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 1398                             		.file 7 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 1399                             		.file 8 "../src/smc_gen/r_bsp/mcu/all/r_rx_compiler.h"
+ 1400                             		.file 9 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/rx72n/mcu_lock

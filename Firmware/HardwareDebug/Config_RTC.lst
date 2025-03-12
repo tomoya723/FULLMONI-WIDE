@@ -1,0 +1,1142 @@
+   1                             		.file	"Config_RTC.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.R_Config_RTC_Create,"ax",@progbits
+   5                             		.global	_R_Config_RTC_Create
+   7                             	_R_Config_RTC_Create:
+   8                             	.LFB3:
+   9                             		.file 1 "../src/smc_gen/Config_RTC/Config_RTC.c"
+   1:../src/smc_gen/Config_RTC/Config_RTC.c **** /**************************************************************************************************
+   2:../src/smc_gen/Config_RTC/Config_RTC.c **** * DISCLAIMER
+   3:../src/smc_gen/Config_RTC/Config_RTC.c **** * This software is supplied by Renesas Electronics Corporation and is only intended for use with Re
+   4:../src/smc_gen/Config_RTC/Config_RTC.c **** * No other uses are authorized. This software is owned by Renesas Electronics Corporation and is pr
+   5:../src/smc_gen/Config_RTC/Config_RTC.c **** * applicable laws, including copyright laws. 
+   6:../src/smc_gen/Config_RTC/Config_RTC.c **** * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING THIS SOFTWARE, WHETHE
+   7:../src/smc_gen/Config_RTC/Config_RTC.c **** * OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULA
+   8:../src/smc_gen/Config_RTC/Config_RTC.c **** * NON-INFRINGEMENT.  ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.TO THE MAXIMUM EXTENT PERMITTED N
+   9:../src/smc_gen/Config_RTC/Config_RTC.c **** * LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE 
+  10:../src/smc_gen/Config_RTC/Config_RTC.c **** * INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS SOFTWARE, E
+  11:../src/smc_gen/Config_RTC/Config_RTC.c **** * ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+  12:../src/smc_gen/Config_RTC/Config_RTC.c **** * Renesas reserves the right, without notice, to make changes to this software and to discontinue t
+  13:../src/smc_gen/Config_RTC/Config_RTC.c **** * of this software. By using this software, you agree to the additional terms and conditions found 
+  14:../src/smc_gen/Config_RTC/Config_RTC.c **** * following link:
+  15:../src/smc_gen/Config_RTC/Config_RTC.c **** * http://www.renesas.com/disclaimer
+  16:../src/smc_gen/Config_RTC/Config_RTC.c **** *
+  17:../src/smc_gen/Config_RTC/Config_RTC.c **** * Copyright (C) 2022 Renesas Electronics Corporation. All rights reserved.
+  18:../src/smc_gen/Config_RTC/Config_RTC.c **** ***************************************************************************************************
+  19:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+  20:../src/smc_gen/Config_RTC/Config_RTC.c **** /**************************************************************************************************
+  21:../src/smc_gen/Config_RTC/Config_RTC.c **** * File Name        : Config_RTC.c
+  22:../src/smc_gen/Config_RTC/Config_RTC.c **** * Component Version: 1.8.0
+  23:../src/smc_gen/Config_RTC/Config_RTC.c **** * Device(s)        : R5F572NNDxFP
+  24:../src/smc_gen/Config_RTC/Config_RTC.c **** * Description      : This file implements device driver for Config_RTC.
+  25:../src/smc_gen/Config_RTC/Config_RTC.c **** ***************************************************************************************************
+  26:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+  27:../src/smc_gen/Config_RTC/Config_RTC.c **** /**************************************************************************************************
+  28:../src/smc_gen/Config_RTC/Config_RTC.c **** Pragma directive
+  29:../src/smc_gen/Config_RTC/Config_RTC.c **** ***************************************************************************************************
+  30:../src/smc_gen/Config_RTC/Config_RTC.c **** /* Start user code for pragma. Do not edit comment generated here */
+  31:../src/smc_gen/Config_RTC/Config_RTC.c **** /* End user code. Do not edit comment generated here */
+  32:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+  33:../src/smc_gen/Config_RTC/Config_RTC.c **** /**************************************************************************************************
+  34:../src/smc_gen/Config_RTC/Config_RTC.c **** Includes
+  35:../src/smc_gen/Config_RTC/Config_RTC.c **** ***************************************************************************************************
+  36:../src/smc_gen/Config_RTC/Config_RTC.c **** #include "r_cg_macrodriver.h"
+  37:../src/smc_gen/Config_RTC/Config_RTC.c **** #include "Config_RTC.h"
+  38:../src/smc_gen/Config_RTC/Config_RTC.c **** /* Start user code for include. Do not edit comment generated here */
+  39:../src/smc_gen/Config_RTC/Config_RTC.c **** /* End user code. Do not edit comment generated here */
+  40:../src/smc_gen/Config_RTC/Config_RTC.c **** #include "r_cg_userdefine.h"
+  41:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+  42:../src/smc_gen/Config_RTC/Config_RTC.c **** /**************************************************************************************************
+  43:../src/smc_gen/Config_RTC/Config_RTC.c **** Global variables and functions
+  44:../src/smc_gen/Config_RTC/Config_RTC.c **** ***************************************************************************************************
+  45:../src/smc_gen/Config_RTC/Config_RTC.c **** /* Start user code for global. Do not edit comment generated here */
+  46:../src/smc_gen/Config_RTC/Config_RTC.c **** /* End user code. Do not edit comment generated here */
+  47:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+  48:../src/smc_gen/Config_RTC/Config_RTC.c **** /**************************************************************************************************
+  49:../src/smc_gen/Config_RTC/Config_RTC.c **** * Function Name: R_Config_RTC_Create
+  50:../src/smc_gen/Config_RTC/Config_RTC.c **** * Description  : This function initializes the RTC module
+  51:../src/smc_gen/Config_RTC/Config_RTC.c **** * Arguments    : None
+  52:../src/smc_gen/Config_RTC/Config_RTC.c **** * Return Value : None
+  53:../src/smc_gen/Config_RTC/Config_RTC.c **** ***************************************************************************************************
+  54:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+  55:../src/smc_gen/Config_RTC/Config_RTC.c **** void R_Config_RTC_Create(void)
+  56:../src/smc_gen/Config_RTC/Config_RTC.c **** {
+  10                             		.loc 1 56 1 view -0
+  11 0000 60 40                   		sub	#4, r0
+  12                             	.LCFI0:
+  57:../src/smc_gen/Config_RTC/Config_RTC.c ****     uint16_t w_count;
+  13                             		.loc 1 57 5 view .LVU1
+  58:../src/smc_gen/Config_RTC/Config_RTC.c ****     uint32_t rw_count;
+  14                             		.loc 1 58 5 view .LVU2
+  59:../src/smc_gen/Config_RTC/Config_RTC.c ****     volatile uint32_t dummy;
+  15                             		.loc 1 59 5 view .LVU3
+  60:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+  61:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* Disable ALM, PRD and CUP interrupts */
+  62:../src/smc_gen/Config_RTC/Config_RTC.c ****     IEN(RTC, ALM) = 0U;
+  16                             		.loc 1 62 5 view .LVU4
+  17                             		.loc 1 62 19 is_stmt 0 view .LVU5
+  18 0002 FB 5E 00 70 08          		mov.L	#0x87000, r5
+  19 0007 CE 54 0B 02             		mov.B	523[r5], r4
+  20 000b 7A 44                   		bclr	#4, r4
+  21 000d CB 54 0B 02             		mov.B	r4, 523[r5]
+  63:../src/smc_gen/Config_RTC/Config_RTC.c ****     IEN(RTC, PRD) = 0U;
+  22                             		.loc 1 63 5 is_stmt 1 view .LVU6
+  23                             		.loc 1 63 19 is_stmt 0 view .LVU7
+  24 0011 CE 54 0B 02             		mov.B	523[r5], r4
+  25 0015 7A 54                   		bclr	#5, r4
+  26 0017 CB 54 0B 02             		mov.B	r4, 523[r5]
+  64:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+  65:../src/smc_gen/Config_RTC/Config_RTC.c ****     if (RTC.RCR1.BIT.AIE == 1U)
+  27                             		.loc 1 65 5 is_stmt 1 view .LVU8
+  28                             		.loc 1 65 21 is_stmt 0 view .LVU9
+  29 001b FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+  30 0020 CD 55 22                		mov.B	34[r5], r5
+  31                             		.loc 1 65 8 view .LVU10
+  32 0023 FD 74 C5 01             		tst	#1, r5
+  33 0027 21 1C                   		bne	.L24
+  34                             	.L2:
+  66:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+  67:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Disable RTC ALARM interrupt */
+  68:../src/smc_gen/Config_RTC/Config_RTC.c ****         RTC.RCR1.BIT.AIE = 0U;
+  69:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (RTC.RCR1.BIT.AIE != 0U)
+  70:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+  71:../src/smc_gen/Config_RTC/Config_RTC.c ****             /* Wait for the register modification to complete */
+  72:../src/smc_gen/Config_RTC/Config_RTC.c ****         }
+  73:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+  74:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Clear IR flag of ICU ALARM interrupt */
+  75:../src/smc_gen/Config_RTC/Config_RTC.c ****         IR(RTC, ALM) = 0U;
+  76:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+  77:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+  78:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* RTC cold start with sub-clock source */
+  79:../src/smc_gen/Config_RTC/Config_RTC.c ****     if(0 == SYSTEM.RSTSR1.BIT.CWSF)
+  35                             		.loc 1 79 5 is_stmt 1 view .LVU11
+  36                             		.loc 1 79 30 is_stmt 0 view .LVU12
+  37 0029 FB 5E 00 00 08          		mov.L	#0x80000, r5
+  38 002e CE 55 91 C2             		mov.B	49809[r5], r5
+  39                             		.loc 1 79 7 view .LVU13
+  40 0032 FD 74 C5 01             		tst	#1, r5
+  41 0036 21 61                   		bne	.L4
+  80:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+  81:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Set RTC clock source */
+  82:../src/smc_gen/Config_RTC/Config_RTC.c ****         RTC.RCR4.BYTE = _00_RTC_SOURCE_SELECT_SUB;
+  42                             		.loc 1 82 9 is_stmt 1 view .LVU14
+  43                             		.loc 1 82 23 is_stmt 0 view .LVU15
+  44 0038 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+  45 003d F9 54 28 00             		mov.B	#0, 40[r5]
+  83:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+  84:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Set sub-clock oscillator */
+  85:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (1U != RTC.RCR3.BIT.RTCEN)
+  46                             		.loc 1 85 9 is_stmt 1 view .LVU16
+  47                             		.loc 1 85 15 is_stmt 0 view .LVU17
+  48 0041 2E 39                   		bra	.L5
+  49                             	.L24:
+  68:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (RTC.RCR1.BIT.AIE != 0U)
+  50                             		.loc 1 68 9 is_stmt 1 view .LVU18
+  68:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (RTC.RCR1.BIT.AIE != 0U)
+  51                             		.loc 1 68 26 is_stmt 0 view .LVU19
+  52 0043 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+  53 0048 CD 54 22                		mov.B	34[r5], r4
+  54 004b 7A 04                   		bclr	#0, r4
+  55 004d C7 54 22                		mov.B	r4, 34[r5]
+  69:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+  56                             		.loc 1 69 9 is_stmt 1 view .LVU20
+  57                             	.L3:
+  72:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+  58                             		.loc 1 72 9 discriminator 1 view .LVU21
+  69:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+  59                             		.loc 1 69 28 is_stmt 0 discriminator 1 view .LVU22
+  60 0050 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+  61 0055 CD 55 22                		mov.B	34[r5], r5
+  69:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+  62                             		.loc 1 69 15 discriminator 1 view .LVU23
+  63 0058 FD 74 C5 01             		tst	#1, r5
+  64 005c 21 F4                   		bne	.L3
+  75:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+  65                             		.loc 1 75 9 is_stmt 1 view .LVU24
+  75:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+  66                             		.loc 1 75 22 is_stmt 0 view .LVU25
+  67 005e FB 5E 00 70 08          		mov.L	#0x87000, r5
+  68 0063 CD 54 5C                		mov.B	92[r5], r4
+  69 0066 7A 04                   		bclr	#0, r4
+  70 0068 C7 54 5C                		mov.B	r4, 92[r5]
+  71 006b 2E BE                   		bra	.L2
+  72                             	.L22:
+  86:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+  87:../src/smc_gen/Config_RTC/Config_RTC.c ****             RTC.RCR3.BIT.RTCEN = 1U;
+  73                             		.loc 1 87 13 is_stmt 1 view .LVU26
+  74                             		.loc 1 87 32 is_stmt 0 view .LVU27
+  75 006d FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+  76 0072 CD 54 26                		mov.B	38[r5], r4
+  77 0075 78 04                   		bset	#0, r4
+  78 0077 C7 54 26                		mov.B	r4, 38[r5]
+  79                             	.L5:
+  85:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+  80                             		.loc 1 85 34 view .LVU28
+  81 007a FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+  82 007f CD 55 26                		mov.B	38[r5], r5
+  85:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+  83                             		.loc 1 85 15 view .LVU29
+  84 0082 FD 74 C5 01             		tst	#1, r5
+  85 0086 20 E7                   		beq	.L22
+  88:../src/smc_gen/Config_RTC/Config_RTC.c ****         }
+  89:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+  90:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Wait for 6 sub-clock cycles */
+  91:../src/smc_gen/Config_RTC/Config_RTC.c ****         for (w_count = 0U; w_count < _2256_RTC_SUB_6_CYCLE_WAIT; w_count++)
+  86                             		.loc 1 91 22 view .LVU30
+  87 0088 66 05                   		mov	#0, r5
+  88                             	.L6:
+  89                             	.LVL0:
+  90                             		.loc 1 91 9 discriminator 1 view .LVU31
+  91 008a 5F 54                   		movu.W	r5, r4
+  92 008c 76 04 55 22             		cmp	#0x2255, r4
+  93 0090 24 07                   		bgtu	.L4
+  92:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+  93:../src/smc_gen/Config_RTC/Config_RTC.c ****             nop();
+  94                             		.loc 1 93 13 is_stmt 1 discriminator 3 view .LVU32
+  95                             	 ; 93 "../src/smc_gen/Config_RTC/Config_RTC.c" 1
+  96 0092 03                      		nop
+  97                             	 ; 0 "" 2
+  91:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+  98                             		.loc 1 91 73 is_stmt 0 discriminator 3 view .LVU33
+  99 0093 62 15                   		add	#1, r5
+ 100                             	.LVL1:
+  91:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+ 101                             		.loc 1 91 73 discriminator 3 view .LVU34
+ 102 0095 2E F5                   		bra	.L6
+ 103                             	.LVL2:
+ 104                             	.L4:
+  94:../src/smc_gen/Config_RTC/Config_RTC.c ****         }
+  95:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+  96:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+  97:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* RTC cold start with sub-clock source or RTC start with main clock source */
+  98:../src/smc_gen/Config_RTC/Config_RTC.c ****     if((0 == SYSTEM.RSTSR1.BIT.CWSF) || (_01_RTC_SOURCE_SELECT_MAIN_FORCED == RTC.RCR4.BYTE))
+ 105                             		.loc 1 98 5 is_stmt 1 view .LVU35
+ 106                             		.loc 1 98 31 is_stmt 0 view .LVU36
+ 107 0097 FB 5E 00 00 08          		mov.L	#0x80000, r5
+ 108 009c CE 55 91 C2             		mov.B	49809[r5], r5
+ 109                             		.loc 1 98 7 view .LVU37
+ 110 00a0 FD 74 C5 01             		tst	#1, r5
+ 111 00a4 20 11                   		beq	.L9
+ 112                             		.loc 1 98 87 discriminator 1 view .LVU38
+ 113 00a6 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 114 00ab CD 55 28                		mov.B	40[r5], r5
+ 115                             		.loc 1 98 38 discriminator 1 view .LVU39
+ 116 00ae 5B 55                   		movu.B	r5, r5
+ 117 00b0 61 15                   		cmp	#1, r5
+ 118 00b2 3B C8 00                		bne	.L10
+ 119                             	.L9:
+  99:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 100:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 101:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Stop all counters */
+ 102:../src/smc_gen/Config_RTC/Config_RTC.c ****         RTC.RCR2.BYTE = 0x00U;
+ 120                             		.loc 1 102 9 is_stmt 1 view .LVU40
+ 121                             		.loc 1 102 23 is_stmt 0 view .LVU41
+ 122 00b5 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 123 00ba F9 54 24 00             		mov.B	#0, 36[r5]
+ 103:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (RTC.RCR2.BIT.START != 0U)
+ 124                             		.loc 1 103 9 is_stmt 1 view .LVU42
+ 125                             	.L11:
+ 104:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+ 105:../src/smc_gen/Config_RTC/Config_RTC.c ****             /* Wait for the register modification to complete */
+ 106:../src/smc_gen/Config_RTC/Config_RTC.c ****         }
+ 126                             		.loc 1 106 9 discriminator 1 view .LVU43
+ 103:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (RTC.RCR2.BIT.START != 0U)
+ 127                             		.loc 1 103 28 is_stmt 0 discriminator 1 view .LVU44
+ 128 00be FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 129 00c3 CD 55 24                		mov.B	36[r5], r5
+ 103:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (RTC.RCR2.BIT.START != 0U)
+ 130                             		.loc 1 103 15 discriminator 1 view .LVU45
+ 131 00c6 FD 74 C5 01             		tst	#1, r5
+ 132 00ca 21 F4                   		bne	.L11
+ 107:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 108:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Select count mode */
+ 109:../src/smc_gen/Config_RTC/Config_RTC.c ****         RTC.RCR2.BIT.CNTMD = 0U;
+ 133                             		.loc 1 109 9 is_stmt 1 view .LVU46
+ 134                             		.loc 1 109 28 is_stmt 0 view .LVU47
+ 135 00cc FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 136 00d1 CD 54 24                		mov.B	36[r5], r4
+ 137 00d4 7A 74                   		bclr	#7, r4
+ 138 00d6 C7 54 24                		mov.B	r4, 36[r5]
+ 110:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (RTC.RCR2.BIT.CNTMD != 0U)
+ 139                             		.loc 1 110 9 is_stmt 1 view .LVU48
+ 140                             	.L12:
+ 111:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+ 112:../src/smc_gen/Config_RTC/Config_RTC.c ****             /* Wait for the register modification to complete */
+ 113:../src/smc_gen/Config_RTC/Config_RTC.c ****         }
+ 141                             		.loc 1 113 9 discriminator 1 view .LVU49
+ 110:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (RTC.RCR2.BIT.CNTMD != 0U)
+ 142                             		.loc 1 110 28 is_stmt 0 discriminator 1 view .LVU50
+ 143 00d9 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 144 00de CD 55 24                		mov.B	36[r5], r5
+ 145 00e1 5B 55                   		movu.B	r5, r5
+ 110:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (RTC.RCR2.BIT.CNTMD != 0U)
+ 146                             		.loc 1 110 15 discriminator 1 view .LVU51
+ 147 00e3 68 75                   		shlr	#7, r5
+ 148 00e5 21 F4                   		bne	.L12
+ 114:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 115:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Execute RTC software reset */
+ 116:../src/smc_gen/Config_RTC/Config_RTC.c ****         RTC.RCR2.BIT.RESET = 1U;
+ 149                             		.loc 1 116 9 is_stmt 1 view .LVU52
+ 150                             		.loc 1 116 28 is_stmt 0 view .LVU53
+ 151 00e7 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 152 00ec CD 54 24                		mov.B	36[r5], r4
+ 153 00ef 78 14                   		bset	#1, r4
+ 154 00f1 C7 54 24                		mov.B	r4, 36[r5]
+ 117:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (RTC.RCR2.BIT.RESET != 0U)
+ 155                             		.loc 1 117 9 is_stmt 1 view .LVU54
+ 156                             	.L13:
+ 118:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+ 119:../src/smc_gen/Config_RTC/Config_RTC.c ****             /* Wait for the register modification to complete */
+ 120:../src/smc_gen/Config_RTC/Config_RTC.c ****         }
+ 157                             		.loc 1 120 9 discriminator 1 view .LVU55
+ 117:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (RTC.RCR2.BIT.RESET != 0U)
+ 158                             		.loc 1 117 28 is_stmt 0 discriminator 1 view .LVU56
+ 159 00f4 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 160 00f9 CD 55 24                		mov.B	36[r5], r5
+ 117:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (RTC.RCR2.BIT.RESET != 0U)
+ 161                             		.loc 1 117 15 discriminator 1 view .LVU57
+ 162 00fc FD 74 C5 02             		tst	#2, r5
+ 163 0100 21 F4                   		bne	.L13
+ 121:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 122:../src/smc_gen/Config_RTC/Config_RTC.c ****          /* Stop RTC counter */
+ 123:../src/smc_gen/Config_RTC/Config_RTC.c ****         RTC.RCR2.BIT.START = 0U;
+ 164                             		.loc 1 123 9 is_stmt 1 view .LVU58
+ 165                             		.loc 1 123 28 is_stmt 0 view .LVU59
+ 166 0102 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 167 0107 CD 54 24                		mov.B	36[r5], r4
+ 168 010a 7A 04                   		bclr	#0, r4
+ 169 010c C7 54 24                		mov.B	r4, 36[r5]
+ 124:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (RTC.RCR2.BIT.START != 0U)
+ 170                             		.loc 1 124 9 is_stmt 1 view .LVU60
+ 171                             	.L14:
+ 125:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+ 126:../src/smc_gen/Config_RTC/Config_RTC.c ****             /* Wait for the register modification to complete */
+ 127:../src/smc_gen/Config_RTC/Config_RTC.c ****         }
+ 172                             		.loc 1 127 9 discriminator 1 view .LVU61
+ 124:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (RTC.RCR2.BIT.START != 0U)
+ 173                             		.loc 1 124 28 is_stmt 0 discriminator 1 view .LVU62
+ 174 010f FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 175 0114 CD 55 24                		mov.B	36[r5], r5
+ 124:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (RTC.RCR2.BIT.START != 0U)
+ 176                             		.loc 1 124 15 discriminator 1 view .LVU63
+ 177 0117 FD 74 C5 01             		tst	#1, r5
+ 178 011b 21 F4                   		bne	.L14
+ 128:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 129:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Clear ALM,PRD,CUP IR */
+ 130:../src/smc_gen/Config_RTC/Config_RTC.c ****         IR(RTC, ALM) = 0U;
+ 179                             		.loc 1 130 9 is_stmt 1 view .LVU64
+ 180                             		.loc 1 130 22 is_stmt 0 view .LVU65
+ 181 011d FB 5E 00 70 08          		mov.L	#0x87000, r5
+ 182 0122 CD 54 5C                		mov.B	92[r5], r4
+ 183 0125 7A 04                   		bclr	#0, r4
+ 184 0127 C7 54 5C                		mov.B	r4, 92[r5]
+ 131:../src/smc_gen/Config_RTC/Config_RTC.c ****         IR(RTC, PRD) = 0U;
+ 185                             		.loc 1 131 9 is_stmt 1 view .LVU66
+ 186                             		.loc 1 131 22 is_stmt 0 view .LVU67
+ 187 012a CD 54 5D                		mov.B	93[r5], r4
+ 188 012d 7A 04                   		bclr	#0, r4
+ 189 012f C7 54 5D                		mov.B	r4, 93[r5]
+ 132:../src/smc_gen/Config_RTC/Config_RTC.c ****         RTC.RCR2.BYTE |= (_00_RTC_AUTO_ADJUSTMENT_DISABLE | _40_RTC_HOUR_MODE_24);
+ 190                             		.loc 1 132 9 is_stmt 1 view .LVU68
+ 191                             		.loc 1 132 23 is_stmt 0 view .LVU69
+ 192 0132 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 193 0137 F1 56 24                		bset	#6, 36[r5].B
+ 133:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 134:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Perform 4 read operations after writing */
+ 135:../src/smc_gen/Config_RTC/Config_RTC.c ****         for (rw_count = 0U; rw_count < _04_FOUR_READ_COUNT; rw_count++)
+ 194                             		.loc 1 135 9 is_stmt 1 view .LVU70
+ 195                             	.LVL3:
+ 196                             		.loc 1 135 23 is_stmt 0 view .LVU71
+ 197 013a 66 04                   		mov.L	#0, r4
+ 198                             		.loc 1 135 9 view .LVU72
+ 199 013c 2E 10                   		bra	.L15
+ 200                             	.LVL4:
+ 201                             	.L16:
+ 136:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+ 137:../src/smc_gen/Config_RTC/Config_RTC.c ****             dummy = RTC.RCR2.BYTE;
+ 202                             		.loc 1 137 13 is_stmt 1 discriminator 3 view .LVU73
+ 203                             		.loc 1 137 29 is_stmt 0 discriminator 3 view .LVU74
+ 204 013e FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 205 0143 CD 55 24                		mov.B	36[r5], r5
+ 206 0146 5B 55                   		movu.B	r5, r5
+ 207                             		.loc 1 137 19 discriminator 3 view .LVU75
+ 208 0148 E3 05                   		mov.L	r5, [r0]
+ 135:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+ 209                             		.loc 1 135 69 discriminator 3 view .LVU76
+ 210 014a 62 14                   		add	#1, r4
+ 211                             	.LVL5:
+ 212                             	.L15:
+ 135:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+ 213                             		.loc 1 135 9 discriminator 1 view .LVU77
+ 214 014c 61 34                   		cmp	#3, r4
+ 215 014e 25 F0                   		bleu	.L16
+ 216                             	.L17:
+ 138:../src/smc_gen/Config_RTC/Config_RTC.c ****         }
+ 139:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (RTC.RCR2.BIT.HR24 != 1U)
+ 140:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+ 141:../src/smc_gen/Config_RTC/Config_RTC.c ****             /* Wait for the register modification to complete */
+ 142:../src/smc_gen/Config_RTC/Config_RTC.c ****         }
+ 217                             		.loc 1 142 9 is_stmt 1 discriminator 1 view .LVU78
+ 139:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+ 218                             		.loc 1 139 28 is_stmt 0 discriminator 1 view .LVU79
+ 219 0150 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 220 0155 CD 55 24                		mov.B	36[r5], r5
+ 139:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+ 221                             		.loc 1 139 15 discriminator 1 view .LVU80
+ 222 0158 FD 74 C5 40             		tst	#0x40, r5
+ 223 015c 20 F4                   		beq	.L17
+ 143:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 144:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Set control registers */
+ 145:../src/smc_gen/Config_RTC/Config_RTC.c ****         dummy = _00_RTC_ALARM_INT_DISABLE | _00_RTC_PERIOD_INT_DISABLE | _00_RTC_PERIODIC_INT_PERIO
+ 224                             		.loc 1 145 9 is_stmt 1 view .LVU81
+ 225                             		.loc 1 145 15 is_stmt 0 view .LVU82
+ 226 015e F8 06 00                		mov.L	#0, [r0]
+ 146:../src/smc_gen/Config_RTC/Config_RTC.c ****         RTC.RCR1.BYTE = dummy;
+ 227                             		.loc 1 146 9 is_stmt 1 view .LVU83
+ 228                             		.loc 1 146 23 is_stmt 0 view .LVU84
+ 229 0161 EC 04                   		mov.L	[r0], r4
+ 230                             	.LVL6:
+ 231                             		.loc 1 146 23 view .LVU85
+ 232 0163 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 233 0168 C7 54 22                		mov.B	r4, 34[r5]
+ 147:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (dummy != RTC.RCR1.BYTE)
+ 234                             		.loc 1 147 9 is_stmt 1 view .LVU86
+ 235                             	.L18:
+ 148:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+ 149:../src/smc_gen/Config_RTC/Config_RTC.c ****             /* Wait for this write to complete. */
+ 150:../src/smc_gen/Config_RTC/Config_RTC.c ****         }
+ 236                             		.loc 1 150 9 discriminator 1 view .LVU87
+ 147:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (dummy != RTC.RCR1.BYTE)
+ 237                             		.loc 1 147 33 is_stmt 0 discriminator 1 view .LVU88
+ 238 016b FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 239 0170 CD 55 22                		mov.B	34[r5], r5
+ 240 0173 5B 55                   		movu.B	r5, r5
+ 147:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (dummy != RTC.RCR1.BYTE)
+ 241                             		.loc 1 147 15 discriminator 1 view .LVU89
+ 242 0175 06 84 05                		cmp	[r0].L, r5
+ 243 0178 21 F3                   		bne	.L18
+ 244                             	.L10:
+ 151:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 152:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+ 153:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 154:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* Set control registers */
+ 155:../src/smc_gen/Config_RTC/Config_RTC.c ****     dummy = RTC.RCR1.BYTE | _00_RTC_CARRY_INT_DISABLE;
+ 245                             		.loc 1 155 5 is_stmt 1 view .LVU90
+ 246                             		.loc 1 155 21 is_stmt 0 view .LVU91
+ 247 017a FB 4E 00 C4 08          		mov.L	#0x8c400, r4
+ 248 017f CD 45 22                		mov.B	34[r4], r5
+ 249                             		.loc 1 155 27 view .LVU92
+ 250 0182 5B 55                   		movu.B	r5, r5
+ 251                             		.loc 1 155 11 view .LVU93
+ 252 0184 E3 05                   		mov.L	r5, [r0]
+ 156:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RCR1.BYTE = dummy;
+ 253                             		.loc 1 156 5 is_stmt 1 view .LVU94
+ 254                             		.loc 1 156 19 is_stmt 0 view .LVU95
+ 255 0186 EC 05                   		mov.L	[r0], r5
+ 256 0188 C7 45 22                		mov.B	r5, 34[r4]
+ 157:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (dummy != RTC.RCR1.BYTE)
+ 257                             		.loc 1 157 5 is_stmt 1 view .LVU96
+ 258                             	.L19:
+ 158:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 159:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Wait for this write to complete. */
+ 160:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+ 259                             		.loc 1 160 5 discriminator 1 view .LVU97
+ 157:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (dummy != RTC.RCR1.BYTE)
+ 260                             		.loc 1 157 29 is_stmt 0 discriminator 1 view .LVU98
+ 261 018b FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 262 0190 CD 55 22                		mov.B	34[r5], r5
+ 263 0193 5B 55                   		movu.B	r5, r5
+ 157:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (dummy != RTC.RCR1.BYTE)
+ 264                             		.loc 1 157 11 discriminator 1 view .LVU99
+ 265 0195 06 84 05                		cmp	[r0].L, r5
+ 266 0198 21 F3                   		bne	.L19
+ 161:../src/smc_gen/Config_RTC/Config_RTC.c ****     dummy = RTC.RCR2.BYTE | _00_RTC_RTCOUT_OUTPUT_DISABLE;
+ 267                             		.loc 1 161 5 is_stmt 1 view .LVU100
+ 268                             		.loc 1 161 21 is_stmt 0 view .LVU101
+ 269 019a FB 4E 00 C4 08          		mov.L	#0x8c400, r4
+ 270 019f CD 45 24                		mov.B	36[r4], r5
+ 271                             		.loc 1 161 27 view .LVU102
+ 272 01a2 5B 55                   		movu.B	r5, r5
+ 273                             		.loc 1 161 11 view .LVU103
+ 274 01a4 E3 05                   		mov.L	r5, [r0]
+ 162:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RCR2.BYTE = dummy;
+ 275                             		.loc 1 162 5 is_stmt 1 view .LVU104
+ 276                             		.loc 1 162 19 is_stmt 0 view .LVU105
+ 277 01a6 EC 05                   		mov.L	[r0], r5
+ 278 01a8 C7 45 24                		mov.B	r5, 36[r4]
+ 163:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (dummy != RTC.RCR2.BYTE)
+ 279                             		.loc 1 163 5 is_stmt 1 view .LVU106
+ 280                             	.L20:
+ 164:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 165:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Wait for this write to complete. */
+ 166:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+ 281                             		.loc 1 166 5 discriminator 1 view .LVU107
+ 163:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (dummy != RTC.RCR2.BYTE)
+ 282                             		.loc 1 163 29 is_stmt 0 discriminator 1 view .LVU108
+ 283 01ab FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 284 01b0 CD 55 24                		mov.B	36[r5], r5
+ 285 01b3 5B 55                   		movu.B	r5, r5
+ 163:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (dummy != RTC.RCR2.BYTE)
+ 286                             		.loc 1 163 11 discriminator 1 view .LVU109
+ 287 01b5 06 84 05                		cmp	[r0].L, r5
+ 288 01b8 21 F3                   		bne	.L20
+ 167:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 168:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* Set time capture */
+ 169:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RTCCR0.BYTE = _00_RTC_TIME_CAPTURE_NO_EVENT | _00_RTC_TIME_CAPTURE_NOISE_FILTER_OFF | 
+ 289                             		.loc 1 169 5 is_stmt 1 view .LVU110
+ 290                             		.loc 1 169 21 is_stmt 0 view .LVU111
+ 291 01ba FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 292 01bf F9 54 40 00             		mov.B	#0, 64[r5]
+ 170:../src/smc_gen/Config_RTC/Config_RTC.c ****                       _00_RTC_TIME_CAPTURE_EVENT_DISABLE;
+ 171:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RTCCR1.BYTE = _00_RTC_TIME_CAPTURE_NO_EVENT | _00_RTC_TIME_CAPTURE_NOISE_FILTER_OFF | 
+ 293                             		.loc 1 171 5 is_stmt 1 view .LVU112
+ 294                             		.loc 1 171 21 is_stmt 0 view .LVU113
+ 295 01c3 F9 54 42 00             		mov.B	#0, 66[r5]
+ 172:../src/smc_gen/Config_RTC/Config_RTC.c ****                       _00_RTC_TIME_CAPTURE_EVENT_DISABLE;
+ 173:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RTCCR2.BYTE = _00_RTC_TIME_CAPTURE_NO_EVENT | _00_RTC_TIME_CAPTURE_NOISE_FILTER_OFF | 
+ 296                             		.loc 1 173 5 is_stmt 1 view .LVU114
+ 297                             		.loc 1 173 21 is_stmt 0 view .LVU115
+ 298 01c7 F9 54 44 00             		mov.B	#0, 68[r5]
+ 174:../src/smc_gen/Config_RTC/Config_RTC.c ****                       _00_RTC_TIME_CAPTURE_EVENT_DISABLE;
+ 175:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 176:../src/smc_gen/Config_RTC/Config_RTC.c ****     R_Config_RTC_Create_UserInit();
+ 299                             		.loc 1 176 5 is_stmt 1 view .LVU116
+ 300 01cb 05 00 00 00             		bsr	_R_Config_RTC_Create_UserInit
+ 301                             	.LVL7:
+ 177:../src/smc_gen/Config_RTC/Config_RTC.c **** }
+ 302                             		.loc 1 177 1 is_stmt 0 view .LVU117
+ 303 01cf 67 01                   		rtsd	#4
+ 304                             	.LFE3:
+ 306                             		.section	.text.R_Config_RTC_Start,"ax",@progbits
+ 307                             		.global	_R_Config_RTC_Start
+ 309                             	_R_Config_RTC_Start:
+ 310                             	.LFB4:
+ 178:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 179:../src/smc_gen/Config_RTC/Config_RTC.c **** /**************************************************************************************************
+ 180:../src/smc_gen/Config_RTC/Config_RTC.c **** * Function Name: R_Config_RTC_Start
+ 181:../src/smc_gen/Config_RTC/Config_RTC.c **** * Description  : This function starts RTC counter
+ 182:../src/smc_gen/Config_RTC/Config_RTC.c **** * Arguments    : None
+ 183:../src/smc_gen/Config_RTC/Config_RTC.c **** * Return Value : None
+ 184:../src/smc_gen/Config_RTC/Config_RTC.c **** ***************************************************************************************************
+ 185:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 186:../src/smc_gen/Config_RTC/Config_RTC.c **** void R_Config_RTC_Start(void)
+ 187:../src/smc_gen/Config_RTC/Config_RTC.c **** {
+ 311                             		.loc 1 187 1 is_stmt 1 view -0
+ 188:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 189:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* Set the START bit to 1 */
+ 190:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RCR2.BIT.START = 1U;
+ 312                             		.loc 1 190 5 view .LVU119
+ 313                             		.loc 1 190 24 is_stmt 0 view .LVU120
+ 314 0000 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 315 0005 CD 54 24                		mov.B	36[r5], r4
+ 316 0008 78 04                   		bset	#0, r4
+ 317 000a C7 54 24                		mov.B	r4, 36[r5]
+ 191:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.START != 1U)
+ 318                             		.loc 1 191 5 is_stmt 1 view .LVU121
+ 319                             	.L26:
+ 192:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 193:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Wait for the register modification to complete */
+ 194:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+ 320                             		.loc 1 194 5 discriminator 1 view .LVU122
+ 191:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.START != 1U)
+ 321                             		.loc 1 191 24 is_stmt 0 discriminator 1 view .LVU123
+ 322 000d FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 323 0012 CD 55 24                		mov.B	36[r5], r5
+ 191:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.START != 1U)
+ 324                             		.loc 1 191 11 discriminator 1 view .LVU124
+ 325 0015 FD 74 C5 01             		tst	#1, r5
+ 326 0019 20 F4                   		beq	.L26
+ 195:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 196:../src/smc_gen/Config_RTC/Config_RTC.c **** }
+ 327                             		.loc 1 196 1 view .LVU125
+ 328 001b 02                      		rts
+ 329                             	.LFE4:
+ 331                             		.section	.text.R_Config_RTC_Stop,"ax",@progbits
+ 332                             		.global	_R_Config_RTC_Stop
+ 334                             	_R_Config_RTC_Stop:
+ 335                             	.LFB5:
+ 197:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 198:../src/smc_gen/Config_RTC/Config_RTC.c **** /**************************************************************************************************
+ 199:../src/smc_gen/Config_RTC/Config_RTC.c **** * Function Name: R_Config_RTC_Stop
+ 200:../src/smc_gen/Config_RTC/Config_RTC.c **** * Description  : This function stops RTC counter
+ 201:../src/smc_gen/Config_RTC/Config_RTC.c **** * Arguments    : None
+ 202:../src/smc_gen/Config_RTC/Config_RTC.c **** * Return Value : None
+ 203:../src/smc_gen/Config_RTC/Config_RTC.c **** ***************************************************************************************************
+ 204:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 205:../src/smc_gen/Config_RTC/Config_RTC.c **** void R_Config_RTC_Stop(void)
+ 206:../src/smc_gen/Config_RTC/Config_RTC.c **** {
+ 336                             		.loc 1 206 1 is_stmt 1 view -0
+ 207:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 208:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* Stop all counters */
+ 209:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RCR2.BIT.START = 0U;
+ 337                             		.loc 1 209 5 view .LVU127
+ 338                             		.loc 1 209 24 is_stmt 0 view .LVU128
+ 339 0000 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 340 0005 CD 54 24                		mov.B	36[r5], r4
+ 341 0008 7A 04                   		bclr	#0, r4
+ 342 000a C7 54 24                		mov.B	r4, 36[r5]
+ 210:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.START != 0U)
+ 343                             		.loc 1 210 5 is_stmt 1 view .LVU129
+ 344                             	.L28:
+ 211:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 212:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Wait for the register modification to complete */
+ 213:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+ 345                             		.loc 1 213 5 discriminator 1 view .LVU130
+ 210:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.START != 0U)
+ 346                             		.loc 1 210 24 is_stmt 0 discriminator 1 view .LVU131
+ 347 000d FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 348 0012 CD 55 24                		mov.B	36[r5], r5
+ 210:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.START != 0U)
+ 349                             		.loc 1 210 11 discriminator 1 view .LVU132
+ 350 0015 FD 74 C5 01             		tst	#1, r5
+ 351 0019 21 F4                   		bne	.L28
+ 214:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 215:../src/smc_gen/Config_RTC/Config_RTC.c **** }
+ 352                             		.loc 1 215 1 view .LVU133
+ 353 001b 02                      		rts
+ 354                             	.LFE5:
+ 356                             		.section	.text.R_Config_RTC_Restart,"ax",@progbits
+ 357                             		.global	_R_Config_RTC_Restart
+ 359                             	_R_Config_RTC_Restart:
+ 360                             	.LVL8:
+ 361                             	.LFB6:
+ 216:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 217:../src/smc_gen/Config_RTC/Config_RTC.c **** /**************************************************************************************************
+ 218:../src/smc_gen/Config_RTC/Config_RTC.c **** * Function Name: R_Config_RTC_Restart
+ 219:../src/smc_gen/Config_RTC/Config_RTC.c **** * Description  : This function restarts RTC counter
+ 220:../src/smc_gen/Config_RTC/Config_RTC.c **** * Arguments    : counter_write_val -
+ 221:../src/smc_gen/Config_RTC/Config_RTC.c **** *                    counter write value
+ 222:../src/smc_gen/Config_RTC/Config_RTC.c **** * Return Value : None
+ 223:../src/smc_gen/Config_RTC/Config_RTC.c **** ***************************************************************************************************
+ 224:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 225:../src/smc_gen/Config_RTC/Config_RTC.c **** void R_Config_RTC_Restart(rtc_calendarcounter_value_t counter_write_val)
+ 226:../src/smc_gen/Config_RTC/Config_RTC.c **** {
+ 362                             		.loc 1 226 1 is_stmt 1 view -0
+ 363                             		.loc 1 226 1 is_stmt 0 view .LVU135
+ 364 0000 60 40                   		sub	#4, r0
+ 365                             	.LCFI1:
+ 227:../src/smc_gen/Config_RTC/Config_RTC.c ****     uint32_t rw_count;
+ 366                             		.loc 1 227 5 is_stmt 1 view .LVU136
+ 228:../src/smc_gen/Config_RTC/Config_RTC.c ****     volatile uint32_t dummy;
+ 367                             		.loc 1 228 5 view .LVU137
+ 229:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 230:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* Disable ALM, PRD and CUP interrupts */
+ 231:../src/smc_gen/Config_RTC/Config_RTC.c ****     IEN(RTC, ALM) = 0U;
+ 368                             		.loc 1 231 5 view .LVU138
+ 369                             		.loc 1 231 19 is_stmt 0 view .LVU139
+ 370 0002 FB 5E 00 70 08          		mov.L	#0x87000, r5
+ 371 0007 CE 54 0B 02             		mov.B	523[r5], r4
+ 372 000b 7A 44                   		bclr	#4, r4
+ 373 000d CB 54 0B 02             		mov.B	r4, 523[r5]
+ 232:../src/smc_gen/Config_RTC/Config_RTC.c ****     IEN(RTC, PRD) = 0U;
+ 374                             		.loc 1 232 5 is_stmt 1 view .LVU140
+ 375                             		.loc 1 232 19 is_stmt 0 view .LVU141
+ 376 0011 CE 54 0B 02             		mov.B	523[r5], r4
+ 377 0015 7A 54                   		bclr	#5, r4
+ 378 0017 CB 54 0B 02             		mov.B	r4, 523[r5]
+ 233:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 234:../src/smc_gen/Config_RTC/Config_RTC.c ****     if (RTC.RCR1.BIT.AIE == 1U)
+ 379                             		.loc 1 234 5 is_stmt 1 view .LVU142
+ 380                             		.loc 1 234 21 is_stmt 0 view .LVU143
+ 381 001b FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 382 0020 CD 55 22                		mov.B	34[r5], r5
+ 383                             		.loc 1 234 8 view .LVU144
+ 384 0023 FD 74 C5 01             		tst	#1, r5
+ 385 0027 21 44                   		bne	.L39
+ 386                             	.L30:
+ 235:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 236:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Disable RTC ALARM interrupt */
+ 237:../src/smc_gen/Config_RTC/Config_RTC.c ****         RTC.RCR1.BIT.AIE = 0U;
+ 238:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (RTC.RCR1.BIT.AIE != 0U)
+ 239:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+ 240:../src/smc_gen/Config_RTC/Config_RTC.c ****             /* Wait for the register modification to complete */
+ 241:../src/smc_gen/Config_RTC/Config_RTC.c ****         }
+ 242:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 243:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Clear IR flag of ICU ALARM interrupt */
+ 244:../src/smc_gen/Config_RTC/Config_RTC.c ****         IR(RTC, ALM) = 0U;
+ 245:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+ 246:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 247:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* Stop all counters */
+ 248:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RCR2.BIT.START = 0U;
+ 387                             		.loc 1 248 5 is_stmt 1 view .LVU145
+ 388                             		.loc 1 248 24 is_stmt 0 view .LVU146
+ 389 0029 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 390 002e CD 54 24                		mov.B	36[r5], r4
+ 391 0031 7A 04                   		bclr	#0, r4
+ 392 0033 C7 54 24                		mov.B	r4, 36[r5]
+ 249:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.START != 0U)
+ 393                             		.loc 1 249 5 is_stmt 1 view .LVU147
+ 394                             	.L32:
+ 250:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 251:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Wait for the register modification to complete */
+ 252:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+ 395                             		.loc 1 252 5 discriminator 1 view .LVU148
+ 249:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.START != 0U)
+ 396                             		.loc 1 249 24 is_stmt 0 discriminator 1 view .LVU149
+ 397 0036 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 398 003b CD 55 24                		mov.B	36[r5], r5
+ 249:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.START != 0U)
+ 399                             		.loc 1 249 11 discriminator 1 view .LVU150
+ 400 003e FD 74 C5 01             		tst	#1, r5
+ 401 0042 21 F4                   		bne	.L32
+ 253:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 254:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* Execute RTC software reset */
+ 255:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RCR2.BIT.RESET = 1U;
+ 402                             		.loc 1 255 5 is_stmt 1 view .LVU151
+ 403                             		.loc 1 255 24 is_stmt 0 view .LVU152
+ 404 0044 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 405 0049 CD 54 24                		mov.B	36[r5], r4
+ 406 004c 78 14                   		bset	#1, r4
+ 407 004e C7 54 24                		mov.B	r4, 36[r5]
+ 256:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.RESET != 0U)
+ 408                             		.loc 1 256 5 is_stmt 1 view .LVU153
+ 409                             	.L33:
+ 257:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 258:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Wait for the register modification to complete */
+ 259:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+ 410                             		.loc 1 259 5 discriminator 1 view .LVU154
+ 256:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.RESET != 0U)
+ 411                             		.loc 1 256 24 is_stmt 0 discriminator 1 view .LVU155
+ 412 0051 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 413 0056 CD 55 24                		mov.B	36[r5], r5
+ 256:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.RESET != 0U)
+ 414                             		.loc 1 256 11 discriminator 1 view .LVU156
+ 415 0059 FD 74 C5 02             		tst	#2, r5
+ 416 005d 21 F4                   		bne	.L33
+ 260:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 261:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* Set control registers */
+ 262:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RCR2.BYTE |= (_00_RTC_RTCOUT_OUTPUT_DISABLE | _00_RTC_AUTO_ADJUSTMENT_DISABLE | _40_RTC_HOU
+ 417                             		.loc 1 262 5 is_stmt 1 view .LVU157
+ 418                             		.loc 1 262 19 is_stmt 0 view .LVU158
+ 419 005f FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 420 0064 F1 56 24                		bset	#6, 36[r5].B
+ 263:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 264:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* Perform 4 read operations after writing */
+ 265:../src/smc_gen/Config_RTC/Config_RTC.c ****     for (rw_count = 0U; rw_count < _04_FOUR_READ_COUNT; rw_count++)
+ 421                             		.loc 1 265 5 is_stmt 1 view .LVU159
+ 422                             	.LVL9:
+ 423                             		.loc 1 265 19 is_stmt 0 view .LVU160
+ 424 0067 66 04                   		mov.L	#0, r4
+ 425                             		.loc 1 265 5 view .LVU161
+ 426 0069 2E 3A                   		bra	.L34
+ 427                             	.LVL10:
+ 428                             	.L39:
+ 237:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (RTC.RCR1.BIT.AIE != 0U)
+ 429                             		.loc 1 237 9 is_stmt 1 view .LVU162
+ 237:../src/smc_gen/Config_RTC/Config_RTC.c ****         while (RTC.RCR1.BIT.AIE != 0U)
+ 430                             		.loc 1 237 26 is_stmt 0 view .LVU163
+ 431 006b FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 432 0070 CD 54 22                		mov.B	34[r5], r4
+ 433 0073 7A 04                   		bclr	#0, r4
+ 434 0075 C7 54 22                		mov.B	r4, 34[r5]
+ 238:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+ 435                             		.loc 1 238 9 is_stmt 1 view .LVU164
+ 436                             	.L31:
+ 241:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 437                             		.loc 1 241 9 discriminator 1 view .LVU165
+ 238:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+ 438                             		.loc 1 238 28 is_stmt 0 discriminator 1 view .LVU166
+ 439 0078 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 440 007d CD 55 22                		mov.B	34[r5], r5
+ 238:../src/smc_gen/Config_RTC/Config_RTC.c ****         {
+ 441                             		.loc 1 238 15 discriminator 1 view .LVU167
+ 442 0080 FD 74 C5 01             		tst	#1, r5
+ 443 0084 21 F4                   		bne	.L31
+ 244:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+ 444                             		.loc 1 244 9 is_stmt 1 view .LVU168
+ 244:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+ 445                             		.loc 1 244 22 is_stmt 0 view .LVU169
+ 446 0086 FB 5E 00 70 08          		mov.L	#0x87000, r5
+ 447 008b CD 54 5C                		mov.B	92[r5], r4
+ 448 008e 7A 04                   		bclr	#0, r4
+ 449 0090 C7 54 5C                		mov.B	r4, 92[r5]
+ 450 0093 2E 96                   		bra	.L30
+ 451                             	.LVL11:
+ 452                             	.L35:
+ 266:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 267:../src/smc_gen/Config_RTC/Config_RTC.c ****         dummy = RTC.RCR2.BYTE;
+ 453                             		.loc 1 267 9 is_stmt 1 discriminator 3 view .LVU170
+ 454                             		.loc 1 267 25 is_stmt 0 discriminator 3 view .LVU171
+ 455 0095 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 456 009a CD 55 24                		mov.B	36[r5], r5
+ 457 009d 5B 55                   		movu.B	r5, r5
+ 458                             		.loc 1 267 15 discriminator 3 view .LVU172
+ 459 009f E3 05                   		mov.L	r5, [r0]
+ 265:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 460                             		.loc 1 265 65 discriminator 3 view .LVU173
+ 461 00a1 62 14                   		add	#1, r4
+ 462                             	.LVL12:
+ 463                             	.L34:
+ 265:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 464                             		.loc 1 265 5 discriminator 1 view .LVU174
+ 465 00a3 61 34                   		cmp	#3, r4
+ 466 00a5 25 F0                   		bleu	.L35
+ 467                             	.L36:
+ 268:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+ 269:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 270:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.HR24 != 1U)
+ 271:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 272:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Wait for the register modification to complete */
+ 273:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+ 468                             		.loc 1 273 5 is_stmt 1 discriminator 1 view .LVU175
+ 270:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 469                             		.loc 1 270 24 is_stmt 0 discriminator 1 view .LVU176
+ 470 00a7 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 471 00ac CD 55 24                		mov.B	36[r5], r5
+ 270:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 472                             		.loc 1 270 11 discriminator 1 view .LVU177
+ 473 00af FD 74 C5 40             		tst	#0x40, r5
+ 474 00b3 20 F4                   		beq	.L36
+ 274:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 275:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* Set counter values */
+ 276:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RSECCNT.BYTE = counter_write_val.rseccnt;
+ 475                             		.loc 1 276 5 is_stmt 1 view .LVU178
+ 476                             		.loc 1 276 22 is_stmt 0 view .LVU179
+ 477 00b5 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 478 00ba 80 D1                   		mov.B	r1, 2[r5]
+ 277:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RMINCNT.BYTE = counter_write_val.rmincnt;
+ 479                             		.loc 1 277 5 is_stmt 1 view .LVU180
+ 480                             		.loc 1 277 41 is_stmt 0 view .LVU181
+ 481 00bc FD 88 14                		shlr	#8, r1, r4
+ 482                             	.LVL13:
+ 483                             		.loc 1 277 22 view .LVU182
+ 484 00bf 81 54                   		mov.B	r4, 4[r5]
+ 278:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RHRCNT.BYTE = counter_write_val.rhrcnt;
+ 485                             		.loc 1 278 5 is_stmt 1 view .LVU183
+ 486                             		.loc 1 278 40 is_stmt 0 view .LVU184
+ 487 00c1 FD 90 14                		shlr	#16, r1, r4
+ 488                             		.loc 1 278 21 view .LVU185
+ 489 00c4 81 D4                   		mov.B	r4, 6[r5]
+ 279:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RWKCNT.BYTE = counter_write_val.rwkcnt;
+ 490                             		.loc 1 279 5 is_stmt 1 view .LVU186
+ 491                             		.loc 1 279 21 is_stmt 0 view .LVU187
+ 492 00c6 82 52                   		mov.B	r2, 8[r5]
+ 280:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RDAYCNT.BYTE = counter_write_val.rdaycnt;
+ 493                             		.loc 1 280 5 is_stmt 1 view .LVU188
+ 494                             		.loc 1 280 41 is_stmt 0 view .LVU189
+ 495 00c8 69 81                   		shlr	#24, r1
+ 496                             	.LVL14:
+ 497                             		.loc 1 280 22 view .LVU190
+ 498 00ca 82 D1                   		mov.B	r1, 10[r5]
+ 281:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RMONCNT.BYTE = counter_write_val.rmoncnt;
+ 499                             		.loc 1 281 5 is_stmt 1 view .LVU191
+ 500                             		.loc 1 281 41 is_stmt 0 view .LVU192
+ 501 00cc FD 88 24                		shlr	#8, r2, r4
+ 502                             		.loc 1 281 22 view .LVU193
+ 503 00cf 83 54                   		mov.B	r4, 12[r5]
+ 282:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RYRCNT.WORD = counter_write_val.ryrcnt;
+ 504                             		.loc 1 282 5 is_stmt 1 view .LVU194
+ 505                             		.loc 1 282 40 is_stmt 0 view .LVU195
+ 506 00d1 69 02                   		shlr	#16, r2
+ 507                             		.loc 1 282 21 view .LVU196
+ 508 00d3 91 DA                   		mov.W	r2, 14[r5]
+ 283:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 284:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* Set the START bit to 1 */
+ 285:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RCR2.BIT.START = 1U;
+ 509                             		.loc 1 285 5 is_stmt 1 view .LVU197
+ 510                             		.loc 1 285 24 is_stmt 0 view .LVU198
+ 511 00d5 CD 54 24                		mov.B	36[r5], r4
+ 512 00d8 78 04                   		bset	#0, r4
+ 513 00da C7 54 24                		mov.B	r4, 36[r5]
+ 286:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.START != 1U)
+ 514                             		.loc 1 286 5 is_stmt 1 view .LVU199
+ 515                             	.L37:
+ 287:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 288:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Wait for the register modification to complete */
+ 289:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+ 516                             		.loc 1 289 5 discriminator 1 view .LVU200
+ 286:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.START != 1U)
+ 517                             		.loc 1 286 24 is_stmt 0 discriminator 1 view .LVU201
+ 518 00dd FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 519 00e2 CD 55 24                		mov.B	36[r5], r5
+ 286:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.START != 1U)
+ 520                             		.loc 1 286 11 discriminator 1 view .LVU202
+ 521 00e5 FD 74 C5 01             		tst	#1, r5
+ 522 00e9 20 F4                   		beq	.L37
+ 290:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 291:../src/smc_gen/Config_RTC/Config_RTC.c **** }
+ 523                             		.loc 1 291 1 view .LVU203
+ 524 00eb 67 01                   		rtsd	#4
+ 525                             	.LFE6:
+ 527                             		.section	.text.R_Config_RTC_Get_CalendarCounterValue,"ax",@progbits
+ 528                             		.global	_R_Config_RTC_Get_CalendarCounterValue
+ 530                             	_R_Config_RTC_Get_CalendarCounterValue:
+ 531                             	.LVL15:
+ 532                             	.LFB7:
+ 292:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 293:../src/smc_gen/Config_RTC/Config_RTC.c **** /**************************************************************************************************
+ 294:../src/smc_gen/Config_RTC/Config_RTC.c **** * Function Name: R_Config_RTC_Get_CalendarCounterValue
+ 295:../src/smc_gen/Config_RTC/Config_RTC.c **** * Description  : This function get RTC calendar counter value
+ 296:../src/smc_gen/Config_RTC/Config_RTC.c **** * Arguments    : counter_read_val -
+ 297:../src/smc_gen/Config_RTC/Config_RTC.c **** *                    counter read pointer
+ 298:../src/smc_gen/Config_RTC/Config_RTC.c **** * Return Value : None
+ 299:../src/smc_gen/Config_RTC/Config_RTC.c **** ***************************************************************************************************
+ 300:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 301:../src/smc_gen/Config_RTC/Config_RTC.c **** void R_Config_RTC_Get_CalendarCounterValue(rtc_calendarcounter_value_t * const counter_read_val)
+ 302:../src/smc_gen/Config_RTC/Config_RTC.c **** {
+ 533                             		.loc 1 302 1 is_stmt 1 view -0
+ 303:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 304:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* Enable RTC CUP interrupt */
+ 305:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RCR1.BYTE |= _02_RTC_CARRY_INT_ENABLE;
+ 534                             		.loc 1 305 5 view .LVU205
+ 535                             		.loc 1 305 19 is_stmt 0 view .LVU206
+ 536 0000 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 537 0005 F1 51 22                		bset	#1, 34[r5].B
+ 538                             	.L41:
+ 306:../src/smc_gen/Config_RTC/Config_RTC.c ****     do
+ 539                             		.loc 1 306 5 is_stmt 1 discriminator 1 view .LVU207
+ 307:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 308:../src/smc_gen/Config_RTC/Config_RTC.c ****         ICU.PIBR6.BYTE = 0x02U;
+ 540                             		.loc 1 308 9 discriminator 1 view .LVU208
+ 541                             		.loc 1 308 24 is_stmt 0 discriminator 1 view .LVU209
+ 542 0008 FB 3E 00 70 08          		mov.L	#0x87000, r3
+ 543 000d FA 34 06 07 02          		mov.B	#2, 1798[r3]
+ 309:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Read counter registers */
+ 310:../src/smc_gen/Config_RTC/Config_RTC.c ****         counter_read_val->rseccnt = RTC.RSECCNT.BYTE;
+ 544                             		.loc 1 310 9 is_stmt 1 discriminator 1 view .LVU210
+ 545                             		.loc 1 310 48 is_stmt 0 discriminator 1 view .LVU211
+ 546 0012 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 547 0017 88 D4                   		mov.B	2[r5], r4
+ 548                             		.loc 1 310 35 discriminator 1 view .LVU212
+ 549 0019 C3 14                   		mov.B	r4, [r1]
+ 311:../src/smc_gen/Config_RTC/Config_RTC.c ****         counter_read_val->rmincnt = RTC.RMINCNT.BYTE;
+ 550                             		.loc 1 311 9 is_stmt 1 discriminator 1 view .LVU213
+ 551                             		.loc 1 311 48 is_stmt 0 discriminator 1 view .LVU214
+ 552 001b 89 54                   		mov.B	4[r5], r4
+ 553                             		.loc 1 311 35 discriminator 1 view .LVU215
+ 554 001d 80 1C                   		mov.B	r4, 1[r1]
+ 312:../src/smc_gen/Config_RTC/Config_RTC.c ****         counter_read_val->rhrcnt = RTC.RHRCNT.BYTE & 0x3FU;
+ 555                             		.loc 1 312 9 is_stmt 1 discriminator 1 view .LVU216
+ 556                             		.loc 1 312 46 is_stmt 0 discriminator 1 view .LVU217
+ 557 001f 89 D4                   		mov.B	6[r5], r4
+ 558                             		.loc 1 312 52 discriminator 1 view .LVU218
+ 559 0021 75 24 3F                		and #63, r4
+ 560                             		.loc 1 312 34 discriminator 1 view .LVU219
+ 561 0024 80 94                   		mov.B	r4, 2[r1]
+ 313:../src/smc_gen/Config_RTC/Config_RTC.c ****         counter_read_val->rwkcnt = RTC.RWKCNT.BYTE;
+ 562                             		.loc 1 313 9 is_stmt 1 discriminator 1 view .LVU220
+ 563                             		.loc 1 313 46 is_stmt 0 discriminator 1 view .LVU221
+ 564 0026 8A 54                   		mov.B	8[r5], r4
+ 565                             		.loc 1 313 34 discriminator 1 view .LVU222
+ 566 0028 81 14                   		mov.B	r4, 4[r1]
+ 314:../src/smc_gen/Config_RTC/Config_RTC.c ****         counter_read_val->rdaycnt = RTC.RDAYCNT.BYTE;
+ 567                             		.loc 1 314 9 is_stmt 1 discriminator 1 view .LVU223
+ 568                             		.loc 1 314 48 is_stmt 0 discriminator 1 view .LVU224
+ 569 002a 8A D4                   		mov.B	10[r5], r4
+ 570                             		.loc 1 314 35 discriminator 1 view .LVU225
+ 571 002c 80 9C                   		mov.B	r4, 3[r1]
+ 315:../src/smc_gen/Config_RTC/Config_RTC.c ****         counter_read_val->rmoncnt = RTC.RMONCNT.BYTE;
+ 572                             		.loc 1 315 9 is_stmt 1 discriminator 1 view .LVU226
+ 573                             		.loc 1 315 48 is_stmt 0 discriminator 1 view .LVU227
+ 574 002e 8B 54                   		mov.B	12[r5], r4
+ 575                             		.loc 1 315 35 discriminator 1 view .LVU228
+ 576 0030 81 1C                   		mov.B	r4, 5[r1]
+ 316:../src/smc_gen/Config_RTC/Config_RTC.c ****         counter_read_val->ryrcnt = RTC.RYRCNT.WORD;
+ 577                             		.loc 1 316 9 is_stmt 1 discriminator 1 view .LVU229
+ 578                             		.loc 1 316 46 is_stmt 0 discriminator 1 view .LVU230
+ 579 0032 99 DD                   		mov.W	14[r5], r5
+ 580                             		.loc 1 316 34 discriminator 1 view .LVU231
+ 581 0034 90 9D                   		mov.W	r5, 6[r1]
+ 317:../src/smc_gen/Config_RTC/Config_RTC.c ****     } while ((ICU.PIBR6.BYTE & 0x02U) != 0U);
+ 582                             		.loc 1 317 24 discriminator 1 view .LVU232
+ 583 0036 CE 35 06 07             		mov.B	1798[r3], r5
+ 584                             		.loc 1 317 15 discriminator 1 view .LVU233
+ 585 003a FD 74 C5 02             		tst	#2, r5
+ 586 003e 21 CA                   		bne	.L41
+ 318:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 319:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* Disable RTC CUP interrupt */
+ 320:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RCR1.BYTE &= (~_02_RTC_CARRY_INT_ENABLE);
+ 587                             		.loc 1 320 5 is_stmt 1 view .LVU234
+ 588                             		.loc 1 320 19 is_stmt 0 view .LVU235
+ 589 0040 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 590 0045 F1 59 22                		bclr	#1, 34[r5].B
+ 321:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 322:../src/smc_gen/Config_RTC/Config_RTC.c **** }
+ 591                             		.loc 1 322 1 view .LVU236
+ 592 0048 02                      		rts
+ 593                             	.LFE7:
+ 595                             		.section	.text.R_Config_RTC_Set_CalendarCounterValue,"ax",@progbits
+ 596                             		.global	_R_Config_RTC_Set_CalendarCounterValue
+ 598                             	_R_Config_RTC_Set_CalendarCounterValue:
+ 599                             	.LVL16:
+ 600                             	.LFB8:
+ 323:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 324:../src/smc_gen/Config_RTC/Config_RTC.c **** /**************************************************************************************************
+ 325:../src/smc_gen/Config_RTC/Config_RTC.c **** * Function Name: R_Config_RTC_Set_CalendarCounterValue
+ 326:../src/smc_gen/Config_RTC/Config_RTC.c **** * Description  : This function set RTC calendar counter value
+ 327:../src/smc_gen/Config_RTC/Config_RTC.c **** * Arguments    : counter_write_val -
+ 328:../src/smc_gen/Config_RTC/Config_RTC.c **** *                    counter write value
+ 329:../src/smc_gen/Config_RTC/Config_RTC.c **** * Return Value : None
+ 330:../src/smc_gen/Config_RTC/Config_RTC.c **** ***************************************************************************************************
+ 331:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 332:../src/smc_gen/Config_RTC/Config_RTC.c **** void R_Config_RTC_Set_CalendarCounterValue(rtc_calendarcounter_value_t counter_write_val)
+ 333:../src/smc_gen/Config_RTC/Config_RTC.c **** {
+ 601                             		.loc 1 333 1 is_stmt 1 view -0
+ 602                             		.loc 1 333 1 is_stmt 0 view .LVU238
+ 603 0000 60 40                   		sub	#4, r0
+ 604                             	.LCFI2:
+ 334:../src/smc_gen/Config_RTC/Config_RTC.c ****     uint32_t rw_count;
+ 605                             		.loc 1 334 5 is_stmt 1 view .LVU239
+ 335:../src/smc_gen/Config_RTC/Config_RTC.c ****     volatile uint32_t dummy;
+ 606                             		.loc 1 335 5 view .LVU240
+ 336:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 337:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* Stop all counters */
+ 338:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RCR2.BIT.START = 0U;
+ 607                             		.loc 1 338 5 view .LVU241
+ 608                             		.loc 1 338 24 is_stmt 0 view .LVU242
+ 609 0002 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 610 0007 CD 54 24                		mov.B	36[r5], r4
+ 611 000a 7A 04                   		bclr	#0, r4
+ 612 000c C7 54 24                		mov.B	r4, 36[r5]
+ 339:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.START != 0U)
+ 613                             		.loc 1 339 5 is_stmt 1 view .LVU243
+ 614                             	.L43:
+ 340:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 341:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Wait for the register modification to complete */
+ 342:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+ 615                             		.loc 1 342 5 discriminator 1 view .LVU244
+ 339:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.START != 0U)
+ 616                             		.loc 1 339 24 is_stmt 0 discriminator 1 view .LVU245
+ 617 000f FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 618 0014 CD 55 24                		mov.B	36[r5], r5
+ 339:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.START != 0U)
+ 619                             		.loc 1 339 11 discriminator 1 view .LVU246
+ 620 0017 FD 74 C5 01             		tst	#1, r5
+ 621 001b 21 F4                   		bne	.L43
+ 343:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 344:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* Execute RTC software reset */
+ 345:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RCR2.BIT.RESET = 1U;
+ 622                             		.loc 1 345 5 is_stmt 1 view .LVU247
+ 623                             		.loc 1 345 24 is_stmt 0 view .LVU248
+ 624 001d FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 625 0022 CD 54 24                		mov.B	36[r5], r4
+ 626 0025 78 14                   		bset	#1, r4
+ 627 0027 C7 54 24                		mov.B	r4, 36[r5]
+ 346:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.RESET != 0U)
+ 628                             		.loc 1 346 5 is_stmt 1 view .LVU249
+ 629                             	.L44:
+ 347:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 348:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Wait for the register modification to complete */
+ 349:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+ 630                             		.loc 1 349 5 discriminator 1 view .LVU250
+ 346:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.RESET != 0U)
+ 631                             		.loc 1 346 24 is_stmt 0 discriminator 1 view .LVU251
+ 632 002a FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 633 002f CD 55 24                		mov.B	36[r5], r5
+ 346:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.RESET != 0U)
+ 634                             		.loc 1 346 11 discriminator 1 view .LVU252
+ 635 0032 FD 74 C5 02             		tst	#2, r5
+ 636 0036 21 F4                   		bne	.L44
+ 350:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 351:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* Set control registers */
+ 352:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RCR2.BYTE |= (_00_RTC_RTCOUT_OUTPUT_DISABLE | _00_RTC_AUTO_ADJUSTMENT_DISABLE | _40_RTC_HOU
+ 637                             		.loc 1 352 5 is_stmt 1 view .LVU253
+ 638                             		.loc 1 352 19 is_stmt 0 view .LVU254
+ 639 0038 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 640 003d F1 56 24                		bset	#6, 36[r5].B
+ 353:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 354:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* Perform 4 read operations after writing */
+ 355:../src/smc_gen/Config_RTC/Config_RTC.c ****     for (rw_count = 0U; rw_count < _04_FOUR_READ_COUNT; rw_count++)
+ 641                             		.loc 1 355 5 is_stmt 1 view .LVU255
+ 642                             	.LVL17:
+ 643                             		.loc 1 355 19 is_stmt 0 view .LVU256
+ 644 0040 66 04                   		mov.L	#0, r4
+ 645                             		.loc 1 355 5 view .LVU257
+ 646 0042 2E 10                   		bra	.L45
+ 647                             	.LVL18:
+ 648                             	.L46:
+ 356:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 357:../src/smc_gen/Config_RTC/Config_RTC.c ****         dummy = RTC.RCR2.BYTE;
+ 649                             		.loc 1 357 9 is_stmt 1 discriminator 3 view .LVU258
+ 650                             		.loc 1 357 25 is_stmt 0 discriminator 3 view .LVU259
+ 651 0044 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 652 0049 CD 55 24                		mov.B	36[r5], r5
+ 653 004c 5B 55                   		movu.B	r5, r5
+ 654                             		.loc 1 357 15 discriminator 3 view .LVU260
+ 655 004e E3 05                   		mov.L	r5, [r0]
+ 355:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 656                             		.loc 1 355 65 discriminator 3 view .LVU261
+ 657 0050 62 14                   		add	#1, r4
+ 658                             	.LVL19:
+ 659                             	.L45:
+ 355:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 660                             		.loc 1 355 5 discriminator 1 view .LVU262
+ 661 0052 61 34                   		cmp	#3, r4
+ 662 0054 25 F0                   		bleu	.L46
+ 663                             	.L47:
+ 358:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+ 359:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 360:../src/smc_gen/Config_RTC/Config_RTC.c ****     while (RTC.RCR2.BIT.HR24 != 1U)
+ 361:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 362:../src/smc_gen/Config_RTC/Config_RTC.c ****         /* Wait for the register modification to complete */
+ 363:../src/smc_gen/Config_RTC/Config_RTC.c ****     }
+ 664                             		.loc 1 363 5 is_stmt 1 discriminator 1 view .LVU263
+ 360:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 665                             		.loc 1 360 24 is_stmt 0 discriminator 1 view .LVU264
+ 666 0056 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 667 005b CD 55 24                		mov.B	36[r5], r5
+ 360:../src/smc_gen/Config_RTC/Config_RTC.c ****     {
+ 668                             		.loc 1 360 11 discriminator 1 view .LVU265
+ 669 005e FD 74 C5 40             		tst	#0x40, r5
+ 670 0062 20 F4                   		beq	.L47
+ 364:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 365:../src/smc_gen/Config_RTC/Config_RTC.c ****     /* Set counter values */
+ 366:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RSECCNT.BYTE = counter_write_val.rseccnt;
+ 671                             		.loc 1 366 5 is_stmt 1 view .LVU266
+ 672                             		.loc 1 366 22 is_stmt 0 view .LVU267
+ 673 0064 FB 5E 00 C4 08          		mov.L	#0x8c400, r5
+ 674 0069 80 D1                   		mov.B	r1, 2[r5]
+ 367:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RMINCNT.BYTE = counter_write_val.rmincnt;
+ 675                             		.loc 1 367 5 is_stmt 1 view .LVU268
+ 676                             		.loc 1 367 41 is_stmt 0 view .LVU269
+ 677 006b FD 88 14                		shlr	#8, r1, r4
+ 678                             	.LVL20:
+ 679                             		.loc 1 367 22 view .LVU270
+ 680 006e 81 54                   		mov.B	r4, 4[r5]
+ 368:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RHRCNT.BYTE = counter_write_val.rhrcnt;
+ 681                             		.loc 1 368 5 is_stmt 1 view .LVU271
+ 682                             		.loc 1 368 40 is_stmt 0 view .LVU272
+ 683 0070 FD 90 14                		shlr	#16, r1, r4
+ 684                             		.loc 1 368 21 view .LVU273
+ 685 0073 81 D4                   		mov.B	r4, 6[r5]
+ 369:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RWKCNT.BYTE = counter_write_val.rwkcnt;
+ 686                             		.loc 1 369 5 is_stmt 1 view .LVU274
+ 687                             		.loc 1 369 21 is_stmt 0 view .LVU275
+ 688 0075 82 52                   		mov.B	r2, 8[r5]
+ 370:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RDAYCNT.BYTE = counter_write_val.rdaycnt;
+ 689                             		.loc 1 370 5 is_stmt 1 view .LVU276
+ 690                             		.loc 1 370 41 is_stmt 0 view .LVU277
+ 691 0077 69 81                   		shlr	#24, r1
+ 692                             	.LVL21:
+ 693                             		.loc 1 370 22 view .LVU278
+ 694 0079 82 D1                   		mov.B	r1, 10[r5]
+ 371:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RMONCNT.BYTE = counter_write_val.rmoncnt;
+ 695                             		.loc 1 371 5 is_stmt 1 view .LVU279
+ 696                             		.loc 1 371 41 is_stmt 0 view .LVU280
+ 697 007b FD 88 24                		shlr	#8, r2, r4
+ 698                             		.loc 1 371 22 view .LVU281
+ 699 007e 83 54                   		mov.B	r4, 12[r5]
+ 372:../src/smc_gen/Config_RTC/Config_RTC.c ****     RTC.RYRCNT.WORD = counter_write_val.ryrcnt;
+ 700                             		.loc 1 372 5 is_stmt 1 view .LVU282
+ 701                             		.loc 1 372 40 is_stmt 0 view .LVU283
+ 702 0080 69 02                   		shlr	#16, r2
+ 703                             		.loc 1 372 21 view .LVU284
+ 704 0082 91 DA                   		mov.W	r2, 14[r5]
+ 373:../src/smc_gen/Config_RTC/Config_RTC.c **** 
+ 374:../src/smc_gen/Config_RTC/Config_RTC.c **** }
+ 705                             		.loc 1 374 1 view .LVU285
+ 706 0084 67 01                   		rtsd	#4
+ 707                             	.LFE8:
+ 787                             	.Letext0:
+ 788                             		.file 2 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 789                             		.file 3 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 790                             		.file 4 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\lib\\gcc\\rx-
+ 791                             		.file 5 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 792                             		.file 6 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 793                             		.file 7 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 794                             		.file 8 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/all/r_rx_compi
+ 795                             		.file 9 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/rx72n/register
+ 796                             		.file 10 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/rx72n/mcu_loc
+ 797                             		.file 11 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\general/r_cg_rtc.h"
+ 798                             		.file 12 "../src/smc_gen/Config_RTC/Config_RTC.h"

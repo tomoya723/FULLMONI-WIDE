@@ -1,0 +1,1289 @@
+   1                             		.file	"dave_irq_rx.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.d1_mapirq_intern,"ax",@progbits
+   6                             	_d1_mapirq_intern:
+   7                             	.LVL0:
+   8                             	.LFB0:
+   9                             		.file 1 "../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c"
+   1:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //--------------------------------------------------------------------------
+   2:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** // Project: D/AVE
+   3:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** // File:    dave_irq_rx.c (%version: 8 %)
+   4:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //          created Tue Aug 23 09:26:54 2005 by hh04027
+   5:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //
+   6:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** // Description:
+   7:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //  %date_modified: Thu Oct 18 13:28:42 2007 %  (%derived_by:  hh74040 %)
+   8:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //
+   9:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** // Changes:
+  10:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //  2006-01-04 CSe  adapted to changes in dave_base.h
+  11:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //  2005-04-12 CSe  fully implemented missing d1 driver functionality
+  12:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //  2007-10-18 ASc  added ifdefs to allow compilation without altera lcd
+  13:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //  2009-03-17 MMa  added support for TES Display Controller
+  14:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //  2012-08-03 CSe  clearing interrupt before calling registered IRQ handler
+  15:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //  2018-01-24      added support for RX
+  16:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //  2020-02-28      added ICU_GROUPAL1 Enable/Disable Switch
+  17:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //  2021-05-27      supported GNU-RX and IAR compiler.
+  18:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //--------------------------------------------------------------------------
+  19:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+  20:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** #include <stdlib.h>
+  21:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** #include <stdbool.h>
+  22:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** #include "dave_base.h"
+  23:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** #include "dave_base_rx.h"
+  24:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+  25:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** #define ICU_GROUPAL1_ENABLE    (0) /*ICU_GROUPAL1 Enable/Disable*/
+  26:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+  27:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** #if (ICU_GROUPAL1_ENABLE == 1)
+  28:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** #include "platform.h"
+  29:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** #endif
+  30:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+  31:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** #define DAVE_STAT        (0x0)  /* STATUS register offset              */
+  32:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** #define DAVE_IRQ_CTRL    (0x30) /* IRQCTL register offset              */
+  33:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** #define DAVE_IRQ_IPR     (7)    /* Interrupt priority of DRW2D         */
+  34:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** #define DAVE_IRQ_GRP_NUM (11)   /* Interrupt request bit of DRW2D      */
+  35:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** #define ICU_GROUPAL1     (113)  /* Interrupt vector number of GROUPAL1 */
+  36:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+  37:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //--------------------------------------------------------------------------
+  38:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+  39:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** enum d1_irqslots
+  40:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** {
+  41:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     d1_irqslot_break = 0, 
+  42:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     d1_irqslot_vbi = 1, 
+  43:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     d1_irqslot_dlist = 2, 
+  44:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     d1_irqcount
+  45:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** };
+  46:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+  47:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //--------------------------------------------------------------------------
+  48:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+  49:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** static d1_interrupt g_irq_handler[d1_irqcount];
+  50:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** static void *g_irq_data[d1_irqcount];
+  51:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** static volatile int g_irq_triggered[d1_irqcount];
+  52:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** static d1_device_rx *context;
+  53:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+  54:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** static void d1_ir_set(bool enable, int vector);
+  55:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** static void d1_ipr_set(unsigned char priority, int vector);
+  56:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** static void d1_ien_set(bool enable, int vector);
+  57:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** static void d1_genal1_set(bool enable, int grp_num);
+  58:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+  59:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** static unsigned char d1_ipr_get(int vector);
+  60:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** static unsigned long d1_genal1_get();
+  61:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+  62:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** #if ICU_GROUPAL1_ENABLE
+  63:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** static unsigned long d1_grpal1_get();
+  64:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** static void excep_icu_groupal1_isr(void);
+  65:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** #endif
+  66:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+  67:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** static int d1_mapirq_intern(int irqtype)
+  68:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** {
+  10                             		.loc 1 68 1 view -0
+  69:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     int index;
+  11                             		.loc 1 69 5 view .LVU1
+  70:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+  71:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* map irqtype bit to slot index */
+  72:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     switch (irqtype)
+  12                             		.loc 1 72 5 view .LVU2
+  13 0000 61 21                   		cmp	#2, r1
+  14 0002 20 0E                   		beq	.L3
+  15 0004 61 41                   		cmp	#4, r1
+  16 0006 20 0D                   		beq	.L4
+  17 0008 61 11                   		cmp	#1, r1
+  18 000a 20 0C                   		beq	.L5
+  73:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+  74:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     case d1_irq_break:
+  75:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         index = d1_irqslot_break;
+  76:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     break;
+  77:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+  78:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     case d1_irq_vbi:
+  79:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         index = d1_irqslot_vbi;
+  80:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     break;
+  81:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+  82:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     case d1_irq_dlist:
+  83:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         index = d1_irqslot_dlist;
+  84:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     break;
+  85:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+  86:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     default:
+  87:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         index = -1;
+  19                             		.loc 1 87 15 is_stmt 0 view .LVU3
+  20 000c FB 16 FF                		mov.L	#-1, r1
+  21                             	.LVL1:
+  22                             		.loc 1 87 15 view .LVU4
+  23 000f 02                      		rts
+  24                             	.LVL2:
+  25                             	.L3:
+  79:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     break;
+  26                             		.loc 1 79 15 view .LVU5
+  27 0010 66 11                   		mov.L	#1, r1
+  28                             	.LVL3:
+  79:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     break;
+  29                             		.loc 1 79 15 view .LVU6
+  30 0012 02                      		rts
+  31                             	.LVL4:
+  32                             	.L4:
+  83:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     break;
+  33                             		.loc 1 83 15 view .LVU7
+  34 0013 66 21                   		mov.L	#2, r1
+  35                             	.LVL5:
+  83:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     break;
+  36                             		.loc 1 83 15 view .LVU8
+  37 0015 02                      		rts
+  38                             	.LVL6:
+  39                             	.L5:
+  75:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     break;
+  40                             		.loc 1 75 15 view .LVU9
+  41 0016 66 01                   		mov.L	#0, r1
+  42                             	.LVL7:
+  88:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     break;
+  89:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+  90:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+  91:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     return index;
+  43                             		.loc 1 91 5 is_stmt 1 view .LVU10
+  92:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+  44                             		.loc 1 92 1 is_stmt 0 view .LVU11
+  45 0018 02                      		rts
+  46                             	.LFE0:
+  48                             		.section	.text.d1_ir_set,"ax",@progbits
+  50                             	_d1_ir_set:
+  51                             	.LVL8:
+  52                             	.LFB9:
+  93:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+  94:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //--------------------------------------------------------------------------
+  95:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** // initializaton + deinitialization
+  96:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** int d1_initirq_intern(d1_device_rx *handle)
+  97:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** {
+  98:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     unsigned char tmp_ipr;
+  99:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 100:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     context = handle;
+ 101:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 102:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* clear DAVE irq's, enable dlist irq */
+ 103:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     WRITE_REG(DAVE2D_0_BASE, DAVE_IRQ_CTRL, 0xe);
+ 104:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 105:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* enable DAVE irq */
+ 106:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     d1_genal1_set(true, DAVE_IRQ_GRP_NUM);
+ 107:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 108:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* group interrupt request is disabled */
+ 109:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     d1_ien_set(false, ICU_GROUPAL1);
+ 110:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 111:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* interrupt request is cleared */
+ 112:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     d1_ir_set(false, ICU_GROUPAL1);
+ 113:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 114:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* group interrupt request priority level is set */
+ 115:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     tmp_ipr = (unsigned char)((DAVE_IRQ_IPR > d1_ipr_get(ICU_GROUPAL1)) ? DAVE_IRQ_IPR : d1_ipr_get
+ 116:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     d1_ipr_set(tmp_ipr, ICU_GROUPAL1);
+ 117:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 118:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* group interrupt request is enabled */
+ 119:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     d1_ien_set(true, ICU_GROUPAL1);
+ 120:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 121:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     return 1;
+ 122:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 123:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 124:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //--------------------------------------------------------------------------
+ 125:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //
+ 126:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** void d1_setirqhandler(d1_device *handle, int irqtype, d1_interrupt code, void *data)
+ 127:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** {
+ 128:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     int irqslot;
+ 129:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 130:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* unused arguments */
+ 131:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     INTERNAL_NOT_USED(handle);
+ 132:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 133:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* get slot */
+ 134:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     irqslot = d1_mapirq_intern(irqtype);
+ 135:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (irqslot < 0)
+ 136:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 137:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         return;
+ 138:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 139:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 140:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* store irq handler and pointer */
+ 141:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     g_irq_handler[irqslot] = code;
+ 142:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     g_irq_data[irqslot] = data;
+ 143:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 144:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 145:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //--------------------------------------------------------------------------
+ 146:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //
+ 147:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** d1_interrupt d1_getirqhandler(d1_device *handle, int irqtype)
+ 148:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** {
+ 149:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     int irqslot;
+ 150:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 151:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* unused arguments */
+ 152:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     INTERNAL_NOT_USED(handle);
+ 153:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 154:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* get slot */
+ 155:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     irqslot = d1_mapirq_intern(irqtype);
+ 156:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (irqslot < 0)
+ 157:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 158:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         return NULL;
+ 159:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 160:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 161:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     return g_irq_handler[irqslot];
+ 162:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 163:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 164:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //--------------------------------------------------------------------------
+ 165:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //
+ 166:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** void * d1_getirqdata(d1_device *handle, int irqtype)
+ 167:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** {
+ 168:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     int irqslot;
+ 169:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 170:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* unused arguments */
+ 171:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     INTERNAL_NOT_USED(handle);
+ 172:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 173:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* get slot */
+ 174:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     irqslot = d1_mapirq_intern(irqtype);
+ 175:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (irqslot < 0)
+ 176:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 177:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         return NULL;
+ 178:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 179:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 180:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     return g_irq_data[irqslot];
+ 181:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 182:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 183:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** int d1_shutdownirq_intern(d1_device_rx *handle)
+ 184:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** {
+ 185:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     unsigned long tmp_gen;
+ 186:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 187:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* unused arguments */
+ 188:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     INTERNAL_NOT_USED(handle);
+ 189:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 190:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* disable DAVE irq */
+ 191:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     d1_genal1_set(false, DAVE_IRQ_GRP_NUM);
+ 192:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 193:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* clear DAVE irq's, disable dlist irq */
+ 194:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     WRITE_REG(DAVE2D_0_BASE, DAVE_IRQ_CTRL, 0xc);
+ 195:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 196:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     tmp_gen = d1_genal1_get();
+ 197:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (0 == tmp_gen)
+ 198:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 199:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         /* group interrupt request is disabled */
+ 200:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         d1_ien_set(false, ICU_GROUPAL1);
+ 201:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 202:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         /* group interrupt request priority level is cleared */
+ 203:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         d1_ipr_set(0, ICU_GROUPAL1);
+ 204:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 205:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 206:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     return 1;
+ 207:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 208:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 209:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //--------------------------------------------------------------------------
+ 210:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** //
+ 211:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** int d1_queryirq(d1_device *handle, int irqmask, int timeout)
+ 212:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** {
+ 213:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* unused arguments */
+ 214:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     INTERNAL_NOT_USED(handle);
+ 215:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 216:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* break + vip + vbi interrupts are not supported */
+ 217:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (irqmask & ~d1_irq_break & ~d1_irq_vip & ~d1_irq_vbi)
+ 218:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 219:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         if ((irqmask & d1_irq_dlist) && g_irq_triggered[d1_irqslot_dlist])
+ 220:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         {
+ 221:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             g_irq_triggered[d1_irqslot_dlist] = 0;
+ 222:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             return d1_irq_dlist;
+ 223:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         }
+ 224:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 225:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         if (timeout == d1_to_no_wait)
+ 226:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         {
+ 227:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             return 0;
+ 228:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         }
+ 229:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 230:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         /* wait for irq */
+ 231:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         while(1)
+ 232:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         {
+ 233:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             if ((irqmask & d1_irq_dlist) && g_irq_triggered[d1_irqslot_dlist])
+ 234:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             {
+ 235:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                 g_irq_triggered[d1_irqslot_dlist] = 0;
+ 236:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                 return d1_irq_dlist;
+ 237:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             }
+ 238:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         }
+ 239:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 240:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 241:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     return 0;
+ 242:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 243:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 244:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** int d1_callirqhandler(d1_device *handle, int irqtype, void *irqdata)
+ 245:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** {
+ 246:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     int irqslot;
+ 247:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 248:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* unused arguments */
+ 249:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     INTERNAL_NOT_USED(handle);
+ 250:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 251:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* get slot */
+ 252:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     irqslot = d1_mapirq_intern(irqtype);
+ 253:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (irqslot < 0)
+ 254:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 255:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         return 0;
+ 256:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 257:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 258:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (!g_irq_handler[irqslot])
+ 259:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 260:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         return 1;
+ 261:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 262:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 263:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* call irq handler */
+ 264:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     g_irq_handler[irqslot](irqtype, irqdata, g_irq_data[irqslot]);
+ 265:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 266:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     return 1;
+ 267:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 268:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 269:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** void drw_int_isr(void)
+ 270:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** {
+ 271:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     unsigned long intReg;
+ 272:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 273:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     intReg = READ_REG(DAVE2D_0_BASE, DAVE_STAT);
+ 274:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 275:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* any DAVE interrupt? */
+ 276:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (intReg & 0x30)
+ 277:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 278:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         /* clear/enable all DAVE interrupts */
+ 279:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         WRITE_REG(DAVE2D_0_BASE, DAVE_IRQ_CTRL, 0xe);
+ 280:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 281:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         /* display list interrupt? */
+ 282:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         if (intReg & 0x20)
+ 283:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         {
+ 284:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             if (context->dlist_indirect && *(context->dlist_start) != 0)
+ 285:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             {
+ 286:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                 long dlist_addr;
+ 287:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                 dlist_addr = *(context->dlist_start);
+ 288:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 289:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                 /* get next dlist start address */
+ 290:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                 context->dlist_start++;
+ 291:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 292:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                 /* starting Dave */
+ 293:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                 WRITE_REG(DAVE2D_0_BASE, D2_DLISTSTART, dlist_addr);
+ 294:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             }
+ 295:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             else
+ 296:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             {
+ 297:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                 if (g_irq_handler[d1_irqslot_dlist])
+ 298:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                 {
+ 299:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                     g_irq_handler[d1_irqslot_dlist] (d1_irq_dlist, 0, g_irq_data[d1_irqslot_dlist])
+ 300:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                 }
+ 301:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 302:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                 g_irq_triggered[d1_irqslot_dlist] = 1;
+ 303:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             }
+ 304:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         }
+ 305:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 306:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 307:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** #if ICU_GROUPAL1_ENABLE
+ 308:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** R_BSP_PRAGMA_STATIC_INTERRUPT(excep_icu_groupal1_isr, VECT(ICU,GROUPAL1))
+ 309:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** /***********************************************************************
+ 310:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Function Name: excep_icu_groupal1_isr
+ 311:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Description  : GRPAL1 interrupt routine for DRW2D.
+ 312:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Arguments    : none
+ 313:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Return Value : none
+ 314:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  **********************************************************************/
+ 315:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** R_BSP_ATTRIB_STATIC_INTERRUPT void excep_icu_groupal1_isr(void)
+ 316:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** {
+ 317:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     unsigned long isflag;
+ 318:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 319:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     isflag = d1_grpal1_get();
+ 320:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 321:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (0x00000800UL == isflag)
+ 322:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 323:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         drw_int_isr();
+ 324:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 325:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** } /* End of function excep_icu_groupal1_isr() */
+ 326:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** #endif
+ 327:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** /***********************************************************************
+ 328:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Function Name: d1_ir_set
+ 329:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Description  : Write the IR register.
+ 330:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Arguments    : enable
+ 331:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  *                    Enable or disable the register bit.
+ 332:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  *                vector
+ 333:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  *                    Interrupt vector number.
+ 334:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Return Value : none
+ 335:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  **********************************************************************/
+ 336:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** static void d1_ir_set(bool enable, int vector)
+ 337:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** {
+  53                             		.loc 1 337 1 is_stmt 1 view -0
+ 338:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     unsigned char *p_ir_addr;
+  54                             		.loc 1 338 5 view .LVU13
+ 339:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 340:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* The address offset from the address of the base register is cast to match the size of the re
+ 341:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     p_ir_addr = ((unsigned char *)IR_0_BASE) + vector;
+  55                             		.loc 1 341 5 view .LVU14
+  56                             		.loc 1 341 15 is_stmt 0 view .LVU15
+  57 0000 73 22 00 70 08          		add	#0x87000, r2
+  58                             	.LVL9:
+ 342:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 343:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (true == enable)
+  59                             		.loc 1 343 5 is_stmt 1 view .LVU16
+  60                             		.loc 1 343 8 is_stmt 0 view .LVU17
+  61 0005 FD 78 C1 FF 00          		tst	#0xff, r1
+  62 000a 15                      		beq	.L7
+ 344:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 345:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         *p_ir_addr = 1;
+  63                             		.loc 1 345 9 is_stmt 1 view .LVU18
+  64                             		.loc 1 345 20 is_stmt 0 view .LVU19
+  65 000b F8 24 01                		mov.B	#1, [r2]
+  66 000e 02                      		rts
+  67                             	.L7:
+ 346:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 347:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     else
+ 348:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 349:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         *p_ir_addr = 0;
+  68                             		.loc 1 349 9 is_stmt 1 view .LVU20
+  69                             		.loc 1 349 20 is_stmt 0 view .LVU21
+  70 000f F8 24 00                		mov.B	#0, [r2]
+ 350:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 351:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** } /* End of function d1_ir_set() */
+  71                             		.loc 1 351 1 view .LVU22
+  72 0012 02                      		rts
+  73                             	.LFE9:
+  75                             		.section	.text.d1_ipr_set,"ax",@progbits
+  77                             	_d1_ipr_set:
+  78                             	.LVL10:
+  79                             	.LFB10:
+ 352:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 353:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** /***********************************************************************
+ 354:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Function Name: d1_ipr_set
+ 355:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Description  : Write the IPR register.
+ 356:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Arguments    : priority
+ 357:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  *                    Interrupt priority.
+ 358:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  *                vector
+ 359:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  *                    Interrupt vector number.
+ 360:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Return Value : none
+ 361:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  **********************************************************************/
+ 362:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** static void d1_ipr_set(unsigned char priority, int vector)
+ 363:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** {
+  80                             		.loc 1 363 1 is_stmt 1 view -0
+ 364:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     unsigned char *p_ipr_addr;
+  81                             		.loc 1 364 5 view .LVU24
+ 365:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 366:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* The address offset from the address of the base register is cast to match the size of the re
+ 367:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     p_ipr_addr = ((unsigned char *)IPR_0_BASE) + vector;
+  82                             		.loc 1 367 5 view .LVU25
+  83                             		.loc 1 367 16 is_stmt 0 view .LVU26
+  84 0000 73 22 00 73 08          		add	#0x87300, r2
+  85                             	.LVL11:
+ 368:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     *p_ipr_addr = priority;
+  86                             		.loc 1 368 5 is_stmt 1 view .LVU27
+  87                             		.loc 1 368 17 is_stmt 0 view .LVU28
+  88 0005 C3 21                   		mov.B	r1, [r2]
+ 369:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** } /* End of function d1_ipr_set() */
+  89                             		.loc 1 369 1 view .LVU29
+  90 0007 02                      		rts
+  91                             	.LFE10:
+  93                             		.section	.text.d1_ipr_get,"ax",@progbits
+  95                             	_d1_ipr_get:
+  96                             	.LVL12:
+  97                             	.LFB11:
+ 370:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 371:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** /***********************************************************************
+ 372:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Function Name: d1_ipr_get
+ 373:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Description  : Read the IPR register.
+ 374:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Arguments    : vector
+ 375:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  *                    Interrupt vector number.
+ 376:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Return Value : Value of IPR register.
+ 377:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  **********************************************************************/
+ 378:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** static unsigned char d1_ipr_get(int vector)
+ 379:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** {
+  98                             		.loc 1 379 1 is_stmt 1 view -0
+ 380:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     unsigned char *p_ipr_addr;
+  99                             		.loc 1 380 5 view .LVU31
+ 381:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 382:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* The address offset from the address of the base register is cast to match the size of the re
+ 383:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     p_ipr_addr = ((unsigned char *)IPR_0_BASE) + vector;
+ 100                             		.loc 1 383 5 view .LVU32
+ 101                             		.loc 1 383 16 is_stmt 0 view .LVU33
+ 102 0000 73 11 00 73 08          		add	#0x87300, r1
+ 103                             	.LVL13:
+ 384:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 385:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     return (*p_ipr_addr);
+ 104                             		.loc 1 385 5 is_stmt 1 view .LVU34
+ 386:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** } /* End of function d1_ipr_get() */
+ 105                             		.loc 1 386 1 is_stmt 0 view .LVU35
+ 106 0005 58 11                   		movu.B	[r1], r1
+ 107                             	.LVL14:
+ 108                             		.loc 1 386 1 view .LVU36
+ 109 0007 02                      		rts
+ 110                             	.LFE11:
+ 112                             		.section	.text.d1_ien_set,"ax",@progbits
+ 114                             	_d1_ien_set:
+ 115                             	.LVL15:
+ 116                             	.LFB12:
+ 387:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 388:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** /***********************************************************************
+ 389:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Function Name: d1_ien_set
+ 390:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Description  : Write the IER register.
+ 391:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Arguments    : enable
+ 392:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  *                    Enable or disable the register bit.
+ 393:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  *                vector
+ 394:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  *                    Interrupt vector number.
+ 395:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Return Value : none
+ 396:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  **********************************************************************/
+ 397:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** static void d1_ien_set(bool enable, int vector)
+ 398:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** {
+ 117                             		.loc 1 398 1 is_stmt 1 view -0
+ 399:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     unsigned char *p_ien_addr;
+ 118                             		.loc 1 399 5 view .LVU38
+ 400:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     unsigned char tmp_ier;
+ 119                             		.loc 1 400 5 view .LVU39
+ 401:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     unsigned char tmp_ien;
+ 120                             		.loc 1 401 5 view .LVU40
+ 402:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 403:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     tmp_ier = vector / 8;
+ 121                             		.loc 1 403 5 view .LVU41
+ 122                             		.loc 1 403 22 is_stmt 0 view .LVU42
+ 123 0000 EF 25                   		mov.L	r2, r5
+ 124 0002 61 02                   		cmp	#0, r2
+ 125 0004 29 23                   		blt	.L16
+ 126                             	.L12:
+ 127                             		.loc 1 403 22 view .LVU43
+ 128 0006 6A 35                   		shar	#3, r5
+ 129                             	.LVL16:
+ 404:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     tmp_ien = vector % 8;
+ 130                             		.loc 1 404 5 is_stmt 1 view .LVU44
+ 131                             		.loc 1 404 22 is_stmt 0 view .LVU45
+ 132 0008 74 22 07 00 00 80       		and	#-2147483641, r2
+ 133                             	.LVL17:
+ 134                             		.loc 1 404 22 view .LVU46
+ 135 000e 27 1E                   		bn	.L17
+ 136                             	.L13:
+ 137                             	.LVL18:
+ 405:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 406:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* The address offset from the address of the base register is cast to match the size of the re
+ 407:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     p_ien_addr = ((unsigned char *)IEN_0_BASE) + tmp_ier;
+ 138                             		.loc 1 407 5 is_stmt 1 view .LVU47
+ 139                             		.loc 1 407 48 is_stmt 0 view .LVU48
+ 140 0010 76 25 FF 00             		and #0xff, r5
+ 141                             	.LVL19:
+ 142                             		.loc 1 407 16 view .LVU49
+ 143 0014 73 55 00 72 08          		add	#0x87200, r5
+ 144                             	.LVL20:
+ 408:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 409:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (true == enable)
+ 145                             		.loc 1 409 5 is_stmt 1 view .LVU50
+ 146                             		.loc 1 409 8 is_stmt 0 view .LVU51
+ 147 0019 5B 11                   		movu.B	r1, r1
+ 148                             		.loc 1 409 8 view .LVU52
+ 149 001b 61 01                   		cmp	#0, r1
+ 150 001d 20 18                   		beq	.L14
+ 410:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 411:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         *p_ien_addr = ((*p_ien_addr) | (1 << tmp_ien));
+ 151                             		.loc 1 411 9 is_stmt 1 view .LVU53
+ 152                             		.loc 1 411 43 is_stmt 0 view .LVU54
+ 153 001f 76 22 FF 00             		and #0xff, r2
+ 154                             	.LVL21:
+ 155                             		.loc 1 411 38 view .LVU55
+ 156 0023 FC 60 52                		bset	r2, [r5].B
+ 157 0026 02                      		rts
+ 158                             	.LVL22:
+ 159                             	.L16:
+ 403:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     tmp_ien = vector % 8;
+ 160                             		.loc 1 403 22 view .LVU56
+ 161 0027 71 25 07                		add	#7, r2, r5
+ 162 002a 2E DC                   		bra	.L12
+ 163                             	.LVL23:
+ 164                             	.L17:
+ 404:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 165                             		.loc 1 404 22 view .LVU57
+ 166 002c 60 12                   		sub	#1, r2
+ 167 002e 75 32 F8                		or	#-8, r2
+ 168 0031 62 12                   		add	#1, r2
+ 169 0033 2E DD                   		bra	.L13
+ 170                             	.LVL24:
+ 171                             	.L14:
+ 412:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 413:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     else
+ 414:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 415:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         *p_ien_addr = ((*p_ien_addr) & (~(1 << tmp_ien)));
+ 172                             		.loc 1 415 9 is_stmt 1 view .LVU58
+ 173                             		.loc 1 415 25 is_stmt 0 view .LVU59
+ 174 0035 CC 53                   		mov.B	[r5], r3
+ 175                             		.loc 1 415 45 view .LVU60
+ 176 0037 76 22 FF 00             		and #0xff, r2
+ 177                             	.LVL25:
+ 178                             		.loc 1 415 45 view .LVU61
+ 179 003b 66 14                   		mov.L	#1, r4
+ 180 003d FD 62 24                		shll	r2, r4
+ 181                             		.loc 1 415 38 view .LVU62
+ 182 0040 7E 04                   		not	r4
+ 183 0042 53 34                   		and	r3, r4
+ 184                             		.loc 1 415 21 view .LVU63
+ 185 0044 C3 54                   		mov.B	r4, [r5]
+ 416:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 417:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** } /* End of function d1_ien_set() */
+ 186                             		.loc 1 417 1 view .LVU64
+ 187 0046 02                      		rts
+ 188                             	.LFE12:
+ 190                             		.section	.text.d1_genal1_set,"ax",@progbits
+ 192                             	_d1_genal1_set:
+ 193                             	.LVL26:
+ 194                             	.LFB13:
+ 418:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 419:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** /***********************************************************************
+ 420:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Function Name: d1_genal1_set
+ 421:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Description  : Write the GENAL1 register.
+ 422:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Arguments    : enable
+ 423:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  *                    Enable or disable the register bit.
+ 424:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  *                grp_num
+ 425:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  *                    The register bit position.
+ 426:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Return Value : none
+ 427:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  **********************************************************************/
+ 428:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** static void d1_genal1_set(bool enable, int grp_num)
+ 429:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** {
+ 195                             		.loc 1 429 1 is_stmt 1 view -0
+ 430:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     unsigned long *p_genal1_addr;
+ 196                             		.loc 1 430 5 view .LVU66
+ 431:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 432:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* The address of the base register is cast to match the size of the register. */
+ 433:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     p_genal1_addr = ((unsigned long *)GENAL1_0_BASE);
+ 197                             		.loc 1 433 5 view .LVU67
+ 434:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 435:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (true == enable)
+ 198                             		.loc 1 435 5 view .LVU68
+ 199                             		.loc 1 435 8 is_stmt 0 view .LVU69
+ 200 0000 FD 78 C1 FF 00          		tst	#0xff, r1
+ 201 0005 20 0F                   		beq	.L19
+ 436:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 437:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         *p_genal1_addr = ((*p_genal1_addr) | (1 << grp_num));
+ 202                             		.loc 1 437 9 is_stmt 1 view .LVU70
+ 203                             		.loc 1 437 28 is_stmt 0 view .LVU71
+ 204 0007 FB 4E 74 78 08          		mov.L	#0x87874, r4
+ 205 000c EC 45                   		mov.L	[r4], r5
+ 206                             		.loc 1 437 44 view .LVU72
+ 207 000e FC 63 52                		bset	r2, r5
+ 208                             		.loc 1 437 24 view .LVU73
+ 209 0011 E3 45                   		mov.L	r5, [r4]
+ 210 0013 02                      		rts
+ 211                             	.L19:
+ 438:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 439:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     else
+ 440:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 441:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         *p_genal1_addr = ((*p_genal1_addr) & (~(1 << grp_num)));
+ 212                             		.loc 1 441 9 is_stmt 1 view .LVU74
+ 213                             		.loc 1 441 28 is_stmt 0 view .LVU75
+ 214 0014 FB 4E 74 78 08          		mov.L	#0x87874, r4
+ 215                             		.loc 1 441 51 view .LVU76
+ 216 0019 66 15                   		mov.L	#1, r5
+ 217 001b FD 62 25                		shll	r2, r5
+ 218                             		.loc 1 441 47 view .LVU77
+ 219 001e 7E 05                   		not	r5
+ 220                             		.loc 1 441 44 view .LVU78
+ 221 0020 06 90 45                		and	[r4], r5
+ 222                             		.loc 1 441 24 view .LVU79
+ 223 0023 E3 45                   		mov.L	r5, [r4]
+ 442:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 443:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** } /* End of function d1_genal1_set() */
+ 224                             		.loc 1 443 1 view .LVU80
+ 225 0025 02                      		rts
+ 226                             	.LFE13:
+ 228                             		.section	.text.d1_genal1_get,"ax",@progbits
+ 230                             	_d1_genal1_get:
+ 231                             	.LFB14:
+ 444:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 445:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** /***********************************************************************
+ 446:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Function Name: d1_genal1_get
+ 447:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Description  : Read the GENAL1 register.
+ 448:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Arguments    : none
+ 449:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  * Return Value : Value of GENAL1 register.
+ 450:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****  **********************************************************************/
+ 451:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** static unsigned long d1_genal1_get()
+ 452:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** {
+ 232                             		.loc 1 452 1 is_stmt 1 view -0
+ 453:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     unsigned long *p_genal1_addr;
+ 233                             		.loc 1 453 5 view .LVU82
+ 454:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 455:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* The address of the base register is cast to match the size of the register. */
+ 456:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     p_genal1_addr = ((unsigned long *)GENAL1_0_BASE);
+ 234                             		.loc 1 456 5 view .LVU83
+ 235                             	.LVL27:
+ 457:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 458:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     return (*p_genal1_addr);
+ 236                             		.loc 1 458 5 view .LVU84
+ 459:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** } /* End of function d1_genal1_get() */
+ 237                             		.loc 1 459 1 is_stmt 0 view .LVU85
+ 238 0000 FB 5E 74 78 08          		mov.L	#0x87874, r5
+ 239 0005 EC 51                   		mov.L	[r5], r1
+ 240 0007 02                      		rts
+ 241                             	.LFE14:
+ 243                             		.section	.text.d1_initirq_intern,"ax",@progbits
+ 244                             		.global	_d1_initirq_intern
+ 246                             	_d1_initirq_intern:
+ 247                             	.LVL28:
+ 248                             	.LFB1:
+  97:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     unsigned char tmp_ipr;
+ 249                             		.loc 1 97 1 is_stmt 1 view -0
+  98:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 250                             		.loc 1 98 5 view .LVU87
+ 100:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 251                             		.loc 1 100 5 view .LVU88
+ 100:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 252                             		.loc 1 100 13 is_stmt 0 view .LVU89
+ 253 0000 FB 52 00 00 00 00       		mov.L	#_context, r5
+ 254 0006 E3 51                   		mov.L	r1, [r5]
+ 103:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 255                             		.loc 1 103 5 is_stmt 1 view .LVU90
+ 256 0008 FB 5E C0 30 0E          		mov.L	#0xe30c0, r5
+ 257 000d F8 56 0E                		mov.L	#14, [r5]
+ 106:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 258                             		.loc 1 106 5 view .LVU91
+ 259 0010 66 B2                   		mov.L	#11, r2
+ 260 0012 66 11                   		mov	#1, r1
+ 261                             	.LVL29:
+ 106:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 262                             		.loc 1 106 5 is_stmt 0 view .LVU92
+ 263 0014 05 00 00 00             		bsr	_d1_genal1_set
+ 264                             	.LVL30:
+ 109:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 265                             		.loc 1 109 5 is_stmt 1 view .LVU93
+ 266 0018 75 42 71                		mov.L	#0x71, r2
+ 267 001b 66 01                   		mov	#0, r1
+ 268 001d 05 00 00 00             		bsr	_d1_ien_set
+ 269                             	.LVL31:
+ 112:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 270                             		.loc 1 112 5 view .LVU94
+ 271 0021 75 42 71                		mov.L	#0x71, r2
+ 272 0024 66 01                   		mov	#0, r1
+ 273 0026 05 00 00 00             		bsr	_d1_ir_set
+ 274                             	.LVL32:
+ 115:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     d1_ipr_set(tmp_ipr, ICU_GROUPAL1);
+ 275                             		.loc 1 115 5 view .LVU95
+ 115:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     d1_ipr_set(tmp_ipr, ICU_GROUPAL1);
+ 276                             		.loc 1 115 47 is_stmt 0 view .LVU96
+ 277 002a 75 41 71                		mov.L	#0x71, r1
+ 278 002d 05 00 00 00             		bsr	_d1_ipr_get
+ 279                             	.LVL33:
+ 115:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     d1_ipr_set(tmp_ipr, ICU_GROUPAL1);
+ 280                             		.loc 1 115 15 view .LVU97
+ 281 0031 61 61                   		cmp	#6, r1
+ 282 0033 24 04                   		bgtu	.L23
+ 283 0035 66 71                   		mov	#7, r1
+ 284                             	.L23:
+ 285                             	.LVL34:
+ 116:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 286                             		.loc 1 116 5 is_stmt 1 discriminator 4 view .LVU98
+ 287 0037 75 42 71                		mov.L	#0x71, r2
+ 288 003a 05 00 00 00             		bsr	_d1_ipr_set
+ 289                             	.LVL35:
+ 119:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 290                             		.loc 1 119 5 discriminator 4 view .LVU99
+ 291 003e 75 42 71                		mov.L	#0x71, r2
+ 292 0041 66 11                   		mov	#1, r1
+ 293 0043 05 00 00 00             		bsr	_d1_ien_set
+ 294                             	.LVL36:
+ 121:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 295                             		.loc 1 121 5 discriminator 4 view .LVU100
+ 122:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 296                             		.loc 1 122 1 is_stmt 0 discriminator 4 view .LVU101
+ 297 0047 66 11                   		mov.L	#1, r1
+ 298 0049 02                      		rts
+ 299                             	.LFE1:
+ 301                             		.section	.text.d1_setirqhandler,"ax",@progbits
+ 302                             		.global	_d1_setirqhandler
+ 304                             	_d1_setirqhandler:
+ 305                             	.LVL37:
+ 306                             	.LFB2:
+ 127:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     int irqslot;
+ 307                             		.loc 1 127 1 is_stmt 1 view -0
+ 127:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     int irqslot;
+ 308                             		.loc 1 127 1 is_stmt 0 view .LVU103
+ 309 0000 6E 7A                   		pushm	r7-r10
+ 310                             	.LCFI0:
+ 311 0002 EF 3A                   		mov.L	r3, r10
+ 312 0004 EF 47                   		mov.L	r4, r7
+ 128:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 313                             		.loc 1 128 5 is_stmt 1 view .LVU104
+ 131:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 314                             		.loc 1 131 5 view .LVU105
+ 134:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (irqslot < 0)
+ 315                             		.loc 1 134 5 view .LVU106
+ 134:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (irqslot < 0)
+ 316                             		.loc 1 134 15 is_stmt 0 view .LVU107
+ 317 0006 EF 21                   		mov.L	r2, r1
+ 318                             	.LVL38:
+ 134:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (irqslot < 0)
+ 319                             		.loc 1 134 15 view .LVU108
+ 320 0008 05 00 00 00             		bsr	_d1_mapirq_intern
+ 321                             	.LVL39:
+ 135:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 322                             		.loc 1 135 5 is_stmt 1 view .LVU109
+ 135:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 323                             		.loc 1 135 8 is_stmt 0 view .LVU110
+ 324 000c 61 01                   		cmp	#0, r1
+ 325 000e 29 14                   		blt	.L24
+ 141:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     g_irq_data[irqslot] = data;
+ 326                             		.loc 1 141 5 is_stmt 1 view .LVU111
+ 141:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     g_irq_data[irqslot] = data;
+ 327                             		.loc 1 141 28 is_stmt 0 view .LVU112
+ 328 0010 FB 52 00 00 00 00       		mov.L	#_g_irq_handler, r5
+ 329 0016 FE 21 5A                		mov.L	r10, [r1,r5]
+ 142:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 330                             		.loc 1 142 5 is_stmt 1 view .LVU113
+ 142:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 331                             		.loc 1 142 25 is_stmt 0 view .LVU114
+ 332 0019 FB A2 00 00 00 00       		mov.L	#_g_irq_data, r10
+ 333                             	.LVL40:
+ 142:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 334                             		.loc 1 142 25 view .LVU115
+ 335 001f FE 21 A7                		mov.L	r7, [r1,r10]
+ 336                             	.LVL41:
+ 337                             	.L24:
+ 143:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 338                             		.loc 1 143 1 view .LVU116
+ 339 0022 3F 7A 04                		rtsd	#16, r7-r10
+ 143:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 340                             		.loc 1 143 1 view .LVU117
+ 341                             	.LFE2:
+ 343                             		.section	.text.d1_getirqhandler,"ax",@progbits
+ 344                             		.global	_d1_getirqhandler
+ 346                             	_d1_getirqhandler:
+ 347                             	.LVL42:
+ 348                             	.LFB3:
+ 148:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     int irqslot;
+ 349                             		.loc 1 148 1 is_stmt 1 view -0
+ 149:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 350                             		.loc 1 149 5 view .LVU119
+ 152:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 351                             		.loc 1 152 5 view .LVU120
+ 155:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (irqslot < 0)
+ 352                             		.loc 1 155 5 view .LVU121
+ 155:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (irqslot < 0)
+ 353                             		.loc 1 155 15 is_stmt 0 view .LVU122
+ 354 0000 EF 21                   		mov.L	r2, r1
+ 355                             	.LVL43:
+ 155:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (irqslot < 0)
+ 356                             		.loc 1 155 15 view .LVU123
+ 357 0002 05 00 00 00             		bsr	_d1_mapirq_intern
+ 358                             	.LVL44:
+ 156:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 359                             		.loc 1 156 5 is_stmt 1 view .LVU124
+ 156:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 360                             		.loc 1 156 8 is_stmt 0 view .LVU125
+ 361 0006 61 01                   		cmp	#0, r1
+ 362 0008 29 0C                   		blt	.L29
+ 161:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 363                             		.loc 1 161 5 is_stmt 1 view .LVU126
+ 161:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 364                             		.loc 1 161 25 is_stmt 0 view .LVU127
+ 365 000a FB 52 00 00 00 00       		mov.L	#_g_irq_handler, r5
+ 366 0010 FE 61 51                		mov.L	[r1,r5], r1
+ 367                             	.LVL45:
+ 161:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 368                             		.loc 1 161 25 view .LVU128
+ 369 0013 02                      		rts
+ 370                             	.LVL46:
+ 371                             	.L29:
+ 158:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 372                             		.loc 1 158 16 view .LVU129
+ 373 0014 66 01                   		mov.L	#0, r1
+ 374                             	.LVL47:
+ 162:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 375                             		.loc 1 162 1 view .LVU130
+ 376 0016 02                      		rts
+ 377                             	.LFE3:
+ 379                             		.section	.text.d1_getirqdata,"ax",@progbits
+ 380                             		.global	_d1_getirqdata
+ 382                             	_d1_getirqdata:
+ 383                             	.LVL48:
+ 384                             	.LFB4:
+ 167:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     int irqslot;
+ 385                             		.loc 1 167 1 is_stmt 1 view -0
+ 168:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 386                             		.loc 1 168 5 view .LVU132
+ 171:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 387                             		.loc 1 171 5 view .LVU133
+ 174:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (irqslot < 0)
+ 388                             		.loc 1 174 5 view .LVU134
+ 174:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (irqslot < 0)
+ 389                             		.loc 1 174 15 is_stmt 0 view .LVU135
+ 390 0000 EF 21                   		mov.L	r2, r1
+ 391                             	.LVL49:
+ 174:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (irqslot < 0)
+ 392                             		.loc 1 174 15 view .LVU136
+ 393 0002 05 00 00 00             		bsr	_d1_mapirq_intern
+ 394                             	.LVL50:
+ 175:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 395                             		.loc 1 175 5 is_stmt 1 view .LVU137
+ 175:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 396                             		.loc 1 175 8 is_stmt 0 view .LVU138
+ 397 0006 61 01                   		cmp	#0, r1
+ 398 0008 29 0C                   		blt	.L32
+ 180:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 399                             		.loc 1 180 5 is_stmt 1 view .LVU139
+ 180:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 400                             		.loc 1 180 22 is_stmt 0 view .LVU140
+ 401 000a FB 52 00 00 00 00       		mov.L	#_g_irq_data, r5
+ 402 0010 FE 61 51                		mov.L	[r1,r5], r1
+ 403                             	.LVL51:
+ 180:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 404                             		.loc 1 180 22 view .LVU141
+ 405 0013 02                      		rts
+ 406                             	.LVL52:
+ 407                             	.L32:
+ 177:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 408                             		.loc 1 177 16 view .LVU142
+ 409 0014 66 01                   		mov.L	#0, r1
+ 410                             	.LVL53:
+ 181:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 411                             		.loc 1 181 1 view .LVU143
+ 412 0016 02                      		rts
+ 413                             	.LFE4:
+ 415                             		.section	.text.d1_shutdownirq_intern,"ax",@progbits
+ 416                             		.global	_d1_shutdownirq_intern
+ 418                             	_d1_shutdownirq_intern:
+ 419                             	.LVL54:
+ 420                             	.LFB5:
+ 184:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     unsigned long tmp_gen;
+ 421                             		.loc 1 184 1 is_stmt 1 view -0
+ 185:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 422                             		.loc 1 185 5 view .LVU145
+ 188:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 423                             		.loc 1 188 5 view .LVU146
+ 191:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 424                             		.loc 1 191 5 view .LVU147
+ 425 0000 66 B2                   		mov.L	#11, r2
+ 426 0002 66 01                   		mov	#0, r1
+ 427                             	.LVL55:
+ 191:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 428                             		.loc 1 191 5 is_stmt 0 view .LVU148
+ 429 0004 05 00 00 00             		bsr	_d1_genal1_set
+ 430                             	.LVL56:
+ 194:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 431                             		.loc 1 194 5 is_stmt 1 view .LVU149
+ 432 0008 FB 5E C0 30 0E          		mov.L	#0xe30c0, r5
+ 433 000d F8 56 0C                		mov.L	#12, [r5]
+ 196:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (0 == tmp_gen)
+ 434                             		.loc 1 196 5 view .LVU150
+ 196:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (0 == tmp_gen)
+ 435                             		.loc 1 196 15 is_stmt 0 view .LVU151
+ 436 0010 05 00 00 00             		bsr	_d1_genal1_get
+ 437                             	.LVL57:
+ 197:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 438                             		.loc 1 197 5 is_stmt 1 view .LVU152
+ 197:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 439                             		.loc 1 197 8 is_stmt 0 view .LVU153
+ 440 0014 61 01                   		cmp	#0, r1
+ 441 0016 14                      		beq	.L35
+ 442                             	.LVL58:
+ 443                             	.L34:
+ 206:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 444                             		.loc 1 206 5 is_stmt 1 view .LVU154
+ 207:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 445                             		.loc 1 207 1 is_stmt 0 view .LVU155
+ 446 0017 66 11                   		mov.L	#1, r1
+ 447 0019 02                      		rts
+ 448                             	.LVL59:
+ 449                             	.L35:
+ 200:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 450                             		.loc 1 200 9 is_stmt 1 view .LVU156
+ 451 001a 75 42 71                		mov.L	#0x71, r2
+ 452 001d 05 00 00 00             		bsr	_d1_ien_set
+ 453                             	.LVL60:
+ 203:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 454                             		.loc 1 203 9 view .LVU157
+ 455 0021 75 42 71                		mov.L	#0x71, r2
+ 456 0024 66 01                   		mov	#0, r1
+ 457 0026 05 00 00 00             		bsr	_d1_ipr_set
+ 458                             	.LVL61:
+ 459 002a 2E ED                   		bra	.L34
+ 460                             	.LFE5:
+ 462                             		.section	.text.d1_queryirq,"ax",@progbits
+ 463                             		.global	_d1_queryirq
+ 465                             	_d1_queryirq:
+ 466                             	.LVL62:
+ 467                             	.LFB6:
+ 212:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     /* unused arguments */
+ 468                             		.loc 1 212 1 view -0
+ 214:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 469                             		.loc 1 214 5 view .LVU159
+ 217:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 470                             		.loc 1 217 5 view .LVU160
+ 217:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 471                             		.loc 1 217 47 is_stmt 0 view .LVU161
+ 472 0000 FB 16 F4                		mov.L	#-12, r1
+ 473                             	.LVL63:
+ 217:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 474                             		.loc 1 217 47 view .LVU162
+ 475 0003 53 21                   		and	r2, r1
+ 217:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 476                             		.loc 1 217 8 view .LVU163
+ 477 0005 20 17                   		beq	.L36
+ 219:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         {
+ 478                             		.loc 1 219 9 is_stmt 1 view .LVU164
+ 219:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         {
+ 479                             		.loc 1 219 22 is_stmt 0 view .LVU165
+ 480 0007 64 42                   		and	#4, r2
+ 481                             	.LVL64:
+ 219:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         {
+ 482                             		.loc 1 219 12 view .LVU166
+ 483 0009 20 0D                   		beq	.L38
+ 219:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         {
+ 484                             		.loc 1 219 56 discriminator 1 view .LVU167
+ 485 000b FB 52 00 00 00 00       		mov.L	#_g_irq_triggered, r5
+ 486 0011 A8 D5                   		mov.L	8[r5], r5
+ 219:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         {
+ 487                             		.loc 1 219 38 discriminator 1 view .LVU168
+ 488 0013 61 05                   		cmp	#0, r5
+ 489 0015 18                      		bne	.L42
+ 490                             	.L38:
+ 225:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         {
+ 491                             		.loc 1 225 9 is_stmt 1 view .LVU169
+ 225:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         {
+ 492                             		.loc 1 225 12 is_stmt 0 view .LVU170
+ 493 0016 61 03                   		cmp	#0, r3
+ 494 0018 21 11                   		bne	.L39
+ 227:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         }
+ 495                             		.loc 1 227 20 view .LVU171
+ 496 001a EF 31                   		mov.L	r3, r1
+ 497                             	.L36:
+ 242:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 498                             		.loc 1 242 1 view .LVU172
+ 499 001c 02                      		rts
+ 500                             	.L42:
+ 221:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             return d1_irq_dlist;
+ 501                             		.loc 1 221 13 is_stmt 1 view .LVU173
+ 221:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             return d1_irq_dlist;
+ 502                             		.loc 1 221 47 is_stmt 0 view .LVU174
+ 503 001d FB 52 00 00 00 00       		mov.L	#_g_irq_triggered, r5
+ 504 0023 3E 52 00                		mov.L	#0, 8[r5]
+ 222:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         }
+ 505                             		.loc 1 222 13 is_stmt 1 view .LVU175
+ 222:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         }
+ 506                             		.loc 1 222 20 is_stmt 0 view .LVU176
+ 507 0026 66 41                   		mov.L	#4, r1
+ 508 0028 02                      		rts
+ 509                             	.L39:
+ 231:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         {
+ 510                             		.loc 1 231 9 is_stmt 1 view .LVU177
+ 233:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             {
+ 511                             		.loc 1 233 13 view .LVU178
+ 233:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             {
+ 512                             		.loc 1 233 16 is_stmt 0 view .LVU179
+ 513 0029 61 02                   		cmp	#0, r2
+ 514 002b 20 FE                   		beq	.L39
+ 233:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             {
+ 515                             		.loc 1 233 60 discriminator 1 view .LVU180
+ 516 002d FB 52 00 00 00 00       		mov.L	#_g_irq_triggered, r5
+ 517 0033 A8 D5                   		mov.L	8[r5], r5
+ 233:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             {
+ 518                             		.loc 1 233 42 discriminator 1 view .LVU181
+ 519 0035 61 05                   		cmp	#0, r5
+ 520 0037 20 F2                   		beq	.L39
+ 235:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                 return d1_irq_dlist;
+ 521                             		.loc 1 235 17 is_stmt 1 view .LVU182
+ 235:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                 return d1_irq_dlist;
+ 522                             		.loc 1 235 51 is_stmt 0 view .LVU183
+ 523 0039 FB 52 00 00 00 00       		mov.L	#_g_irq_triggered, r5
+ 524 003f 3E 52 00                		mov.L	#0, 8[r5]
+ 236:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             }
+ 525                             		.loc 1 236 17 is_stmt 1 view .LVU184
+ 236:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             }
+ 526                             		.loc 1 236 24 is_stmt 0 view .LVU185
+ 527 0042 66 41                   		mov.L	#4, r1
+ 528 0044 02                      		rts
+ 529                             	.LFE6:
+ 531                             		.section	.text.d1_callirqhandler,"ax",@progbits
+ 532                             		.global	_d1_callirqhandler
+ 534                             	_d1_callirqhandler:
+ 535                             	.LVL65:
+ 536                             	.LFB7:
+ 245:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     int irqslot;
+ 537                             		.loc 1 245 1 is_stmt 1 view -0
+ 245:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     int irqslot;
+ 538                             		.loc 1 245 1 is_stmt 0 view .LVU187
+ 539 0000 6E 7A                   		pushm	r7-r10
+ 540                             	.LCFI1:
+ 541 0002 EF 27                   		mov.L	r2, r7
+ 542 0004 EF 3A                   		mov.L	r3, r10
+ 246:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 543                             		.loc 1 246 5 is_stmt 1 view .LVU188
+ 249:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 544                             		.loc 1 249 5 view .LVU189
+ 252:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (irqslot < 0)
+ 545                             		.loc 1 252 5 view .LVU190
+ 252:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (irqslot < 0)
+ 546                             		.loc 1 252 15 is_stmt 0 view .LVU191
+ 547 0006 EF 21                   		mov.L	r2, r1
+ 548                             	.LVL66:
+ 252:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     if (irqslot < 0)
+ 549                             		.loc 1 252 15 view .LVU192
+ 550 0008 05 00 00 00             		bsr	_d1_mapirq_intern
+ 551                             	.LVL67:
+ 253:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 552                             		.loc 1 253 5 is_stmt 1 view .LVU193
+ 253:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 553                             		.loc 1 253 8 is_stmt 0 view .LVU194
+ 554 000c 61 01                   		cmp	#0, r1
+ 555 000e 29 23                   		blt	.L45
+ 258:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 556                             		.loc 1 258 5 is_stmt 1 view .LVU195
+ 258:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 557                             		.loc 1 258 23 is_stmt 0 view .LVU196
+ 558 0010 FB 52 00 00 00 00       		mov.L	#_g_irq_handler, r5
+ 559 0016 FE 61 55                		mov.L	[r1,r5], r5
+ 258:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 560                             		.loc 1 258 8 view .LVU197
+ 561 0019 61 05                   		cmp	#0, r5
+ 562 001b 20 1A                   		beq	.L46
+ 264:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 563                             		.loc 1 264 5 is_stmt 1 view .LVU198
+ 564 001d FB 42 00 00 00 00       		mov.L	#_g_irq_data, r4
+ 565 0023 FE 61 43                		mov.L	[r1,r4], r3
+ 566 0026 EF A2                   		mov.L	r10, r2
+ 567 0028 EF 71                   		mov.L	r7, r1
+ 568                             	.LVL68:
+ 264:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 569                             		.loc 1 264 5 is_stmt 0 view .LVU199
+ 570 002a 7F 15                   		jsr	r5
+ 571                             	.LVL69:
+ 266:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 572                             		.loc 1 266 5 is_stmt 1 view .LVU200
+ 266:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** }
+ 573                             		.loc 1 266 12 is_stmt 0 view .LVU201
+ 574 002c 66 11                   		mov.L	#1, r1
+ 575                             	.L43:
+ 267:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 576                             		.loc 1 267 1 view .LVU202
+ 577 002e 3F 7A 04                		rtsd	#16, r7-r10
+ 578                             	.LVL70:
+ 579                             	.L45:
+ 255:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 580                             		.loc 1 255 16 view .LVU203
+ 581 0031 66 01                   		mov.L	#0, r1
+ 582                             	.LVL71:
+ 255:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 583                             		.loc 1 255 16 view .LVU204
+ 584 0033 2E FB                   		bra	.L43
+ 585                             	.LVL72:
+ 586                             	.L46:
+ 260:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 587                             		.loc 1 260 16 view .LVU205
+ 588 0035 66 11                   		mov.L	#1, r1
+ 589                             	.LVL73:
+ 260:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     }
+ 590                             		.loc 1 260 16 view .LVU206
+ 591 0037 2E F7                   		bra	.L43
+ 592                             	.LFE7:
+ 594                             		.section	.text.drw_int_isr,"ax",@progbits
+ 595                             		.global	_drw_int_isr
+ 597                             	_drw_int_isr:
+ 598                             	.LFB8:
+ 270:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     unsigned long intReg;
+ 599                             		.loc 1 270 1 is_stmt 1 view -0
+ 271:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 600                             		.loc 1 271 5 view .LVU208
+ 273:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 601                             		.loc 1 273 5 view .LVU209
+ 273:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 602                             		.loc 1 273 12 is_stmt 0 view .LVU210
+ 603 0000 FB 5E 00 30 0E          		mov.L	#0xe3000, r5
+ 604 0005 EC 55                   		mov.L	[r5], r5
+ 605                             	.LVL74:
+ 276:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 606                             		.loc 1 276 5 is_stmt 1 view .LVU211
+ 276:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****     {
+ 607                             		.loc 1 276 8 is_stmt 0 view .LVU212
+ 608 0007 FD 74 C5 30             		tst	#48, r5
+ 609 000b 20 56                   		beq	.L48
+ 279:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 610                             		.loc 1 279 9 is_stmt 1 view .LVU213
+ 611 000d FB 4E C0 30 0E          		mov.L	#0xe30c0, r4
+ 612 0012 F8 46 0E                		mov.L	#14, [r4]
+ 282:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         {
+ 613                             		.loc 1 282 9 view .LVU214
+ 282:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****         {
+ 614                             		.loc 1 282 12 is_stmt 0 view .LVU215
+ 615 0015 FD 74 C5 20             		tst	#32, r5
+ 616 0019 20 48                   		beq	.L48
+ 284:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             {
+ 617                             		.loc 1 284 13 is_stmt 1 view .LVU216
+ 284:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             {
+ 618                             		.loc 1 284 24 is_stmt 0 view .LVU217
+ 619 001b FB 52 00 00 00 00       		mov.L	#_context, r5
+ 620                             	.LVL75:
+ 284:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             {
+ 621                             		.loc 1 284 24 view .LVU218
+ 622 0021 EC 55                   		mov.L	[r5], r5
+ 623 0023 A8 5C                   		mov.L	4[r5], r4
+ 284:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             {
+ 624                             		.loc 1 284 16 view .LVU219
+ 625 0025 61 04                   		cmp	#0, r4
+ 626 0027 20 17                   		beq	.L50
+ 284:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             {
+ 627                             		.loc 1 284 53 discriminator 1 view .LVU220
+ 628 0029 EC 54                   		mov.L	[r5], r4
+ 284:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             {
+ 629                             		.loc 1 284 44 discriminator 1 view .LVU221
+ 630 002b EC 43                   		mov.L	[r4], r3
+ 284:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             {
+ 631                             		.loc 1 284 41 discriminator 1 view .LVU222
+ 632 002d 61 03                   		cmp	#0, r3
+ 633 002f 20 0F                   		beq	.L50
+ 634                             	.LBB2:
+ 286:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                 dlist_addr = *(context->dlist_start);
+ 635                             		.loc 1 286 17 is_stmt 1 view .LVU223
+ 287:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 636                             		.loc 1 287 17 view .LVU224
+ 287:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 637                             		.loc 1 287 28 is_stmt 0 view .LVU225
+ 638 0031 FD 2A 43                		mov.L	[r4+], r3
+ 639                             	.LVL76:
+ 290:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 640                             		.loc 1 290 17 is_stmt 1 view .LVU226
+ 290:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** 
+ 641                             		.loc 1 290 37 is_stmt 0 view .LVU227
+ 642 0034 E3 54                   		mov.L	r4, [r5]
+ 643                             	.LVL77:
+ 293:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             }
+ 644                             		.loc 1 293 17 is_stmt 1 view .LVU228
+ 645 0036 FB 5E C8 30 0E          		mov.L	#0xe30c8, r5
+ 646 003b E3 53                   		mov.L	r3, [r5]
+ 647                             	.LBE2:
+ 285:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                 long dlist_addr;
+ 648                             		.loc 1 285 13 is_stmt 0 view .LVU229
+ 649 003d 02                      		rts
+ 650                             	.LVL78:
+ 651                             	.L50:
+ 297:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                 {
+ 652                             		.loc 1 297 17 is_stmt 1 view .LVU230
+ 297:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                 {
+ 653                             		.loc 1 297 34 is_stmt 0 view .LVU231
+ 654 003e FB 52 00 00 00 00       		mov.L	#_g_irq_handler, r5
+ 655 0044 A8 D5                   		mov.L	8[r5], r5
+ 297:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                 {
+ 656                             		.loc 1 297 20 view .LVU232
+ 657 0046 61 05                   		cmp	#0, r5
+ 658 0048 20 10                   		beq	.L51
+ 299:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****                 }
+ 659                             		.loc 1 299 21 is_stmt 1 view .LVU233
+ 660 004a FB 42 00 00 00 00       		mov.L	#_g_irq_data, r4
+ 661 0050 A8 C3                   		mov.L	8[r4], r3
+ 662 0052 66 02                   		mov.L	#0, r2
+ 663 0054 66 41                   		mov.L	#4, r1
+ 664 0056 7F 15                   		jsr	r5
+ 665                             	.LVL79:
+ 666                             	.L51:
+ 302:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             }
+ 667                             		.loc 1 302 17 view .LVU234
+ 302:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c ****             }
+ 668                             		.loc 1 302 51 is_stmt 0 view .LVU235
+ 669 0058 FB 52 00 00 00 00       		mov.L	#_g_irq_triggered, r5
+ 670 005e 3E 52 01                		mov.L	#1, 8[r5]
+ 671                             	.L48:
+ 306:../src/smc_gen/r_drw2d_rx/src/rx/dave_irq_rx.c **** #if ICU_GROUPAL1_ENABLE
+ 672                             		.loc 1 306 1 view .LVU236
+ 673 0061 02                      		rts
+ 674                             	.LFE8:
+ 676                             		.section	.bss.context,"aw",@nobits
+ 677                             		.balign 4
+ 680                             	_context:
+ 681 0000 00 00 00 00             		.zero	4
+ 682                             		.section	.bss.g_irq_triggered,"aw",@nobits
+ 683                             		.balign 4
+ 686                             	_g_irq_triggered:
+ 687 0000 00 00 00 00 00 00 00 00 		.zero	12
+ 687      00 00 00 00 
+ 688                             		.section	.bss.g_irq_data,"aw",@nobits
+ 689                             		.balign 4
+ 692                             	_g_irq_data:
+ 693 0000 00 00 00 00 00 00 00 00 		.zero	12
+ 693      00 00 00 00 
+ 694                             		.section	.bss.g_irq_handler,"aw",@nobits
+ 695                             		.balign 4
+ 698                             	_g_irq_handler:
+ 699 0000 00 00 00 00 00 00 00 00 		.zero	12
+ 699      00 00 00 00 
+ 862                             	.Letext0:
+ 863                             		.file 2 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\lib\\gcc\\rx-
+ 864                             		.file 3 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 865                             		.file 4 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 866                             		.file 5 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 867                             		.file 6 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 868                             		.file 7 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_drw2d_rx\\inc\\tes/dav
+ 869                             		.file 8 "../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.h"

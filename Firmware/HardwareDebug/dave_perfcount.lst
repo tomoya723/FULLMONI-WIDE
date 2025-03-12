@@ -1,0 +1,707 @@
+   1                             		.file	"dave_perfcount.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.d2_setperfcountevent,"ax",@progbits
+   5                             		.global	_d2_setperfcountevent
+   7                             	_d2_setperfcountevent:
+   8                             	.LVL0:
+   9                             	.LFB6:
+  10                             		.file 1 "../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c"
+   1:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** /*--------------------------------------------------------------------------
+   2:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * Project: D/AVE
+   3:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * File:    dave_perfcount.c (%version: 5 %)
+   4:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *          created Wed Jan 12 16:11:17 2005 by hh04027
+   5:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *
+   6:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * Description:
+   7:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  %date_modified: Mon Mar 12 15:29:23 2007 %  (%derived_by:  hh74026 %)
+   8:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *
+   9:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * Changes:
+  10:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  2007-03-14 CSe  added DEVICEBUSY error when DLR is active
+  11:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  2008-01-14 ASc  changed comments from C++ to C, removed tabs 
+  12:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  2008-07-16 ASt  added new performance counter events for ndoc
+  13:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  2012-09-25 BSp  MISRA cleanup
+  14:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  */
+  15:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+  16:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** /*--------------------------------------------------------------------------
+  17:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *
+  18:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * Title: Profiling
+  19:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * Performance measurement counter functions
+  20:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *
+  21:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * Check D2FB_PERFCOUNT bit of <d2_getrevisionhw> to see if performance counters
+  22:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * are available.
+  23:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *
+  24:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *-------------------------------------------------------------------------- */
+  25:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+  26:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** #include "dave_driver.h"
+  27:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** #include "dave_intern.h"
+  28:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+  29:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** /*--------------------------------------------------------------------------
+  30:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * Group: Performance counting
+  31:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * */
+  32:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+  33:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+  34:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** /*--------------------------------------------------------------------------
+  35:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * function: d2_setperfcountevent
+  36:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * Set the event to be counted by performance counter.
+  37:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *
+  38:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * Does not work while D/AVE is active! When calling this while D/AVE is active
+  39:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * executing a display list, rendering errors or even hangups can occur.
+  40:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *
+  41:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * parameters:
+  42:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *   handle - device pointer (see: <d2_opendevice>)
+  43:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *   counter - 0 or 1: which of both available performance counters to use
+  44:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *   event - which events the selected performance counter has to count
+  45:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *
+  46:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * events:
+  47:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_disable        - disable performance counter
+  48:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_davecycles     - DAVE active cycles
+  49:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_fbreads        - framebuffer read access
+  50:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_fbwrites       - framebuffer write access
+  51:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_texreads       - texture read access
+  52:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_invpixels      - invisible pixels (enumerated but selected with alpha 0%)
+  53:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_invpixels_miss - invisible pixels while internal fifo is empty (lost cycles)
+  54:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_dlrcycles      - displaylist reader active cycles
+  55:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_fbreadhits     - framebuffer read hits
+  56:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_fbreadmisses   - framebuffer read misses
+  57:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_fbwritehits    - framebuffer write hits
+  58:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_fbwritemisses  - framebuffer write misses
+  59:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_texreadhits    - texture read hits
+  60:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_texreadmisses  - texture read misses
+  61:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_clkcycles      - every clock cycle (for use as timer)
+  62:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_dlrburstreads  - displaylist reader burst reads
+  63:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_dlrwordsread   - displaylist reader words read
+  64:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_rlerewinds     - texture rle decoder rewinds
+  65:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_texburstreads  - texture cache burst reads
+  66:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_texwordsread   - texture cache words read
+  67:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_fbburstreads   - framebuffer cache burst reads
+  68:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_fbwordsread    - framebuffer cache words read
+  69:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_fbburstwrites  - framebuffer cache burst writes
+  70:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *  d2_pc_fbwordswritten - framebuffer cache words written
+  71:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *
+  72:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * returns:
+  73:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *   errorcode (D2_OK if successfull) see list of <Errorcodes> for details
+  74:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * */
+  75:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** d2_s32 d2_setperfcountevent( d2_device *handle, d2_u32 counter, d2_u32 event )
+  76:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** {
+  11                             		.loc 1 76 1 view -0
+  12                             		.loc 1 76 1 is_stmt 0 view .LVU1
+  13 0000 6E 6A                   		pushm	r6-r10
+  14                             	.LCFI0:
+  15 0002 EF 17                   		mov.L	r1, r7
+  16 0004 EF 26                   		mov.L	r2, r6
+  17 0006 EF 3A                   		mov.L	r3, r10
+  77:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    D2_VALIDATE( handle, D2_INVALIDDEVICE );    /* PRQA S 3112 3453 */ /* $Misra: #DEBUG_MACRO $*/
+  18                             		.loc 1 77 4 is_stmt 1 view .LVU2
+  78:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    D2_CHECKERR( counter < 2, D2_VALUETOOBIG ); /* PRQA S 3112 3453 */ /* $Misra: #DEBUG_MACRO $*/
+  19                             		.loc 1 78 4 view .LVU3
+  79:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+  80:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    if(0 != ((d2_u32)d2hw_get( D2_DEV(handle)->hwid, D2_STATUS ) & D2C_DLISTACTIVE))
+  20                             		.loc 1 80 4 view .LVU4
+  21                             		.loc 1 80 21 is_stmt 0 view .LVU5
+  22 0008 66 02                   		mov.L	#0, r2
+  23                             	.LVL1:
+  24                             		.loc 1 80 21 view .LVU6
+  25 000a A9 91                   		mov.L	24[r1], r1
+  26                             	.LVL2:
+  27                             		.loc 1 80 21 view .LVU7
+  28 000c 05 00 00 00             		bsr	_d2hw_get
+  29                             	.LVL3:
+  30                             		.loc 1 80 6 view .LVU8
+  31 0010 FD 74 C1 08             		tst	#8, r1
+  32 0014 21 23                   		bne	.L11
+  81:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    {
+  82:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****       D2_RETERR( handle, D2_DEVICEBUSY );
+  83:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    }
+  84:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+  85:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    /* fbcache performance measurement is different for prefetching framebuffer cache */
+  86:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    if(0 != (D2_DEV(handle)->hwrevision & D2FB_FBPREFETCH))
+  33                             		.loc 1 86 4 is_stmt 1 view .LVU9
+  34                             		.loc 1 86 27 is_stmt 0 view .LVU10
+  35 0016 ED 75 20                		mov.L	128[r7], r5
+  36                             		.loc 1 86 6 view .LVU11
+  37 0019 FD 7C C5 00 00 40       		tst	#0x400000, r5
+  38 001f 20 29                   		beq	.L4
+  87:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    {
+  88:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****       switch (event)
+  39                             		.loc 1 88 7 is_stmt 1 view .LVU12
+  40 0021 61 BA                   		cmp	#11, r10
+  41 0023 20 50                   		beq	.L6
+  42 0025 61 BA                   		cmp	#11, r10
+  43 0027 25 1A                   		bleu	.L12
+  44 0029 75 5A 1C                		cmp	#28, r10
+  45 002c 20 4C                   		beq	.L8
+  46 002e 75 5A 1D                		cmp	#29, r10
+  47 0031 21 17                   		bne	.L4
+  89:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****       {
+  90:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****          case d2_pc_fbwritehits:
+  91:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****             event = d2_pc_fbwrites;
+  92:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****             break;
+  93:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+  94:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****          case d2_pc_fbwritemisses:
+  95:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****             event = d2_pc_noevent;
+  96:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****             break;
+  97:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+  98:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****          case d2_pc_fbrwconflicts:
+  99:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****             event = d2_pc_fbwritehits;
+ 100:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****             break;
+ 101:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+ 102:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****          case d2_pc_fbrwconflictcycles:
+ 103:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****             event = d2_pc_fbwritemisses;
+  48                             		.loc 1 103 19 is_stmt 0 view .LVU13
+  49 0033 66 BA                   		mov.L	#11, r10
+  50                             	.LVL4:
+  51                             		.loc 1 103 19 view .LVU14
+  52 0035 2E 13                   		bra	.L4
+  53                             	.LVL5:
+  54                             	.L11:
+  82:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    }
+  55                             		.loc 1 82 7 is_stmt 1 view .LVU15
+  56                             	.LBB10:
+  57                             	.LBI10:
+  58                             		.file 2 "../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h"
+   1:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*--------------------------------------------------------------------------
+   2:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * Project: D/AVE
+   3:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * File:    dave_intern.h (%version: 29 %)
+   4:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *          created Tue Jan 11 12:57:48 2005 by hh04027
+   5:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *
+   6:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * Description:
+   7:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  %date_modified: Thu Jan 25 18:12:54 2007 %  (%derived_by:  hh74026 %)
+   8:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *
+   9:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * Changes:
+  10:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2005-12-22 CSe  removed transfermode field, added flags field in _d2_devicedata
+  11:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2006-02-16 CSe  added performance counter support
+  12:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2006-10-30 CSe  removed waitdlist flag
+  13:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2006-11-07 CSe  removed waitdlist flag
+  14:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2006-11-07 CSe  added dlist_buffer to device struct for 'd2_df_low_localmem' mode
+  15:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2007-01-26 CSe  made 'low localmem' mode configurable
+  16:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2007-05-23 MGe  added delayed_errorcode to context
+  17:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2008-01-14 ASc  changed comments from C++ to C, removed tabs
+  18:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2008-11-24 AJ   Added support for IAR compiler
+  19:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2011-09-05 MRe  added cr2 register to device structure
+  20:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2012-09-25 BSp  MISRA cleanup
+  21:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *-------------------------------------------------------------------------- */
+  22:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  23:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #ifndef __1_dave_intern_h_H
+  24:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define __1_dave_intern_h_H
+  25:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+  26:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * define inline modifier if available */
+  27:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #ifdef _MSC_VER
+  28:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_INLINE __forceinline
+  29:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #else
+  30:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #ifdef __CA850__
+  31:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_INLINE
+  32:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #elif defined(__ICCV850__)
+  33:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_INLINE _Pragma("inline")
+  34:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #else
+  35:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_INLINE inline
+  36:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #endif
+  37:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #endif
+  38:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  39:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+  40:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * define null to become independent of stdlib */
+  41:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #ifndef NULL
+  42:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #ifdef __cplusplus
+  43:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define NULL    0
+  44:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #else
+  45:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define NULL    ((void *)0)
+  46:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #endif
+  47:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #endif
+  48:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  49:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+  50:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * internally used types */
+  51:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  52:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #ifdef _MSC_VER
+  53:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** typedef __int64 d2_int64;
+  54:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #elif (defined(__CA850__) || defined(__ICC850__))
+  55:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define _NO_LL_
+  56:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** typedef struct {
+  57:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32 low32;
+  58:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s32 high32;
+  59:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** } d2_int64;
+  60:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #else
+  61:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** typedef long long d2_int64;
+  62:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #endif
+  63:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  64:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+  65:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * use separate context for blit 
+  66:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  see also d2_df_no_blitctxbackup and d2_bf_no_blitctxbackup*/
+  67:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  68:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*
+  69:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_USEBLITBACKUPCONTEXT 
+  70:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** */
+  71:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  72:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  73:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+  74:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * force register cache usage
+  75:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  see also d2_df_no_registercaching */
+  76:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  77:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_USEREGCACHE 
+  78:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  79:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+  80:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * set initial size of list of dlist start address */
+  81:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  82:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define DLIST_ADRESSES_NUMBER 16
+  83:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  84:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  85:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+  86:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * Register Cache */
+  87:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  88:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #include "dave_registermap.h"
+  89:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  90:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** typedef struct _d2_cacheddata
+  91:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+  92:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s32    data[  D2_QUANTITY ];
+  93:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s8     valid[ D2_QUANTITY ];
+  94:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** } d2_cacheddata;
+  95:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  96:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #ifdef D2_USEREGCACHE
+  97:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** D2_EXTERN const d2_u8 d2_cacheableregs[D2_QUANTITY];
+  98:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #endif
+  99:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 100:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** typedef void (*d2_fp_scratchfull)( void *handle );
+ 101:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 102:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*--------------------------------------------------------------------------- */
+ 103:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #include "dave_base.h"
+ 104:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #include "dave_dlist.h"
+ 105:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #include "dave_rbuffer.h"
+ 106:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #include "dave_hardware.h"
+ 107:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #include "dave_context.h"
+ 108:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #include "dave_math.h"
+ 109:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 110:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+ 111:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * use higher precision of qlimiters */
+ 112:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 113:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define LIMITER_HIPRECISION 6 
+ 114:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 115:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 116:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+ 117:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * These helper macros are used to stringify a given macro */
+ 118:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_STR(s)           # s
+ 119:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_XSTR(s)          D2_STR(s)  /* PRQA S 3453 */ /* $Misra: #MISRA_BUG_MACRO_HASH $*/
+ 120:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 121:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 122:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+ 123:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * Define the D2_VERSION and D2_VERSION_STRING macros */
+ 124:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 125:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /* Build up the D2_VERSION macro */
+ 126:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_VERSION ((D2_VERSION_BRANCH << 24) | (D2_VERSION_MAJOR << 16) | D2_VERSION_MINOR )
+ 127:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 128:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /* Create the D2_VERSION_STRING macro */
+ 129:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_VERSION_STRING  D2_VERSION_BRANCH_STRING " V" D2_XSTR(D2_VERSION_MAJOR) "." D2_XSTR(D2_V
+ 130:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 131:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+ 132:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * Internal device structure */
+ 133:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 134:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** typedef struct _d2_devicedata
+ 135:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+ 136:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    struct _d2_devicedata *next;        /* to chain devices [must be index 0] */
+ 137:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 138:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_dlist *readlist;                 /* read (executing) dlist */
+ 139:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_dlist *writelist;                /* write (under construction) dlist */
+ 140:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_rbuffer *selectedbuffer;         /* currently selected renderbuffer */
+ 141:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_rbuffer *renderbuffer[2];        /* default renderbuffers */
+ 142:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 143:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d1_device      *hwid;               /* lowlevel access handle */
+ 144:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_contextdata *ctxchain;           /* context chain (list of all contexts for this device) */
+ 145:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_contextdata *ctxdef;             /* default context (cannot be removed by application) */
+ 146:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_contextdata *ctxselected;        /* selected context (used as target of context write/read op
+ 147:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_contextdata *ctxsolid;           /* solid context (used as source for rendering solid geometr
+ 148:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_contextdata *ctxoutline;         /* outline context (used as source for rendering outlines) *
+ 149:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #ifdef D2_USEBLITBACKUPCONTEXT
+ 150:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_contextdata *blitcontext;        /* internal context used only for blits */
+ 151:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #else
+ 152:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_contextdata_backup *blitcontext_b; /* internal context backup used only for blits */
+ 153:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #endif
+ 154:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_contextdata *srccontext;         /* last context that acted as source for display list (for d
+ 155:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_color       *srcclut;            /* last clut that was loaded  */
+ 156:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 157:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    void *   framebuffer;               /* rendering baseaddress */
+ 158:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s32   pitch, bpp;                /* framebuffer pitch and bytes per pixel */
+ 159:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s32   fbformat;                  /* framebuffer format */
+ 160:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32   fbwidth,fbheight;          /* framebuffer size */
+ 161:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32   fbstylemask;               /* dave ctrl1 bitmask for framebuffer format */
+ 162:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32   cr2;                       /* control register 2 */
+ 163:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 164:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32   cachectlmask;              /* dave cache ctrl register bitmask */
+ 165:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32   perftriggermask;           /* dave performance counter trigger source register bitmask 
+ 166:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 167:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32   rendermode;                /* see 'enum d2_rendermodes' */
+ 168:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32   flags;                     /* see 'enum d2_deviceflags' */
+ 169:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_width outlinewidth;
+ 170:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_point soffx, soffy;
+ 171:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_point clipxmin, clipymin;
+ 172:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_point clipxmax, clipymax;
+ 173:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 174:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_lowlocalmem_mode *lowlocalmem_mode;       /* only used in 'low localmem' mode */
+ 175:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 176:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32 hwrevision;
+ 177:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32 hwmemarchitecture;
+ 178:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 179:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32 dlistblocksize;              /* specify number of entries to grow when dlist is full */
+ 180:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #ifdef D2_USEREGCACHE
+ 181:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_cacheddata cache;                 /* register cache for this device */
+ 182:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #endif
+ 183:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    /* display list assembly buffer */
+ 184:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_dlist_scratch_entry *dlscratch_base;
+ 185:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_dlist_scratch_entry *dlscratch_pos;
+ 186:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s32                  dlscratch_cnt;
+ 187:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_fp_scratchfull       dlscratch_hook;
+ 188:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 189:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s8   lasttextwasrle;               /* last texture format was RLE */
+ 190:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s8   maxpatlen;                    /* maximum size of pattern bitvector supported by the hard
+ 191:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s8   errorcode;                    /* last actions detaild result code */
+ 192:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s8   delayed_errorcode;            /* errorcondition that exists until the renderbuffer gets 
+ 193:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s8   hilimiterprecision_supported; /* is set to 1 when the hilimiterprecision feature is supp
+ 194:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 195:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s8   dlist_indirect_supported;     /* is set to 1 when lists of dlist addresses are supported
+ 196:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s32* dlist_list_single[2];         /* for d2_executedlist we need an extra dlist list with ju
+ 197:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 198:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** } d2_devicedata;
+ 199:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 200:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*--------------------------------------------------------------------------- */
+ 201:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 202:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** typedef struct _d2_bbox
+ 203:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+ 204:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_point xmin, ymin;
+ 205:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_point xmax, ymax;
+ 206:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** } d2_bbox;
+ 207:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 208:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** typedef struct _d2_limdata
+ 209:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+ 210:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s32 start;
+ 211:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s32 xadd;
+ 212:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s32 yadd;
+ 213:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** } d2_limdata;
+ 214:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 215:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+ 216:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * Internal flags */
+ 217:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 218:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** typedef d2_u32 d2_lineendflags_intern;
+ 219:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 220:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define d2_lei_base                256u
+ 221:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 222:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define d2_lei_ext_first_edge     (d2_lei_base *  2)
+ 223:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define d2_lei_ext_last_edge      (d2_lei_base *  4)
+ 224:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define d2_lei_buffer_first_edge  (d2_lei_base *  8)
+ 225:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define d2_lei_buffer_last_edge   (d2_lei_base * 16)
+ 226:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define d2_lei_miter_edge         (d2_lei_base * 32)
+ 227:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define d2_lei_miter1_flip        (d2_lei_base * 64)
+ 228:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define d2_lei_miter2_flip        (d2_lei_base *128)
+ 229:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 230:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+ 231:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * Internal macros */
+ 232:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 233:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_DEV(d)           ((d2_devicedata *) (d))           /* PRQA S 3453 */ /* $Misra: #MACRO_T
+ 234:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_CTX(c)           ((d2_contextdata *) (c))          /* PRQA S 3453 */ /* $Misra: #MACRO_T
+ 235:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_FNC(r)           ((d2_renderfunctions *) (r))      /* PRQA S 3453 */ /* $Misra: #MACRO_T
+ 236:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_DRB(r)           ((d2_rbuffer *) (r))              /* PRQA S 3453 */ /* $Misra: #MACRO_T
+ 237:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 238:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** static D2_INLINE d2_s32 d2_seterr(d2_device *handle, d2_s32 err); /* to satisfy MISRA rule 3450 */
+ 239:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** static D2_INLINE d2_s32 d2_seterr(d2_device *handle, d2_s32 err) /* PRQA S 3219, 3480 */ /* $Misra:
+  59                             		.loc 2 239 25 view .LVU16
+  60                             	.LBB11:
+ 240:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+ 241:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    D2_DEV(handle)->errorcode = (d2_s8)(err);
+  61                             		.loc 2 241 4 view .LVU17
+  62                             		.loc 2 241 30 is_stmt 0 view .LVU18
+  63 0037 FA 74 C6 01 12          		mov.B	#18, 454[r7]
+ 242:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 243:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    return err;
+  64                             		.loc 2 243 4 is_stmt 1 view .LVU19
+  65                             	.LVL6:
+  66                             		.loc 2 243 4 is_stmt 0 view .LVU20
+  67                             	.LBE11:
+  68                             	.LBE10:
+  82:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    }
+  69                             		.loc 1 82 7 view .LVU21
+  70 003c 75 41 12                		mov.L	#18, r1
+  71 003f 2E 31                   		bra	.L1
+  72                             	.L12:
+  88:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****       {
+  73                             		.loc 1 88 7 view .LVU22
+  74 0041 61 AA                   		cmp	#10, r10
+  75 0043 1D                      		bne	.L4
+  91:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****             break;
+  76                             		.loc 1 91 19 view .LVU23
+  77 0044 66 3A                   		mov.L	#3, r10
+  78                             	.LVL7:
+  79 0046 EF 00                   		.balign 8,3,2
+  80                             	.L4:
+ 104:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****             break;
+ 105:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+ 106:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****          default:
+ 107:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****             break;
+ 108:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****       }
+ 109:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    }
+ 110:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+ 111:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    D2_DEV(handle)->perftriggermask &= ~(0xffffu << (counter << 4));
+  81                             		.loc 1 111 4 is_stmt 1 view .LVU24
+  82                             		.loc 1 111 61 is_stmt 0 view .LVU25
+  83 0048 FD C4 62                		shll	#4, r6, r2
+  84                             		.loc 1 111 49 view .LVU26
+  85 004b FB 3E FF FF 00          		mov.L	#0xffff, r3
+  86 0050 FD 62 23                		shll	r2, r3
+  87                             		.loc 1 111 39 view .LVU27
+  88 0053 7E 03                   		not	r3
+  89                             		.loc 1 111 36 view .LVU28
+  90 0055 06 91 73 18             		and	96[r7].L, r3
+ 112:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    D2_DEV(handle)->perftriggermask |=  event << (counter << 4);
+  91                             		.loc 1 112 4 is_stmt 1 view .LVU29
+  92                             		.loc 1 112 46 is_stmt 0 view .LVU30
+  93 0059 FD 62 2A                		shll	r2, r10
+  94                             	.LVL8:
+  95                             		.loc 1 112 36 view .LVU31
+  96 005c 57 A3                   		or	r10, r3
+  97 005e A6 73                   		mov.L	r3, 96[r7]
+ 113:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+ 114:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    d2hw_set( D2_DEV(handle)->hwid, D2_PERFTRIGGER, (d2_s32)D2_DEV(handle)->perftriggermask );
+  98                             		.loc 1 114 4 is_stmt 1 view .LVU32
+  99 0060 75 42 35                		mov.L	#53, r2
+ 100 0063 A9 F1                   		mov.L	24[r7], r1
+ 101 0065 05 00 00 00             		bsr	_d2hw_set
+ 102                             	.LVL9:
+ 115:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+ 116:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    D2_RETOK(handle);
+ 103                             		.loc 1 116 4 view .LVU33
+ 104                             	.LBB12:
+ 105                             	.LBI12:
+ 239:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+ 106                             		.loc 2 239 25 view .LVU34
+ 107                             	.LBB13:
+ 241:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 108                             		.loc 2 241 4 view .LVU35
+ 241:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 109                             		.loc 2 241 30 is_stmt 0 view .LVU36
+ 110 0069 FA 74 C6 01 00          		mov.B	#0, 454[r7]
+ 111                             		.loc 2 243 4 is_stmt 1 view .LVU37
+ 112                             	.LVL10:
+ 113                             		.loc 2 243 4 is_stmt 0 view .LVU38
+ 114                             	.LBE13:
+ 115                             	.LBE12:
+ 116                             		.loc 1 116 4 view .LVU39
+ 117 006e 66 01                   		mov.L	#0, r1
+ 118                             	.L1:
+ 117:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** }
+ 119                             		.loc 1 117 1 view .LVU40
+ 120 0070 3F 6A 05                		rtsd	#20, r6-r10
+ 121                             	.LVL11:
+ 122                             	.L6:
+  95:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****             break;
+ 123                             		.loc 1 95 19 view .LVU41
+ 124 0073 75 4A 1E                		mov.L	#30, r10
+ 125                             	.LVL12:
+  95:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****             break;
+ 126                             		.loc 1 95 19 view .LVU42
+ 127 0076 2E D2                   		bra	.L4
+ 128                             	.LVL13:
+ 129                             	.L8:
+  99:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****             break;
+ 130                             		.loc 1 99 19 view .LVU43
+ 131 0078 66 AA                   		mov.L	#10, r10
+ 132                             	.LVL14:
+  99:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****             break;
+ 133                             		.loc 1 99 19 view .LVU44
+ 134 007a 2E CE                   		bra	.L4
+ 135                             	.LFE6:
+ 137 007c 76 10 01 00             		.section	.text.d2_setperfcountvalue,"ax",@progbits
+ 138                             		.global	_d2_setperfcountvalue
+ 140                             	_d2_setperfcountvalue:
+ 141                             	.LVL15:
+ 142                             	.LFB7:
+ 118:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+ 119:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** /*--------------------------------------------------------------------------
+ 120:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * function: d2_setperfcountvalue
+ 121:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * Set the current performance counter value.
+ 122:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *
+ 123:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * Does not work while D/AVE is active! When calling this while D/AVE is active
+ 124:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * executing a display list, rendering errors or even hangups can occur.
+ 125:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *
+ 126:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * parameters:
+ 127:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *   handle - device pointer (see: <d2_opendevice>)
+ 128:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *   counter - 0 or 1: which of both available performance counters to use
+ 129:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *   value - value to be set: 0 for reset
+ 130:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *
+ 131:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * returns:
+ 132:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *   errorcode (D2_OK if successfull) see list of <Errorcodes> for details
+ 133:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * */
+ 134:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** d2_s32 d2_setperfcountvalue( d2_device *handle, d2_u32 counter, d2_slong value )
+ 135:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** {
+ 143                             		.loc 1 135 1 is_stmt 1 view -0
+ 144                             		.loc 1 135 1 is_stmt 0 view .LVU46
+ 145 0000 6E 6A                   		pushm	r6-r10
+ 146                             	.LCFI1:
+ 147 0002 EF 17                   		mov.L	r1, r7
+ 148 0004 EF 26                   		mov.L	r2, r6
+ 149 0006 EF 3A                   		mov.L	r3, r10
+ 136:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    D2_VALIDATE( handle, D2_INVALIDDEVICE );     /* PRQA S 3112 3453 */ /* $Misra: #DEBUG_MACRO $*/
+ 150                             		.loc 1 136 4 is_stmt 1 view .LVU47
+ 137:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    D2_CHECKERR( counter < 2, D2_VALUETOOBIG );  /* PRQA S 3112 3453 */ /* $Misra: #DEBUG_MACRO $*/
+ 151                             		.loc 1 137 4 view .LVU48
+ 138:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+ 139:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    if(0 != ((d2_u32)d2hw_get( D2_DEV(handle)->hwid, D2_STATUS ) & D2C_DLISTACTIVE))
+ 152                             		.loc 1 139 4 view .LVU49
+ 153                             		.loc 1 139 21 is_stmt 0 view .LVU50
+ 154 0008 66 02                   		mov.L	#0, r2
+ 155                             	.LVL16:
+ 156                             		.loc 1 139 21 view .LVU51
+ 157 000a A9 91                   		mov.L	24[r1], r1
+ 158                             	.LVL17:
+ 159                             		.loc 1 139 21 view .LVU52
+ 160 000c 05 00 00 00             		bsr	_d2hw_get
+ 161                             	.LVL18:
+ 162                             		.loc 1 139 6 view .LVU53
+ 163 0010 FD 74 C1 08             		tst	#8, r1
+ 164 0014 21 1B                   		bne	.L19
+ 140:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    {
+ 141:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****       D2_RETERR( handle, D2_DEVICEBUSY );
+ 142:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    }
+ 143:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+ 144:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    if(0 == counter)
+ 165                             		.loc 1 144 4 is_stmt 1 view .LVU54
+ 166                             		.loc 1 144 6 is_stmt 0 view .LVU55
+ 167 0016 61 06                   		cmp	#0, r6
+ 168 0018 21 21                   		bne	.L16
+ 145:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    {
+ 146:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****       d2hw_set( D2_DEV(handle)->hwid, D2_PERFCOUNT1 , value );
+ 169                             		.loc 1 146 7 is_stmt 1 view .LVU56
+ 170 001a EF A3                   		mov.L	r10, r3
+ 171 001c 75 42 33                		mov.L	#51, r2
+ 172 001f A9 F1                   		mov.L	24[r7], r1
+ 173 0021 05 00 00 00             		bsr	_d2hw_set
+ 174                             	.LVL19:
+ 175                             	.L17:
+ 147:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    }
+ 148:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    else
+ 149:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    {
+ 150:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****       d2hw_set( D2_DEV(handle)->hwid, D2_PERFCOUNT2 , value );
+ 151:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    }
+ 152:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+ 153:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    D2_RETOK(handle);
+ 176                             		.loc 1 153 4 view .LVU57
+ 177                             	.LBB14:
+ 178                             	.LBI14:
+ 239:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+ 179                             		.loc 2 239 25 view .LVU58
+ 180                             	.LBB15:
+ 241:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 181                             		.loc 2 241 4 view .LVU59
+ 241:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 182                             		.loc 2 241 30 is_stmt 0 view .LVU60
+ 183 0025 FA 74 C6 01 00          		mov.B	#0, 454[r7]
+ 184                             		.loc 2 243 4 is_stmt 1 view .LVU61
+ 185                             	.LVL20:
+ 186                             		.loc 2 243 4 is_stmt 0 view .LVU62
+ 187                             	.LBE15:
+ 188                             	.LBE14:
+ 189                             		.loc 1 153 4 view .LVU63
+ 190 002a 66 01                   		mov.L	#0, r1
+ 191                             	.L13:
+ 154:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** }
+ 192                             		.loc 1 154 1 view .LVU64
+ 193 002c 3F 6A 05                		rtsd	#20, r6-r10
+ 194                             	.LVL21:
+ 195                             	.L19:
+ 141:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    }
+ 196                             		.loc 1 141 7 is_stmt 1 view .LVU65
+ 197                             	.LBB16:
+ 198                             	.LBI16:
+ 239:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+ 199                             		.loc 2 239 25 view .LVU66
+ 200                             	.LBB17:
+ 241:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 201                             		.loc 2 241 4 view .LVU67
+ 241:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 202                             		.loc 2 241 30 is_stmt 0 view .LVU68
+ 203 002f FA 74 C6 01 12          		mov.B	#18, 454[r7]
+ 204                             		.loc 2 243 4 is_stmt 1 view .LVU69
+ 205                             	.LVL22:
+ 206                             		.loc 2 243 4 is_stmt 0 view .LVU70
+ 207                             	.LBE17:
+ 208                             	.LBE16:
+ 141:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    }
+ 209                             		.loc 1 141 7 view .LVU71
+ 210 0034 75 41 12                		mov.L	#18, r1
+ 211 0037 2E F5                   		bra	.L13
+ 212                             	.L16:
+ 150:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    }
+ 213                             		.loc 1 150 7 is_stmt 1 view .LVU72
+ 214 0039 EF A3                   		mov.L	r10, r3
+ 215 003b 75 42 34                		mov.L	#52, r2
+ 216 003e A9 F1                   		mov.L	24[r7], r1
+ 217 0040 05 00 00 00             		bsr	_d2hw_set
+ 218                             	.LVL23:
+ 219 0044 2E E1                   		bra	.L17
+ 220                             	.LFE7:
+ 222                             		.section	.text.d2_getperfcountvalue,"ax",@progbits
+ 223                             		.global	_d2_getperfcountvalue
+ 225                             	_d2_getperfcountvalue:
+ 226                             	.LVL24:
+ 227                             	.LFB8:
+ 155:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+ 156:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+ 157:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** /*--------------------------------------------------------------------------
+ 158:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * function: d2_getperfcountvalue
+ 159:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * Get the current performance counter value.
+ 160:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *
+ 161:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * parameters:
+ 162:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *   handle - device pointer (see: <d2_opendevice>)
+ 163:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *   counter - 0 or 1: which of both available performance counters to use
+ 164:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *
+ 165:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * returns:
+ 166:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  *   current counter register value
+ 167:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****  * */
+ 168:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** d2_slong d2_getperfcountvalue( d2_device *handle, d2_u32 counter )
+ 169:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** {
+ 228                             		.loc 1 169 1 view -0
+ 170:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    D2_VALIDATE( handle, D2_INVALIDDEVICE );    /* PRQA S 3112 3453 */ /* $Misra: #DEBUG_MACRO $*/
+ 229                             		.loc 1 170 4 view .LVU74
+ 171:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    D2_CHECKERR( counter < 2, D2_VALUETOOBIG ); /* PRQA S 3112 3453 */ /* $Misra: #DEBUG_MACRO $*/
+ 230                             		.loc 1 171 4 view .LVU75
+ 172:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** 
+ 173:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    if(0 == counter)
+ 231                             		.loc 1 173 4 view .LVU76
+ 232                             		.loc 1 173 6 is_stmt 0 view .LVU77
+ 233 0000 61 02                   		cmp	#0, r2
+ 234 0002 21 0C                   		bne	.L21
+ 174:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    {
+ 175:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****       return d2hw_get( D2_DEV(handle)->hwid, D2_PERFCOUNT1 );
+ 235                             		.loc 1 175 7 is_stmt 1 view .LVU78
+ 236                             		.loc 1 175 14 is_stmt 0 view .LVU79
+ 237 0004 75 42 33                		mov.L	#51, r2
+ 238                             	.LVL25:
+ 239                             		.loc 1 175 14 view .LVU80
+ 240 0007 A9 91                   		mov.L	24[r1], r1
+ 241                             	.LVL26:
+ 242                             		.loc 1 175 14 view .LVU81
+ 243 0009 05 00 00 00             		bsr	_d2hw_get
+ 244                             	.LVL27:
+ 245 000d 02                      		rts
+ 246                             	.LVL28:
+ 247                             	.L21:
+ 176:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    }
+ 177:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    else
+ 178:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    {
+ 179:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****       return d2hw_get( D2_DEV(handle)->hwid, D2_PERFCOUNT2 );
+ 248                             		.loc 1 179 7 is_stmt 1 view .LVU82
+ 249                             		.loc 1 179 14 is_stmt 0 view .LVU83
+ 250 000e 75 42 34                		mov.L	#52, r2
+ 251                             	.LVL29:
+ 252                             		.loc 1 179 14 view .LVU84
+ 253 0011 A9 91                   		mov.L	24[r1], r1
+ 254                             	.LVL30:
+ 255                             		.loc 1 179 14 view .LVU85
+ 256 0013 05 00 00 00             		bsr	_d2hw_get
+ 257                             	.LVL31:
+ 180:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c ****    }
+ 181:../src/smc_gen/r_drw2d_rx/src/tes/dave_perfcount.c **** }
+ 258                             		.loc 1 181 1 view .LVU86
+ 259 0017 02                      		rts
+ 260                             	.LFE8:
+ 332                             	.Letext0:
+ 333                             		.file 3 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_drw2d_rx\\inc\\tes/dav
+ 334                             		.file 4 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_drw2d_rx\\inc\\tes/dav
+ 335                             		.file 5 "../src/smc_gen/r_drw2d_rx/src/tes/dave_dlist.h"
+ 336                             		.file 6 "../src/smc_gen/r_drw2d_rx/src/tes/dave_rbuffer.h"
+ 337                             		.file 7 "../src/smc_gen/r_drw2d_rx/src/tes/dave_gradient.h"
+ 338                             		.file 8 "../src/smc_gen/r_drw2d_rx/src/tes/dave_context.h"
+ 339                             		.file 9 "../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.h"

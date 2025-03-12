@@ -1,0 +1,1562 @@
+   1                             		.file	"main.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.rodata.main.str1.1,"aMS",@progbits,1
+   5                             	.LC0:
+   6 0000 44 3A 2F 65 32 5F 73 74 		.string	"D:/e2_studio/workspace/FULLMONI_WIDE/Firmware/aw"
+   6      75 64 69 6F 2F 77 6F 72 
+   6      6B 73 70 61 63 65 2F 46 
+   6      55 4C 4C 4D 4F 4E 49 5F 
+   6      57 49 44 45 2F 46 69 72 
+   7                             	.LC1:
+   8 0031 46 55 4C 4C 4D 4F 4E 49 		.string	"FULLMONI Init Done."
+   8      20 49 6E 69 74 20 44 6F 
+   8      6E 65 2E 00 
+   9                             		.section	.text.main,"ax",@progbits
+  10                             		.global	_main
+  12                             	_main:
+  13                             	.LFB3:
+  14                             		.file 1 "../src/main.c"
+   1:../src/main.c **** // --------------------------------------------------------------------
+   2:../src/main.c **** // Include User Header File
+   3:../src/main.c **** // --------------------------------------------------------------------
+   4:../src/main.c **** #include "r_smc_entry.h"
+   5:../src/main.c **** #include "platform.h"           // Located in the FIT BSP module
+   6:../src/main.c **** #include "Generated/Resource.h"
+   7:../src/main.c **** #include "../aw/Source/Generated/Resource.h"
+   8:../src/main.c **** #include "TFTLCD102.h"
+   9:../src/main.c **** #include "neopixel.h"
+  10:../src/main.c **** #include "can.h"
+  11:../src/main.c **** #include "dataregister.h"
+  12:../src/main.c **** #include "smc_gen/general/r_cg_rtc.h"
+  13:../src/main.c **** 
+  14:../src/main.c **** // --------------------------------------------------------------------
+  15:../src/main.c **** // グローバル変数宣言
+  16:../src/main.c **** // --------------------------------------------------------------------
+  17:../src/main.c **** volatile long			g_int10mscnt;
+  18:../src/main.c **** volatile unsigned int	g_fps_cnt, g_fps_max, g_sp_int_flg, g_sw_cnt, g_sw_int_flg;
+  19:../src/main.c **** volatile uint8_t I2C_WriteData[] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x0
+  20:../src/main.c **** volatile uint8_t I2C_BUF[] = {0x00,0x00};
+  21:../src/main.c **** volatile uint8_t I2C_BUF2[] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+  22:../src/main.c **** volatile unsigned long sp_int, sp_int_old, tr_int, wr_cnt;
+  23:../src/main.c **** volatile unsigned int sp_TGRA;
+  24:../src/main.c **** volatile uint8_t I2C0_TX_END_FLG = 0;
+  25:../src/main.c **** volatile uint8_t I2C0_RX_END_FLG = 0;
+  26:../src/main.c **** volatile uint8_t I2C0_RCV_ERR_FLG = 0;
+  27:../src/main.c **** volatile MD_STATUS I2C0_md_status;
+  28:../src/main.c **** volatile uint8_t I2C1_TX_END_FLG = 0;
+  29:../src/main.c **** volatile uint8_t I2C1_RX_END_FLG = 0;
+  30:../src/main.c **** volatile uint8_t I2C1_RCV_ERR_FLG = 0;
+  31:../src/main.c **** volatile MD_STATUS I2C1_md_status;
+  32:../src/main.c **** 
+  33:../src/main.c **** // --------------------------------------------------------------------
+  34:../src/main.c **** // グローバル構造体宣言
+  35:../src/main.c **** // --------------------------------------------------------------------
+  36:../src/main.c **** volatile CAN_data_t			g_CAN_data;
+  37:../src/main.c **** volatile CALC_data_t		g_CALC_data;
+  38:../src/main.c **** 
+  39:../src/main.c **** void main(void);
+  40:../src/main.c **** void User_CallBack_transmitend0(void);
+  41:../src/main.c **** void User_CallBack_receiveend0(void);
+  42:../src/main.c **** void User_CallBack_receiveerror0(MD_STATUS status);
+  43:../src/main.c **** void User_CallBack_transmitend1(void);
+  44:../src/main.c **** void User_CallBack_receiveend1(void);
+  45:../src/main.c **** void User_CallBack_receiveerror1(MD_STATUS status);
+  46:../src/main.c **** void Neopixel_SetRGB(unsigned int LED_No, int g, int r, int b);
+  47:../src/main.c **** void Neopixel_InitRGB(void);
+  48:../src/main.c **** void Neopixel_TX(void);
+  49:../src/main.c **** 
+  50:../src/main.c **** extern void LCD_FadeIN(void);
+  51:../src/main.c **** 
+  52:../src/main.c **** void main(void)
+  53:../src/main.c **** {
+  15                             		.loc 1 53 1 view -0
+  16 0000 7E A7                   		push.l	r7
+  17                             	.LCFI0:
+  54:../src/main.c **** 	unsigned int shift_rev_cnt;
+  18                             		.loc 1 54 2 view .LVU1
+  55:../src/main.c **** 
+  56:../src/main.c **** //	R_Systeminit();
+  57:../src/main.c **** 	// MTU0 (10ms Interupt function)
+  58:../src/main.c **** 	// MTU1 (Rotary Encorder Input function)
+  59:../src/main.c **** 	// MTU3 (LCD Back Light Control)
+  60:../src/main.c **** 	// MTU8 (Vehicle speed　Pulse　Interupt function)
+  61:../src/main.c **** 	// RIIC ch0 EEPROM 16K 400kbps
+  62:../src/main.c **** 	// RIIC ch1 ATtiny85 Neopixel Driver 400kbps
+  63:../src/main.c **** 
+  64:../src/main.c **** 	// RTC Start
+  65:../src/main.c **** /*	R_Config_RTC_Stop();
+  66:../src/main.c **** 	RTC.RYRCNT.WORD = 0x0025U;
+  67:../src/main.c **** 	RTC.RMONCNT.BYTE = 0x03U;
+  68:../src/main.c **** 	RTC.RDAYCNT.BYTE = 0x09U;
+  69:../src/main.c **** 	RTC.RHRCNT.BYTE = 0x10U;
+  70:../src/main.c **** 	RTC.RMINCNT.BYTE = 0x39U;
+  71:../src/main.c **** 	RTC.RSECCNT.BYTE = 0x00U;*/
+  72:../src/main.c **** 
+  73:../src/main.c **** 	R_Config_RTC_Start();
+  19                             		.loc 1 73 2 view .LVU2
+  20 0002 05 00 00 00             		bsr	_R_Config_RTC_Start
+  21                             	.LVL0:
+  74:../src/main.c **** 
+  75:../src/main.c **** 	R_Config_S12AD0_Start();
+  22                             		.loc 1 75 2 view .LVU3
+  23 0006 05 00 00 00             		bsr	_R_Config_S12AD0_Start
+  24                             	.LVL1:
+  76:../src/main.c **** 	S12AD.ADCSR.BIT.ADST = 1;         // ADC start
+  25                             		.loc 1 76 2 view .LVU4
+  26                             		.loc 1 76 23 is_stmt 0 view .LVU5
+  27 000a FB 5E 00 90 08          		mov.L	#0x89000, r5
+  28 000f DC 54                   		mov.W	[r5], r4
+  29 0011 78 F4                   		bset	#15, r4
+  30 0013 D3 54                   		mov.W	r4, [r5]
+  77:../src/main.c **** 	while(S12AD.ADCSR.BIT.ADST==1);   // wait for ADC completion
+  31                             		.loc 1 77 2 is_stmt 1 view .LVU6
+  32                             	.L2:
+  33                             		.loc 1 77 32 discriminator 1 view .LVU7
+  34                             		.loc 1 77 23 is_stmt 0 discriminator 1 view .LVU8
+  35 0015 FB 5E 00 90 08          		mov.L	#0x89000, r5
+  36 001a DC 55                   		mov.W	[r5], r5
+  37 001c 5F 55                   		movu.W	r5, r5
+  38                             		.loc 1 77 7 discriminator 1 view .LVU9
+  39 001e 68 F5                   		shlr	#15, r5
+  40 0020 61 15                   		cmp	#1, r5
+  41 0022 20 F3                   		beq	.L2
+  78:../src/main.c **** 	g_CALC_data.AD0 = S12AD.ADDR0;
+  42                             		.loc 1 78 2 is_stmt 1 view .LVU10
+  43                             		.loc 1 78 25 is_stmt 0 view .LVU11
+  44 0024 FB 4E 00 90 08          		mov.L	#0x89000, r4
+  45 0029 9C 43                   		mov.W	32[r4], r3
+  46                             		.loc 1 78 18 view .LVU12
+  47 002b 5F 33                   		movu.W	r3, r3
+  48 002d FC 57 33                		utof	r3, r3
+  49 0030 FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+  50 0036 A0 5B                   		mov.L	r3, 4[r5]
+  79:../src/main.c **** 	g_CALC_data.AD1 = S12AD.ADDR1;
+  51                             		.loc 1 79 2 is_stmt 1 view .LVU13
+  52                             		.loc 1 79 25 is_stmt 0 view .LVU14
+  53 0038 9C 4B                   		mov.W	34[r4], r3
+  54                             		.loc 1 79 18 view .LVU15
+  55 003a 5F 33                   		movu.W	r3, r3
+  56 003c FC 57 33                		utof	r3, r3
+  57 003f A0 D3                   		mov.L	r3, 8[r5]
+  80:../src/main.c **** 	g_CALC_data.AD2 = S12AD.ADDR2;
+  58                             		.loc 1 80 2 is_stmt 1 view .LVU16
+  59                             		.loc 1 80 25 is_stmt 0 view .LVU17
+  60 0041 9C C3                   		mov.W	36[r4], r3
+  61                             		.loc 1 80 18 view .LVU18
+  62 0043 5F 33                   		movu.W	r3, r3
+  63 0045 FC 57 33                		utof	r3, r3
+  64 0048 A0 DB                   		mov.L	r3, 12[r5]
+  81:../src/main.c **** 	g_CALC_data.AD3 = S12AD.ADDR3;
+  65                             		.loc 1 81 2 is_stmt 1 view .LVU19
+  66                             		.loc 1 81 25 is_stmt 0 view .LVU20
+  67 004a 9C CB                   		mov.W	38[r4], r3
+  68                             		.loc 1 81 18 view .LVU21
+  69 004c 5F 33                   		movu.W	r3, r3
+  70 004e FC 57 33                		utof	r3, r3
+  71 0051 A1 5B                   		mov.L	r3, 20[r5]
+  82:../src/main.c **** 	g_CALC_data.AD4 = S12AD.ADDR4;
+  72                             		.loc 1 82 2 is_stmt 1 view .LVU22
+  73                             		.loc 1 82 25 is_stmt 0 view .LVU23
+  74 0053 9D 43                   		mov.W	40[r4], r3
+  75                             		.loc 1 82 18 view .LVU24
+  76 0055 5F 33                   		movu.W	r3, r3
+  77 0057 FC 57 33                		utof	r3, r3
+  78 005a A1 D3                   		mov.L	r3, 24[r5]
+  83:../src/main.c **** 	g_CALC_data.AD5 = S12AD.ADDR5;
+  79                             		.loc 1 83 2 is_stmt 1 view .LVU25
+  80                             		.loc 1 83 25 is_stmt 0 view .LVU26
+  81 005c 9D 4B                   		mov.W	42[r4], r3
+  82                             		.loc 1 83 18 view .LVU27
+  83 005e 5F 33                   		movu.W	r3, r3
+  84 0060 FC 57 33                		utof	r3, r3
+  85 0063 A1 DB                   		mov.L	r3, 28[r5]
+  84:../src/main.c **** 	g_CALC_data.AD6 = S12AD.ADDR6;
+  86                             		.loc 1 84 2 is_stmt 1 view .LVU28
+  87                             		.loc 1 84 25 is_stmt 0 view .LVU29
+  88 0065 9D C3                   		mov.W	44[r4], r3
+  89                             		.loc 1 84 18 view .LVU30
+  90 0067 5F 33                   		movu.W	r3, r3
+  91 0069 FC 57 33                		utof	r3, r3
+  92 006c A2 53                   		mov.L	r3, 32[r5]
+  85:../src/main.c **** 	g_CALC_data.AD7 = S12AD.ADDR7;
+  93                             		.loc 1 85 2 is_stmt 1 view .LVU31
+  94                             		.loc 1 85 25 is_stmt 0 view .LVU32
+  95 006e 9D CC                   		mov.W	46[r4], r4
+  96                             		.loc 1 85 18 view .LVU33
+  97 0070 5F 44                   		movu.W	r4, r4
+  98 0072 FC 57 44                		utof	r4, r4
+  99 0075 A2 5C                   		mov.L	r4, 36[r5]
+  86:../src/main.c **** 
+  87:../src/main.c **** 	R_Config_MTU0_Start();
+ 100                             		.loc 1 87 2 is_stmt 1 view .LVU34
+ 101 0077 05 00 00 00             		bsr	_R_Config_MTU0_Start
+ 102                             	.LVL2:
+  88:../src/main.c **** 	R_Config_MTU1_Start();
+ 103                             		.loc 1 88 2 view .LVU35
+ 104 007b 05 00 00 00             		bsr	_R_Config_MTU1_Start
+ 105                             	.LVL3:
+  89:../src/main.c **** 
+  90:../src/main.c **** 	R_Config_MTU3_Start();
+ 106                             		.loc 1 90 2 view .LVU36
+ 107 007f 05 00 00 00             		bsr	_R_Config_MTU3_Start
+ 108                             	.LVL4:
+  91:../src/main.c **** 
+  92:../src/main.c **** 	// Init CAN
+  93:../src/main.c **** 	Init_CAN();
+ 109                             		.loc 1 93 2 view .LVU37
+ 110 0083 05 00 00 00             		bsr	_Init_CAN
+ 111                             	.LVL5:
+  94:../src/main.c **** 
+  95:../src/main.c **** 	init_data_store();
+ 112                             		.loc 1 95 2 view .LVU38
+ 113 0087 05 00 00 00             		bsr	_init_data_store
+ 114                             	.LVL6:
+  96:../src/main.c **** 
+  97:../src/main.c **** 	// Init Qe for Display
+  98:../src/main.c **** 	APPW_X_Setup();
+ 115                             		.loc 1 98 2 view .LVU39
+ 116 008b 05 00 00 00             		bsr	_APPW_X_Setup
+ 117                             	.LVL7:
+  99:../src/main.c **** 	APPW_Init(APPW_PROJECT_PATH);
+ 118                             		.loc 1 99 2 view .LVU40
+ 119 008f FB 12 00 00 00 00       		mov.L	#.LC0, r1
+ 120 0095 05 00 00 00             		bsr	_APPW_Init
+ 121                             	.LVL8:
+ 100:../src/main.c **** 	APPW_CreateRoot(APPW_INITIAL_SCREEN, WM_HBKWIN);
+ 122                             		.loc 1 100 2 view .LVU41
+ 123 0099 05 00 00 00             		bsr	_WM_GetDesktopWindow
+ 124                             	.LVL9:
+ 125 009d EF 12                   		mov.L	r1, r2
+ 126 009f FB 12 00 00 00 00       		mov.L	#_ID_SCREEN_00_RootInfo, r1
+ 127 00a5 05 00 00 00             		bsr	_APPW_CreateRoot
+ 128                             	.LVL10:
+ 101:../src/main.c **** 
+ 102:../src/main.c **** 	// First drawing LCD
+ 103:../src/main.c **** 	GUI_Exec1();
+ 129                             		.loc 1 103 2 view .LVU42
+ 130 00a9 05 00 00 00             		bsr	_GUI_Exec1
+ 131                             	.LVL11:
+ 104:../src/main.c **** 	APPW_Exec();
+ 132                             		.loc 1 104 2 view .LVU43
+ 133 00ad 05 00 00 00             		bsr	_APPW_Exec
+ 134                             	.LVL12:
+ 105:../src/main.c **** 
+ 106:../src/main.c **** 	LCD_FadeIN();
+ 135                             		.loc 1 106 2 view .LVU44
+ 136 00b1 05 00 00 00             		bsr	_LCD_FadeIN
+ 137                             	.LVL13:
+ 107:../src/main.c **** 
+ 108:../src/main.c **** 	R_Config_RIIC0_Start();
+ 138                             		.loc 1 108 2 view .LVU45
+ 139 00b5 05 00 00 00             		bsr	_R_Config_RIIC0_Start
+ 140                             	.LVL14:
+ 109:../src/main.c **** 	R_Config_RIIC1_Start();
+ 141                             		.loc 1 109 2 view .LVU46
+ 142 00b9 05 00 00 00             		bsr	_R_Config_RIIC1_Start
+ 143                             	.LVL15:
+ 110:../src/main.c **** 
+ 111:../src/main.c **** 	// Read ODO/Trip pulse log from EEPROM
+ 112:../src/main.c **** 	R_Config_RIIC0_Master_Send_Without_Stop(0x50,(void *) I2C_BUF,2); //I2C_BUF:Read Adress
+ 144                             		.loc 1 112 2 view .LVU47
+ 145 00bd 66 23                   		mov	#2, r3
+ 146 00bf FB 22 00 00 00 00       		mov.L	#_I2C_BUF, r2
+ 147 00c5 75 41 50                		mov	#0x50, r1
+ 148 00c8 05 00 00 00             		bsr	_R_Config_RIIC0_Master_Send_Without_Stop
+ 149                             	.LVL16:
+ 113:../src/main.c **** 	while(I2C0_TX_END_FLG == 0); // Wait for TX done
+ 150                             		.loc 1 113 2 view .LVU48
+ 151                             	.L3:
+ 152                             		.loc 1 113 29 discriminator 1 view .LVU49
+ 153                             		.loc 1 113 24 is_stmt 0 discriminator 1 view .LVU50
+ 154 00cc FB 52 00 00 00 00       		mov.L	#_I2C0_TX_END_FLG, r5
+ 155 00d2 CC 55                   		mov.B	[r5], r5
+ 156                             		.loc 1 113 7 discriminator 1 view .LVU51
+ 157 00d4 5B 55                   		movu.B	r5, r5
+ 158 00d6 61 05                   		cmp	#0, r5
+ 159 00d8 20 F4                   		beq	.L3
+ 114:../src/main.c **** 	I2C0_TX_END_FLG = 0;
+ 160                             		.loc 1 114 2 is_stmt 1 view .LVU52
+ 161                             		.loc 1 114 18 is_stmt 0 view .LVU53
+ 162 00da FB 52 00 00 00 00       		mov.L	#_I2C0_TX_END_FLG, r5
+ 163 00e0 F8 54 00                		mov.B	#0, [r5]
+ 115:../src/main.c **** 	R_Config_RIIC0_Master_Receive(0x50,(void *) I2C_BUF2,12); //I2C_BUF2:Read Data
+ 164                             		.loc 1 115 2 is_stmt 1 view .LVU54
+ 165 00e3 66 C3                   		mov	#12, r3
+ 166 00e5 FB 22 00 00 00 00       		mov.L	#_I2C_BUF2, r2
+ 167 00eb 75 41 50                		mov	#0x50, r1
+ 168 00ee 05 00 00 00             		bsr	_R_Config_RIIC0_Master_Receive
+ 169                             	.LVL17:
+ 116:../src/main.c **** 	while(I2C0_RX_END_FLG == 0); // Wait for RX done
+ 170                             		.loc 1 116 2 view .LVU55
+ 171                             	.L4:
+ 172                             		.loc 1 116 29 discriminator 1 view .LVU56
+ 173                             		.loc 1 116 24 is_stmt 0 discriminator 1 view .LVU57
+ 174 00f2 FB 52 00 00 00 00       		mov.L	#_I2C0_RX_END_FLG, r5
+ 175 00f8 CC 55                   		mov.B	[r5], r5
+ 176                             		.loc 1 116 7 discriminator 1 view .LVU58
+ 177 00fa 5B 55                   		movu.B	r5, r5
+ 178 00fc 61 05                   		cmp	#0, r5
+ 179 00fe 20 F4                   		beq	.L4
+ 117:../src/main.c **** 	I2C0_RX_END_FLG = 0;
+ 180                             		.loc 1 117 2 is_stmt 1 view .LVU59
+ 181                             		.loc 1 117 18 is_stmt 0 view .LVU60
+ 182 0100 FB 52 00 00 00 00       		mov.L	#_I2C0_RX_END_FLG, r5
+ 183 0106 F8 54 00                		mov.B	#0, [r5]
+ 118:../src/main.c **** //	odo = I2C_BUF2[1] << 16 + I2C_BUF2[0];
+ 119:../src/main.c **** 	wr_cnt = (I2C_BUF2[0] <<  24) + (I2C_BUF2[1] <<  16) + (I2C_BUF2[2] <<  8) + I2C_BUF2[3];
+ 184                             		.loc 1 119 2 is_stmt 1 view .LVU61
+ 185                             		.loc 1 119 20 is_stmt 0 view .LVU62
+ 186 0109 FB 52 00 00 00 00       		mov.L	#_I2C_BUF2, r5
+ 187 010f CC 54                   		mov.B	[r5], r4
+ 188                             		.loc 1 119 24 view .LVU63
+ 189 0111 6D 84                   		shll	#24, r4
+ 190                             		.loc 1 119 43 view .LVU64
+ 191 0113 88 5B                   		mov.B	1[r5], r3
+ 192 0115 5B 33                   		movu.B	r3, r3
+ 193                             		.loc 1 119 47 view .LVU65
+ 194 0117 6D 03                   		shll	#16, r3
+ 195                             		.loc 1 119 32 view .LVU66
+ 196 0119 4B 34                   		add	r3, r4
+ 197                             		.loc 1 119 66 view .LVU67
+ 198 011b 88 D3                   		mov.B	2[r5], r3
+ 199 011d 5B 33                   		movu.B	r3, r3
+ 200                             		.loc 1 119 70 view .LVU68
+ 201 011f 6C 83                   		shll	#8, r3
+ 202                             		.loc 1 119 55 view .LVU69
+ 203 0121 4B 34                   		add	r3, r4
+ 204                             		.loc 1 119 87 view .LVU70
+ 205 0123 88 DB                   		mov.B	3[r5], r3
+ 206 0125 5B 33                   		movu.B	r3, r3
+ 207                             		.loc 1 119 77 view .LVU71
+ 208 0127 4B 34                   		add	r3, r4
+ 209                             		.loc 1 119 9 view .LVU72
+ 210 0129 FB 32 00 00 00 00       		mov.L	#_wr_cnt, r3
+ 211 012f E3 34                   		mov.L	r4, [r3]
+ 120:../src/main.c **** 	sp_int = (I2C_BUF2[4] <<  24) + (I2C_BUF2[5] <<  16) + (I2C_BUF2[6] <<  8) + I2C_BUF2[7];
+ 212                             		.loc 1 120 2 is_stmt 1 view .LVU73
+ 213                             		.loc 1 120 20 is_stmt 0 view .LVU74
+ 214 0131 89 54                   		mov.B	4[r5], r4
+ 215                             		.loc 1 120 24 view .LVU75
+ 216 0133 6D 84                   		shll	#24, r4
+ 217                             		.loc 1 120 43 view .LVU76
+ 218 0135 89 5B                   		mov.B	5[r5], r3
+ 219 0137 5B 33                   		movu.B	r3, r3
+ 220                             		.loc 1 120 47 view .LVU77
+ 221 0139 6D 03                   		shll	#16, r3
+ 222                             		.loc 1 120 32 view .LVU78
+ 223 013b 4B 34                   		add	r3, r4
+ 224                             		.loc 1 120 66 view .LVU79
+ 225 013d 89 D3                   		mov.B	6[r5], r3
+ 226 013f 5B 33                   		movu.B	r3, r3
+ 227                             		.loc 1 120 70 view .LVU80
+ 228 0141 6C 83                   		shll	#8, r3
+ 229                             		.loc 1 120 55 view .LVU81
+ 230 0143 4B 34                   		add	r3, r4
+ 231                             		.loc 1 120 87 view .LVU82
+ 232 0145 89 DB                   		mov.B	7[r5], r3
+ 233 0147 5B 33                   		movu.B	r3, r3
+ 234                             		.loc 1 120 77 view .LVU83
+ 235 0149 4B 34                   		add	r3, r4
+ 236                             		.loc 1 120 9 view .LVU84
+ 237 014b FB 32 00 00 00 00       		mov.L	#_sp_int, r3
+ 238 0151 E3 34                   		mov.L	r4, [r3]
+ 121:../src/main.c **** 	tr_int = (I2C_BUF2[8] <<  24) + (I2C_BUF2[9] <<  16) + (I2C_BUF2[10] <<  8) + I2C_BUF2[11];
+ 239                             		.loc 1 121 2 is_stmt 1 view .LVU85
+ 240                             		.loc 1 121 20 is_stmt 0 view .LVU86
+ 241 0153 8A 54                   		mov.B	8[r5], r4
+ 242                             		.loc 1 121 24 view .LVU87
+ 243 0155 6D 84                   		shll	#24, r4
+ 244                             		.loc 1 121 43 view .LVU88
+ 245 0157 8A 5B                   		mov.B	9[r5], r3
+ 246 0159 5B 33                   		movu.B	r3, r3
+ 247                             		.loc 1 121 47 view .LVU89
+ 248 015b 6D 03                   		shll	#16, r3
+ 249                             		.loc 1 121 32 view .LVU90
+ 250 015d 4B 34                   		add	r3, r4
+ 251                             		.loc 1 121 66 view .LVU91
+ 252 015f 8A D3                   		mov.B	10[r5], r3
+ 253 0161 5B 33                   		movu.B	r3, r3
+ 254                             		.loc 1 121 71 view .LVU92
+ 255 0163 6C 83                   		shll	#8, r3
+ 256                             		.loc 1 121 55 view .LVU93
+ 257 0165 4B 34                   		add	r3, r4
+ 258                             		.loc 1 121 88 view .LVU94
+ 259 0167 8A DD                   		mov.B	11[r5], r5
+ 260 0169 5B 55                   		movu.B	r5, r5
+ 261                             		.loc 1 121 78 view .LVU95
+ 262 016b 4B 45                   		add	r4, r5
+ 263                             		.loc 1 121 9 view .LVU96
+ 264 016d FB 42 00 00 00 00       		mov.L	#_tr_int, r4
+ 265 0173 E3 45                   		mov.L	r5, [r4]
+ 122:../src/main.c **** //	wr_cnt = 0;
+ 123:../src/main.c **** 	// odo trip 初期化時は以下コメントを解除
+ 124:../src/main.c **** 	/*
+ 125:../src/main.c **** 	sp_int = 2548000; // データ入力用 1000km
+ 126:../src/main.c **** 	tr_int = 0; // データ入力用 1000km
+ 127:../src/main.c **** 	I2C_WriteData[1]  = ((wr_cnt >> 24) & 0x000000FF);
+ 128:../src/main.c **** 	I2C_WriteData[2]  = ((wr_cnt >> 16) & 0x000000FF);
+ 129:../src/main.c **** 	I2C_WriteData[3]  = ((wr_cnt >>  8) & 0x000000FF);
+ 130:../src/main.c **** 	I2C_WriteData[4]  = ((wr_cnt      ) & 0x000000FF);
+ 131:../src/main.c **** 	I2C_WriteData[5]  = ((sp_int >> 24) & 0x000000FF);
+ 132:../src/main.c **** 	I2C_WriteData[6]  = ((sp_int >> 16) & 0x000000FF);
+ 133:../src/main.c **** 	I2C_WriteData[7]  = ((sp_int >>  8) & 0x000000FF);
+ 134:../src/main.c **** 	I2C_WriteData[8]  = ((sp_int      ) & 0x000000FF);
+ 135:../src/main.c **** 	I2C_WriteData[9]  = ((tr_int >> 24) & 0x000000FF);
+ 136:../src/main.c **** 	I2C_WriteData[10] = ((tr_int >> 16) & 0x000000FF);
+ 137:../src/main.c **** 	I2C_WriteData[11] = ((tr_int >>  8) & 0x000000FF);
+ 138:../src/main.c **** 	I2C_WriteData[12] = ((tr_int      ) & 0x000000FF);
+ 139:../src/main.c **** 	R_Config_RIIC0_Master_Send(0x50,(void *) I2C_WriteData,14);		// odo & trip write
+ 140:../src/main.c **** 	while(I2C0_TX_END_FLG == 0); // I2C送信完了待ち
+ 141:../src/main.c **** 	I2C0_TX_END_FLG = 0;
+ 142:../src/main.c **** 	*/
+ 143:../src/main.c **** 
+ 144:../src/main.c **** 	// Start MTU8 (Vehicle speed　Pulse　Interupt function)
+ 145:../src/main.c **** 	R_Config_MTU8_Start();
+ 266                             		.loc 1 145 2 is_stmt 1 view .LVU97
+ 267 0175 05 00 00 00             		bsr	_R_Config_MTU8_Start
+ 268                             	.LVL18:
+ 146:../src/main.c **** 
+ 147:../src/main.c **** 	printf("FULLMONI Init Done.\n");
+ 269                             		.loc 1 147 2 view .LVU98
+ 270 0179 FB 12 31 00 00 00       		mov.L	#.LC1, r1
+ 271 017f 05 00 00 00             		bsr	_puts
+ 272                             	.LVL19:
+ 148:../src/main.c **** 
+ 149:../src/main.c **** 	Neopixel_InitRGB();
+ 273                             		.loc 1 149 2 view .LVU99
+ 274 0183 05 00 00 00             		bsr	_Neopixel_InitRGB
+ 275                             	.LVL20:
+ 276 0187 38 31 01                		bra	.L5
+ 277                             	.LVL21:
+ 278                             	.L42:
+ 150:../src/main.c **** 
+ 151:../src/main.c **** 	while (1)
+ 152:../src/main.c **** 	{
+ 153:../src/main.c **** 		// wait Reflesh Cycletime
+ 154:../src/main.c **** 		g_int10mscnt =  -3;		// peiod 10ms x  3 = 30ms  33fps
+ 155:../src/main.c **** //		g_int10mscnt =  -4;		// peiod 10ms x  4 = 40ms  25fps
+ 156:../src/main.c **** //		g_int10mscnt =  -5;		// peiod 10ms x  5 = 50ms  20fps
+ 157:../src/main.c **** //		g_int10mscnt =  -10;	// peiod 10ms x 10 = 100ms 10fps
+ 158:../src/main.c **** 
+ 159:../src/main.c **** 		// fps count
+ 160:../src/main.c **** 		g_fps_cnt ++;
+ 161:../src/main.c **** 		APPW_SetVarData(ID_VAR_FPS, g_fps_max);
+ 162:../src/main.c **** 
+ 163:../src/main.c **** 		data_store();
+ 164:../src/main.c **** 
+ 165:../src/main.c **** 		GUI_Exec1();
+ 166:../src/main.c **** 		APPW_Exec();
+ 167:../src/main.c **** 
+ 168:../src/main.c **** 		main_CAN();
+ 169:../src/main.c **** 
+ 170:../src/main.c **** 		if((sp_int != sp_int_old) && (g_sp_int_flg == 100))
+ 171:../src/main.c **** 		{
+ 172:../src/main.c **** 			I2C_WriteData[1]  = ((wr_cnt >> 24) & 0x000000FF);
+ 279                             		.loc 1 172 4 view .LVU100
+ 280                             		.loc 1 172 33 is_stmt 0 view .LVU101
+ 281 018a FB 52 00 00 00 00       		mov.L	#_wr_cnt, r5
+ 282 0190 EC 54                   		mov.L	[r5], r4
+ 283 0192 69 84                   		shlr	#24, r4
+ 284                             		.loc 1 172 22 view .LVU102
+ 285 0194 FB 22 00 00 00 00       		mov.L	#_I2C_WriteData, r2
+ 286 019a 80 2C                   		mov.B	r4, 1[r2]
+ 173:../src/main.c **** 			I2C_WriteData[2]  = ((wr_cnt >> 16) & 0x000000FF);
+ 287                             		.loc 1 173 4 is_stmt 1 view .LVU103
+ 288                             		.loc 1 173 33 is_stmt 0 view .LVU104
+ 289 019c EC 54                   		mov.L	[r5], r4
+ 290 019e 69 04                   		shlr	#16, r4
+ 291                             		.loc 1 173 22 view .LVU105
+ 292 01a0 80 A4                   		mov.B	r4, 2[r2]
+ 174:../src/main.c **** 			I2C_WriteData[3]  = ((wr_cnt >>  8) & 0x000000FF);
+ 293                             		.loc 1 174 4 is_stmt 1 view .LVU106
+ 294                             		.loc 1 174 33 is_stmt 0 view .LVU107
+ 295 01a2 EC 54                   		mov.L	[r5], r4
+ 296 01a4 68 84                   		shlr	#8, r4
+ 297                             		.loc 1 174 22 view .LVU108
+ 298 01a6 80 AC                   		mov.B	r4, 3[r2]
+ 175:../src/main.c **** 			I2C_WriteData[4]  = ((wr_cnt      ) & 0x000000FF);
+ 299                             		.loc 1 175 4 is_stmt 1 view .LVU109
+ 300                             		.loc 1 175 22 is_stmt 0 view .LVU110
+ 301 01a8 EC 55                   		mov.L	[r5], r5
+ 302 01aa 81 25                   		mov.B	r5, 4[r2]
+ 176:../src/main.c **** 			I2C_WriteData[5]  = ((sp_int >> 24) & 0x000000FF);
+ 303                             		.loc 1 176 4 is_stmt 1 view .LVU111
+ 304                             		.loc 1 176 33 is_stmt 0 view .LVU112
+ 305 01ac FB 52 00 00 00 00       		mov.L	#_sp_int, r5
+ 306 01b2 EC 54                   		mov.L	[r5], r4
+ 307 01b4 69 84                   		shlr	#24, r4
+ 308                             		.loc 1 176 22 view .LVU113
+ 309 01b6 81 2C                   		mov.B	r4, 5[r2]
+ 177:../src/main.c **** 			I2C_WriteData[6]  = ((sp_int >> 16) & 0x000000FF);
+ 310                             		.loc 1 177 4 is_stmt 1 view .LVU114
+ 311                             		.loc 1 177 33 is_stmt 0 view .LVU115
+ 312 01b8 EC 54                   		mov.L	[r5], r4
+ 313 01ba 69 04                   		shlr	#16, r4
+ 314                             		.loc 1 177 22 view .LVU116
+ 315 01bc 81 A4                   		mov.B	r4, 6[r2]
+ 178:../src/main.c **** 			I2C_WriteData[7]  = ((sp_int >>  8) & 0x000000FF);
+ 316                             		.loc 1 178 4 is_stmt 1 view .LVU117
+ 317                             		.loc 1 178 33 is_stmt 0 view .LVU118
+ 318 01be EC 54                   		mov.L	[r5], r4
+ 319 01c0 68 84                   		shlr	#8, r4
+ 320                             		.loc 1 178 22 view .LVU119
+ 321 01c2 81 AC                   		mov.B	r4, 7[r2]
+ 179:../src/main.c **** 			I2C_WriteData[8]  = ((sp_int      ) & 0x000000FF);
+ 322                             		.loc 1 179 4 is_stmt 1 view .LVU120
+ 323                             		.loc 1 179 22 is_stmt 0 view .LVU121
+ 324 01c4 EC 55                   		mov.L	[r5], r5
+ 325 01c6 82 25                   		mov.B	r5, 8[r2]
+ 180:../src/main.c **** 			I2C_WriteData[9]  = ((tr_int >> 24) & 0x000000FF);
+ 326                             		.loc 1 180 4 is_stmt 1 view .LVU122
+ 327                             		.loc 1 180 33 is_stmt 0 view .LVU123
+ 328 01c8 FB 52 00 00 00 00       		mov.L	#_tr_int, r5
+ 329 01ce EC 54                   		mov.L	[r5], r4
+ 330 01d0 69 84                   		shlr	#24, r4
+ 331                             		.loc 1 180 22 view .LVU124
+ 332 01d2 82 2C                   		mov.B	r4, 9[r2]
+ 181:../src/main.c **** 			I2C_WriteData[10] = ((tr_int >> 16) & 0x000000FF);
+ 333                             		.loc 1 181 4 is_stmt 1 view .LVU125
+ 334                             		.loc 1 181 33 is_stmt 0 view .LVU126
+ 335 01d4 EC 54                   		mov.L	[r5], r4
+ 336 01d6 69 04                   		shlr	#16, r4
+ 337                             		.loc 1 181 22 view .LVU127
+ 338 01d8 82 A4                   		mov.B	r4, 10[r2]
+ 182:../src/main.c **** 			I2C_WriteData[11] = ((tr_int >>  8) & 0x000000FF);
+ 339                             		.loc 1 182 4 is_stmt 1 view .LVU128
+ 340                             		.loc 1 182 33 is_stmt 0 view .LVU129
+ 341 01da EC 54                   		mov.L	[r5], r4
+ 342 01dc 68 84                   		shlr	#8, r4
+ 343                             		.loc 1 182 22 view .LVU130
+ 344 01de 82 AC                   		mov.B	r4, 11[r2]
+ 183:../src/main.c **** 			I2C_WriteData[12] = ((tr_int      ) & 0x000000FF);
+ 345                             		.loc 1 183 4 is_stmt 1 view .LVU131
+ 346                             		.loc 1 183 22 is_stmt 0 view .LVU132
+ 347 01e0 EC 55                   		mov.L	[r5], r5
+ 348 01e2 83 25                   		mov.B	r5, 12[r2]
+ 184:../src/main.c **** 		//	R_Config_RIIC0_Master_Send(0x50,(void *) I2C_WriteData,10);		// odo write
+ 185:../src/main.c **** 			R_Config_RIIC0_Master_Send(0x50,(void *) I2C_WriteData,14);		// odo & trip write
+ 349                             		.loc 1 185 4 is_stmt 1 view .LVU133
+ 350 01e4 66 E3                   		mov	#14, r3
+ 351 01e6 75 41 50                		mov	#0x50, r1
+ 352 01e9 05 00 00 00             		bsr	_R_Config_RIIC0_Master_Send
+ 353                             	.LVL22:
+ 186:../src/main.c **** 			while(I2C0_TX_END_FLG == 0); // I2C送信完了待ち
+ 354                             		.loc 1 186 4 view .LVU134
+ 355                             	.L7:
+ 356                             		.loc 1 186 31 discriminator 1 view .LVU135
+ 357                             		.loc 1 186 26 is_stmt 0 discriminator 1 view .LVU136
+ 358 01ed FB 52 00 00 00 00       		mov.L	#_I2C0_TX_END_FLG, r5
+ 359 01f3 CC 55                   		mov.B	[r5], r5
+ 360                             		.loc 1 186 9 discriminator 1 view .LVU137
+ 361 01f5 5B 55                   		movu.B	r5, r5
+ 362 01f7 61 05                   		cmp	#0, r5
+ 363 01f9 20 F4                   		beq	.L7
+ 187:../src/main.c **** 			I2C0_TX_END_FLG = 0;
+ 364                             		.loc 1 187 4 is_stmt 1 view .LVU138
+ 365                             		.loc 1 187 20 is_stmt 0 view .LVU139
+ 366 01fb FB 52 00 00 00 00       		mov.L	#_I2C0_TX_END_FLG, r5
+ 367 0201 F8 54 00                		mov.B	#0, [r5]
+ 188:../src/main.c **** 			sp_int_old = sp_int;
+ 368                             		.loc 1 188 4 is_stmt 1 view .LVU140
+ 369                             		.loc 1 188 15 is_stmt 0 view .LVU141
+ 370 0204 FB 52 00 00 00 00       		mov.L	#_sp_int, r5
+ 371 020a EC 54                   		mov.L	[r5], r4
+ 372 020c FB 52 00 00 00 00       		mov.L	#_sp_int_old, r5
+ 373 0212 E3 54                   		mov.L	r4, [r5]
+ 189:../src/main.c **** 			wr_cnt ++;
+ 374                             		.loc 1 189 4 is_stmt 1 view .LVU142
+ 375                             		.loc 1 189 11 is_stmt 0 view .LVU143
+ 376 0214 FB 42 00 00 00 00       		mov.L	#_wr_cnt, r4
+ 377 021a EC 45                   		mov.L	[r4], r5
+ 378 021c 62 15                   		add	#1, r5
+ 379 021e E3 45                   		mov.L	r5, [r4]
+ 380 0220 38 EE 00                		bra	.L6
+ 381                             	.L43:
+ 190:../src/main.c **** 		}
+ 191:../src/main.c **** 
+ 192:../src/main.c **** 		if((g_CALC_data.rev >= 5500) && (g_CALC_data.rev < 6000))
+ 193:../src/main.c **** 		{
+ 194:../src/main.c **** 			Neopixel_SetRGB(0, 0, 0, 255);
+ 382                             		.loc 1 194 4 is_stmt 1 view .LVU144
+ 383 0223 75 44 FF                		mov.L	#0xff, r4
+ 384 0226 66 03                   		mov.L	#0, r3
+ 385 0228 66 02                   		mov.L	#0, r2
+ 386 022a 66 01                   		mov.L	#0, r1
+ 387 022c 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 388                             	.LVL23:
+ 195:../src/main.c **** 			Neopixel_SetRGB(1, 0, 0, 0);
+ 389                             		.loc 1 195 4 view .LVU145
+ 390 0230 66 04                   		mov.L	#0, r4
+ 391 0232 66 03                   		mov.L	#0, r3
+ 392 0234 66 02                   		mov.L	#0, r2
+ 393 0236 66 11                   		mov.L	#1, r1
+ 394 0238 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 395                             	.LVL24:
+ 196:../src/main.c **** 			Neopixel_SetRGB(2, 0, 0, 0);
+ 396                             		.loc 1 196 4 view .LVU146
+ 397 023c 66 04                   		mov.L	#0, r4
+ 398 023e 66 03                   		mov.L	#0, r3
+ 399 0240 66 02                   		mov.L	#0, r2
+ 400 0242 66 21                   		mov.L	#2, r1
+ 401 0244 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 402                             	.LVL25:
+ 197:../src/main.c **** 			Neopixel_SetRGB(3, 0, 0, 0);
+ 403                             		.loc 1 197 4 view .LVU147
+ 404 0248 66 04                   		mov.L	#0, r4
+ 405 024a 66 03                   		mov.L	#0, r3
+ 406 024c 66 02                   		mov.L	#0, r2
+ 407 024e 66 31                   		mov.L	#3, r1
+ 408 0250 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 409                             	.LVL26:
+ 198:../src/main.c **** 			Neopixel_SetRGB(4, 0, 0, 0);
+ 410                             		.loc 1 198 4 view .LVU148
+ 411 0254 66 04                   		mov.L	#0, r4
+ 412 0256 66 03                   		mov.L	#0, r3
+ 413 0258 66 02                   		mov.L	#0, r2
+ 414 025a 66 41                   		mov.L	#4, r1
+ 415 025c 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 416                             	.LVL27:
+ 199:../src/main.c **** 			Neopixel_SetRGB(5, 0, 0, 0);
+ 417                             		.loc 1 199 4 view .LVU149
+ 418 0260 66 04                   		mov.L	#0, r4
+ 419 0262 66 03                   		mov.L	#0, r3
+ 420 0264 66 02                   		mov.L	#0, r2
+ 421 0266 66 51                   		mov.L	#5, r1
+ 422 0268 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 423                             	.LVL28:
+ 200:../src/main.c **** 			Neopixel_SetRGB(6, 0, 0, 0);
+ 424                             		.loc 1 200 4 view .LVU150
+ 425 026c 66 04                   		mov.L	#0, r4
+ 426 026e 66 03                   		mov.L	#0, r3
+ 427 0270 66 02                   		mov.L	#0, r2
+ 428 0272 66 61                   		mov.L	#6, r1
+ 429 0274 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 430                             	.LVL29:
+ 201:../src/main.c **** 			Neopixel_SetRGB(7, 0, 0, 255);
+ 431                             		.loc 1 201 4 view .LVU151
+ 432 0278 75 44 FF                		mov.L	#0xff, r4
+ 433 027b 66 03                   		mov.L	#0, r3
+ 434 027d 66 02                   		mov.L	#0, r2
+ 435 027f 66 71                   		mov.L	#7, r1
+ 436 0281 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 437                             	.LVL30:
+ 438 0285 FC 13 00                		.balign 8,3,3
+ 439                             	.L11:
+ 202:../src/main.c **** 		}
+ 203:../src/main.c **** 
+ 204:../src/main.c **** 		else if((g_CALC_data.rev >= 6000) && (g_CALC_data.rev < 6500))
+ 205:../src/main.c **** 		{
+ 206:../src/main.c **** 			Neopixel_SetRGB(0, 0, 0, 255);
+ 207:../src/main.c **** 			Neopixel_SetRGB(1, 0, 0, 255);
+ 208:../src/main.c **** 			Neopixel_SetRGB(2, 0, 0, 0);
+ 209:../src/main.c **** 			Neopixel_SetRGB(3, 0, 0, 0);
+ 210:../src/main.c **** 			Neopixel_SetRGB(4, 0, 0, 0);
+ 211:../src/main.c **** 			Neopixel_SetRGB(5, 0, 0, 0);
+ 212:../src/main.c **** 			Neopixel_SetRGB(6, 0, 0, 255);
+ 213:../src/main.c **** 			Neopixel_SetRGB(7, 0, 0, 255);
+ 214:../src/main.c **** 		}
+ 215:../src/main.c **** 		else if((g_CALC_data.rev >= 6500) && (g_CALC_data.rev < 7000))
+ 216:../src/main.c **** 		{
+ 217:../src/main.c **** 			Neopixel_SetRGB(0, 0, 255, 0);
+ 218:../src/main.c **** 			Neopixel_SetRGB(1, 0, 255, 0);
+ 219:../src/main.c **** 			Neopixel_SetRGB(2, 0, 255, 0);
+ 220:../src/main.c **** 			Neopixel_SetRGB(3, 0, 0, 0);
+ 221:../src/main.c **** 			Neopixel_SetRGB(4, 0, 0, 0);
+ 222:../src/main.c **** 			Neopixel_SetRGB(5, 0, 255, 0);
+ 223:../src/main.c **** 			Neopixel_SetRGB(6, 0, 255, 0);
+ 224:../src/main.c **** 			Neopixel_SetRGB(7, 0, 255, 0);
+ 225:../src/main.c **** 		}
+ 226:../src/main.c **** 		else if((g_CALC_data.rev >= 7000) && (g_CALC_data.rev < 7500))
+ 227:../src/main.c **** 		{
+ 228:../src/main.c **** 			Neopixel_SetRGB(0, 255, 0, 0);
+ 229:../src/main.c **** 			Neopixel_SetRGB(1, 255, 0, 0);
+ 230:../src/main.c **** 			Neopixel_SetRGB(2, 255, 0, 0);
+ 231:../src/main.c **** 			Neopixel_SetRGB(3, 255, 0, 0);
+ 232:../src/main.c **** 			Neopixel_SetRGB(4, 255, 0, 0);
+ 233:../src/main.c **** 			Neopixel_SetRGB(5, 255, 0, 0);
+ 234:../src/main.c **** 			Neopixel_SetRGB(6, 255, 0, 0);
+ 235:../src/main.c **** 			Neopixel_SetRGB(7, 255, 0, 0);
+ 236:../src/main.c **** 		}
+ 237:../src/main.c **** 		else if((g_CALC_data.rev >= 7500))
+ 238:../src/main.c **** 		{
+ 239:../src/main.c **** 			if(shift_rev_cnt == 0)
+ 240:../src/main.c **** 			{
+ 241:../src/main.c **** 				shift_rev_cnt = 1;
+ 242:../src/main.c **** 				Neopixel_SetRGB(0, 255, 255, 255);
+ 243:../src/main.c **** 				Neopixel_SetRGB(1, 255, 255, 255);
+ 244:../src/main.c **** 				Neopixel_SetRGB(2, 255, 255, 255);
+ 245:../src/main.c **** 				Neopixel_SetRGB(3, 255, 255, 255);
+ 246:../src/main.c **** 				Neopixel_SetRGB(4, 255, 255, 255);
+ 247:../src/main.c **** 				Neopixel_SetRGB(5, 255, 255, 255);
+ 248:../src/main.c **** 				Neopixel_SetRGB(6, 255, 255, 255);
+ 249:../src/main.c **** 				Neopixel_SetRGB(7, 255, 255, 255);
+ 250:../src/main.c **** 			}
+ 251:../src/main.c **** 			else
+ 252:../src/main.c **** 			{
+ 253:../src/main.c **** 				shift_rev_cnt = 0;
+ 254:../src/main.c **** 				Neopixel_SetRGB(0, 0, 0, 0);
+ 255:../src/main.c **** 				Neopixel_SetRGB(1, 0, 0, 0);
+ 256:../src/main.c **** 				Neopixel_SetRGB(2, 0, 0, 0);
+ 257:../src/main.c **** 				Neopixel_SetRGB(3, 0, 0, 0);
+ 258:../src/main.c **** 				Neopixel_SetRGB(4, 0, 0, 0);
+ 259:../src/main.c **** 				Neopixel_SetRGB(5, 0, 0, 0);
+ 260:../src/main.c **** 				Neopixel_SetRGB(6, 0, 0, 0);
+ 261:../src/main.c **** 				Neopixel_SetRGB(7, 0, 0, 0);
+ 262:../src/main.c **** 			}
+ 263:../src/main.c **** 		}
+ 264:../src/main.c **** 		else
+ 265:../src/main.c **** 		{
+ 266:../src/main.c **** 			Neopixel_SetRGB(0, 0, 0, 0);
+ 267:../src/main.c **** 			Neopixel_SetRGB(1, 0, 0, 0);
+ 268:../src/main.c **** 			Neopixel_SetRGB(2, 0, 0, 0);
+ 269:../src/main.c **** 			Neopixel_SetRGB(3, 0, 0, 0);
+ 270:../src/main.c **** 			Neopixel_SetRGB(4, 0, 0, 0);
+ 271:../src/main.c **** 			Neopixel_SetRGB(5, 0, 0, 0);
+ 272:../src/main.c **** 			Neopixel_SetRGB(6, 0, 0, 0);
+ 273:../src/main.c **** 			Neopixel_SetRGB(7, 0, 0, 0);
+ 274:../src/main.c **** 			shift_rev_cnt = 0;
+ 275:../src/main.c **** 		}
+ 276:../src/main.c **** 		Neopixel_TX();
+ 440                             		.loc 1 276 3 view .LVU152
+ 441 0288 05 00 00 00             		bsr	_Neopixel_TX
+ 442                             	.LVL31:
+ 277:../src/main.c **** 
+ 278:../src/main.c **** 		// Auto dimmer Back Light control
+ 279:../src/main.c **** 		if(g_CALC_data.AD5 <= 50)
+ 443                             		.loc 1 279 3 view .LVU153
+ 444                             		.loc 1 279 17 is_stmt 0 view .LVU154
+ 445 028c FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 446                             		.loc 1 279 5 view .LVU155
+ 447 0292 FB 42 00 00 48 42       		mov.L	#0x42480000, r4
+ 448 0298 FC 85 54 07             		fcmp	28[r5], r4
+ 449 029c 26 05 38 8F 03          		bn	.L40
+ 280:../src/main.c **** 		{
+ 281:../src/main.c **** //			MTU3.TGRD = 200;
+ 282:../src/main.c **** 			MTU3.TGRD = 600;
+ 450                             		.loc 1 282 4 is_stmt 1 view .LVU156
+ 451                             		.loc 1 282 14 is_stmt 0 view .LVU157
+ 452 02a1 FB 5E 00 12 0C          		mov.L	#0xc1200, r5
+ 453 02a6 F9 59 13 58 02          		mov.W	#0x258, 38[r5]
+ 283:../src/main.c **** 			g_CALC_data.neobrightness = 0x0F;
+ 454                             		.loc 1 283 4 is_stmt 1 view .LVU158
+ 455                             		.loc 1 283 30 is_stmt 0 view .LVU159
+ 456 02ab FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 457 02b1 FA 54 D6 01 0F          		mov.B	#15, 470[r5]
+ 458                             	.LVL32:
+ 459 02b6 EF 00                   		.balign 8,3,5
+ 460                             	.L5:
+ 151:../src/main.c **** 	{
+ 461                             		.loc 1 151 2 is_stmt 1 view .LVU160
+ 154:../src/main.c **** //		g_int10mscnt =  -4;		// peiod 10ms x  4 = 40ms  25fps
+ 462                             		.loc 1 154 3 view .LVU161
+ 154:../src/main.c **** //		g_int10mscnt =  -4;		// peiod 10ms x  4 = 40ms  25fps
+ 463                             		.loc 1 154 16 is_stmt 0 view .LVU162
+ 464 02b8 FB 52 00 00 00 00       		mov.L	#_g_int10mscnt, r5
+ 465 02be F8 56 FD                		mov.L	#-3, [r5]
+ 160:../src/main.c **** 		APPW_SetVarData(ID_VAR_FPS, g_fps_max);
+ 466                             		.loc 1 160 3 is_stmt 1 view .LVU163
+ 160:../src/main.c **** 		APPW_SetVarData(ID_VAR_FPS, g_fps_max);
+ 467                             		.loc 1 160 13 is_stmt 0 view .LVU164
+ 468 02c1 FB 42 00 00 00 00       		mov.L	#_g_fps_cnt, r4
+ 469 02c7 EC 45                   		mov.L	[r4], r5
+ 470 02c9 62 15                   		add	#1, r5
+ 471 02cb E3 45                   		mov.L	r5, [r4]
+ 161:../src/main.c **** 
+ 472                             		.loc 1 161 3 is_stmt 1 view .LVU165
+ 473 02cd FB 52 00 00 00 00       		mov.L	#_g_fps_max, r5
+ 474 02d3 EC 52                   		mov.L	[r5], r2
+ 475 02d5 FB 1A 0E 10             		mov	#0x100e, r1
+ 476 02d9 05 00 00 00             		bsr	_APPW_SetVarData
+ 477                             	.LVL33:
+ 163:../src/main.c **** 
+ 478                             		.loc 1 163 3 view .LVU166
+ 479 02dd 05 00 00 00             		bsr	_data_store
+ 480                             	.LVL34:
+ 165:../src/main.c **** 		APPW_Exec();
+ 481                             		.loc 1 165 3 view .LVU167
+ 482 02e1 05 00 00 00             		bsr	_GUI_Exec1
+ 483                             	.LVL35:
+ 166:../src/main.c **** 
+ 484                             		.loc 1 166 3 view .LVU168
+ 485 02e5 05 00 00 00             		bsr	_APPW_Exec
+ 486                             	.LVL36:
+ 168:../src/main.c **** 
+ 487                             		.loc 1 168 3 view .LVU169
+ 488 02e9 05 00 00 00             		bsr	_main_CAN
+ 489                             	.LVL37:
+ 170:../src/main.c **** 		{
+ 490                             		.loc 1 170 3 view .LVU170
+ 170:../src/main.c **** 		{
+ 491                             		.loc 1 170 14 is_stmt 0 view .LVU171
+ 492 02ed FB 52 00 00 00 00       		mov.L	#_sp_int, r5
+ 493 02f3 EC 54                   		mov.L	[r5], r4
+ 494 02f5 FB 52 00 00 00 00       		mov.L	#_sp_int_old, r5
+ 170:../src/main.c **** 		{
+ 495                             		.loc 1 170 5 view .LVU172
+ 496 02fb 06 84 54                		cmp	[r5].L, r4
+ 497 02fe 20 10                   		beq	.L6
+ 170:../src/main.c **** 		{
+ 498                             		.loc 1 170 46 discriminator 1 view .LVU173
+ 499 0300 FB 52 00 00 00 00       		mov.L	#_g_sp_int_flg, r5
+ 500 0306 EC 55                   		mov.L	[r5], r5
+ 170:../src/main.c **** 		{
+ 501                             		.loc 1 170 29 discriminator 1 view .LVU174
+ 502 0308 75 55 64                		cmp	#0x64, r5
+ 503 030b 3A 7F FE                		beq	.L42
+ 504                             	.L6:
+ 192:../src/main.c **** 		{
+ 505                             		.loc 1 192 3 is_stmt 1 view .LVU175
+ 192:../src/main.c **** 		{
+ 506                             		.loc 1 192 18 is_stmt 0 view .LVU176
+ 507 030e FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 508 0314 AC 5D                   		mov.L	68[r5], r5
+ 192:../src/main.c **** 		{
+ 509                             		.loc 1 192 5 view .LVU177
+ 510 0316 FD 72 15 00 E0 AB 45    		fcmp	#0x45abe000, r5
+ 511 031d 27 16                   		bn	.L8
+ 192:../src/main.c **** 		{
+ 512                             		.loc 1 192 47 discriminator 1 view .LVU178
+ 513 031f FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 514 0325 AC 5D                   		mov.L	68[r5], r5
+ 192:../src/main.c **** 		{
+ 515                             		.loc 1 192 32 discriminator 1 view .LVU179
+ 516 0327 FD 72 15 00 80 BB 45    		fcmp	#0x45bb8000, r5
+ 517 032e 26 05 38 F3 FE          		bn	.L43
+ 518                             	.L8:
+ 204:../src/main.c **** 		{
+ 519                             		.loc 1 204 8 is_stmt 1 view .LVU180
+ 204:../src/main.c **** 		{
+ 520                             		.loc 1 204 23 is_stmt 0 view .LVU181
+ 521 0333 FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 522 0339 AC 5D                   		mov.L	68[r5], r5
+ 204:../src/main.c **** 		{
+ 523                             		.loc 1 204 10 view .LVU182
+ 524 033b FD 72 15 00 80 BB 45    		fcmp	#0x45bb8000, r5
+ 525 0342 27 16                   		bn	.L12
+ 204:../src/main.c **** 		{
+ 526                             		.loc 1 204 52 discriminator 1 view .LVU183
+ 527 0344 FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 528 034a AC 5D                   		mov.L	68[r5], r5
+ 204:../src/main.c **** 		{
+ 529                             		.loc 1 204 37 discriminator 1 view .LVU184
+ 530 034c FD 72 15 00 20 CB 45    		fcmp	#0x45cb2000, r5
+ 531 0353 26 05 38 D3 00          		bn	.L44
+ 532                             	.L12:
+ 215:../src/main.c **** 		{
+ 533                             		.loc 1 215 8 is_stmt 1 view .LVU185
+ 215:../src/main.c **** 		{
+ 534                             		.loc 1 215 23 is_stmt 0 view .LVU186
+ 535 0358 FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 536 035e AC 5D                   		mov.L	68[r5], r5
+ 215:../src/main.c **** 		{
+ 537                             		.loc 1 215 10 view .LVU187
+ 538 0360 FD 72 15 00 20 CB 45    		fcmp	#0x45cb2000, r5
+ 539 0367 27 16                   		bn	.L15
+ 215:../src/main.c **** 		{
+ 540                             		.loc 1 215 52 discriminator 1 view .LVU188
+ 541 0369 FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 542 036f AC 5D                   		mov.L	68[r5], r5
+ 215:../src/main.c **** 		{
+ 543                             		.loc 1 215 37 discriminator 1 view .LVU189
+ 544 0371 FD 72 15 00 C0 DA 45    		fcmp	#0x45dac000, r5
+ 545 0378 26 05 38 15 01          		bn	.L45
+ 546                             	.L15:
+ 226:../src/main.c **** 		{
+ 547                             		.loc 1 226 8 is_stmt 1 view .LVU190
+ 226:../src/main.c **** 		{
+ 548                             		.loc 1 226 23 is_stmt 0 view .LVU191
+ 549 037d FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 550 0383 AC 5D                   		mov.L	68[r5], r5
+ 226:../src/main.c **** 		{
+ 551                             		.loc 1 226 10 view .LVU192
+ 552 0385 FD 72 15 00 C0 DA 45    		fcmp	#0x45dac000, r5
+ 553 038c 27 16                   		bn	.L18
+ 226:../src/main.c **** 		{
+ 554                             		.loc 1 226 52 discriminator 1 view .LVU193
+ 555 038e FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 556 0394 AC 5D                   		mov.L	68[r5], r5
+ 226:../src/main.c **** 		{
+ 557                             		.loc 1 226 37 discriminator 1 view .LVU194
+ 558 0396 FD 72 15 00 60 EA 45    		fcmp	#0x45ea6000, r5
+ 559 039d 26 05 38 59 01          		bn	.L46
+ 560                             	.L18:
+ 237:../src/main.c **** 		{
+ 561                             		.loc 1 237 8 is_stmt 1 view .LVU195
+ 237:../src/main.c **** 		{
+ 562                             		.loc 1 237 23 is_stmt 0 view .LVU196
+ 563 03a2 FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 564 03a8 AC 5D                   		mov.L	68[r5], r5
+ 237:../src/main.c **** 		{
+ 565                             		.loc 1 237 10 view .LVU197
+ 566 03aa FD 72 15 00 60 EA 45    		fcmp	#0x45ea6000, r5
+ 567 03b1 26 05 38 15 02          		bn	.L39
+ 239:../src/main.c **** 			{
+ 568                             		.loc 1 239 4 is_stmt 1 view .LVU198
+ 239:../src/main.c **** 			{
+ 569                             		.loc 1 239 6 is_stmt 0 view .LVU199
+ 570 03b6 61 07                   		cmp	#0, r7
+ 571 03b8 3B AB 01                		bne	.L23
+ 241:../src/main.c **** 				Neopixel_SetRGB(0, 255, 255, 255);
+ 572                             		.loc 1 241 5 is_stmt 1 view .LVU200
+ 573                             	.LVL38:
+ 242:../src/main.c **** 				Neopixel_SetRGB(1, 255, 255, 255);
+ 574                             		.loc 1 242 5 view .LVU201
+ 575 03bb 75 44 FF                		mov.L	#0xff, r4
+ 576 03be EF 43                   		mov.L	r4, r3
+ 577 03c0 EF 42                   		mov.L	r4, r2
+ 578 03c2 66 01                   		mov.L	#0, r1
+ 579 03c4 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 580                             	.LVL39:
+ 243:../src/main.c **** 				Neopixel_SetRGB(2, 255, 255, 255);
+ 581                             		.loc 1 243 5 view .LVU202
+ 582 03c8 75 44 FF                		mov.L	#0xff, r4
+ 583 03cb EF 43                   		mov.L	r4, r3
+ 584 03cd EF 42                   		mov.L	r4, r2
+ 585 03cf 66 11                   		mov.L	#1, r1
+ 586 03d1 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 587                             	.LVL40:
+ 244:../src/main.c **** 				Neopixel_SetRGB(3, 255, 255, 255);
+ 588                             		.loc 1 244 5 view .LVU203
+ 589 03d5 75 44 FF                		mov.L	#0xff, r4
+ 590 03d8 EF 43                   		mov.L	r4, r3
+ 591 03da EF 42                   		mov.L	r4, r2
+ 592 03dc 66 21                   		mov.L	#2, r1
+ 593 03de 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 594                             	.LVL41:
+ 245:../src/main.c **** 				Neopixel_SetRGB(4, 255, 255, 255);
+ 595                             		.loc 1 245 5 view .LVU204
+ 596 03e2 75 44 FF                		mov.L	#0xff, r4
+ 597 03e5 EF 43                   		mov.L	r4, r3
+ 598 03e7 EF 42                   		mov.L	r4, r2
+ 599 03e9 66 31                   		mov.L	#3, r1
+ 600 03eb 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 601                             	.LVL42:
+ 246:../src/main.c **** 				Neopixel_SetRGB(5, 255, 255, 255);
+ 602                             		.loc 1 246 5 view .LVU205
+ 603 03ef 75 44 FF                		mov.L	#0xff, r4
+ 604 03f2 EF 43                   		mov.L	r4, r3
+ 605 03f4 EF 42                   		mov.L	r4, r2
+ 606 03f6 66 41                   		mov.L	#4, r1
+ 607 03f8 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 608                             	.LVL43:
+ 247:../src/main.c **** 				Neopixel_SetRGB(6, 255, 255, 255);
+ 609                             		.loc 1 247 5 view .LVU206
+ 610 03fc 75 44 FF                		mov.L	#0xff, r4
+ 611 03ff EF 43                   		mov.L	r4, r3
+ 612 0401 EF 42                   		mov.L	r4, r2
+ 613 0403 66 51                   		mov.L	#5, r1
+ 614 0405 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 615                             	.LVL44:
+ 248:../src/main.c **** 				Neopixel_SetRGB(7, 255, 255, 255);
+ 616                             		.loc 1 248 5 view .LVU207
+ 617 0409 75 44 FF                		mov.L	#0xff, r4
+ 618 040c EF 43                   		mov.L	r4, r3
+ 619 040e EF 42                   		mov.L	r4, r2
+ 620 0410 66 61                   		mov.L	#6, r1
+ 621 0412 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 622                             	.LVL45:
+ 249:../src/main.c **** 			}
+ 623                             		.loc 1 249 5 view .LVU208
+ 624 0416 75 44 FF                		mov.L	#0xff, r4
+ 625 0419 EF 43                   		mov.L	r4, r3
+ 626 041b EF 42                   		mov.L	r4, r2
+ 627 041d 66 71                   		mov.L	#7, r1
+ 628 041f 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 629                             	.LVL46:
+ 241:../src/main.c **** 				Neopixel_SetRGB(0, 255, 255, 255);
+ 630                             		.loc 1 241 19 is_stmt 0 view .LVU209
+ 631 0423 66 17                   		mov.L	#1, r7
+ 632 0425 38 63 FE                		bra	.L11
+ 633                             	.LVL47:
+ 634                             	.L44:
+ 206:../src/main.c **** 			Neopixel_SetRGB(1, 0, 0, 255);
+ 635                             		.loc 1 206 4 is_stmt 1 view .LVU210
+ 636 0428 75 44 FF                		mov.L	#0xff, r4
+ 637 042b 66 03                   		mov.L	#0, r3
+ 638 042d 66 02                   		mov.L	#0, r2
+ 639 042f 66 01                   		mov.L	#0, r1
+ 640 0431 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 641                             	.LVL48:
+ 207:../src/main.c **** 			Neopixel_SetRGB(2, 0, 0, 0);
+ 642                             		.loc 1 207 4 view .LVU211
+ 643 0435 75 44 FF                		mov.L	#0xff, r4
+ 644 0438 66 03                   		mov.L	#0, r3
+ 645 043a 66 02                   		mov.L	#0, r2
+ 646 043c 66 11                   		mov.L	#1, r1
+ 647 043e 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 648                             	.LVL49:
+ 208:../src/main.c **** 			Neopixel_SetRGB(3, 0, 0, 0);
+ 649                             		.loc 1 208 4 view .LVU212
+ 650 0442 66 04                   		mov.L	#0, r4
+ 651 0444 66 03                   		mov.L	#0, r3
+ 652 0446 66 02                   		mov.L	#0, r2
+ 653 0448 66 21                   		mov.L	#2, r1
+ 654 044a 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 655                             	.LVL50:
+ 209:../src/main.c **** 			Neopixel_SetRGB(4, 0, 0, 0);
+ 656                             		.loc 1 209 4 view .LVU213
+ 657 044e 66 04                   		mov.L	#0, r4
+ 658 0450 66 03                   		mov.L	#0, r3
+ 659 0452 66 02                   		mov.L	#0, r2
+ 660 0454 66 31                   		mov.L	#3, r1
+ 661 0456 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 662                             	.LVL51:
+ 210:../src/main.c **** 			Neopixel_SetRGB(5, 0, 0, 0);
+ 663                             		.loc 1 210 4 view .LVU214
+ 664 045a 66 04                   		mov.L	#0, r4
+ 665 045c 66 03                   		mov.L	#0, r3
+ 666 045e 66 02                   		mov.L	#0, r2
+ 667 0460 66 41                   		mov.L	#4, r1
+ 668 0462 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 669                             	.LVL52:
+ 211:../src/main.c **** 			Neopixel_SetRGB(6, 0, 0, 255);
+ 670                             		.loc 1 211 4 view .LVU215
+ 671 0466 66 04                   		mov.L	#0, r4
+ 672 0468 66 03                   		mov.L	#0, r3
+ 673 046a 66 02                   		mov.L	#0, r2
+ 674 046c 66 51                   		mov.L	#5, r1
+ 675 046e 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 676                             	.LVL53:
+ 212:../src/main.c **** 			Neopixel_SetRGB(7, 0, 0, 255);
+ 677                             		.loc 1 212 4 view .LVU216
+ 678 0472 75 44 FF                		mov.L	#0xff, r4
+ 679 0475 66 03                   		mov.L	#0, r3
+ 680 0477 66 02                   		mov.L	#0, r2
+ 681 0479 66 61                   		mov.L	#6, r1
+ 682 047b 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 683                             	.LVL54:
+ 213:../src/main.c **** 		}
+ 684                             		.loc 1 213 4 view .LVU217
+ 685 047f 75 44 FF                		mov.L	#0xff, r4
+ 686 0482 66 03                   		mov.L	#0, r3
+ 687 0484 66 02                   		mov.L	#0, r2
+ 688 0486 66 71                   		mov.L	#7, r1
+ 689 0488 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 690                             	.LVL55:
+ 691 048c 38 FC FD                		bra	.L11
+ 692                             	.L45:
+ 217:../src/main.c **** 			Neopixel_SetRGB(1, 0, 255, 0);
+ 693                             		.loc 1 217 4 view .LVU218
+ 694 048f 66 04                   		mov.L	#0, r4
+ 695 0491 75 43 FF                		mov.L	#0xff, r3
+ 696 0494 66 02                   		mov.L	#0, r2
+ 697 0496 66 01                   		mov.L	#0, r1
+ 698 0498 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 699                             	.LVL56:
+ 218:../src/main.c **** 			Neopixel_SetRGB(2, 0, 255, 0);
+ 700                             		.loc 1 218 4 view .LVU219
+ 701 049c 66 04                   		mov.L	#0, r4
+ 702 049e 75 43 FF                		mov.L	#0xff, r3
+ 703 04a1 66 02                   		mov.L	#0, r2
+ 704 04a3 66 11                   		mov.L	#1, r1
+ 705 04a5 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 706                             	.LVL57:
+ 219:../src/main.c **** 			Neopixel_SetRGB(3, 0, 0, 0);
+ 707                             		.loc 1 219 4 view .LVU220
+ 708 04a9 66 04                   		mov.L	#0, r4
+ 709 04ab 75 43 FF                		mov.L	#0xff, r3
+ 710 04ae 66 02                   		mov.L	#0, r2
+ 711 04b0 66 21                   		mov.L	#2, r1
+ 712 04b2 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 713                             	.LVL58:
+ 220:../src/main.c **** 			Neopixel_SetRGB(4, 0, 0, 0);
+ 714                             		.loc 1 220 4 view .LVU221
+ 715 04b6 66 04                   		mov.L	#0, r4
+ 716 04b8 66 03                   		mov.L	#0, r3
+ 717 04ba 66 02                   		mov.L	#0, r2
+ 718 04bc 66 31                   		mov.L	#3, r1
+ 719 04be 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 720                             	.LVL59:
+ 221:../src/main.c **** 			Neopixel_SetRGB(5, 0, 255, 0);
+ 721                             		.loc 1 221 4 view .LVU222
+ 722 04c2 66 04                   		mov.L	#0, r4
+ 723 04c4 66 03                   		mov.L	#0, r3
+ 724 04c6 66 02                   		mov.L	#0, r2
+ 725 04c8 66 41                   		mov.L	#4, r1
+ 726 04ca 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 727                             	.LVL60:
+ 222:../src/main.c **** 			Neopixel_SetRGB(6, 0, 255, 0);
+ 728                             		.loc 1 222 4 view .LVU223
+ 729 04ce 66 04                   		mov.L	#0, r4
+ 730 04d0 75 43 FF                		mov.L	#0xff, r3
+ 731 04d3 66 02                   		mov.L	#0, r2
+ 732 04d5 66 51                   		mov.L	#5, r1
+ 733 04d7 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 734                             	.LVL61:
+ 223:../src/main.c **** 			Neopixel_SetRGB(7, 0, 255, 0);
+ 735                             		.loc 1 223 4 view .LVU224
+ 736 04db 66 04                   		mov.L	#0, r4
+ 737 04dd 75 43 FF                		mov.L	#0xff, r3
+ 738 04e0 66 02                   		mov.L	#0, r2
+ 739 04e2 66 61                   		mov.L	#6, r1
+ 740 04e4 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 741                             	.LVL62:
+ 224:../src/main.c **** 		}
+ 742                             		.loc 1 224 4 view .LVU225
+ 743 04e8 66 04                   		mov.L	#0, r4
+ 744 04ea 75 43 FF                		mov.L	#0xff, r3
+ 745 04ed 66 02                   		mov.L	#0, r2
+ 746 04ef 66 71                   		mov.L	#7, r1
+ 747 04f1 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 748                             	.LVL63:
+ 749 04f5 38 93 FD                		bra	.L11
+ 750                             	.L46:
+ 228:../src/main.c **** 			Neopixel_SetRGB(1, 255, 0, 0);
+ 751                             		.loc 1 228 4 view .LVU226
+ 752 04f8 66 04                   		mov.L	#0, r4
+ 753 04fa 66 03                   		mov.L	#0, r3
+ 754 04fc 75 42 FF                		mov.L	#0xff, r2
+ 755 04ff 66 01                   		mov.L	#0, r1
+ 756 0501 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 757                             	.LVL64:
+ 229:../src/main.c **** 			Neopixel_SetRGB(2, 255, 0, 0);
+ 758                             		.loc 1 229 4 view .LVU227
+ 759 0505 66 04                   		mov.L	#0, r4
+ 760 0507 66 03                   		mov.L	#0, r3
+ 761 0509 75 42 FF                		mov.L	#0xff, r2
+ 762 050c 66 11                   		mov.L	#1, r1
+ 763 050e 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 764                             	.LVL65:
+ 230:../src/main.c **** 			Neopixel_SetRGB(3, 255, 0, 0);
+ 765                             		.loc 1 230 4 view .LVU228
+ 766 0512 66 04                   		mov.L	#0, r4
+ 767 0514 66 03                   		mov.L	#0, r3
+ 768 0516 75 42 FF                		mov.L	#0xff, r2
+ 769 0519 66 21                   		mov.L	#2, r1
+ 770 051b 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 771                             	.LVL66:
+ 231:../src/main.c **** 			Neopixel_SetRGB(4, 255, 0, 0);
+ 772                             		.loc 1 231 4 view .LVU229
+ 773 051f 66 04                   		mov.L	#0, r4
+ 774 0521 66 03                   		mov.L	#0, r3
+ 775 0523 75 42 FF                		mov.L	#0xff, r2
+ 776 0526 66 31                   		mov.L	#3, r1
+ 777 0528 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 778                             	.LVL67:
+ 232:../src/main.c **** 			Neopixel_SetRGB(5, 255, 0, 0);
+ 779                             		.loc 1 232 4 view .LVU230
+ 780 052c 66 04                   		mov.L	#0, r4
+ 781 052e 66 03                   		mov.L	#0, r3
+ 782 0530 75 42 FF                		mov.L	#0xff, r2
+ 783 0533 66 41                   		mov.L	#4, r1
+ 784 0535 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 785                             	.LVL68:
+ 233:../src/main.c **** 			Neopixel_SetRGB(6, 255, 0, 0);
+ 786                             		.loc 1 233 4 view .LVU231
+ 787 0539 66 04                   		mov.L	#0, r4
+ 788 053b 66 03                   		mov.L	#0, r3
+ 789 053d 75 42 FF                		mov.L	#0xff, r2
+ 790 0540 66 51                   		mov.L	#5, r1
+ 791 0542 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 792                             	.LVL69:
+ 234:../src/main.c **** 			Neopixel_SetRGB(7, 255, 0, 0);
+ 793                             		.loc 1 234 4 view .LVU232
+ 794 0546 66 04                   		mov.L	#0, r4
+ 795 0548 66 03                   		mov.L	#0, r3
+ 796 054a 75 42 FF                		mov.L	#0xff, r2
+ 797 054d 66 61                   		mov.L	#6, r1
+ 798 054f 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 799                             	.LVL70:
+ 235:../src/main.c **** 		}
+ 800                             		.loc 1 235 4 view .LVU233
+ 801 0553 66 04                   		mov.L	#0, r4
+ 802 0555 66 03                   		mov.L	#0, r3
+ 803 0557 75 42 FF                		mov.L	#0xff, r2
+ 804 055a 66 71                   		mov.L	#7, r1
+ 805 055c 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 806                             	.LVL71:
+ 807 0560 38 28 FD                		bra	.L11
+ 808                             	.L23:
+ 253:../src/main.c **** 				Neopixel_SetRGB(0, 0, 0, 0);
+ 809                             		.loc 1 253 5 view .LVU234
+ 810                             	.LVL72:
+ 254:../src/main.c **** 				Neopixel_SetRGB(1, 0, 0, 0);
+ 811                             		.loc 1 254 5 view .LVU235
+ 812 0563 66 04                   		mov.L	#0, r4
+ 813 0565 66 03                   		mov.L	#0, r3
+ 814 0567 66 02                   		mov.L	#0, r2
+ 815 0569 66 01                   		mov.L	#0, r1
+ 816 056b 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 817                             	.LVL73:
+ 255:../src/main.c **** 				Neopixel_SetRGB(2, 0, 0, 0);
+ 818                             		.loc 1 255 5 view .LVU236
+ 819 056f 66 04                   		mov.L	#0, r4
+ 820 0571 66 03                   		mov.L	#0, r3
+ 821 0573 66 02                   		mov.L	#0, r2
+ 822 0575 66 11                   		mov.L	#1, r1
+ 823 0577 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 824                             	.LVL74:
+ 256:../src/main.c **** 				Neopixel_SetRGB(3, 0, 0, 0);
+ 825                             		.loc 1 256 5 view .LVU237
+ 826 057b 66 04                   		mov.L	#0, r4
+ 827 057d 66 03                   		mov.L	#0, r3
+ 828 057f 66 02                   		mov.L	#0, r2
+ 829 0581 66 21                   		mov.L	#2, r1
+ 830 0583 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 831                             	.LVL75:
+ 257:../src/main.c **** 				Neopixel_SetRGB(4, 0, 0, 0);
+ 832                             		.loc 1 257 5 view .LVU238
+ 833 0587 66 04                   		mov.L	#0, r4
+ 834 0589 66 03                   		mov.L	#0, r3
+ 835 058b 66 02                   		mov.L	#0, r2
+ 836 058d 66 31                   		mov.L	#3, r1
+ 837 058f 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 838                             	.LVL76:
+ 258:../src/main.c **** 				Neopixel_SetRGB(5, 0, 0, 0);
+ 839                             		.loc 1 258 5 view .LVU239
+ 840 0593 66 04                   		mov.L	#0, r4
+ 841 0595 66 03                   		mov.L	#0, r3
+ 842 0597 66 02                   		mov.L	#0, r2
+ 843 0599 66 41                   		mov.L	#4, r1
+ 844 059b 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 845                             	.LVL77:
+ 259:../src/main.c **** 				Neopixel_SetRGB(6, 0, 0, 0);
+ 846                             		.loc 1 259 5 view .LVU240
+ 847 059f 66 04                   		mov.L	#0, r4
+ 848 05a1 66 03                   		mov.L	#0, r3
+ 849 05a3 66 02                   		mov.L	#0, r2
+ 850 05a5 66 51                   		mov.L	#5, r1
+ 851 05a7 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 852                             	.LVL78:
+ 260:../src/main.c **** 				Neopixel_SetRGB(7, 0, 0, 0);
+ 853                             		.loc 1 260 5 view .LVU241
+ 854 05ab 66 04                   		mov.L	#0, r4
+ 855 05ad 66 03                   		mov.L	#0, r3
+ 856 05af 66 02                   		mov.L	#0, r2
+ 857 05b1 66 61                   		mov.L	#6, r1
+ 858 05b3 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 859                             	.LVL79:
+ 261:../src/main.c **** 			}
+ 860                             		.loc 1 261 5 view .LVU242
+ 861 05b7 66 04                   		mov.L	#0, r4
+ 862 05b9 66 03                   		mov.L	#0, r3
+ 863 05bb 66 02                   		mov.L	#0, r2
+ 864 05bd 66 71                   		mov.L	#7, r1
+ 865 05bf 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 866                             	.LVL80:
+ 253:../src/main.c **** 				Neopixel_SetRGB(0, 0, 0, 0);
+ 867                             		.loc 1 253 19 is_stmt 0 view .LVU243
+ 868 05c3 66 07                   		mov.L	#0, r7
+ 869 05c5 38 C3 FC                		bra	.L11
+ 870                             	.LVL81:
+ 871                             	.L39:
+ 266:../src/main.c **** 			Neopixel_SetRGB(1, 0, 0, 0);
+ 872                             		.loc 1 266 4 is_stmt 1 view .LVU244
+ 873 05c8 66 04                   		mov.L	#0, r4
+ 874 05ca 66 03                   		mov.L	#0, r3
+ 875 05cc 66 02                   		mov.L	#0, r2
+ 876 05ce 66 01                   		mov.L	#0, r1
+ 877 05d0 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 878                             	.LVL82:
+ 267:../src/main.c **** 			Neopixel_SetRGB(2, 0, 0, 0);
+ 879                             		.loc 1 267 4 view .LVU245
+ 880 05d4 66 04                   		mov.L	#0, r4
+ 881 05d6 66 03                   		mov.L	#0, r3
+ 882 05d8 66 02                   		mov.L	#0, r2
+ 883 05da 66 11                   		mov.L	#1, r1
+ 884 05dc 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 885                             	.LVL83:
+ 268:../src/main.c **** 			Neopixel_SetRGB(3, 0, 0, 0);
+ 886                             		.loc 1 268 4 view .LVU246
+ 887 05e0 66 04                   		mov.L	#0, r4
+ 888 05e2 66 03                   		mov.L	#0, r3
+ 889 05e4 66 02                   		mov.L	#0, r2
+ 890 05e6 66 21                   		mov.L	#2, r1
+ 891 05e8 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 892                             	.LVL84:
+ 269:../src/main.c **** 			Neopixel_SetRGB(4, 0, 0, 0);
+ 893                             		.loc 1 269 4 view .LVU247
+ 894 05ec 66 04                   		mov.L	#0, r4
+ 895 05ee 66 03                   		mov.L	#0, r3
+ 896 05f0 66 02                   		mov.L	#0, r2
+ 897 05f2 66 31                   		mov.L	#3, r1
+ 898 05f4 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 899                             	.LVL85:
+ 270:../src/main.c **** 			Neopixel_SetRGB(5, 0, 0, 0);
+ 900                             		.loc 1 270 4 view .LVU248
+ 901 05f8 66 04                   		mov.L	#0, r4
+ 902 05fa 66 03                   		mov.L	#0, r3
+ 903 05fc 66 02                   		mov.L	#0, r2
+ 904 05fe 66 41                   		mov.L	#4, r1
+ 905 0600 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 906                             	.LVL86:
+ 271:../src/main.c **** 			Neopixel_SetRGB(6, 0, 0, 0);
+ 907                             		.loc 1 271 4 view .LVU249
+ 908 0604 66 04                   		mov.L	#0, r4
+ 909 0606 66 03                   		mov.L	#0, r3
+ 910 0608 66 02                   		mov.L	#0, r2
+ 911 060a 66 51                   		mov.L	#5, r1
+ 912 060c 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 913                             	.LVL87:
+ 272:../src/main.c **** 			Neopixel_SetRGB(7, 0, 0, 0);
+ 914                             		.loc 1 272 4 view .LVU250
+ 915 0610 66 04                   		mov.L	#0, r4
+ 916 0612 66 03                   		mov.L	#0, r3
+ 917 0614 66 02                   		mov.L	#0, r2
+ 918 0616 66 61                   		mov.L	#6, r1
+ 919 0618 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 920                             	.LVL88:
+ 273:../src/main.c **** 			shift_rev_cnt = 0;
+ 921                             		.loc 1 273 4 view .LVU251
+ 922 061c 66 04                   		mov.L	#0, r4
+ 923 061e 66 03                   		mov.L	#0, r3
+ 924 0620 66 02                   		mov.L	#0, r2
+ 925 0622 66 71                   		mov.L	#7, r1
+ 926 0624 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 927                             	.LVL89:
+ 274:../src/main.c **** 		}
+ 928                             		.loc 1 274 4 view .LVU252
+ 274:../src/main.c **** 		}
+ 929                             		.loc 1 274 18 is_stmt 0 view .LVU253
+ 930 0628 66 07                   		mov.L	#0, r7
+ 931 062a 38 5E FC                		bra	.L11
+ 932                             	.LVL90:
+ 933                             	.L40:
+ 284:../src/main.c **** 		}
+ 285:../src/main.c **** 		else if(g_CALC_data.AD5 >= 300)
+ 934                             		.loc 1 285 8 is_stmt 1 view .LVU254
+ 935                             		.loc 1 285 22 is_stmt 0 view .LVU255
+ 936 062d FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 937 0633 A9 DD                   		mov.L	28[r5], r5
+ 938                             		.loc 1 285 10 view .LVU256
+ 939 0635 FD 72 15 00 00 96 43    		fcmp	#0x43960000, r5
+ 940 063c 26 05 38 7A FC          		bn	.L5
+ 286:../src/main.c **** 		{
+ 287:../src/main.c **** 			MTU3.TGRD = 2998;
+ 941                             		.loc 1 287 4 is_stmt 1 view .LVU257
+ 942                             		.loc 1 287 14 is_stmt 0 view .LVU258
+ 943 0641 FB 5E 00 12 0C          		mov.L	#0xc1200, r5
+ 944 0646 F9 59 13 B6 0B          		mov.W	#0xbb6, 38[r5]
+ 288:../src/main.c **** 			g_CALC_data.neobrightness = 0xFF;
+ 945                             		.loc 1 288 4 is_stmt 1 view .LVU259
+ 946                             		.loc 1 288 30 is_stmt 0 view .LVU260
+ 947 064b FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 948 0651 FA 54 D6 01 FF          		mov.B	#-1, 470[r5]
+ 949 0656 38 62 FC                		bra	.L5
+ 950                             	.LFE3:
+ 952 0659 FD 70 40 00 00 00 80    		.section	.text.User_CallBack_transmitend0,"ax",@progbits
+ 953                             		.global	_User_CallBack_transmitend0
+ 955                             	_User_CallBack_transmitend0:
+ 956                             	.LFB4:
+ 289:../src/main.c **** 		}
+ 290:../src/main.c **** 
+ 291:../src/main.c **** //		while(g_int10mscnt < 0);
+ 292:../src/main.c **** 	}
+ 293:../src/main.c **** }
+ 294:../src/main.c **** 
+ 295:../src/main.c **** void User_CallBack_transmitend0(void)
+ 296:../src/main.c **** {
+ 957                             		.loc 1 296 1 is_stmt 1 view -0
+ 297:../src/main.c **** 	I2C0_TX_END_FLG = 1;
+ 958                             		.loc 1 297 2 view .LVU262
+ 959                             		.loc 1 297 18 is_stmt 0 view .LVU263
+ 960 0000 FB 52 00 00 00 00       		mov.L	#_I2C0_TX_END_FLG, r5
+ 961 0006 F8 54 01                		mov.B	#1, [r5]
+ 298:../src/main.c **** }
+ 962                             		.loc 1 298 1 view .LVU264
+ 963 0009 02                      		rts
+ 964                             	.LFE4:
+ 966                             		.section	.text.User_CallBack_receiveend0,"ax",@progbits
+ 967                             		.global	_User_CallBack_receiveend0
+ 969                             	_User_CallBack_receiveend0:
+ 970                             	.LFB5:
+ 299:../src/main.c **** 
+ 300:../src/main.c **** void User_CallBack_receiveend0(void)
+ 301:../src/main.c **** {
+ 971                             		.loc 1 301 1 is_stmt 1 view -0
+ 302:../src/main.c **** 	I2C0_RX_END_FLG = 1;
+ 972                             		.loc 1 302 2 view .LVU266
+ 973                             		.loc 1 302 18 is_stmt 0 view .LVU267
+ 974 0000 FB 52 00 00 00 00       		mov.L	#_I2C0_RX_END_FLG, r5
+ 975 0006 F8 54 01                		mov.B	#1, [r5]
+ 303:../src/main.c **** }
+ 976                             		.loc 1 303 1 view .LVU268
+ 977 0009 02                      		rts
+ 978                             	.LFE5:
+ 980                             		.section	.text.User_CallBack_receiveerror0,"ax",@progbits
+ 981                             		.global	_User_CallBack_receiveerror0
+ 983                             	_User_CallBack_receiveerror0:
+ 984                             	.LVL91:
+ 985                             	.LFB6:
+ 304:../src/main.c **** 
+ 305:../src/main.c **** void User_CallBack_receiveerror0(MD_STATUS status)
+ 306:../src/main.c **** {
+ 986                             		.loc 1 306 1 is_stmt 1 view -0
+ 307:../src/main.c **** 	I2C0_RCV_ERR_FLG = 1;
+ 987                             		.loc 1 307 2 view .LVU270
+ 988                             		.loc 1 307 19 is_stmt 0 view .LVU271
+ 989 0000 FB 52 00 00 00 00       		mov.L	#_I2C0_RCV_ERR_FLG, r5
+ 990 0006 F8 54 01                		mov.B	#1, [r5]
+ 308:../src/main.c **** 	I2C0_md_status = status;
+ 991                             		.loc 1 308 2 is_stmt 1 view .LVU272
+ 992                             		.loc 1 308 17 is_stmt 0 view .LVU273
+ 993 0009 FB 52 00 00 00 00       		mov.L	#_I2C0_md_status, r5
+ 994 000f D3 51                   		mov.W	r1, [r5]
+ 309:../src/main.c **** }
+ 995                             		.loc 1 309 1 view .LVU274
+ 996 0011 02                      		rts
+ 997                             	.LFE6:
+ 999                             		.section	.text.User_CallBack_transmitend1,"ax",@progbits
+ 1000                             		.global	_User_CallBack_transmitend1
+ 1002                             	_User_CallBack_transmitend1:
+ 1003                             	.LFB7:
+ 310:../src/main.c **** 
+ 311:../src/main.c **** void User_CallBack_transmitend1(void)
+ 312:../src/main.c **** {
+ 1004                             		.loc 1 312 1 is_stmt 1 view -0
+ 313:../src/main.c **** 	I2C1_TX_END_FLG = 1;
+ 1005                             		.loc 1 313 2 view .LVU276
+ 1006                             		.loc 1 313 18 is_stmt 0 view .LVU277
+ 1007 0000 FB 52 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r5
+ 1008 0006 F8 54 01                		mov.B	#1, [r5]
+ 314:../src/main.c **** }
+ 1009                             		.loc 1 314 1 view .LVU278
+ 1010 0009 02                      		rts
+ 1011                             	.LFE7:
+ 1013                             		.section	.text.User_CallBack_receiveend1,"ax",@progbits
+ 1014                             		.global	_User_CallBack_receiveend1
+ 1016                             	_User_CallBack_receiveend1:
+ 1017                             	.LFB8:
+ 315:../src/main.c **** 
+ 316:../src/main.c **** void User_CallBack_receiveend1(void)
+ 317:../src/main.c **** {
+ 1018                             		.loc 1 317 1 is_stmt 1 view -0
+ 318:../src/main.c **** 	I2C1_RX_END_FLG = 1;
+ 1019                             		.loc 1 318 2 view .LVU280
+ 1020                             		.loc 1 318 18 is_stmt 0 view .LVU281
+ 1021 0000 FB 52 00 00 00 00       		mov.L	#_I2C1_RX_END_FLG, r5
+ 1022 0006 F8 54 01                		mov.B	#1, [r5]
+ 319:../src/main.c **** }
+ 1023                             		.loc 1 319 1 view .LVU282
+ 1024 0009 02                      		rts
+ 1025                             	.LFE8:
+ 1027                             		.section	.text.User_CallBack_receiveerror1,"ax",@progbits
+ 1028                             		.global	_User_CallBack_receiveerror1
+ 1030                             	_User_CallBack_receiveerror1:
+ 1031                             	.LVL92:
+ 1032                             	.LFB9:
+ 320:../src/main.c **** 
+ 321:../src/main.c **** void User_CallBack_receiveerror1(MD_STATUS status)
+ 322:../src/main.c **** {
+ 1033                             		.loc 1 322 1 is_stmt 1 view -0
+ 323:../src/main.c **** 	I2C1_RCV_ERR_FLG = 1;
+ 1034                             		.loc 1 323 2 view .LVU284
+ 1035                             		.loc 1 323 19 is_stmt 0 view .LVU285
+ 1036 0000 FB 52 00 00 00 00       		mov.L	#_I2C1_RCV_ERR_FLG, r5
+ 1037 0006 F8 54 01                		mov.B	#1, [r5]
+ 324:../src/main.c **** 	I2C1_md_status = status;
+ 1038                             		.loc 1 324 2 is_stmt 1 view .LVU286
+ 1039                             		.loc 1 324 17 is_stmt 0 view .LVU287
+ 1040 0009 FB 52 00 00 00 00       		mov.L	#_I2C1_md_status, r5
+ 1041 000f D3 51                   		mov.W	r1, [r5]
+ 325:../src/main.c **** }
+ 1042                             		.loc 1 325 1 view .LVU288
+ 1043 0011 02                      		rts
+ 1044                             	.LFE9:
+ 1046                             		.comm	_g_CALC_data,472,4
+ 1047                             		.comm	_g_CAN_data,96,4
+ 1048                             		.comm	_I2C1_md_status,2,2
+ 1049                             		.global	_I2C1_RCV_ERR_FLG
+ 1050                             		.section	.bss.I2C1_RCV_ERR_FLG,"aw",@nobits
+ 1053                             	_I2C1_RCV_ERR_FLG:
+ 1054 0000 00                      		.zero	1
+ 1055                             		.global	_I2C1_RX_END_FLG
+ 1056                             		.section	.bss.I2C1_RX_END_FLG,"aw",@nobits
+ 1059                             	_I2C1_RX_END_FLG:
+ 1060 0000 00                      		.zero	1
+ 1061                             		.global	_I2C1_TX_END_FLG
+ 1062                             		.section	.bss.I2C1_TX_END_FLG,"aw",@nobits
+ 1065                             	_I2C1_TX_END_FLG:
+ 1066 0000 00                      		.zero	1
+ 1067                             		.comm	_I2C0_md_status,2,2
+ 1068                             		.global	_I2C0_RCV_ERR_FLG
+ 1069                             		.section	.bss.I2C0_RCV_ERR_FLG,"aw",@nobits
+ 1072                             	_I2C0_RCV_ERR_FLG:
+ 1073 0000 00                      		.zero	1
+ 1074                             		.global	_I2C0_RX_END_FLG
+ 1075                             		.section	.bss.I2C0_RX_END_FLG,"aw",@nobits
+ 1078                             	_I2C0_RX_END_FLG:
+ 1079 0000 00                      		.zero	1
+ 1080                             		.global	_I2C0_TX_END_FLG
+ 1081                             		.section	.bss.I2C0_TX_END_FLG,"aw",@nobits
+ 1084                             	_I2C0_TX_END_FLG:
+ 1085 0000 00                      		.zero	1
+ 1086                             		.comm	_sp_TGRA,4,4
+ 1087                             		.comm	_wr_cnt,4,4
+ 1088                             		.comm	_tr_int,4,4
+ 1089                             		.comm	_sp_int_old,4,4
+ 1090                             		.comm	_sp_int,4,4
+ 1091                             		.global	_I2C_BUF2
+ 1092                             		.section	.bss.I2C_BUF2,"aw",@nobits
+ 1095                             	_I2C_BUF2:
+ 1096 0000 00 00 00 00 00 00 00 00 		.zero	12
+ 1096      00 00 00 00 
+ 1097                             		.global	_I2C_BUF
+ 1098                             		.section	.bss.I2C_BUF,"aw",@nobits
+ 1101                             	_I2C_BUF:
+ 1102 0000 00 00                   		.zero	2
+ 1103                             		.global	_I2C_WriteData
+ 1104                             		.section	.bss.I2C_WriteData,"aw",@nobits
+ 1107                             	_I2C_WriteData:
+ 1108 0000 00 00 00 00 00 00 00 00 		.zero	14
+ 1108      00 00 00 00 00 00 
+ 1109                             		.comm	_g_sw_int_flg,4,4
+ 1110                             		.comm	_g_sw_cnt,4,4
+ 1111                             		.comm	_g_sp_int_flg,4,4
+ 1112                             		.comm	_g_fps_max,4,4
+ 1113                             		.comm	_g_fps_cnt,4,4
+ 1114                             		.comm	_g_int10mscnt,4,4
+ 1195                             	.Letext0:
+ 1196                             		.file 2 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 1197                             		.file 3 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 1198                             		.file 4 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\lib\\gcc\\rx-
+ 1199                             		.file 5 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 1200                             		.file 6 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 1201                             		.file 7 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 1202                             		.file 8 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/all/r_rx_compi
+ 1203                             		.file 9 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/rx72n/register
+ 1204                             		.file 10 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/rx72n/mcu_loc
+ 1205                             		.file 11 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\general/r_cg_macrodrive
+ 1206                             		.file 12 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\Config_MTU0/Config_MTU0
+ 1207                             		.file 13 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\Config_MTU8/Config_MTU8
+ 1208                             		.file 14 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/LC
+ 1209                             		.file 15 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/GU
+ 1210                             		.file 16 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/GU
+ 1211                             		.file 17 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/WM
+ 1212                             		.file 18 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/WI
+ 1213                             		.file 19 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/KE
+ 1214                             		.file 20 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/LC
+ 1215                             		.file 21 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/GU
+ 1216                             		.file 22 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/WM
+ 1217                             		.file 23 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/BU
+ 1218                             		.file 24 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/WI
+ 1219                             		.file 25 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/IM
+ 1220                             		.file 26 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/TE
+ 1221                             		.file 27 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/SL
+ 1222                             		.file 28 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/RO
+ 1223                             		.file 29 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/SW
+ 1224                             		.file 30 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/ED
+ 1225                             		.file 31 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/QR
+ 1226                             		.file 32 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/GA
+ 1227                             		.file 33 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/KE
+ 1228                             		.file 34 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/MU
+ 1229                             		.file 35 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/SC
+ 1230                             		.file 36 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/DR
+ 1231                             		.file 37 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/LI
+ 1232                             		.file 38 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/LI
+ 1233                             		.file 39 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/WH
+ 1234                             		.file 40 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/Ap
+ 1235                             		.file 41 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\aw\\Source/Generated/Resource.h"
+ 1236                             		.file 42 "../src/dataregister.h"
+ 1237                             		.file 43 "../src/neopixel.h"
+ 1238                             		.file 44 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_can_rx/r_can_rx_if.h"
+ 1239                             		.file 45 "../src/aprx72n0a.h"
+ 1240                             		.file 46 "../src/can.h"
+ 1241                             		.file 47 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\Config_RTC/Config_RTC.h
+ 1242                             		.file 48 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\Config_S12AD0/Config_S1
+ 1243                             		.file 49 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\Config_MTU1/Config_MTU1
+ 1244                             		.file 50 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\Config_MTU3/Config_MTU3
+ 1245                             		.file 51 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\Config_RIIC0/Config_RII
+ 1246                             		.file 52 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\Config_RIIC1/Config_RII
+ 1247                             		.file 53 "<built-in>"

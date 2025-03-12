@@ -1,0 +1,872 @@
+   1                             		.file	"neopixel.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.Neopixel_SetRGB,"ax",@progbits
+   5                             		.global	_Neopixel_SetRGB
+   7                             	_Neopixel_SetRGB:
+   8                             	.LVL0:
+   9                             	.LFB3:
+  10                             		.file 1 "../src/neopixel.c"
+   1:../src/neopixel.c **** /*
+   2:../src/neopixel.c ****  * neopixel.c
+   3:../src/neopixel.c ****  *
+   4:../src/neopixel.c ****  *  Created on: 2024/05/16
+   5:../src/neopixel.c ****  *      Author: tomoyasato
+   6:../src/neopixel.c ****  */
+   7:../src/neopixel.c **** 
+   8:../src/neopixel.c **** #include "neopixel.h"
+   9:../src/neopixel.c **** #include "dataregister.h"
+  10:../src/neopixel.c **** #include "platform.h"           // Located in the FIT BSP module
+  11:../src/neopixel.c **** 
+  12:../src/neopixel.c **** void Neopixel_SetRGB(unsigned int LED_No, int g, int r, int b)
+  13:../src/neopixel.c **** {
+  11                             		.loc 1 13 1 view -0
+  14:../src/neopixel.c **** 	unsigned int i;
+  12                             		.loc 1 14 2 view .LVU1
+  15:../src/neopixel.c **** 
+  16:../src/neopixel.c **** 	if(g < 0) g = 0;
+  13                             		.loc 1 16 2 view .LVU2
+  14                             		.loc 1 16 4 is_stmt 0 view .LVU3
+  15 0000 61 02                   		cmp	#0, r2
+  16 0002 29 41                   		blt	.L14
+  17                             	.LVL1:
+  18                             	.L2:
+  17:../src/neopixel.c **** 	if(r < 0) r = 0;
+  19                             		.loc 1 17 2 is_stmt 1 view .LVU4
+  20                             		.loc 1 17 4 is_stmt 0 view .LVU5
+  21 0004 61 03                   		cmp	#0, r3
+  22 0006 29 41                   		blt	.L15
+  23                             	.LVL2:
+  24                             	.L3:
+  18:../src/neopixel.c **** 	if(b < 0) b = 0;
+  25                             		.loc 1 18 2 is_stmt 1 view .LVU6
+  26                             		.loc 1 18 4 is_stmt 0 view .LVU7
+  27 0008 61 04                   		cmp	#0, r4
+  28 000a 29 41                   		blt	.L16
+  29                             	.LVL3:
+  30                             	.L4:
+  19:../src/neopixel.c **** 	if(g > 255) g = 255;
+  31                             		.loc 1 19 2 is_stmt 1 view .LVU8
+  32                             		.loc 1 19 4 is_stmt 0 view .LVU9
+  33 000c 75 52 FF                		cmp	#0xff, r2
+  34 000f 2B 05                   		ble	.L5
+  35                             		.loc 1 19 16 view .LVU10
+  36 0011 75 42 FF                		mov.L	#0xff, r2
+  37                             	.LVL4:
+  38                             	.L5:
+  20:../src/neopixel.c **** 	if(r > 255) r = 255;
+  39                             		.loc 1 20 2 is_stmt 1 view .LVU11
+  40                             		.loc 1 20 4 is_stmt 0 view .LVU12
+  41 0014 75 53 FF                		cmp	#0xff, r3
+  42 0017 2B 05                   		ble	.L6
+  43                             		.loc 1 20 16 view .LVU13
+  44 0019 75 43 FF                		mov.L	#0xff, r3
+  45                             	.LVL5:
+  46                             	.L6:
+  21:../src/neopixel.c **** 	if(b > 255) b = 255;
+  47                             		.loc 1 21 2 is_stmt 1 view .LVU14
+  48                             		.loc 1 21 4 is_stmt 0 view .LVU15
+  49 001c 75 54 FF                		cmp	#0xff, r4
+  50 001f 2B 05                   		ble	.L7
+  51                             		.loc 1 21 16 view .LVU16
+  52 0021 75 44 FF                		mov.L	#0xff, r4
+  53                             	.LVL6:
+  54                             	.L7:
+  22:../src/neopixel.c **** 	g_CALC_data.neopixel[LED_No * 24    ] = g;
+  55                             		.loc 1 22 2 is_stmt 1 view .LVU17
+  56                             		.loc 1 22 30 is_stmt 0 view .LVU18
+  57 0024 75 11 18                		mul	#24, r1
+  58                             	.LVL7:
+  59                             		.loc 1 22 40 view .LVU19
+  60 0027 70 15 00 00 00 00       		add	#_g_CALC_data, r1, r5
+  61 002d C7 52 D6                		mov.B	r2, 214[r5]
+  23:../src/neopixel.c **** 	g_CALC_data.neopixel[LED_No * 24 + 1] = r;
+  62                             		.loc 1 23 2 is_stmt 1 view .LVU20
+  63                             		.loc 1 23 40 is_stmt 0 view .LVU21
+  64 0030 70 15 00 00 00 00       		add	#_g_CALC_data+1, r1, r5
+  65 0036 C7 53 D6                		mov.B	r3, 214[r5]
+  24:../src/neopixel.c **** 	g_CALC_data.neopixel[LED_No * 24 + 2] = b;
+  66                             		.loc 1 24 2 is_stmt 1 view .LVU22
+  67                             		.loc 1 24 40 is_stmt 0 view .LVU23
+  68 0039 70 11 00 00 00 00       		add	#_g_CALC_data+2, r1
+  69 003f C7 14 D6                		mov.B	r4, 214[r1]
+  25:../src/neopixel.c **** 
+  26:../src/neopixel.c **** }
+  70                             		.loc 1 26 1 view .LVU24
+  71 0042 02                      		rts
+  72                             	.LVL8:
+  73                             	.L14:
+  16:../src/neopixel.c **** 	if(r < 0) r = 0;
+  74                             		.loc 1 16 14 view .LVU25
+  75 0043 66 02                   		mov.L	#0, r2
+  76                             	.LVL9:
+  16:../src/neopixel.c **** 	if(r < 0) r = 0;
+  77                             		.loc 1 16 14 view .LVU26
+  78 0045 2E BF                   		bra	.L2
+  79                             	.LVL10:
+  80                             	.L15:
+  17:../src/neopixel.c **** 	if(b < 0) b = 0;
+  81                             		.loc 1 17 14 view .LVU27
+  82 0047 66 03                   		mov.L	#0, r3
+  83                             	.LVL11:
+  17:../src/neopixel.c **** 	if(b < 0) b = 0;
+  84                             		.loc 1 17 14 view .LVU28
+  85 0049 2E BF                   		bra	.L3
+  86                             	.LVL12:
+  87                             	.L16:
+  18:../src/neopixel.c **** 	if(g > 255) g = 255;
+  88                             		.loc 1 18 14 view .LVU29
+  89 004b 66 04                   		mov.L	#0, r4
+  90                             	.LVL13:
+  18:../src/neopixel.c **** 	if(g > 255) g = 255;
+  91                             		.loc 1 18 14 view .LVU30
+  92 004d 2E BF                   		bra	.L4
+  93                             	.LFE3:
+  95                             		.section	.text.Neopixel_TX,"ax",@progbits
+  96                             		.global	_Neopixel_TX
+  98                             	_Neopixel_TX:
+  99                             	.LFB5:
+  27:../src/neopixel.c **** 
+  28:../src/neopixel.c **** void Neopixel_InitRGB(void)
+  29:../src/neopixel.c **** {
+  30:../src/neopixel.c **** 	uint8_t NPcom0[]  = {0x00};
+  31:../src/neopixel.c **** 	uint8_t NPcom1[]  = {0x01, 0xFF};
+  32:../src/neopixel.c **** //	uint8_t NPcom2[]  = {0x02, 0x00, 0xFF, 0x00, 0x00};
+  33:../src/neopixel.c **** //	uint8_t NPcom3[]  = {0x02, 0x01, 0x00, 0xFF, 0x00};
+  34:../src/neopixel.c **** //	uint8_t NPcom4[]  = {0x02, 0x02, 0xFF, 0xFF, 0x00};
+  35:../src/neopixel.c **** //	uint8_t NPcom5[]  = {0x02, 0x03, 0x00, 0x00, 0xFF};
+  36:../src/neopixel.c **** //	uint8_t NPcom6[]  = {0x02, 0x04, 0xFF, 0x00, 0xFF};
+  37:../src/neopixel.c **** //	uint8_t NPcom7[]  = {0x02, 0x05, 0x00, 0xFF, 0xFF};
+  38:../src/neopixel.c **** //	uint8_t NPcom8[]  = {0x02, 0x06, 0xFF, 0xFF, 0xFF};
+  39:../src/neopixel.c **** //	uint8_t NPcom9[]  = {0x02, 0x07, 0xFF, 0x00, 0x00};
+  40:../src/neopixel.c **** 	unsigned int i, j;
+  41:../src/neopixel.c **** 	g_CALC_data.neobrightness = 0xFF;
+  42:../src/neopixel.c **** 
+  43:../src/neopixel.c **** 	for( i = 0; i < 8; i ++ )
+  44:../src/neopixel.c **** 	{
+  45:../src/neopixel.c **** 		Neopixel_SetRGB(i, 0, 0, 0);
+  46:../src/neopixel.c **** 	}
+  47:../src/neopixel.c **** 	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom0,  1);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END_F
+  48:../src/neopixel.c **** 	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom1,  2);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END_F
+  49:../src/neopixel.c **** //	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom2,  5);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END
+  50:../src/neopixel.c **** //	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom3,  5);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END
+  51:../src/neopixel.c **** //	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom4,  5);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END
+  52:../src/neopixel.c **** //	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom5,  5);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END
+  53:../src/neopixel.c **** //	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom6,  5);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END
+  54:../src/neopixel.c **** //	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom7,  5);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END
+  55:../src/neopixel.c **** //	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom8,  5);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END
+  56:../src/neopixel.c **** //	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom9,  5);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END
+  57:../src/neopixel.c **** 	Neopixel_TX();
+  58:../src/neopixel.c **** 
+  59:../src/neopixel.c **** 	for( j = 0; j < 50; j = j + 10 )
+  60:../src/neopixel.c **** 	{
+  61:../src/neopixel.c **** 		for( i = 0; i < 8; i ++ )
+  62:../src/neopixel.c **** 		{
+  63:../src/neopixel.c **** 			Neopixel_SetRGB(i, j - 5 - i * 10, j - 5 - i * 10, j - i * 10);
+  64:../src/neopixel.c **** 			Neopixel_TX();
+  65:../src/neopixel.c **** 		}
+  66:../src/neopixel.c **** 	}
+  67:../src/neopixel.c **** 	for( j = 50; j > 0; j = j - 2 )
+  68:../src/neopixel.c **** 	{
+  69:../src/neopixel.c **** 		for( i = 0; i < 8; i ++ )
+  70:../src/neopixel.c **** 		{
+  71:../src/neopixel.c **** 			Neopixel_SetRGB(i, j - 5, j - 5, j);
+  72:../src/neopixel.c **** 			Neopixel_TX();
+  73:../src/neopixel.c **** 		}
+  74:../src/neopixel.c **** 	}
+  75:../src/neopixel.c **** }
+  76:../src/neopixel.c **** 
+  77:../src/neopixel.c **** void Neopixel_TX(void)
+  78:../src/neopixel.c **** {
+ 100                             		.loc 1 78 1 is_stmt 1 view -0
+ 101 0000 71 00 D4                		add	#-44, r0
+ 102                             	.LCFI0:
+  79:../src/neopixel.c **** 	uint8_t NPcom[8][5];
+ 103                             		.loc 1 79 2 view .LVU32
+  80:../src/neopixel.c **** 	uint8_t NPcom1[1];
+ 104                             		.loc 1 80 2 view .LVU33
+  81:../src/neopixel.c **** //	unsigned int i;
+  82:../src/neopixel.c **** //
+  83:../src/neopixel.c **** //	// 8灯分のコマンドを送信
+  84:../src/neopixel.c **** //	for( i = 0; i < 8; i ++ )
+  85:../src/neopixel.c **** //	{
+  86:../src/neopixel.c **** //		NPcom[i][0] = 0x02;
+  87:../src/neopixel.c **** //		NPcom[i][1] = i;
+  88:../src/neopixel.c **** //		NPcom[i][2] = g_CALC_data.neopixel[i * 24    ];
+  89:../src/neopixel.c **** //		NPcom[i][3] = g_CALC_data.neopixel[i * 24 + 1];
+  90:../src/neopixel.c **** //		NPcom[i][4] = g_CALC_data.neopixel[i * 24 + 2];
+  91:../src/neopixel.c **** //		R_Config_RIIC1_Master_Send(0x06, NPcom[i],  5);
+  92:../src/neopixel.c **** //		while(I2C1_TX_END_FLG == 0);
+  93:../src/neopixel.c **** //		I2C1_TX_END_FLG = 0;
+  94:../src/neopixel.c **** //	}
+  95:../src/neopixel.c **** 	NPcom1[0] = 0x01;
+ 105                             		.loc 1 95 2 view .LVU34
+ 106                             		.loc 1 95 12 is_stmt 0 view .LVU35
+ 107 0003 F9 04 28 01             		mov.B	#1, 40[r0]
+  96:../src/neopixel.c **** 	NPcom1[1] = g_CALC_data.neobrightness;
+ 108                             		.loc 1 96 2 is_stmt 1 view .LVU36
+ 109                             		.loc 1 96 25 is_stmt 0 view .LVU37
+ 110 0007 FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 111 000d CE 55 D6 01             		mov.B	470[r5], r5
+ 112                             		.loc 1 96 12 view .LVU38
+ 113 0011 C7 05 29                		mov.B	r5, 41[r0]
+  97:../src/neopixel.c **** 	R_Config_RIIC1_Master_Send(0x06, NPcom1,  2);
+ 114                             		.loc 1 97 2 is_stmt 1 view .LVU39
+ 115 0014 66 23                   		mov.L	#2, r3
+ 116 0016 71 02 28                		add	#40, r0, r2
+ 117 0019 66 61                   		mov.L	#6, r1
+ 118 001b 05 00 00 00             		bsr	_R_Config_RIIC1_Master_Send
+ 119                             	.LVL14:
+  98:../src/neopixel.c **** 	while(I2C1_TX_END_FLG == 0);
+ 120                             		.loc 1 98 2 view .LVU40
+ 121                             	.L18:
+ 122                             		.loc 1 98 29 discriminator 1 view .LVU41
+ 123                             		.loc 1 98 24 is_stmt 0 discriminator 1 view .LVU42
+ 124 001f FB 52 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r5
+ 125 0025 CC 55                   		mov.B	[r5], r5
+ 126                             		.loc 1 98 7 discriminator 1 view .LVU43
+ 127 0027 5B 55                   		movu.B	r5, r5
+ 128 0029 61 05                   		cmp	#0, r5
+ 129 002b 20 F4                   		beq	.L18
+  99:../src/neopixel.c **** 	I2C1_TX_END_FLG = 0;
+ 130                             		.loc 1 99 2 is_stmt 1 view .LVU44
+ 131                             		.loc 1 99 18 is_stmt 0 view .LVU45
+ 132 002d FB 52 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r5
+ 133 0033 F8 54 00                		mov.B	#0, [r5]
+ 100:../src/neopixel.c **** 	NPcom[0][0] = 0x02;
+ 134                             		.loc 1 100 2 is_stmt 1 view .LVU46
+ 135                             		.loc 1 100 14 is_stmt 0 view .LVU47
+ 136 0036 F8 04 02                		mov.B	#2, [r0]
+ 101:../src/neopixel.c **** 	NPcom[0][1] = 0;
+ 137                             		.loc 1 101 2 is_stmt 1 view .LVU48
+ 138                             		.loc 1 101 14 is_stmt 0 view .LVU49
+ 139 0039 3C 01 00                		mov.B	#0, 1[r0]
+ 102:../src/neopixel.c **** 	NPcom[0][2] = g_CALC_data.neopixel[0 * 24    ];
+ 140                             		.loc 1 102 2 is_stmt 1 view .LVU50
+ 141                             		.loc 1 102 36 is_stmt 0 view .LVU51
+ 142 003c FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 143 0042 CD 54 D6                		mov.B	214[r5], r4
+ 144                             		.loc 1 102 14 view .LVU52
+ 145 0045 80 84                   		mov.B	r4, 2[r0]
+ 103:../src/neopixel.c **** 	NPcom[0][3] = g_CALC_data.neopixel[0 * 24 + 1];
+ 146                             		.loc 1 103 2 is_stmt 1 view .LVU53
+ 147                             		.loc 1 103 36 is_stmt 0 view .LVU54
+ 148 0047 CD 54 D7                		mov.B	215[r5], r4
+ 149                             		.loc 1 103 14 view .LVU55
+ 150 004a 80 8C                   		mov.B	r4, 3[r0]
+ 104:../src/neopixel.c **** 	NPcom[0][4] = g_CALC_data.neopixel[0 * 24 + 2];
+ 151                             		.loc 1 104 2 is_stmt 1 view .LVU56
+ 152                             		.loc 1 104 36 is_stmt 0 view .LVU57
+ 153 004c CD 55 D8                		mov.B	216[r5], r5
+ 154                             		.loc 1 104 14 view .LVU58
+ 155 004f 81 05                   		mov.B	r5, 4[r0]
+ 105:../src/neopixel.c **** 	R_Config_RIIC1_Master_Send(0x06, NPcom[0],  5);
+ 156                             		.loc 1 105 2 is_stmt 1 view .LVU59
+ 157 0051 66 53                   		mov.L	#5, r3
+ 158 0053 EF 02                   		mov.L	r0, r2
+ 159 0055 66 61                   		mov.L	#6, r1
+ 160 0057 05 00 00 00             		bsr	_R_Config_RIIC1_Master_Send
+ 161                             	.LVL15:
+ 106:../src/neopixel.c **** 	while(I2C1_TX_END_FLG == 0);
+ 162                             		.loc 1 106 2 view .LVU60
+ 163                             	.L19:
+ 164                             		.loc 1 106 29 discriminator 1 view .LVU61
+ 165                             		.loc 1 106 24 is_stmt 0 discriminator 1 view .LVU62
+ 166 005b FB 52 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r5
+ 167 0061 CC 55                   		mov.B	[r5], r5
+ 168                             		.loc 1 106 7 discriminator 1 view .LVU63
+ 169 0063 5B 55                   		movu.B	r5, r5
+ 170 0065 61 05                   		cmp	#0, r5
+ 171 0067 20 F4                   		beq	.L19
+ 107:../src/neopixel.c **** 	I2C1_TX_END_FLG = 0;
+ 172                             		.loc 1 107 2 is_stmt 1 view .LVU64
+ 173                             		.loc 1 107 18 is_stmt 0 view .LVU65
+ 174 0069 FB 52 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r5
+ 175 006f F8 54 00                		mov.B	#0, [r5]
+ 108:../src/neopixel.c **** 	NPcom[1][0] = 0x02;
+ 176                             		.loc 1 108 2 is_stmt 1 view .LVU66
+ 177                             		.loc 1 108 14 is_stmt 0 view .LVU67
+ 178 0072 3C 05 02                		mov.B	#2, 5[r0]
+ 109:../src/neopixel.c **** 	NPcom[1][1] = 1;
+ 179                             		.loc 1 109 2 is_stmt 1 view .LVU68
+ 180                             		.loc 1 109 14 is_stmt 0 view .LVU69
+ 181 0075 3C 06 01                		mov.B	#1, 6[r0]
+ 110:../src/neopixel.c **** 	NPcom[1][2] = g_CALC_data.neopixel[1 * 24    ];
+ 182                             		.loc 1 110 2 is_stmt 1 view .LVU70
+ 183                             		.loc 1 110 36 is_stmt 0 view .LVU71
+ 184 0078 FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 185 007e CD 54 EE                		mov.B	238[r5], r4
+ 186                             		.loc 1 110 14 view .LVU72
+ 187 0081 81 8C                   		mov.B	r4, 7[r0]
+ 111:../src/neopixel.c **** 	NPcom[1][3] = g_CALC_data.neopixel[1 * 24 + 1];
+ 188                             		.loc 1 111 2 is_stmt 1 view .LVU73
+ 189                             		.loc 1 111 36 is_stmt 0 view .LVU74
+ 190 0083 CD 54 EF                		mov.B	239[r5], r4
+ 191                             		.loc 1 111 14 view .LVU75
+ 192 0086 82 04                   		mov.B	r4, 8[r0]
+ 112:../src/neopixel.c **** 	NPcom[1][4] = g_CALC_data.neopixel[1 * 24 + 2];
+ 193                             		.loc 1 112 2 is_stmt 1 view .LVU76
+ 194                             		.loc 1 112 36 is_stmt 0 view .LVU77
+ 195 0088 CD 55 F0                		mov.B	240[r5], r5
+ 196                             		.loc 1 112 14 view .LVU78
+ 197 008b 82 0D                   		mov.B	r5, 9[r0]
+ 113:../src/neopixel.c **** 	R_Config_RIIC1_Master_Send(0x06, NPcom[1],  5);
+ 198                             		.loc 1 113 2 is_stmt 1 view .LVU79
+ 199 008d 66 53                   		mov.L	#5, r3
+ 200 008f FF 22 30                		add	r3, r0, r2
+ 201 0092 66 61                   		mov.L	#6, r1
+ 202 0094 05 00 00 00             		bsr	_R_Config_RIIC1_Master_Send
+ 203                             	.LVL16:
+ 114:../src/neopixel.c **** 	while(I2C1_TX_END_FLG == 0);
+ 204                             		.loc 1 114 2 view .LVU80
+ 205                             	.L20:
+ 206                             		.loc 1 114 29 discriminator 1 view .LVU81
+ 207                             		.loc 1 114 24 is_stmt 0 discriminator 1 view .LVU82
+ 208 0098 FB 52 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r5
+ 209 009e CC 55                   		mov.B	[r5], r5
+ 210                             		.loc 1 114 7 discriminator 1 view .LVU83
+ 211 00a0 5B 55                   		movu.B	r5, r5
+ 212 00a2 61 05                   		cmp	#0, r5
+ 213 00a4 20 F4                   		beq	.L20
+ 115:../src/neopixel.c **** 	I2C1_TX_END_FLG = 0;
+ 214                             		.loc 1 115 2 is_stmt 1 view .LVU84
+ 215                             		.loc 1 115 18 is_stmt 0 view .LVU85
+ 216 00a6 FB 52 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r5
+ 217 00ac F8 54 00                		mov.B	#0, [r5]
+ 116:../src/neopixel.c **** 	NPcom[2][0] = 0x02;
+ 218                             		.loc 1 116 2 is_stmt 1 view .LVU86
+ 219                             		.loc 1 116 14 is_stmt 0 view .LVU87
+ 220 00af 3C 0A 02                		mov.B	#2, 10[r0]
+ 117:../src/neopixel.c **** 	NPcom[2][1] = 2;
+ 221                             		.loc 1 117 2 is_stmt 1 view .LVU88
+ 222                             		.loc 1 117 14 is_stmt 0 view .LVU89
+ 223 00b2 3C 0B 02                		mov.B	#2, 11[r0]
+ 118:../src/neopixel.c **** 	NPcom[2][2] = g_CALC_data.neopixel[2 * 24    ];
+ 224                             		.loc 1 118 2 is_stmt 1 view .LVU90
+ 225                             		.loc 1 118 36 is_stmt 0 view .LVU91
+ 226 00b5 FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 227 00bb CE 54 06 01             		mov.B	262[r5], r4
+ 228                             		.loc 1 118 14 view .LVU92
+ 229 00bf 83 04                   		mov.B	r4, 12[r0]
+ 119:../src/neopixel.c **** 	NPcom[2][3] = g_CALC_data.neopixel[2 * 24 + 1];
+ 230                             		.loc 1 119 2 is_stmt 1 view .LVU93
+ 231                             		.loc 1 119 36 is_stmt 0 view .LVU94
+ 232 00c1 CE 54 07 01             		mov.B	263[r5], r4
+ 233                             		.loc 1 119 14 view .LVU95
+ 234 00c5 83 0C                   		mov.B	r4, 13[r0]
+ 120:../src/neopixel.c **** 	NPcom[2][4] = g_CALC_data.neopixel[2 * 24 + 2];
+ 235                             		.loc 1 120 2 is_stmt 1 view .LVU96
+ 236                             		.loc 1 120 36 is_stmt 0 view .LVU97
+ 237 00c7 CE 55 08 01             		mov.B	264[r5], r5
+ 238                             		.loc 1 120 14 view .LVU98
+ 239 00cb 83 85                   		mov.B	r5, 14[r0]
+ 121:../src/neopixel.c **** 	R_Config_RIIC1_Master_Send(0x06, NPcom[2],  5);
+ 240                             		.loc 1 121 2 is_stmt 1 view .LVU99
+ 241 00cd 66 53                   		mov.L	#5, r3
+ 242 00cf 71 02 0A                		add	#10, r0, r2
+ 243 00d2 66 61                   		mov.L	#6, r1
+ 244 00d4 05 00 00 00             		bsr	_R_Config_RIIC1_Master_Send
+ 245                             	.LVL17:
+ 122:../src/neopixel.c **** 	while(I2C1_TX_END_FLG == 0);
+ 246                             		.loc 1 122 2 view .LVU100
+ 247                             	.L21:
+ 248                             		.loc 1 122 29 discriminator 1 view .LVU101
+ 249                             		.loc 1 122 24 is_stmt 0 discriminator 1 view .LVU102
+ 250 00d8 FB 52 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r5
+ 251 00de CC 55                   		mov.B	[r5], r5
+ 252                             		.loc 1 122 7 discriminator 1 view .LVU103
+ 253 00e0 5B 55                   		movu.B	r5, r5
+ 254 00e2 61 05                   		cmp	#0, r5
+ 255 00e4 20 F4                   		beq	.L21
+ 123:../src/neopixel.c **** 	I2C1_TX_END_FLG = 0;
+ 256                             		.loc 1 123 2 is_stmt 1 view .LVU104
+ 257                             		.loc 1 123 18 is_stmt 0 view .LVU105
+ 258 00e6 FB 52 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r5
+ 259 00ec F8 54 00                		mov.B	#0, [r5]
+ 124:../src/neopixel.c **** 	NPcom[3][0] = 0x02;
+ 260                             		.loc 1 124 2 is_stmt 1 view .LVU106
+ 261                             		.loc 1 124 14 is_stmt 0 view .LVU107
+ 262 00ef 3C 0F 02                		mov.B	#2, 15[r0]
+ 125:../src/neopixel.c **** 	NPcom[3][1] = 3;
+ 263                             		.loc 1 125 2 is_stmt 1 view .LVU108
+ 264                             		.loc 1 125 14 is_stmt 0 view .LVU109
+ 265 00f2 3C 80 03                		mov.B	#3, 16[r0]
+ 126:../src/neopixel.c **** 	NPcom[3][2] = g_CALC_data.neopixel[3 * 24    ];
+ 266                             		.loc 1 126 2 is_stmt 1 view .LVU110
+ 267                             		.loc 1 126 36 is_stmt 0 view .LVU111
+ 268 00f5 FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 269 00fb CE 54 1E 01             		mov.B	286[r5], r4
+ 270                             		.loc 1 126 14 view .LVU112
+ 271 00ff 84 0C                   		mov.B	r4, 17[r0]
+ 127:../src/neopixel.c **** 	NPcom[3][3] = g_CALC_data.neopixel[3 * 24 + 1];
+ 272                             		.loc 1 127 2 is_stmt 1 view .LVU113
+ 273                             		.loc 1 127 36 is_stmt 0 view .LVU114
+ 274 0101 CE 54 1F 01             		mov.B	287[r5], r4
+ 275                             		.loc 1 127 14 view .LVU115
+ 276 0105 84 84                   		mov.B	r4, 18[r0]
+ 128:../src/neopixel.c **** 	NPcom[3][4] = g_CALC_data.neopixel[3 * 24 + 2];
+ 277                             		.loc 1 128 2 is_stmt 1 view .LVU116
+ 278                             		.loc 1 128 36 is_stmt 0 view .LVU117
+ 279 0107 CE 55 20 01             		mov.B	288[r5], r5
+ 280                             		.loc 1 128 14 view .LVU118
+ 281 010b 84 8D                   		mov.B	r5, 19[r0]
+ 129:../src/neopixel.c **** 	R_Config_RIIC1_Master_Send(0x06, NPcom[3],  5);
+ 282                             		.loc 1 129 2 is_stmt 1 view .LVU119
+ 283 010d 66 53                   		mov.L	#5, r3
+ 284 010f 71 02 0F                		add	#15, r0, r2
+ 285 0112 66 61                   		mov.L	#6, r1
+ 286 0114 05 00 00 00             		bsr	_R_Config_RIIC1_Master_Send
+ 287                             	.LVL18:
+ 130:../src/neopixel.c **** 	while(I2C1_TX_END_FLG == 0);
+ 288                             		.loc 1 130 2 view .LVU120
+ 289                             	.L22:
+ 290                             		.loc 1 130 29 discriminator 1 view .LVU121
+ 291                             		.loc 1 130 24 is_stmt 0 discriminator 1 view .LVU122
+ 292 0118 FB 52 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r5
+ 293 011e CC 55                   		mov.B	[r5], r5
+ 294                             		.loc 1 130 7 discriminator 1 view .LVU123
+ 295 0120 5B 55                   		movu.B	r5, r5
+ 296 0122 61 05                   		cmp	#0, r5
+ 297 0124 20 F4                   		beq	.L22
+ 131:../src/neopixel.c **** 	I2C1_TX_END_FLG = 0;
+ 298                             		.loc 1 131 2 is_stmt 1 view .LVU124
+ 299                             		.loc 1 131 18 is_stmt 0 view .LVU125
+ 300 0126 FB 52 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r5
+ 301 012c F8 54 00                		mov.B	#0, [r5]
+ 132:../src/neopixel.c **** 	NPcom[4][0] = 0x02;
+ 302                             		.loc 1 132 2 is_stmt 1 view .LVU126
+ 303                             		.loc 1 132 14 is_stmt 0 view .LVU127
+ 304 012f 3C 84 02                		mov.B	#2, 20[r0]
+ 133:../src/neopixel.c **** 	NPcom[4][1] = 4;
+ 305                             		.loc 1 133 2 is_stmt 1 view .LVU128
+ 306                             		.loc 1 133 14 is_stmt 0 view .LVU129
+ 307 0132 3C 85 04                		mov.B	#4, 21[r0]
+ 134:../src/neopixel.c **** 	NPcom[4][2] = g_CALC_data.neopixel[4 * 24    ];
+ 308                             		.loc 1 134 2 is_stmt 1 view .LVU130
+ 309                             		.loc 1 134 36 is_stmt 0 view .LVU131
+ 310 0135 FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 311 013b CE 54 36 01             		mov.B	310[r5], r4
+ 312                             		.loc 1 134 14 view .LVU132
+ 313 013f 85 84                   		mov.B	r4, 22[r0]
+ 135:../src/neopixel.c **** 	NPcom[4][3] = g_CALC_data.neopixel[4 * 24 + 1];
+ 314                             		.loc 1 135 2 is_stmt 1 view .LVU133
+ 315                             		.loc 1 135 36 is_stmt 0 view .LVU134
+ 316 0141 CE 54 37 01             		mov.B	311[r5], r4
+ 317                             		.loc 1 135 14 view .LVU135
+ 318 0145 85 8C                   		mov.B	r4, 23[r0]
+ 136:../src/neopixel.c **** 	NPcom[4][4] = g_CALC_data.neopixel[4 * 24 + 2];
+ 319                             		.loc 1 136 2 is_stmt 1 view .LVU136
+ 320                             		.loc 1 136 36 is_stmt 0 view .LVU137
+ 321 0147 CE 55 38 01             		mov.B	312[r5], r5
+ 322                             		.loc 1 136 14 view .LVU138
+ 323 014b 86 05                   		mov.B	r5, 24[r0]
+ 137:../src/neopixel.c **** 	R_Config_RIIC1_Master_Send(0x06, NPcom[4],  5);
+ 324                             		.loc 1 137 2 is_stmt 1 view .LVU139
+ 325 014d 66 53                   		mov.L	#5, r3
+ 326 014f 71 02 14                		add	#20, r0, r2
+ 327 0152 66 61                   		mov.L	#6, r1
+ 328 0154 05 00 00 00             		bsr	_R_Config_RIIC1_Master_Send
+ 329                             	.LVL19:
+ 138:../src/neopixel.c **** 	while(I2C1_TX_END_FLG == 0);
+ 330                             		.loc 1 138 2 view .LVU140
+ 331                             	.L23:
+ 332                             		.loc 1 138 29 discriminator 1 view .LVU141
+ 333                             		.loc 1 138 24 is_stmt 0 discriminator 1 view .LVU142
+ 334 0158 FB 52 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r5
+ 335 015e CC 55                   		mov.B	[r5], r5
+ 336                             		.loc 1 138 7 discriminator 1 view .LVU143
+ 337 0160 5B 55                   		movu.B	r5, r5
+ 338 0162 61 05                   		cmp	#0, r5
+ 339 0164 20 F4                   		beq	.L23
+ 139:../src/neopixel.c **** 	I2C1_TX_END_FLG = 0;
+ 340                             		.loc 1 139 2 is_stmt 1 view .LVU144
+ 341                             		.loc 1 139 18 is_stmt 0 view .LVU145
+ 342 0166 FB 52 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r5
+ 343 016c F8 54 00                		mov.B	#0, [r5]
+ 140:../src/neopixel.c **** 	NPcom[5][0] = 0x02;
+ 344                             		.loc 1 140 2 is_stmt 1 view .LVU146
+ 345                             		.loc 1 140 14 is_stmt 0 view .LVU147
+ 346 016f 3C 89 02                		mov.B	#2, 25[r0]
+ 141:../src/neopixel.c **** 	NPcom[5][1] = 5;
+ 347                             		.loc 1 141 2 is_stmt 1 view .LVU148
+ 348                             		.loc 1 141 14 is_stmt 0 view .LVU149
+ 349 0172 3C 8A 05                		mov.B	#5, 26[r0]
+ 142:../src/neopixel.c **** 	NPcom[5][2] = g_CALC_data.neopixel[5 * 24    ];
+ 350                             		.loc 1 142 2 is_stmt 1 view .LVU150
+ 351                             		.loc 1 142 36 is_stmt 0 view .LVU151
+ 352 0175 FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 353 017b CE 54 4E 01             		mov.B	334[r5], r4
+ 354                             		.loc 1 142 14 view .LVU152
+ 355 017f 86 8C                   		mov.B	r4, 27[r0]
+ 143:../src/neopixel.c **** 	NPcom[5][3] = g_CALC_data.neopixel[5 * 24 + 1];
+ 356                             		.loc 1 143 2 is_stmt 1 view .LVU153
+ 357                             		.loc 1 143 36 is_stmt 0 view .LVU154
+ 358 0181 CE 54 4F 01             		mov.B	335[r5], r4
+ 359                             		.loc 1 143 14 view .LVU155
+ 360 0185 87 04                   		mov.B	r4, 28[r0]
+ 144:../src/neopixel.c **** 	NPcom[5][4] = g_CALC_data.neopixel[5 * 24 + 2];
+ 361                             		.loc 1 144 2 is_stmt 1 view .LVU156
+ 362                             		.loc 1 144 36 is_stmt 0 view .LVU157
+ 363 0187 CE 55 50 01             		mov.B	336[r5], r5
+ 364                             		.loc 1 144 14 view .LVU158
+ 365 018b 87 0D                   		mov.B	r5, 29[r0]
+ 145:../src/neopixel.c **** 	R_Config_RIIC1_Master_Send(0x06, NPcom[5],  5);
+ 366                             		.loc 1 145 2 is_stmt 1 view .LVU159
+ 367 018d 66 53                   		mov.L	#5, r3
+ 368 018f 71 02 19                		add	#25, r0, r2
+ 369 0192 66 61                   		mov.L	#6, r1
+ 370 0194 05 00 00 00             		bsr	_R_Config_RIIC1_Master_Send
+ 371                             	.LVL20:
+ 146:../src/neopixel.c **** 	while(I2C1_TX_END_FLG == 0);
+ 372                             		.loc 1 146 2 view .LVU160
+ 373                             	.L24:
+ 374                             		.loc 1 146 29 discriminator 1 view .LVU161
+ 375                             		.loc 1 146 24 is_stmt 0 discriminator 1 view .LVU162
+ 376 0198 FB 52 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r5
+ 377 019e CC 55                   		mov.B	[r5], r5
+ 378                             		.loc 1 146 7 discriminator 1 view .LVU163
+ 379 01a0 5B 55                   		movu.B	r5, r5
+ 380 01a2 61 05                   		cmp	#0, r5
+ 381 01a4 20 F4                   		beq	.L24
+ 147:../src/neopixel.c **** 	I2C1_TX_END_FLG = 0;
+ 382                             		.loc 1 147 2 is_stmt 1 view .LVU164
+ 383                             		.loc 1 147 18 is_stmt 0 view .LVU165
+ 384 01a6 FB 52 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r5
+ 385 01ac F8 54 00                		mov.B	#0, [r5]
+ 148:../src/neopixel.c **** 	NPcom[6][0] = 0x02;
+ 386                             		.loc 1 148 2 is_stmt 1 view .LVU166
+ 387                             		.loc 1 148 14 is_stmt 0 view .LVU167
+ 388 01af 3C 8E 02                		mov.B	#2, 30[r0]
+ 149:../src/neopixel.c **** 	NPcom[6][1] = 6;
+ 389                             		.loc 1 149 2 is_stmt 1 view .LVU168
+ 390                             		.loc 1 149 14 is_stmt 0 view .LVU169
+ 391 01b2 3C 8F 06                		mov.B	#6, 31[r0]
+ 150:../src/neopixel.c **** 	NPcom[6][2] = g_CALC_data.neopixel[6 * 24    ];
+ 392                             		.loc 1 150 2 is_stmt 1 view .LVU170
+ 393                             		.loc 1 150 36 is_stmt 0 view .LVU171
+ 394 01b5 FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 395 01bb CE 54 66 01             		mov.B	358[r5], r4
+ 396                             		.loc 1 150 14 view .LVU172
+ 397 01bf C7 04 20                		mov.B	r4, 32[r0]
+ 151:../src/neopixel.c **** 	NPcom[6][3] = g_CALC_data.neopixel[6 * 24 + 1];
+ 398                             		.loc 1 151 2 is_stmt 1 view .LVU173
+ 399                             		.loc 1 151 36 is_stmt 0 view .LVU174
+ 400 01c2 CE 54 67 01             		mov.B	359[r5], r4
+ 401                             		.loc 1 151 14 view .LVU175
+ 402 01c6 C7 04 21                		mov.B	r4, 33[r0]
+ 152:../src/neopixel.c **** 	NPcom[6][4] = g_CALC_data.neopixel[6 * 24 + 2];
+ 403                             		.loc 1 152 2 is_stmt 1 view .LVU176
+ 404                             		.loc 1 152 36 is_stmt 0 view .LVU177
+ 405 01c9 CE 55 68 01             		mov.B	360[r5], r5
+ 406                             		.loc 1 152 14 view .LVU178
+ 407 01cd C7 05 22                		mov.B	r5, 34[r0]
+ 153:../src/neopixel.c **** 	R_Config_RIIC1_Master_Send(0x06, NPcom[6],  5);
+ 408                             		.loc 1 153 2 is_stmt 1 view .LVU179
+ 409 01d0 66 53                   		mov.L	#5, r3
+ 410 01d2 71 02 1E                		add	#30, r0, r2
+ 411 01d5 66 61                   		mov.L	#6, r1
+ 412 01d7 05 00 00 00             		bsr	_R_Config_RIIC1_Master_Send
+ 413                             	.LVL21:
+ 154:../src/neopixel.c **** 	while(I2C1_TX_END_FLG == 0);
+ 414                             		.loc 1 154 2 view .LVU180
+ 415                             	.L25:
+ 416                             		.loc 1 154 29 discriminator 1 view .LVU181
+ 417                             		.loc 1 154 24 is_stmt 0 discriminator 1 view .LVU182
+ 418 01db FB 52 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r5
+ 419 01e1 CC 55                   		mov.B	[r5], r5
+ 420                             		.loc 1 154 7 discriminator 1 view .LVU183
+ 421 01e3 5B 55                   		movu.B	r5, r5
+ 422 01e5 61 05                   		cmp	#0, r5
+ 423 01e7 20 F4                   		beq	.L25
+ 155:../src/neopixel.c **** 	I2C1_TX_END_FLG = 0;
+ 424                             		.loc 1 155 2 is_stmt 1 view .LVU184
+ 425                             		.loc 1 155 18 is_stmt 0 view .LVU185
+ 426 01e9 FB 52 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r5
+ 427 01ef F8 54 00                		mov.B	#0, [r5]
+ 156:../src/neopixel.c **** 	NPcom[7][0] = 0x02;
+ 428                             		.loc 1 156 2 is_stmt 1 view .LVU186
+ 429                             		.loc 1 156 14 is_stmt 0 view .LVU187
+ 430 01f2 F9 04 23 02             		mov.B	#2, 35[r0]
+ 157:../src/neopixel.c **** 	NPcom[7][1] = 7;
+ 431                             		.loc 1 157 2 is_stmt 1 view .LVU188
+ 432                             		.loc 1 157 14 is_stmt 0 view .LVU189
+ 433 01f6 F9 04 24 07             		mov.B	#7, 36[r0]
+ 158:../src/neopixel.c **** 	NPcom[7][2] = g_CALC_data.neopixel[7 * 24    ];
+ 434                             		.loc 1 158 2 is_stmt 1 view .LVU190
+ 435                             		.loc 1 158 36 is_stmt 0 view .LVU191
+ 436 01fa FB 52 00 00 00 00       		mov.L	#_g_CALC_data, r5
+ 437 0200 CE 54 7E 01             		mov.B	382[r5], r4
+ 438                             		.loc 1 158 14 view .LVU192
+ 439 0204 C7 04 25                		mov.B	r4, 37[r0]
+ 159:../src/neopixel.c **** 	NPcom[7][3] = g_CALC_data.neopixel[7 * 24 + 1];
+ 440                             		.loc 1 159 2 is_stmt 1 view .LVU193
+ 441                             		.loc 1 159 36 is_stmt 0 view .LVU194
+ 442 0207 CE 54 7F 01             		mov.B	383[r5], r4
+ 443                             		.loc 1 159 14 view .LVU195
+ 444 020b C7 04 26                		mov.B	r4, 38[r0]
+ 160:../src/neopixel.c **** 	NPcom[7][4] = g_CALC_data.neopixel[7 * 24 + 2];
+ 445                             		.loc 1 160 2 is_stmt 1 view .LVU196
+ 446                             		.loc 1 160 36 is_stmt 0 view .LVU197
+ 447 020e CE 55 80 01             		mov.B	384[r5], r5
+ 448                             		.loc 1 160 14 view .LVU198
+ 449 0212 C7 05 27                		mov.B	r5, 39[r0]
+ 161:../src/neopixel.c **** 	R_Config_RIIC1_Master_Send(0x06, NPcom[7],  5);
+ 450                             		.loc 1 161 2 is_stmt 1 view .LVU199
+ 451 0215 66 53                   		mov.L	#5, r3
+ 452 0217 71 02 23                		add	#35, r0, r2
+ 453 021a 66 61                   		mov.L	#6, r1
+ 454 021c 05 00 00 00             		bsr	_R_Config_RIIC1_Master_Send
+ 455                             	.LVL22:
+ 162:../src/neopixel.c **** 	while(I2C1_TX_END_FLG == 0);
+ 456                             		.loc 1 162 2 view .LVU200
+ 457                             	.L26:
+ 458                             		.loc 1 162 29 discriminator 1 view .LVU201
+ 459                             		.loc 1 162 24 is_stmt 0 discriminator 1 view .LVU202
+ 460 0220 FB 52 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r5
+ 461 0226 CC 55                   		mov.B	[r5], r5
+ 462                             		.loc 1 162 7 discriminator 1 view .LVU203
+ 463 0228 5B 55                   		movu.B	r5, r5
+ 464 022a 61 05                   		cmp	#0, r5
+ 465 022c 20 F4                   		beq	.L26
+ 163:../src/neopixel.c **** 	I2C1_TX_END_FLG = 0;
+ 466                             		.loc 1 163 2 is_stmt 1 view .LVU204
+ 467                             		.loc 1 163 18 is_stmt 0 view .LVU205
+ 468 022e FB 52 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r5
+ 469 0234 F8 54 00                		mov.B	#0, [r5]
+ 164:../src/neopixel.c **** }
+ 470                             		.loc 1 164 1 view .LVU206
+ 471 0237 67 0B                   		rtsd	#44
+ 472                             	.LFE5:
+ 474                             		.section	.text.Neopixel_InitRGB,"ax",@progbits
+ 475                             		.global	_Neopixel_InitRGB
+ 477                             	_Neopixel_InitRGB:
+ 478                             	.LFB4:
+  29:../src/neopixel.c **** 	uint8_t NPcom0[]  = {0x00};
+ 479                             		.loc 1 29 1 is_stmt 1 view -0
+ 480 0000 6E 7A                   		pushm	r7-r10
+ 481                             	.LCFI1:
+ 482 0002 60 40                   		sub	#4, r0
+ 483                             	.LCFI2:
+  30:../src/neopixel.c **** 	uint8_t NPcom1[]  = {0x01, 0xFF};
+ 484                             		.loc 1 30 2 view .LVU208
+  30:../src/neopixel.c **** 	uint8_t NPcom1[]  = {0x01, 0xFF};
+ 485                             		.loc 1 30 10 is_stmt 0 view .LVU209
+ 486 0004 F8 04 00                		mov.B	#0, [r0]
+  31:../src/neopixel.c **** //	uint8_t NPcom2[]  = {0x02, 0x00, 0xFF, 0x00, 0x00};
+ 487                             		.loc 1 31 2 is_stmt 1 view .LVU210
+  31:../src/neopixel.c **** //	uint8_t NPcom2[]  = {0x02, 0x00, 0xFF, 0x00, 0x00};
+ 488                             		.loc 1 31 10 is_stmt 0 view .LVU211
+ 489 0007 3C 01 01                		mov.B	#1, 1[r0]
+ 490 000a F9 04 02 FF             		mov.B	#-1, 2[r0]
+  40:../src/neopixel.c **** 	g_CALC_data.neobrightness = 0xFF;
+ 491                             		.loc 1 40 2 is_stmt 1 view .LVU212
+  41:../src/neopixel.c **** 
+ 492                             		.loc 1 41 2 view .LVU213
+  41:../src/neopixel.c **** 
+ 493                             		.loc 1 41 28 is_stmt 0 view .LVU214
+ 494 000e FB 72 00 00 00 00       		mov.L	#_g_CALC_data, r7
+ 495 0014 FA 74 D6 01 FF          		mov.B	#-1, 470[r7]
+  43:../src/neopixel.c **** 	{
+ 496                             		.loc 1 43 2 is_stmt 1 view .LVU215
+ 497                             	.LVL23:
+  43:../src/neopixel.c **** 	{
+ 498                             		.loc 1 43 9 is_stmt 0 view .LVU216
+ 499 0019 66 07                   		mov.L	#0, r7
+ 500                             	.LVL24:
+ 501                             	.L29:
+  43:../src/neopixel.c **** 	{
+ 502                             		.loc 1 43 2 discriminator 1 view .LVU217
+ 503 001b 61 77                   		cmp	#7, r7
+ 504 001d 24 12                   		bgtu	.L42
+  45:../src/neopixel.c **** 	}
+ 505                             		.loc 1 45 3 is_stmt 1 discriminator 3 view .LVU218
+ 506 001f 66 04                   		mov.L	#0, r4
+ 507 0021 66 03                   		mov.L	#0, r3
+ 508 0023 66 02                   		mov.L	#0, r2
+ 509 0025 EF 71                   		mov.L	r7, r1
+ 510 0027 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 511                             	.LVL25:
+  43:../src/neopixel.c **** 	{
+ 512                             		.loc 1 43 23 is_stmt 0 discriminator 3 view .LVU219
+ 513 002b 62 17                   		add	#1, r7
+ 514                             	.LVL26:
+  43:../src/neopixel.c **** 	{
+ 515                             		.loc 1 43 23 discriminator 3 view .LVU220
+ 516 002d 2E EE                   		bra	.L29
+ 517                             	.L42:
+  47:../src/neopixel.c **** 	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom1,  2);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END_F
+ 518                             		.loc 1 47 2 is_stmt 1 view .LVU221
+ 519 002f 66 13                   		mov.L	#1, r3
+ 520 0031 EF 02                   		mov.L	r0, r2
+ 521 0033 66 61                   		mov.L	#6, r1
+ 522 0035 05 00 00 00             		bsr	_R_Config_RIIC1_Master_Send
+ 523                             	.LVL27:
+  47:../src/neopixel.c **** 	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom1,  2);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END_F
+ 524                             		.loc 1 47 57 view .LVU222
+ 525                             	.L31:
+  47:../src/neopixel.c **** 	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom1,  2);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END_F
+ 526                             		.loc 1 47 85 discriminator 2 view .LVU223
+  47:../src/neopixel.c **** 	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom1,  2);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END_F
+ 527                             		.loc 1 47 79 is_stmt 0 discriminator 2 view .LVU224
+ 528 0039 FB 72 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r7
+ 529 003f CC 77                   		mov.B	[r7], r7
+  47:../src/neopixel.c **** 	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom1,  2);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END_F
+ 530                             		.loc 1 47 62 discriminator 2 view .LVU225
+ 531 0041 5B 77                   		movu.B	r7, r7
+ 532 0043 61 07                   		cmp	#0, r7
+ 533 0045 20 F4                   		beq	.L31
+  47:../src/neopixel.c **** 	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom1,  2);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END_F
+ 534                             		.loc 1 47 87 is_stmt 1 discriminator 3 view .LVU226
+  47:../src/neopixel.c **** 	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom1,  2);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END_F
+ 535                             		.loc 1 47 103 is_stmt 0 discriminator 3 view .LVU227
+ 536 0047 FB 72 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r7
+ 537 004d F8 74 00                		mov.B	#0, [r7]
+  48:../src/neopixel.c **** //	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom2,  5);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END
+ 538                             		.loc 1 48 2 is_stmt 1 discriminator 3 view .LVU228
+ 539 0050 66 23                   		mov.L	#2, r3
+ 540 0052 71 02 01                		add	#1, r0, r2
+ 541 0055 66 61                   		mov.L	#6, r1
+ 542 0057 05 00 00 00             		bsr	_R_Config_RIIC1_Master_Send
+ 543                             	.LVL28:
+  48:../src/neopixel.c **** //	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom2,  5);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END
+ 544                             		.loc 1 48 57 discriminator 3 view .LVU229
+ 545                             	.L32:
+  48:../src/neopixel.c **** //	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom2,  5);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END
+ 546                             		.loc 1 48 85 discriminator 2 view .LVU230
+  48:../src/neopixel.c **** //	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom2,  5);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END
+ 547                             		.loc 1 48 79 is_stmt 0 discriminator 2 view .LVU231
+ 548 005b FB 72 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r7
+ 549 0061 CC 77                   		mov.B	[r7], r7
+  48:../src/neopixel.c **** //	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom2,  5);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END
+ 550                             		.loc 1 48 62 discriminator 2 view .LVU232
+ 551 0063 5B 77                   		movu.B	r7, r7
+ 552 0065 61 07                   		cmp	#0, r7
+ 553 0067 20 F4                   		beq	.L32
+  48:../src/neopixel.c **** //	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom2,  5);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END
+ 554                             		.loc 1 48 87 is_stmt 1 discriminator 3 view .LVU233
+  48:../src/neopixel.c **** //	R_Config_RIIC1_Master_Send(0x06, (void *) NPcom2,  5);	while(I2C1_TX_END_FLG == 0){}	I2C1_TX_END
+ 555                             		.loc 1 48 103 is_stmt 0 discriminator 3 view .LVU234
+ 556 0069 FB 72 00 00 00 00       		mov.L	#_I2C1_TX_END_FLG, r7
+ 557 006f F8 74 00                		mov.B	#0, [r7]
+  57:../src/neopixel.c **** 
+ 558                             		.loc 1 57 2 is_stmt 1 discriminator 3 view .LVU235
+ 559 0072 05 00 00 00             		bsr	_Neopixel_TX
+ 560                             	.LVL29:
+  59:../src/neopixel.c **** 	{
+ 561                             		.loc 1 59 2 discriminator 3 view .LVU236
+  59:../src/neopixel.c **** 	{
+ 562                             		.loc 1 59 9 is_stmt 0 discriminator 3 view .LVU237
+ 563 0076 66 0A                   		mov.L	#0, r10
+  59:../src/neopixel.c **** 	{
+ 564                             		.loc 1 59 2 discriminator 3 view .LVU238
+ 565 0078 2E 20                   		bra	.L33
+ 566                             	.LVL30:
+ 567                             	.L34:
+  63:../src/neopixel.c **** 			Neopixel_TX();
+ 568                             		.loc 1 63 4 is_stmt 1 discriminator 3 view .LVU239
+  63:../src/neopixel.c **** 			Neopixel_TX();
+ 569                             		.loc 1 63 33 is_stmt 0 discriminator 3 view .LVU240
+ 570 007a 66 A4                   		mov.L	#10, r4
+ 571 007c 4F 74                   		mul	r7, r4
+  63:../src/neopixel.c **** 			Neopixel_TX();
+ 572                             		.loc 1 63 29 discriminator 3 view .LVU241
+ 573 007e FF 04 4A                		sub	r4, r10, r4
+ 574 0081 71 42 FB                		add	#-5, r4, r2
+  63:../src/neopixel.c **** 			Neopixel_TX();
+ 575                             		.loc 1 63 4 discriminator 3 view .LVU242
+ 576 0084 EF 23                   		mov.L	r2, r3
+ 577 0086 EF 71                   		mov.L	r7, r1
+ 578 0088 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 579                             	.LVL31:
+  64:../src/neopixel.c **** 		}
+ 580                             		.loc 1 64 4 is_stmt 1 discriminator 3 view .LVU243
+ 581 008c 05 00 00 00             		bsr	_Neopixel_TX
+ 582                             	.LVL32:
+  61:../src/neopixel.c **** 		{
+ 583                             		.loc 1 61 24 is_stmt 0 discriminator 3 view .LVU244
+ 584 0090 62 17                   		add	#1, r7
+ 585                             	.LVL33:
+ 586                             	.L35:
+  61:../src/neopixel.c **** 		{
+ 587                             		.loc 1 61 3 discriminator 1 view .LVU245
+ 588 0092 61 77                   		cmp	#7, r7
+ 589 0094 25 E6                   		bleu	.L34
+  59:../src/neopixel.c **** 	{
+ 590                             		.loc 1 59 24 discriminator 2 view .LVU246
+ 591 0096 62 AA                   		add	#10, r10
+ 592                             	.LVL34:
+ 593                             	.L33:
+  59:../src/neopixel.c **** 	{
+ 594                             		.loc 1 59 2 discriminator 1 view .LVU247
+ 595 0098 75 5A 31                		cmp	#49, r10
+ 596 009b 24 06                   		bgtu	.L43
+  61:../src/neopixel.c **** 		{
+ 597                             		.loc 1 61 10 view .LVU248
+ 598 009d 66 07                   		mov.L	#0, r7
+ 599 009f 2E F3                   		bra	.L35
+ 600                             	.L43:
+  67:../src/neopixel.c **** 	{
+ 601                             		.loc 1 67 9 view .LVU249
+ 602 00a1 75 4A 32                		mov.L	#50, r10
+ 603                             	.LVL35:
+  67:../src/neopixel.c **** 	{
+ 604                             		.loc 1 67 9 view .LVU250
+ 605 00a4 2E 1B                   		bra	.L36
+ 606                             	.LVL36:
+ 607                             	.L37:
+  71:../src/neopixel.c **** 			Neopixel_TX();
+ 608                             		.loc 1 71 4 is_stmt 1 discriminator 3 view .LVU251
+  71:../src/neopixel.c **** 			Neopixel_TX();
+ 609                             		.loc 1 71 25 is_stmt 0 discriminator 3 view .LVU252
+ 610 00a6 71 A2 FB                		add	#-5, r10, r2
+  71:../src/neopixel.c **** 			Neopixel_TX();
+ 611                             		.loc 1 71 4 discriminator 3 view .LVU253
+ 612 00a9 EF A4                   		mov.L	r10, r4
+ 613 00ab EF 23                   		mov.L	r2, r3
+ 614 00ad EF 71                   		mov.L	r7, r1
+ 615 00af 05 00 00 00             		bsr	_Neopixel_SetRGB
+ 616                             	.LVL37:
+  72:../src/neopixel.c **** 		}
+ 617                             		.loc 1 72 4 is_stmt 1 discriminator 3 view .LVU254
+ 618 00b3 05 00 00 00             		bsr	_Neopixel_TX
+ 619                             	.LVL38:
+  69:../src/neopixel.c **** 		{
+ 620                             		.loc 1 69 24 is_stmt 0 discriminator 3 view .LVU255
+ 621 00b7 62 17                   		add	#1, r7
+ 622                             	.LVL39:
+ 623                             	.L38:
+  69:../src/neopixel.c **** 		{
+ 624                             		.loc 1 69 3 discriminator 1 view .LVU256
+ 625 00b9 61 77                   		cmp	#7, r7
+ 626 00bb 25 EB                   		bleu	.L37
+  67:../src/neopixel.c **** 	{
+ 627                             		.loc 1 67 24 discriminator 2 view .LVU257
+ 628 00bd 60 2A                   		sub	#2, r10
+ 629                             	.LVL40:
+ 630                             	.L36:
+  67:../src/neopixel.c **** 	{
+ 631                             		.loc 1 67 2 discriminator 1 view .LVU258
+ 632 00bf 61 0A                   		cmp	#0, r10
+ 633 00c1 15                      		beq	.L44
+  69:../src/neopixel.c **** 		{
+ 634                             		.loc 1 69 10 view .LVU259
+ 635 00c2 66 07                   		mov.L	#0, r7
+ 636 00c4 2E F5                   		bra	.L38
+ 637                             	.L44:
+  75:../src/neopixel.c **** 
+ 638                             		.loc 1 75 1 view .LVU260
+ 639 00c6 3F 7A 05                		rtsd	#20, r7-r10
+  75:../src/neopixel.c **** 
+ 640                             		.loc 1 75 1 view .LVU261
+ 641                             	.LFE4:
+ 705                             	.Letext0:
+ 706                             		.file 2 "../src/dataregister.h"
+ 707                             		.file 3 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 708                             		.file 4 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 709                             		.file 5 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\lib\\gcc\\rx-
+ 710                             		.file 6 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 711                             		.file 7 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 712                             		.file 8 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 713                             		.file 9 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/all/r_rx_compi
+ 714                             		.file 10 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/rx72n/mcu_loc
+ 715                             		.file 11 "../src/neopixel.h"

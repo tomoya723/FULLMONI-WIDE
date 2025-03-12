@@ -1,0 +1,151 @@
+   1                             		.file	"cmt_dev.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.cmtHandler,"ax",@progbits
+   6                             	_cmtHandler:
+   7                             	.LVL0:
+   8                             	.LFB5:
+   9                             		.file 1 "../src/cmt_dev.c"
+   1:../src/cmt_dev.c **** /****************************************************************************/
+   2:../src/cmt_dev.c **** /*                                                                          */
+   3:../src/cmt_dev.c **** /*      AlphaProject サンプルプログラム                                     */
+   4:../src/cmt_dev.c **** /*        CMT処理                                                           */
+   5:../src/cmt_dev.c **** /*                                                                          */
+   6:../src/cmt_dev.c **** /*          Copyright   :: 株式会社アルファプロジェクト                     */
+   7:../src/cmt_dev.c **** /*          Cpu         :: RX71M                                            */
+   8:../src/cmt_dev.c **** /*          File Name   :: cmt_dev.c                                        */
+   9:../src/cmt_dev.c **** /*                                                                          */
+  10:../src/cmt_dev.c **** /****************************************************************************/
+  11:../src/cmt_dev.c **** 
+  12:../src/cmt_dev.c **** 
+  13:../src/cmt_dev.c **** #include "r_cmt_rx_if.h"
+  14:../src/cmt_dev.c **** #include "cmt_dev.h"
+  15:../src/cmt_dev.c **** 
+  16:../src/cmt_dev.c **** /* --------------
+  17:../src/cmt_dev.c ****  * define
+  18:../src/cmt_dev.c ****  * -------------- */
+  19:../src/cmt_dev.c **** #define CMT_1000HZ    (1000u)
+  20:../src/cmt_dev.c **** 
+  21:../src/cmt_dev.c **** /* --------------
+  22:../src/cmt_dev.c ****  * variable
+  23:../src/cmt_dev.c ****  * -------------- */
+  24:../src/cmt_dev.c **** static uint32_t s_1msecCount;
+  25:../src/cmt_dev.c **** 
+  26:../src/cmt_dev.c **** 
+  27:../src/cmt_dev.c **** /* --------------
+  28:../src/cmt_dev.c ****  * function
+  29:../src/cmt_dev.c ****  * -------------- */
+  30:../src/cmt_dev.c **** static void cmtHandler(void * PtrData);
+  31:../src/cmt_dev.c **** 
+  32:../src/cmt_dev.c **** 
+  33:../src/cmt_dev.c **** /****************************************************************************
+  34:../src/cmt_dev.c ****  * CmtInit()
+  35:../src/cmt_dev.c ****  * > CMT初期化
+  36:../src/cmt_dev.c ****  * > input  : none
+  37:../src/cmt_dev.c ****  * > output : bool  -> true:成功  false:失敗
+  38:../src/cmt_dev.c ****  ****************************************************************************/
+  39:../src/cmt_dev.c **** bool CmtInit(void)
+  40:../src/cmt_dev.c **** {
+  41:../src/cmt_dev.c **** 	uint32_t Channel;
+  42:../src/cmt_dev.c **** 	bool Ret;
+  43:../src/cmt_dev.c **** 
+  44:../src/cmt_dev.c **** 	s_1msecCount = 0u;
+  45:../src/cmt_dev.c **** 
+  46:../src/cmt_dev.c **** 	/* タイマ初期化 */
+  47:../src/cmt_dev.c **** 	Ret = R_CMT_CreatePeriodic(CMT_1000HZ, &cmtHandler, &Channel);
+  48:../src/cmt_dev.c **** 	
+  49:../src/cmt_dev.c **** 	return Ret;
+  50:../src/cmt_dev.c **** }
+  51:../src/cmt_dev.c **** 
+  52:../src/cmt_dev.c **** /****************************************************************************
+  53:../src/cmt_dev.c ****  * GetCmt1msecCounter()
+  54:../src/cmt_dev.c ****  * > CMT 1msecカウンタ取得
+  55:../src/cmt_dev.c ****  * > input  : none
+  56:../src/cmt_dev.c ****  * > output : unsigned long  -> 1msecカウンタ値
+  57:../src/cmt_dev.c ****  ****************************************************************************/
+  58:../src/cmt_dev.c **** uint32_t GetCmt1msecCounter(void)
+  59:../src/cmt_dev.c **** {
+  60:../src/cmt_dev.c **** 	return s_1msecCount;
+  61:../src/cmt_dev.c **** }
+  62:../src/cmt_dev.c **** 
+  63:../src/cmt_dev.c **** /****************************************************************************
+  64:../src/cmt_dev.c ****  * cmtHandler()
+  65:../src/cmt_dev.c ****  * > CMT コールバック関数
+  66:../src/cmt_dev.c ****  * > input  : void *  -> 割り込みをトリガしたCMT番号を含む値へのポインタ
+  67:../src/cmt_dev.c ****  * > output : none
+  68:../src/cmt_dev.c ****  ****************************************************************************/
+  69:../src/cmt_dev.c **** static void cmtHandler(void * PtrData)
+  70:../src/cmt_dev.c **** {
+  10                             		.loc 1 70 1 view -0
+  71:../src/cmt_dev.c **** 	s_1msecCount++;
+  11                             		.loc 1 71 2 view .LVU1
+  12                             		.loc 1 71 14 is_stmt 0 view .LVU2
+  13 0000 FB 42 00 00 00 00       		mov.L	#_s_1msecCount, r4
+  14 0006 EC 45                   		mov.L	[r4], r5
+  15 0008 62 15                   		add	#1, r5
+  16 000a E3 45                   		mov.L	r5, [r4]
+  72:../src/cmt_dev.c **** }
+  17                             		.loc 1 72 1 view .LVU3
+  18 000c 02                      		rts
+  19                             	.LFE5:
+  21                             		.section	.text.CmtInit,"ax",@progbits
+  22                             		.global	_CmtInit
+  24                             	_CmtInit:
+  25                             	.LFB3:
+  40:../src/cmt_dev.c **** 	uint32_t Channel;
+  26                             		.loc 1 40 1 is_stmt 1 view -0
+  27 0000 60 40                   		sub	#4, r0
+  28                             	.LCFI0:
+  41:../src/cmt_dev.c **** 	bool Ret;
+  29                             		.loc 1 41 2 view .LVU5
+  42:../src/cmt_dev.c **** 
+  30                             		.loc 1 42 2 view .LVU6
+  44:../src/cmt_dev.c **** 
+  31                             		.loc 1 44 2 view .LVU7
+  44:../src/cmt_dev.c **** 
+  32                             		.loc 1 44 15 is_stmt 0 view .LVU8
+  33 0002 FB 52 00 00 00 00       		mov.L	#_s_1msecCount, r5
+  34 0008 F8 56 00                		mov.L	#0, [r5]
+  47:../src/cmt_dev.c **** 	
+  35                             		.loc 1 47 2 is_stmt 1 view .LVU9
+  47:../src/cmt_dev.c **** 	
+  36                             		.loc 1 47 8 is_stmt 0 view .LVU10
+  37 000b EF 03                   		mov.L	r0, r3
+  38 000d FB 22 00 00 00 00       		mov.L	#_cmtHandler, r2
+  39 0013 FB 1A E8 03             		mov.L	#0x3e8, r1
+  40 0017 05 00 00 00             		bsr	_R_CMT_CreatePeriodic
+  41                             	.LVL1:
+  49:../src/cmt_dev.c **** }
+  42                             		.loc 1 49 2 is_stmt 1 view .LVU11
+  50:../src/cmt_dev.c **** 
+  43                             		.loc 1 50 1 is_stmt 0 view .LVU12
+  44 001b 67 01                   		rtsd	#4
+  45                             	.LFE3:
+  47                             		.section	.text.GetCmt1msecCounter,"ax",@progbits
+  48                             		.global	_GetCmt1msecCounter
+  50                             	_GetCmt1msecCounter:
+  51                             	.LFB4:
+  59:../src/cmt_dev.c **** 	return s_1msecCount;
+  52                             		.loc 1 59 1 is_stmt 1 view -0
+  60:../src/cmt_dev.c **** }
+  53                             		.loc 1 60 2 view .LVU14
+  61:../src/cmt_dev.c **** 
+  54                             		.loc 1 61 1 is_stmt 0 view .LVU15
+  55 0000 FB 52 00 00 00 00       		mov.L	#_s_1msecCount, r5
+  56 0006 EC 51                   		mov.L	[r5], r1
+  57 0008 02                      		rts
+  58                             	.LFE4:
+  60                             		.section	.bss.s_1msecCount,"aw",@nobits
+  61                             		.balign 4
+  64                             	_s_1msecCount:
+  65 0000 00 00 00 00             		.zero	4
+ 112                             	.Letext0:
+ 113                             		.file 2 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 114                             		.file 3 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 115                             		.file 4 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\lib\\gcc\\rx-
+ 116                             		.file 5 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 117                             		.file 6 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 118                             		.file 7 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 119                             		.file 8 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/all/r_rx_compi
+ 120                             		.file 9 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/rx72n/mcu_lock
+ 121                             		.file 10 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_cmt_rx/r_cmt_rx_if.h"

@@ -1,0 +1,1583 @@
+   1                             		.file	"r_dmaca_rx_target.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.r_dmaca_channel_valid_check,"ax",@progbits
+   5                             		.global	_r_dmaca_channel_valid_check
+   7                             	_r_dmaca_channel_valid_check:
+   8                             	.LVL0:
+   9                             	.LFB3:
+  10                             		.file 1 "../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c"
+   1:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /*******************************************************************************
+   2:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * DISCLAIMER
+   3:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * This software is supplied by Renesas Electronics Corporation and is only
+   4:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * intended for use with Renesas products. No other uses are authorized. This
+   5:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * software is owned by Renesas Electronics Corporation and is protected under
+   6:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * all applicable laws, including copyright laws.
+   7:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+   8:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT
+   9:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+  10:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.
+  11:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * TO THE MAXIMUM EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS
+  12:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE
+  13:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR
+  14:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * ANY REASON RELATED TO THIS SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE
+  15:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+  16:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Renesas reserves the right, without notice, to make changes to this software
+  17:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * and to discontinue the availability of this software. By using this software,
+  18:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * you agree to the additional terms and conditions found by accessing the
+  19:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * following link:
+  20:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * http://www.renesas.com/disclaimer
+  21:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *
+  22:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Copyright (C) 2019 Renesas Electronics Corporation. All rights reserved.
+  23:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *******************************************************************************/
+  24:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /*******************************************************************************
+  25:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * File Name    : r_dmaca_rx_target.c
+  26:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Device(s)    : RX
+  27:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Tool-Chain   : Renesas RXC Toolchain v3.01.00
+  28:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * OS           : not use
+  29:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * H/W Platform : not use
+  30:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Description  : Functions for DMACA driver
+  31:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *******************************************************************************/
+  32:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /*******************************************************************************
+  33:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * History      : DD.MM.YYYY Version  Description
+  34:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *              : 30.12.2019 1.00     First Release for RX72N.
+  35:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *******************************************************************************/
+  36:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+  37:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /*******************************************************************************
+  38:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** Includes <System Includes>, "Project Includes"
+  39:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *******************************************************************************/
+  40:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /* Definitions for DMACA support */
+  41:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** #include "r_dmaca_rx_if.h"
+  42:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** #include "./src/r_dmaca_rx_private.h"
+  43:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+  44:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /* Check MCU Group. */
+  45:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** #if defined(BSP_MCU_RX72N)
+  46:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+  47:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /*******************************************************************************
+  48:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** Macro definitions
+  49:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *******************************************************************************/
+  50:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** typedef void (* DMACI_Callback)(void);
+  51:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+  52:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /*******************************************************************************
+  53:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** Private variables and functions
+  54:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *******************************************************************************/
+  55:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+  56:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /* DMACA DMAC0I */
+  57:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** R_BSP_PRAGMA_STATIC_INTERRUPT(r_dmaca_intdmac0i_isr, VECT(DMAC, DMAC0I))
+  58:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** R_BSP_ATTRIB_STATIC_INTERRUPT void r_dmaca_intdmac0i_isr(void);
+  59:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+  60:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /* DMACA DMAC1I */
+  61:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** R_BSP_PRAGMA_STATIC_INTERRUPT(r_dmaca_intdmac1i_isr, VECT(DMAC, DMAC1I))
+  62:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** R_BSP_ATTRIB_STATIC_INTERRUPT void r_dmaca_intdmac1i_isr(void);
+  63:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+  64:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /* DMACA DMAC2I */
+  65:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** R_BSP_PRAGMA_STATIC_INTERRUPT(r_dmaca_intdmac2i_isr, VECT(DMAC, DMAC2I))
+  66:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** R_BSP_ATTRIB_STATIC_INTERRUPT void r_dmaca_intdmac2i_isr(void);
+  67:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+  68:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /* DMACA DMAC3I */
+  69:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** R_BSP_PRAGMA_STATIC_INTERRUPT(r_dmaca_intdmac3i_isr, VECT(DMAC, DMAC3I))
+  70:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** R_BSP_ATTRIB_STATIC_INTERRUPT void r_dmaca_intdmac3i_isr(void);
+  71:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+  72:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /* DMACA DMAC74I */
+  73:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** R_BSP_PRAGMA_STATIC_INTERRUPT(r_dmaca_intdmac74i_isr, VECT(DMAC, DMAC74I))
+  74:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** R_BSP_ATTRIB_STATIC_INTERRUPT void r_dmaca_intdmac74i_isr(void);
+  75:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+  76:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+  77:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /* Array of address of DMRSRm (m=DMACA channel number) */
+  78:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** volatile uint8_t R_BSP_EVENACCESS_SFR *g_icu_dmrsr[] =
+  79:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** {
+  80:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* Initialize Array of address of DMRSRm */
+  81:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     &(ICU.DMRSR0), &(ICU.DMRSR1), &(ICU.DMRSR2), &(ICU.DMRSR3),
+  82:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+  83:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* Initialize Array of address of DMRSRm */
+  84:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     &(ICU.DMRSR4), &(ICU.DMRSR5), &(ICU.DMRSR6), &(ICU.DMRSR7)
+  85:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** };
+  86:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+  87:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /*******************************************************************************
+  88:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** Exported global variables (to be accessed by other files)
+  89:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *******************************************************************************/
+  90:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+  91:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+  92:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /*******************************************************************************
+  93:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Function Name: r_dmaca_channel_valid_check
+  94:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Description  : Checks whether channel is valid or not.
+  95:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Arguments    : channel -
+  96:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                    Which channel to use
+  97:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Return Value : true -
+  98:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                    Channel is valid.
+  99:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                false -
+ 100:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                    Channel is invalid.
+ 101:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *******************************************************************************/
+ 102:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** bool r_dmaca_channel_valid_check(uint8_t channel)
+ 103:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** {
+  11                             		.loc 1 103 1 view -0
+ 104:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     bool ret = false;
+  12                             		.loc 1 104 5 view .LVU1
+ 105:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 106:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     switch (channel)
+  13                             		.loc 1 106 5 view .LVU2
+  14 0000 5B 11                   		movu.B	r1, r1
+  15                             		.loc 1 106 5 is_stmt 0 view .LVU3
+  16 0002 61 71                   		cmp	#7, r1
+  17 0004 24 07                   		bgtu	.L3
+ 107:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     {
+ 108:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH0:
+ 109:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH1:
+ 110:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH2:
+ 111:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH3:
+ 112:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH4:
+ 113:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH5:
+ 114:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH6:
+ 115:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH7:
+ 116:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 117:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* The channel number is valid. */
+ 118:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             ret = true;
+  18                             		.loc 1 118 17 view .LVU4
+  19 0006 66 11                   		mov	#1, r1
+  20                             	.LVL1:
+  21                             	.L2:
+ 119:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 120:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 121:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         default:
+ 122:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 123:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* The channel number is invalid. */
+ 124:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             ret = false;
+ 125:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 126:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 127:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     }
+ 128:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 129:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     return ret;
+  22                             		.loc 1 129 5 is_stmt 1 view .LVU5
+ 130:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** }
+  23                             		.loc 1 130 1 is_stmt 0 view .LVU6
+  24 0008 64 11                   		and #1, r1
+  25                             	.LVL2:
+  26                             		.loc 1 130 1 view .LVU7
+  27 000a 02                      		rts
+  28                             	.LVL3:
+  29                             	.L3:
+ 124:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+  30                             		.loc 1 124 17 view .LVU8
+  31 000b 66 01                   		mov	#0, r1
+  32 000d 2E FB                   		bra	.L2
+  33                             	.LFE3:
+  35                             		.section	.text.r_dmaca_intdmac0i_isr,"ax",@progbits
+  37                             	_r_dmaca_intdmac0i_isr:
+  38                             	.LFB4:
+ 131:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /**************************************************************************
+ 132:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * End of function r_dmaca_channel_valid_check
+ 133:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *************************************************************************/
+ 134:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 135:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /************************************************************************************
+ 136:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Outline      : Interrupt DMAC0I handler
+ 137:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Function Name: r_dmaca_intdmac0i_isr
+ 138:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Description  : Types of interrupt requests from DMACA channel 0.
+ 139:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                If the pointer to function is 'FIT_NO_FUNC' or 'NULL',
+ 140:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                write a program under "do something" in this
+ 141:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                r_dmaca_intdmac0i_isr() function.
+ 142:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Arguments    : None
+ 143:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Return Value : None
+ 144:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** ************************************************************************************/
+ 145:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** R_BSP_ATTRIB_STATIC_INTERRUPT void r_dmaca_intdmac0i_isr(void)
+ 146:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** {
+  39                             		.loc 1 146 1 is_stmt 1 view -0
+  40                             		.global	$tableentry$120$.rvectors
+  41                             	$tableentry$120$.rvectors:
+  42                             		; Note: Interrupt Handler
+  43 0000 6E EF                   		pushm	r14-r15
+  44                             	.LCFI0:
+  45 0002 6E 15                   		pushm	r1-r5
+  46                             	.LCFI1:
+  47 0004 FB 1E 30 14 08          		mov.L	#0x81430, r1
+  48 0009 A8 1B                   		mov.L	4[r1], r3
+  49 000b EC 12                   		mov.L	[r1], r2
+  50 000d 7E A2                   		push.l	r2
+  51                             	.LCFI2:
+  52 000f 7E A3                   		push.l	r3
+  53                             	.LCFI3:
+ 147:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* If the pointer to function is not 'NULL' */
+ 148:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     if (((uint32_t)NULL != (uint32_t)g_pdmaci_handlers[DMACA_CH0]) &&
+  54                             		.loc 1 148 5 view .LVU10
+  55                             		.loc 1 148 55 is_stmt 0 view .LVU11
+  56 0011 FB 52 00 00 00 00       		mov.L	#_g_pdmaci_handlers, r5
+  57 0017 EC 55                   		mov.L	[r5], r5
+  58                             		.loc 1 148 8 view .LVU12
+  59 0019 61 05                   		cmp	#0, r5
+  60 001b 12                      		beq	.L4
+  61                             		.loc 1 148 68 discriminator 1 view .LVU13
+  62 001c 74 05 00 00 00 10       		cmp	#0x10000000, r5
+  63 0022 13                      		beq	.L4
+ 149:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 150:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****        /* If the pointer to function is not 'FIT_NO_FUNC' */
+ 151:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****        ((uint32_t)FIT_NO_FUNC != (uint32_t)g_pdmaci_handlers[DMACA_CH0]))
+ 152:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     {
+ 153:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         /* Callback function handles for channel 0 */
+ 154:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         ((DMACI_Callback)g_pdmaci_handlers[DMACA_CH0])();
+  64                             		.loc 1 154 9 is_stmt 1 view .LVU14
+  65                             		.loc 1 154 10 is_stmt 0 view .LVU15
+  66 0023 7F 15                   		jsr	r5
+  67                             	.LVL4:
+ 155:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     }
+ 156:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     else
+ 157:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     {
+ 158:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         /* do something */
+ 159:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     }
+  68                             		.loc 1 159 5 is_stmt 1 view .LVU16
+ 160:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 161:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     return;
+  69                             		.loc 1 161 5 view .LVU17
+  70                             	.L4:
+ 162:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** }
+  71                             		.loc 1 162 1 is_stmt 0 view .LVU18
+  72 0025 7E B3                   		pop	r3
+  73 0027 7E B2                   		pop	r2
+  74 0029 FB 1E 30 14 08          		mov.L	#0x81430, r1
+  75 002e E3 12                   		mov.L	r2, [r1]
+  76 0030 A0 1B                   		mov.L	r3, 4[r1]
+  77 0032 6F 15                   		popm	r1-r5
+  78 0034 6F EF                   		popm	r14-r15
+  79 0036 7F 95                   		rte
+  80                             	.LFE4:
+  82                             		.section	.text.r_dmaca_intdmac1i_isr,"ax",@progbits
+  84                             	_r_dmaca_intdmac1i_isr:
+  85                             	.LFB5:
+ 163:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /**************************************************************************
+ 164:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * End of function r_dmaca_intdmac0i_isr
+ 165:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *************************************************************************/
+ 166:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 167:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /************************************************************************************
+ 168:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Outline      : Interrupt DMAC1I handler
+ 169:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Function Name: r_dmaca_intdmac1i_isr
+ 170:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Description  : Types of interrupt requests from DMACA channel1.
+ 171:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                If the pointer to function is 'FIT_NO_FUNC' or 'NULL',
+ 172:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                write a program under "do something" in this 
+ 173:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                r_dmaca_intdmac1i_isr() function.
+ 174:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Arguments    : None
+ 175:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Return Value : None
+ 176:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** ************************************************************************************/
+ 177:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** R_BSP_ATTRIB_STATIC_INTERRUPT void r_dmaca_intdmac1i_isr(void)
+ 178:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** {
+  86                             		.loc 1 178 1 is_stmt 1 view -0
+  87                             		.global	$tableentry$121$.rvectors
+  88                             	$tableentry$121$.rvectors:
+  89                             		; Note: Interrupt Handler
+  90 0000 6E EF                   		pushm	r14-r15
+  91                             	.LCFI4:
+  92 0002 6E 15                   		pushm	r1-r5
+  93                             	.LCFI5:
+  94 0004 FB 1E 30 14 08          		mov.L	#0x81430, r1
+  95 0009 A8 1B                   		mov.L	4[r1], r3
+  96 000b EC 12                   		mov.L	[r1], r2
+  97 000d 7E A2                   		push.l	r2
+  98                             	.LCFI6:
+  99 000f 7E A3                   		push.l	r3
+ 100                             	.LCFI7:
+ 179:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* If the pointer to function is not 'NULL' */
+ 180:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     if (((uint32_t)NULL != (uint32_t)g_pdmaci_handlers[DMACA_CH1]) &&
+ 101                             		.loc 1 180 5 view .LVU20
+ 102                             		.loc 1 180 55 is_stmt 0 view .LVU21
+ 103 0011 FB 52 00 00 00 00       		mov.L	#_g_pdmaci_handlers, r5
+ 104 0017 A8 5D                   		mov.L	4[r5], r5
+ 105                             		.loc 1 180 8 view .LVU22
+ 106 0019 61 05                   		cmp	#0, r5
+ 107 001b 12                      		beq	.L7
+ 108                             		.loc 1 180 68 discriminator 1 view .LVU23
+ 109 001c 74 05 00 00 00 10       		cmp	#0x10000000, r5
+ 110 0022 13                      		beq	.L7
+ 181:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 182:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****        /* If the pointer to function is not 'FIT_NO_FUNC' */
+ 183:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****        ((uint32_t)FIT_NO_FUNC != (uint32_t)g_pdmaci_handlers[DMACA_CH1]))
+ 184:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     {
+ 185:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         /* Callback function handles for channel 1 */
+ 186:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         ((DMACI_Callback)g_pdmaci_handlers[DMACA_CH1])();
+ 111                             		.loc 1 186 9 is_stmt 1 view .LVU24
+ 112                             		.loc 1 186 10 is_stmt 0 view .LVU25
+ 113 0023 7F 15                   		jsr	r5
+ 114                             	.LVL5:
+ 187:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     }
+ 188:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     else
+ 189:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     {
+ 190:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         /* do something */
+ 191:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     }
+ 115                             		.loc 1 191 5 is_stmt 1 view .LVU26
+ 192:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 193:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     return;
+ 116                             		.loc 1 193 5 view .LVU27
+ 117                             	.L7:
+ 194:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** }
+ 118                             		.loc 1 194 1 is_stmt 0 view .LVU28
+ 119 0025 7E B3                   		pop	r3
+ 120 0027 7E B2                   		pop	r2
+ 121 0029 FB 1E 30 14 08          		mov.L	#0x81430, r1
+ 122 002e E3 12                   		mov.L	r2, [r1]
+ 123 0030 A0 1B                   		mov.L	r3, 4[r1]
+ 124 0032 6F 15                   		popm	r1-r5
+ 125 0034 6F EF                   		popm	r14-r15
+ 126 0036 7F 95                   		rte
+ 127                             	.LFE5:
+ 129                             		.section	.text.r_dmaca_intdmac2i_isr,"ax",@progbits
+ 131                             	_r_dmaca_intdmac2i_isr:
+ 132                             	.LFB6:
+ 195:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /**************************************************************************
+ 196:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * End of function r_dmaca_intdmac1i_isr
+ 197:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *************************************************************************/
+ 198:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 199:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /************************************************************************************
+ 200:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Outline      : Interrupt DMAC2I handler
+ 201:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Function Name: r_dmaca_intdmac2i_isr
+ 202:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Description  : Types of interrupt requests from DMACA channel2.
+ 203:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                If the pointer to function is 'FIT_NO_FUNC' or 'NULL',
+ 204:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                write a program under "do something" in this 
+ 205:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                r_dmaca_intdmac2i_isr() function.
+ 206:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Arguments    : None
+ 207:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Return Value : None
+ 208:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** ************************************************************************************/
+ 209:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** R_BSP_ATTRIB_STATIC_INTERRUPT void r_dmaca_intdmac2i_isr(void)
+ 210:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** {
+ 133                             		.loc 1 210 1 is_stmt 1 view -0
+ 134                             		.global	$tableentry$122$.rvectors
+ 135                             	$tableentry$122$.rvectors:
+ 136                             		; Note: Interrupt Handler
+ 137 0000 6E EF                   		pushm	r14-r15
+ 138                             	.LCFI8:
+ 139 0002 6E 15                   		pushm	r1-r5
+ 140                             	.LCFI9:
+ 141 0004 FB 1E 30 14 08          		mov.L	#0x81430, r1
+ 142 0009 A8 1B                   		mov.L	4[r1], r3
+ 143 000b EC 12                   		mov.L	[r1], r2
+ 144 000d 7E A2                   		push.l	r2
+ 145                             	.LCFI10:
+ 146 000f 7E A3                   		push.l	r3
+ 147                             	.LCFI11:
+ 211:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* If the pointer to function is not 'NULL' */
+ 212:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     if (((uint32_t)NULL != (uint32_t)g_pdmaci_handlers[DMACA_CH2]) &&
+ 148                             		.loc 1 212 5 view .LVU30
+ 149                             		.loc 1 212 55 is_stmt 0 view .LVU31
+ 150 0011 FB 52 00 00 00 00       		mov.L	#_g_pdmaci_handlers, r5
+ 151 0017 A8 D5                   		mov.L	8[r5], r5
+ 152                             		.loc 1 212 8 view .LVU32
+ 153 0019 61 05                   		cmp	#0, r5
+ 154 001b 12                      		beq	.L10
+ 155                             		.loc 1 212 68 discriminator 1 view .LVU33
+ 156 001c 74 05 00 00 00 10       		cmp	#0x10000000, r5
+ 157 0022 13                      		beq	.L10
+ 213:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 214:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****        /* If the pointer to function is not 'FIT_NO_FUNC' */
+ 215:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****        ((uint32_t)FIT_NO_FUNC != (uint32_t)g_pdmaci_handlers[DMACA_CH2]))
+ 216:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     {
+ 217:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         /* Callback function handles for channel 2 */
+ 218:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         ((DMACI_Callback)g_pdmaci_handlers[DMACA_CH2])();
+ 158                             		.loc 1 218 9 is_stmt 1 view .LVU34
+ 159                             		.loc 1 218 10 is_stmt 0 view .LVU35
+ 160 0023 7F 15                   		jsr	r5
+ 161                             	.LVL6:
+ 219:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     }
+ 220:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     else
+ 221:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     {
+ 222:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         /* do something */
+ 223:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     }
+ 162                             		.loc 1 223 5 is_stmt 1 view .LVU36
+ 224:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 225:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     return;
+ 163                             		.loc 1 225 5 view .LVU37
+ 164                             	.L10:
+ 226:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** }
+ 165                             		.loc 1 226 1 is_stmt 0 view .LVU38
+ 166 0025 7E B3                   		pop	r3
+ 167 0027 7E B2                   		pop	r2
+ 168 0029 FB 1E 30 14 08          		mov.L	#0x81430, r1
+ 169 002e E3 12                   		mov.L	r2, [r1]
+ 170 0030 A0 1B                   		mov.L	r3, 4[r1]
+ 171 0032 6F 15                   		popm	r1-r5
+ 172 0034 6F EF                   		popm	r14-r15
+ 173 0036 7F 95                   		rte
+ 174                             	.LFE6:
+ 176                             		.section	.text.r_dmaca_intdmac3i_isr,"ax",@progbits
+ 178                             	_r_dmaca_intdmac3i_isr:
+ 179                             	.LFB7:
+ 227:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /**************************************************************************
+ 228:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * End of function r_dmaca_intdmac2i_isr
+ 229:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *************************************************************************/
+ 230:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 231:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /************************************************************************************
+ 232:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Outline      : Interrupt DMAC3I handler
+ 233:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Function Name: r_dmaca_intdmac3i_isr
+ 234:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Description  : Types of interrupt requests from DMACA channel3.
+ 235:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                If the pointer to function is 'FIT_NO_FUNC' or 'NULL',
+ 236:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                write a program under "do something" in this 
+ 237:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                r_dmaca_intdmac3i_isr() function.
+ 238:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Arguments    : None
+ 239:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Return Value : None
+ 240:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** ************************************************************************************/
+ 241:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** R_BSP_ATTRIB_STATIC_INTERRUPT void r_dmaca_intdmac3i_isr(void)
+ 242:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** {
+ 180                             		.loc 1 242 1 is_stmt 1 view -0
+ 181                             		.global	$tableentry$123$.rvectors
+ 182                             	$tableentry$123$.rvectors:
+ 183                             		; Note: Interrupt Handler
+ 184 0000 6E EF                   		pushm	r14-r15
+ 185                             	.LCFI12:
+ 186 0002 6E 15                   		pushm	r1-r5
+ 187                             	.LCFI13:
+ 188 0004 FB 1E 30 14 08          		mov.L	#0x81430, r1
+ 189 0009 A8 1B                   		mov.L	4[r1], r3
+ 190 000b EC 12                   		mov.L	[r1], r2
+ 191 000d 7E A2                   		push.l	r2
+ 192                             	.LCFI14:
+ 193 000f 7E A3                   		push.l	r3
+ 194                             	.LCFI15:
+ 243:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* If the pointer to function is not 'NULL' */
+ 244:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     if (((uint32_t)NULL != (uint32_t)g_pdmaci_handlers[DMACA_CH3]) &&
+ 195                             		.loc 1 244 5 view .LVU40
+ 196                             		.loc 1 244 55 is_stmt 0 view .LVU41
+ 197 0011 FB 52 00 00 00 00       		mov.L	#_g_pdmaci_handlers, r5
+ 198 0017 A8 DD                   		mov.L	12[r5], r5
+ 199                             		.loc 1 244 8 view .LVU42
+ 200 0019 61 05                   		cmp	#0, r5
+ 201 001b 12                      		beq	.L13
+ 202                             		.loc 1 244 68 discriminator 1 view .LVU43
+ 203 001c 74 05 00 00 00 10       		cmp	#0x10000000, r5
+ 204 0022 13                      		beq	.L13
+ 245:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 246:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****        /* If the pointer to function is not 'FIT_NO_FUNC' */
+ 247:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****        ((uint32_t)FIT_NO_FUNC != (uint32_t)g_pdmaci_handlers[DMACA_CH3]))
+ 248:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     {
+ 249:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         /* Callback function handles for channel 3 */
+ 250:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         ((DMACI_Callback)g_pdmaci_handlers[DMACA_CH3])();
+ 205                             		.loc 1 250 9 is_stmt 1 view .LVU44
+ 206                             		.loc 1 250 10 is_stmt 0 view .LVU45
+ 207 0023 7F 15                   		jsr	r5
+ 208                             	.LVL7:
+ 251:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     }
+ 252:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     else
+ 253:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     {
+ 254:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         /* do something */
+ 255:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     }
+ 209                             		.loc 1 255 5 is_stmt 1 view .LVU46
+ 256:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 257:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     return;
+ 210                             		.loc 1 257 5 view .LVU47
+ 211                             	.L13:
+ 258:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** }
+ 212                             		.loc 1 258 1 is_stmt 0 view .LVU48
+ 213 0025 7E B3                   		pop	r3
+ 214 0027 7E B2                   		pop	r2
+ 215 0029 FB 1E 30 14 08          		mov.L	#0x81430, r1
+ 216 002e E3 12                   		mov.L	r2, [r1]
+ 217 0030 A0 1B                   		mov.L	r3, 4[r1]
+ 218 0032 6F 15                   		popm	r1-r5
+ 219 0034 6F EF                   		popm	r14-r15
+ 220 0036 7F 95                   		rte
+ 221                             	.LFE7:
+ 223                             		.section	.text.r_dmaca_intdmac74i_isr,"ax",@progbits
+ 225                             	_r_dmaca_intdmac74i_isr:
+ 226                             	.LFB8:
+ 259:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /**************************************************************************
+ 260:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * End of function r_dmaca_intdmac3i_isr
+ 261:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *************************************************************************/
+ 262:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 263:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /************************************************************************************
+ 264:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Outline      : Interrupt DMAC74I handler
+ 265:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Function Name: r_dmaca_intdmac74i_isr
+ 266:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Description  : Types of interrupt requests from DMACA channel4 to channel7.
+ 267:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                If the pointer to function is 'FIT_NO_FUNC' or 'NULL',
+ 268:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                write a program under the "do something" in this
+ 269:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                r_dmaca_intdmac74i_isr() function.
+ 270:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Arguments    : None
+ 271:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Return Value : None
+ 272:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** ************************************************************************************/
+ 273:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** R_BSP_ATTRIB_STATIC_INTERRUPT void r_dmaca_intdmac74i_isr(void)
+ 274:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** {
+ 227                             		.loc 1 274 1 is_stmt 1 view -0
+ 228                             		.global	$tableentry$124$.rvectors
+ 229                             	$tableentry$124$.rvectors:
+ 230                             		; Note: Interrupt Handler
+ 231 0000 6E 1F                   		pushm	r1-r15
+ 232                             	.LCFI16:
+ 233 0002 FB 1E 30 14 08          		mov.L	#0x81430, r1
+ 234 0007 A8 1B                   		mov.L	4[r1], r3
+ 235 0009 EC 12                   		mov.L	[r1], r2
+ 236 000b 7E A2                   		push.l	r2
+ 237                             	.LCFI17:
+ 238 000d 7E A3                   		push.l	r3
+ 239                             	.LCFI18:
+ 275:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     uint8_t channel;
+ 240                             		.loc 1 275 5 view .LVU50
+ 276:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 277:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* Get DMAC interrupt status */
+ 278:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     channel = DMAC.DMIST.BYTE;
+ 241                             		.loc 1 278 5 view .LVU51
+ 242                             		.loc 1 278 13 is_stmt 0 view .LVU52
+ 243 000f FB 5E 00 22 08          		mov.L	#0x82200, r5
+ 244 0014 89 56                   		mov.B	4[r5], r6
+ 245                             	.LVL8:
+ 279:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 280:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     if (0x00 != (channel & DMACA_DMIS4_BIT_MASK))
+ 246                             		.loc 1 280 5 is_stmt 1 view .LVU53
+ 247                             		.loc 1 280 8 is_stmt 0 view .LVU54
+ 248 0016 FD 74 C6 10             		tst	#16, r6
+ 249 001a 20 16                   		beq	.L17
+ 281:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     {
+ 282:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         /* If the pointer to function is not 'NULL' */
+ 283:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         if (((uint32_t)NULL != (uint32_t)g_pdmaci_handlers[DMACA_CH4]) &&
+ 250                             		.loc 1 283 9 is_stmt 1 view .LVU55
+ 251                             		.loc 1 283 59 is_stmt 0 view .LVU56
+ 252 001c FB 52 00 00 00 00       		mov.L	#_g_pdmaci_handlers, r5
+ 253 0022 A9 55                   		mov.L	16[r5], r5
+ 254                             		.loc 1 283 12 view .LVU57
+ 255 0024 61 05                   		cmp	#0, r5
+ 256 0026 12                      		beq	.L17
+ 257                             		.loc 1 283 72 discriminator 1 view .LVU58
+ 258 0027 74 05 00 00 00 10       		cmp	#0x10000000, r5
+ 259 002d 13                      		beq	.L17
+ 284:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 285:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****            /* If the pointer to function is not 'FIT_NO_FUNC' */
+ 286:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****            ((uint32_t)FIT_NO_FUNC != (uint32_t)g_pdmaci_handlers[DMACA_CH4]))
+ 287:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 288:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Callback function handles for channel 4 */
+ 289:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             ((DMACI_Callback)g_pdmaci_handlers[DMACA_CH4])();
+ 260                             		.loc 1 289 13 is_stmt 1 view .LVU59
+ 261                             		.loc 1 289 14 is_stmt 0 view .LVU60
+ 262 002e 7F 15                   		jsr	r5
+ 263                             	.LVL9:
+ 264                             		.balign 8,3,6
+ 265                             	.L17:
+ 290:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 291:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         else
+ 292:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 293:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* do something */
+ 294:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 266                             		.loc 1 294 9 is_stmt 1 view .LVU61
+ 295:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     }
+ 296:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 297:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     if (0x00 != (channel & DMACA_DMIS5_BIT_MASK))
+ 267                             		.loc 1 297 5 view .LVU62
+ 268                             		.loc 1 297 8 is_stmt 0 view .LVU63
+ 269 0030 FD 74 C6 20             		tst	#32, r6
+ 270 0034 20 1C                   		beq	.L18
+ 298:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     {
+ 299:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         /* If the pointer to function is not 'NULL' */
+ 300:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         if (((uint32_t)NULL != (uint32_t)g_pdmaci_handlers[DMACA_CH5]) &&
+ 271                             		.loc 1 300 9 is_stmt 1 view .LVU64
+ 272                             		.loc 1 300 59 is_stmt 0 view .LVU65
+ 273 0036 FB 52 00 00 00 00       		mov.L	#_g_pdmaci_handlers, r5
+ 274 003c A9 5D                   		mov.L	20[r5], r5
+ 275                             		.loc 1 300 12 view .LVU66
+ 276 003e 61 05                   		cmp	#0, r5
+ 277 0040 20 10                   		beq	.L18
+ 278                             		.loc 1 300 72 discriminator 1 view .LVU67
+ 279 0042 74 05 00 00 00 10       		cmp	#0x10000000, r5
+ 280 0048 10                      		beq	.L18
+ 301:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 302:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****            /* If the pointer to function is not 'FIT_NO_FUNC' */
+ 303:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****            ((uint32_t)FIT_NO_FUNC != (uint32_t)g_pdmaci_handlers[DMACA_CH5]))
+ 304:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 305:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Callback function handles for channel 5 */
+ 306:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             ((DMACI_Callback)g_pdmaci_handlers[DMACA_CH5])();
+ 281                             		.loc 1 306 13 is_stmt 1 view .LVU68
+ 282                             		.loc 1 306 14 is_stmt 0 view .LVU69
+ 283 0049 7F 15                   		jsr	r5
+ 284                             	.LVL10:
+ 285 004b 77 10 01 00 00          		.balign 8,3,6
+ 286                             	.L18:
+ 307:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 308:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         else
+ 309:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 310:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* do something */
+ 311:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 287                             		.loc 1 311 9 is_stmt 1 view .LVU70
+ 312:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     }
+ 313:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 314:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     if (0x00 != (channel & DMACA_DMIS6_BIT_MASK))
+ 288                             		.loc 1 314 5 view .LVU71
+ 289                             		.loc 1 314 8 is_stmt 0 view .LVU72
+ 290 0050 FD 74 C6 40             		tst	#0x40, r6
+ 291 0054 20 1C                   		beq	.L19
+ 315:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     {
+ 316:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         /* If the pointer to function is not 'NULL' */
+ 317:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         if (((uint32_t)NULL != (uint32_t)g_pdmaci_handlers[DMACA_CH6]) &&
+ 292                             		.loc 1 317 9 is_stmt 1 view .LVU73
+ 293                             		.loc 1 317 59 is_stmt 0 view .LVU74
+ 294 0056 FB 52 00 00 00 00       		mov.L	#_g_pdmaci_handlers, r5
+ 295 005c A9 D5                   		mov.L	24[r5], r5
+ 296                             		.loc 1 317 12 view .LVU75
+ 297 005e 61 05                   		cmp	#0, r5
+ 298 0060 20 10                   		beq	.L19
+ 299                             		.loc 1 317 72 discriminator 1 view .LVU76
+ 300 0062 74 05 00 00 00 10       		cmp	#0x10000000, r5
+ 301 0068 10                      		beq	.L19
+ 318:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 319:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****            /* If the pointer to function is not 'FIT_NO_FUNC' */
+ 320:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****            ((uint32_t)FIT_NO_FUNC != (uint32_t)g_pdmaci_handlers[DMACA_CH6]))
+ 321:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 322:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Callback function handles for channel 6 */
+ 323:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             ((DMACI_Callback)g_pdmaci_handlers[DMACA_CH6])();
+ 302                             		.loc 1 323 13 is_stmt 1 view .LVU77
+ 303                             		.loc 1 323 14 is_stmt 0 view .LVU78
+ 304 0069 7F 15                   		jsr	r5
+ 305                             	.LVL11:
+ 306 006b 77 10 01 00 00          		.balign 8,3,6
+ 307                             	.L19:
+ 324:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 325:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         else
+ 326:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 327:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* do something */
+ 328:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 308                             		.loc 1 328 9 is_stmt 1 view .LVU79
+ 329:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     }
+ 330:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 331:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     if (0x00 != (channel & DMACA_DMIS7_BIT_MASK))
+ 309                             		.loc 1 331 5 view .LVU80
+ 310                             		.loc 1 331 8 is_stmt 0 view .LVU81
+ 311 0070 FD 78 C6 80 00          		tst	#0x80, r6
+ 312 0075 21 14                   		bne	.L22
+ 313 0077 03                      		.balign 8,3,1
+ 314                             	.L16:
+ 332:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     {
+ 333:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         /* If the pointer to function is not 'NULL' */
+ 334:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         if (((uint32_t)NULL != (uint32_t)g_pdmaci_handlers[DMACA_CH7]) &&
+ 335:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 336:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****            /* If the pointer to function is not 'FIT_NO_FUNC' */
+ 337:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****            ((uint32_t)FIT_NO_FUNC != (uint32_t)g_pdmaci_handlers[DMACA_CH7]))
+ 338:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 339:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Callback function handles for channel 7 */
+ 340:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             ((DMACI_Callback)g_pdmaci_handlers[DMACA_CH7])();
+ 341:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 342:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         else
+ 343:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 344:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* do something */
+ 345:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 346:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     }
+ 347:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 348:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     return;
+ 349:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** }
+ 315                             		.loc 1 349 1 view .LVU82
+ 316 0078 7E B3                   		pop	r3
+ 317 007a 7E B2                   		pop	r2
+ 318 007c FB 1E 30 14 08          		mov.L	#0x81430, r1
+ 319 0081 E3 12                   		mov.L	r2, [r1]
+ 320 0083 A0 1B                   		mov.L	r3, 4[r1]
+ 321 0085 6F 1F                   		popm	r1-r15
+ 322                             	.LVL12:
+ 323                             		.loc 1 349 1 view .LVU83
+ 324 0087 7F 95                   		rte
+ 325                             	.LVL13:
+ 326                             	.L22:
+ 334:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 327                             		.loc 1 334 9 is_stmt 1 view .LVU84
+ 334:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 328                             		.loc 1 334 59 is_stmt 0 view .LVU85
+ 329 0089 FB 52 00 00 00 00       		mov.L	#_g_pdmaci_handlers, r5
+ 330 008f A9 DD                   		mov.L	28[r5], r5
+ 334:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 331                             		.loc 1 334 12 view .LVU86
+ 332 0091 61 05                   		cmp	#0, r5
+ 333 0093 20 E5                   		beq	.L16
+ 334:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 334                             		.loc 1 334 72 discriminator 1 view .LVU87
+ 335 0095 74 05 00 00 00 10       		cmp	#0x10000000, r5
+ 336 009b 20 DD                   		beq	.L16
+ 340:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 337                             		.loc 1 340 13 is_stmt 1 view .LVU88
+ 340:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 338                             		.loc 1 340 14 is_stmt 0 view .LVU89
+ 339 009d 7F 15                   		jsr	r5
+ 340                             	.LVL14:
+ 345:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     }
+ 341                             		.loc 1 345 9 is_stmt 1 view .LVU90
+ 348:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** }
+ 342                             		.loc 1 348 5 view .LVU91
+ 343 009f 2E D9                   		bra	.L16
+ 344                             	.LFE8:
+ 346 00a1 FD 70 40 00 00 00 80    		.section	.text.r_dmaca_int_disable,"ax",@progbits
+ 347                             		.global	_r_dmaca_int_disable
+ 349                             	_r_dmaca_int_disable:
+ 350                             	.LVL15:
+ 351                             	.LFB9:
+ 350:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /**************************************************************************
+ 351:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * End of function r_dmaca_intdmac74i_isr
+ 352:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *************************************************************************/
+ 353:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 354:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /*******************************************************************************
+ 355:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Function Name: r_dmaca_int_disable
+ 356:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Description  : Disables DMACmI interrupt. (m = 0 to 3, or 74)
+ 357:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Arguments    : channel -
+ 358:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                    Which channel to use
+ 359:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Return Value : DMACA_SUCCESS -
+ 360:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                    DMACmI interrupt is disabled successfully.
+ 361:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                DMACA_ERR_INVALID_CH -
+ 362:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                    Channel is invalid.
+ 363:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *******************************************************************************/
+ 364:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** dmaca_return_t r_dmaca_int_disable(uint8_t channel)
+ 365:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** {
+ 352                             		.loc 1 365 1 view -0
+ 366:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 367:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* Clear the DMACmI interrupt Enable bit. */
+ 368:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* Clear the DMACmI priority level. */
+ 369:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     switch (channel)
+ 353                             		.loc 1 369 5 view .LVU93
+ 354 0000 5B 15                   		movu.B	r1, r5
+ 355 0002 61 35                   		cmp	#3, r5
+ 356 0004 3A C1 00                		beq	.L24
+ 357 0007 25 56                   		bleu	.L36
+ 358 0009 5B 15                   		movu.B	r1, r5
+ 359 000b 61 55                   		cmp	#5, r5
+ 360 000d 3A 14 01                		beq	.L29
+ 361 0010 22 05 38 CE 00          		bltu	.L30
+ 362 0015 61 65                   		cmp	#6, r5
+ 363 0017 3A 4D 01                		beq	.L31
+ 364 001a 61 75                   		cmp	#7, r5
+ 365 001c 21 70                   		bne	.L37
+ 370:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     {
+ 371:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH0:
+ 372:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 373:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Clear the DMAC0I interrupt Enable bit. */
+ 374:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         	R_BSP_InterruptRequestDisable(VECT(DMAC,DMAC0I));
+ 375:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 376:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Clear the DMAC0I priority level. */
+ 377:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             IPR(DMAC, DMAC0I) = 0;
+ 378:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 379:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 380:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH1:
+ 381:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 382:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Clear the DMAC1I interrupt Enable bit. */
+ 383:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         	R_BSP_InterruptRequestDisable(VECT(DMAC,DMAC1I));
+ 384:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 385:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Clear the DMAC1I priority level. */
+ 386:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             IPR(DMAC, DMAC1I) = 0;
+ 387:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 388:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 389:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH2:
+ 390:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 391:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Clear the DMAC2I interrupt Enable bit. */
+ 392:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         	R_BSP_InterruptRequestDisable(VECT(DMAC,DMAC2I));
+ 393:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 394:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Clear the DMAC2I priority level. */
+ 395:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             IPR(DMAC, DMAC2I) = 0;
+ 396:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 397:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 398:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH3:
+ 399:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 400:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Clear the DMAC3I interrupt Enable bit. */
+ 401:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         	R_BSP_InterruptRequestDisable(VECT(DMAC,DMAC3I));
+ 402:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 403:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Clear the DMAC3I priority level. */
+ 404:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             IPR(DMAC, DMAC3I) = 0;
+ 405:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 406:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 407:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH4:
+ 408:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 409:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             if (!((g_locking_sw[DMACA_CH5] || g_locking_sw[DMACA_CH6]) || g_locking_sw[DMACA_CH7]))
+ 410:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             {
+ 411:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 412:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****                 /* Clear the DMAC74I interrupt Enable bit. */
+ 413:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             	R_BSP_InterruptRequestDisable(VECT(DMAC,DMAC74I));
+ 414:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 415:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****                 /* Clear the DMAC74I priority level. */
+ 416:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****                 IPR(DMAC, DMAC74I) = 0;
+ 417:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             }
+ 418:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 419:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 420:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH5:
+ 421:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 422:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             if (!((g_locking_sw[DMACA_CH4] || g_locking_sw[DMACA_CH6]) || g_locking_sw[DMACA_CH7]))
+ 423:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             {
+ 424:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 425:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****                 /* Clear the DMAC74I interrupt Enable bit. */
+ 426:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             	R_BSP_InterruptRequestDisable(VECT(DMAC,DMAC74I));
+ 427:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 428:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****                 /* Clear the DMAC74I priority level. */
+ 429:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****                 IPR(DMAC, DMAC74I) = 0;
+ 430:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             }
+ 431:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 432:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 433:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH6:
+ 434:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 435:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             if (!((g_locking_sw[DMACA_CH4] || g_locking_sw[DMACA_CH5]) || g_locking_sw[DMACA_CH7]))
+ 436:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             {
+ 437:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 438:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****                 /* Clear the DMAC74I interrupt Enable bit. */
+ 439:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             	R_BSP_InterruptRequestDisable(VECT(DMAC,DMAC74I));
+ 440:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 441:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****                 /* Clear the DMAC74I priority level. */
+ 442:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****                 IPR(DMAC, DMAC74I) = 0;
+ 443:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             }
+ 444:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 445:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 446:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH7:
+ 447:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 448:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             if (!((g_locking_sw[DMACA_CH4] || g_locking_sw[DMACA_CH5]) || g_locking_sw[DMACA_CH6]))
+ 366                             		.loc 1 448 13 view .LVU94
+ 367                             		.loc 1 448 16 is_stmt 0 view .LVU95
+ 368 001e FB 52 00 00 00 00       		mov.L	#_g_locking_sw, r5
+ 369 0024 B1 55                   		movu.B	4[r5], r5
+ 370 0026 61 05                   		cmp	#0, r5
+ 371 0028 21 58                   		bne	.L34
+ 372                             		.loc 1 448 44 discriminator 1 view .LVU96
+ 373 002a FB 52 00 00 00 00       		mov.L	#_g_locking_sw, r5
+ 374 0030 B1 5D                   		movu.B	5[r5], r5
+ 375 0032 61 05                   		cmp	#0, r5
+ 376 0034 21 4C                   		bne	.L34
+ 377                             		.loc 1 448 17 discriminator 2 view .LVU97
+ 378 0036 FB 52 00 00 00 00       		mov.L	#_g_locking_sw, r5
+ 379 003c B1 D5                   		movu.B	6[r5], r5
+ 380 003e 61 05                   		cmp	#0, r5
+ 381 0040 21 40                   		bne	.L34
+ 449:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             {
+ 450:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 451:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****                 /* Clear the DMAC74I interrupt Enable bit. */
+ 452:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             	R_BSP_InterruptRequestDisable(VECT(DMAC,DMAC74I));
+ 382                             		.loc 1 452 14 is_stmt 1 view .LVU98
+ 383 0042 75 41 7C                		mov.L	#0x7c, r1
+ 384                             	.LVL16:
+ 385                             		.loc 1 452 14 is_stmt 0 view .LVU99
+ 386 0045 05 00 00 00             		bsr	_R_BSP_InterruptRequestDisable
+ 387                             	.LVL17:
+ 453:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 454:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****                 /* Clear the DMAC74I priority level. */
+ 455:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****                 IPR(DMAC, DMAC74I) = 0;
+ 388                             		.loc 1 455 17 is_stmt 1 view .LVU100
+ 389                             		.loc 1 455 36 is_stmt 0 view .LVU101
+ 390 0049 FB 5E 00 70 08          		mov.L	#0x87000, r5
+ 391 004e CE 53 7C 03             		mov.B	892[r5], r3
+ 392 0052 FB 46 F0                		mov.L	#-16, r4
+ 393 0055 53 34                   		and	r3, r4
+ 394 0057 CB 54 7C 03             		mov.B	r4, 892[r5]
+ 395 005b 2E 25                   		bra	.L34
+ 396                             	.LVL18:
+ 397                             	.L36:
+ 369:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     {
+ 398                             		.loc 1 369 5 view .LVU102
+ 399 005d 61 15                   		cmp	#1, r5
+ 400 005f 20 30                   		beq	.L26
+ 401 0061 61 15                   		cmp	#1, r5
+ 402 0063 24 47                   		bgtu	.L38
+ 374:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 403                             		.loc 1 374 10 is_stmt 1 view .LVU103
+ 404 0065 75 41 78                		mov.L	#0x78, r1
+ 405                             	.LVL19:
+ 374:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 406                             		.loc 1 374 10 is_stmt 0 view .LVU104
+ 407 0068 05 00 00 00             		bsr	_R_BSP_InterruptRequestDisable
+ 408                             	.LVL20:
+ 377:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 409                             		.loc 1 377 13 is_stmt 1 view .LVU105
+ 377:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 410                             		.loc 1 377 31 is_stmt 0 view .LVU106
+ 411 006c FB 5E 00 70 08          		mov.L	#0x87000, r5
+ 412 0071 CE 53 78 03             		mov.B	888[r5], r3
+ 413 0075 FB 46 F0                		mov.L	#-16, r4
+ 414 0078 53 34                   		and	r3, r4
+ 415 007a CB 54 78 03             		mov.B	r4, 888[r5]
+ 378:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 416                             		.loc 1 378 13 is_stmt 1 view .LVU107
+ 417 007e EF 00                   		.balign 8,3,4
+ 418                             	.L34:
+ 456:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             }
+ 457:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 458:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 459:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         default:
+ 460:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 461:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* The channel number is invalid. */
+ 462:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             return DMACA_ERR_INVALID_CH;
+ 463:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 419                             		.loc 1 463 13 view .LVU108
+ 464:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 465:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     }
+ 466:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 467:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* Check interrupt priority of DMAC0I*/
+ 468:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     if (0x00 == IPR(DMAC, DMAC0I))
+ 420                             		.loc 1 468 5 view .LVU109
+ 421                             		.loc 1 468 17 is_stmt 0 view .LVU110
+ 422 0080 FB 5E 00 70 08          		mov.L	#0x87000, r5
+ 423 0085 CE 55 78 03             		mov.B	888[r5], r5
+ 469:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     {
+ 470:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         /* do nothing */
+ 471:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     }
+ 424                             		.loc 1 471 5 is_stmt 1 view .LVU111
+ 472:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 473:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     return DMACA_SUCCESS;
+ 425                             		.loc 1 473 5 view .LVU112
+ 426                             		.loc 1 473 12 is_stmt 0 view .LVU113
+ 427 0089 66 21                   		mov.L	#2, r1
+ 474:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** }
+ 428                             		.loc 1 474 1 view .LVU114
+ 429 008b 02                      		rts
+ 430                             	.LVL21:
+ 431                             	.L37:
+ 462:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 432                             		.loc 1 462 20 view .LVU115
+ 433 008c 66 31                   		mov.L	#3, r1
+ 434                             	.LVL22:
+ 462:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 435                             		.loc 1 462 20 view .LVU116
+ 436 008e 02                      		rts
+ 437                             	.LVL23:
+ 438                             	.L26:
+ 383:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 439                             		.loc 1 383 10 is_stmt 1 view .LVU117
+ 440 008f 75 41 79                		mov.L	#0x79, r1
+ 441                             	.LVL24:
+ 383:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 442                             		.loc 1 383 10 is_stmt 0 view .LVU118
+ 443 0092 05 00 00 00             		bsr	_R_BSP_InterruptRequestDisable
+ 444                             	.LVL25:
+ 386:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 445                             		.loc 1 386 13 is_stmt 1 view .LVU119
+ 386:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 446                             		.loc 1 386 31 is_stmt 0 view .LVU120
+ 447 0096 FB 5E 00 70 08          		mov.L	#0x87000, r5
+ 448 009b CE 53 79 03             		mov.B	889[r5], r3
+ 449 009f FB 46 F0                		mov.L	#-16, r4
+ 450 00a2 53 34                   		and	r3, r4
+ 451 00a4 CB 54 79 03             		mov.B	r4, 889[r5]
+ 387:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 452                             		.loc 1 387 13 is_stmt 1 view .LVU121
+ 453 00a8 2E D8                   		bra	.L34
+ 454                             	.LVL26:
+ 455                             	.L38:
+ 392:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 456                             		.loc 1 392 10 view .LVU122
+ 457 00aa 75 41 7A                		mov.L	#0x7a, r1
+ 458                             	.LVL27:
+ 392:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 459                             		.loc 1 392 10 is_stmt 0 view .LVU123
+ 460 00ad 05 00 00 00             		bsr	_R_BSP_InterruptRequestDisable
+ 461                             	.LVL28:
+ 395:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 462                             		.loc 1 395 13 is_stmt 1 view .LVU124
+ 395:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 463                             		.loc 1 395 31 is_stmt 0 view .LVU125
+ 464 00b1 FB 5E 00 70 08          		mov.L	#0x87000, r5
+ 465 00b6 CE 53 7A 03             		mov.B	890[r5], r3
+ 466 00ba FB 46 F0                		mov.L	#-16, r4
+ 467 00bd 53 34                   		and	r3, r4
+ 468 00bf CB 54 7A 03             		mov.B	r4, 890[r5]
+ 396:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 469                             		.loc 1 396 13 is_stmt 1 view .LVU126
+ 470 00c3 2E BD                   		bra	.L34
+ 471                             	.LVL29:
+ 472                             	.L24:
+ 401:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 473                             		.loc 1 401 10 view .LVU127
+ 474 00c5 75 41 7B                		mov.L	#0x7b, r1
+ 475                             	.LVL30:
+ 401:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 476                             		.loc 1 401 10 is_stmt 0 view .LVU128
+ 477 00c8 05 00 00 00             		bsr	_R_BSP_InterruptRequestDisable
+ 478                             	.LVL31:
+ 404:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 479                             		.loc 1 404 13 is_stmt 1 view .LVU129
+ 404:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 480                             		.loc 1 404 31 is_stmt 0 view .LVU130
+ 481 00cc FB 5E 00 70 08          		mov.L	#0x87000, r5
+ 482 00d1 CE 53 7B 03             		mov.B	891[r5], r3
+ 483 00d5 FB 46 F0                		mov.L	#-16, r4
+ 484 00d8 53 34                   		and	r3, r4
+ 485 00da CB 54 7B 03             		mov.B	r4, 891[r5]
+ 405:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 486                             		.loc 1 405 13 is_stmt 1 view .LVU131
+ 487 00de 2E A2                   		bra	.L34
+ 488                             	.LVL32:
+ 489                             	.L30:
+ 409:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             {
+ 490                             		.loc 1 409 13 view .LVU132
+ 409:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             {
+ 491                             		.loc 1 409 16 is_stmt 0 view .LVU133
+ 492 00e0 FB 52 00 00 00 00       		mov.L	#_g_locking_sw, r5
+ 493 00e6 B1 5D                   		movu.B	5[r5], r5
+ 494 00e8 61 05                   		cmp	#0, r5
+ 495 00ea 21 96                   		bne	.L34
+ 409:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             {
+ 496                             		.loc 1 409 44 discriminator 1 view .LVU134
+ 497 00ec FB 52 00 00 00 00       		mov.L	#_g_locking_sw, r5
+ 498 00f2 B1 D5                   		movu.B	6[r5], r5
+ 499 00f4 61 05                   		cmp	#0, r5
+ 500 00f6 21 8A                   		bne	.L34
+ 409:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             {
+ 501                             		.loc 1 409 17 discriminator 2 view .LVU135
+ 502 00f8 FB 52 00 00 00 00       		mov.L	#_g_locking_sw, r5
+ 503 00fe B1 DD                   		movu.B	7[r5], r5
+ 504 0100 61 05                   		cmp	#0, r5
+ 505 0102 3B 7E FF                		bne	.L34
+ 413:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 506                             		.loc 1 413 14 is_stmt 1 view .LVU136
+ 507 0105 75 41 7C                		mov.L	#0x7c, r1
+ 508                             	.LVL33:
+ 413:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 509                             		.loc 1 413 14 is_stmt 0 view .LVU137
+ 510 0108 05 00 00 00             		bsr	_R_BSP_InterruptRequestDisable
+ 511                             	.LVL34:
+ 416:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             }
+ 512                             		.loc 1 416 17 is_stmt 1 view .LVU138
+ 416:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             }
+ 513                             		.loc 1 416 36 is_stmt 0 view .LVU139
+ 514 010c FB 5E 00 70 08          		mov.L	#0x87000, r5
+ 515 0111 CE 53 7C 03             		mov.B	892[r5], r3
+ 516 0115 FB 46 F0                		mov.L	#-16, r4
+ 517 0118 53 34                   		and	r3, r4
+ 518 011a CB 54 7C 03             		mov.B	r4, 892[r5]
+ 519 011e 38 62 FF                		bra	.L34
+ 520                             	.LVL35:
+ 521                             	.L29:
+ 422:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             {
+ 522                             		.loc 1 422 13 is_stmt 1 view .LVU140
+ 422:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             {
+ 523                             		.loc 1 422 16 is_stmt 0 view .LVU141
+ 524 0121 FB 52 00 00 00 00       		mov.L	#_g_locking_sw, r5
+ 525 0127 B1 55                   		movu.B	4[r5], r5
+ 526 0129 61 05                   		cmp	#0, r5
+ 527 012b 3B 55 FF                		bne	.L34
+ 422:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             {
+ 528                             		.loc 1 422 44 discriminator 1 view .LVU142
+ 529 012e FB 52 00 00 00 00       		mov.L	#_g_locking_sw, r5
+ 530 0134 B1 D5                   		movu.B	6[r5], r5
+ 531 0136 61 05                   		cmp	#0, r5
+ 532 0138 3B 48 FF                		bne	.L34
+ 422:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             {
+ 533                             		.loc 1 422 17 discriminator 2 view .LVU143
+ 534 013b FB 52 00 00 00 00       		mov.L	#_g_locking_sw, r5
+ 535 0141 B1 DD                   		movu.B	7[r5], r5
+ 536 0143 61 05                   		cmp	#0, r5
+ 537 0145 3B 3B FF                		bne	.L34
+ 426:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 538                             		.loc 1 426 14 is_stmt 1 view .LVU144
+ 539 0148 75 41 7C                		mov.L	#0x7c, r1
+ 540                             	.LVL36:
+ 426:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 541                             		.loc 1 426 14 is_stmt 0 view .LVU145
+ 542 014b 05 00 00 00             		bsr	_R_BSP_InterruptRequestDisable
+ 543                             	.LVL37:
+ 429:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             }
+ 544                             		.loc 1 429 17 is_stmt 1 view .LVU146
+ 429:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             }
+ 545                             		.loc 1 429 36 is_stmt 0 view .LVU147
+ 546 014f FB 5E 00 70 08          		mov.L	#0x87000, r5
+ 547 0154 CE 53 7C 03             		mov.B	892[r5], r3
+ 548 0158 FB 46 F0                		mov.L	#-16, r4
+ 549 015b 53 34                   		and	r3, r4
+ 550 015d CB 54 7C 03             		mov.B	r4, 892[r5]
+ 551 0161 38 1F FF                		bra	.L34
+ 552                             	.LVL38:
+ 553                             	.L31:
+ 435:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             {
+ 554                             		.loc 1 435 13 is_stmt 1 view .LVU148
+ 435:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             {
+ 555                             		.loc 1 435 16 is_stmt 0 view .LVU149
+ 556 0164 FB 52 00 00 00 00       		mov.L	#_g_locking_sw, r5
+ 557 016a B1 55                   		movu.B	4[r5], r5
+ 558 016c 61 05                   		cmp	#0, r5
+ 559 016e 3B 12 FF                		bne	.L34
+ 435:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             {
+ 560                             		.loc 1 435 44 discriminator 1 view .LVU150
+ 561 0171 FB 52 00 00 00 00       		mov.L	#_g_locking_sw, r5
+ 562 0177 B1 5D                   		movu.B	5[r5], r5
+ 563 0179 61 05                   		cmp	#0, r5
+ 564 017b 3B 05 FF                		bne	.L34
+ 435:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             {
+ 565                             		.loc 1 435 17 discriminator 2 view .LVU151
+ 566 017e FB 52 00 00 00 00       		mov.L	#_g_locking_sw, r5
+ 567 0184 B1 DD                   		movu.B	7[r5], r5
+ 568 0186 61 05                   		cmp	#0, r5
+ 569 0188 3B F8 FE                		bne	.L34
+ 439:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 570                             		.loc 1 439 14 is_stmt 1 view .LVU152
+ 571 018b 75 41 7C                		mov.L	#0x7c, r1
+ 572                             	.LVL39:
+ 439:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 573                             		.loc 1 439 14 is_stmt 0 view .LVU153
+ 574 018e 05 00 00 00             		bsr	_R_BSP_InterruptRequestDisable
+ 575                             	.LVL40:
+ 442:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             }
+ 576                             		.loc 1 442 17 is_stmt 1 view .LVU154
+ 442:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             }
+ 577                             		.loc 1 442 36 is_stmt 0 view .LVU155
+ 578 0192 FB 5E 00 70 08          		mov.L	#0x87000, r5
+ 579 0197 CE 53 7C 03             		mov.B	892[r5], r3
+ 580 019b FB 46 F0                		mov.L	#-16, r4
+ 581 019e 53 34                   		and	r3, r4
+ 582 01a0 CB 54 7C 03             		mov.B	r4, 892[r5]
+ 583 01a4 38 DC FE                		bra	.L34
+ 584                             	.LFE9:
+ 586 01a7 03                      		.section	.text.r_dmaca_int_enable,"ax",@progbits
+ 587                             		.global	_r_dmaca_int_enable
+ 589                             	_r_dmaca_int_enable:
+ 590                             	.LVL41:
+ 591                             	.LFB10:
+ 475:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /**************************************************************************
+ 476:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * End of function r_dmaca_int_disable
+ 477:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *************************************************************************/
+ 478:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 479:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /*******************************************************************************
+ 480:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Function Name: r_dmaca_int_enable
+ 481:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Description  : Enables DMACmI interrupt. (m = 0 to 3, or 74)
+ 482:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Arguments    : channel -
+ 483:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                    Which channel to use
+ 484:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *              : priority -
+ 485:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                    DMACmI interrupt priority level
+ 486:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Return Value : DMACA_SUCCESS -
+ 487:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                    DMACmI interrupt is enabled successfully.
+ 488:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                DMACA_ERR_INVALID_CH -
+ 489:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                    Channel is invalid.
+ 490:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *******************************************************************************/
+ 491:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** dmaca_return_t r_dmaca_int_enable(uint8_t channel, uint8_t priority)
+ 492:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** {
+ 592                             		.loc 1 492 1 is_stmt 1 view -0
+ 493:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* Set the DMACmI priority level. */
+ 494:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* Set the DMACmI interrupt Enable bit. */
+ 495:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     switch (channel)
+ 593                             		.loc 1 495 5 view .LVU157
+ 594 0000 5B 15                   		movu.B	r1, r5
+ 595 0002 61 25                   		cmp	#2, r5
+ 596 0004 3A 90 00                		beq	.L40
+ 597 0007 25 3E                   		bleu	.L51
+ 598 0009 5B 15                   		movu.B	r1, r5
+ 599 000b 61 35                   		cmp	#3, r5
+ 600 000d 3A A4 00                		beq	.L45
+ 601 0010 61 75                   		cmp	#7, r5
+ 602 0012 25 05 38 BA 00          		bgtu	.L52
+ 496:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     {
+ 497:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH0:
+ 498:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 499:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 500:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Set the DMAC0I priority level. */
+ 501:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             IPR(DMAC, DMAC0I) = priority;
+ 502:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 503:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Set the DMAC0I interrupt Enable bit. */
+ 504:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             R_BSP_InterruptRequestEnable(VECT(DMAC,DMAC0I));
+ 505:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 506:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 507:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH1:
+ 508:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 509:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Set the DMAC1I priority level. */
+ 510:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             IPR(DMAC, DMAC1I) = priority;
+ 511:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 512:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Set the DMAC1I interrupt Enable bit. */
+ 513:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             R_BSP_InterruptRequestEnable(VECT(DMAC,DMAC1I));
+ 514:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 515:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 516:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH2:
+ 517:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 518:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 519:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Set the DMAC2I priority level. */
+ 520:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             IPR(DMAC, DMAC2I) = priority;
+ 521:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 522:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Set the DMAC2I interrupt Enable bit. */
+ 523:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             R_BSP_InterruptRequestEnable(VECT(DMAC,DMAC2I));
+ 524:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 525:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 526:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH3:
+ 527:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 528:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 529:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Set the DMAC3I priority level. */
+ 530:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             IPR(DMAC, DMAC3I) = priority;
+ 531:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 532:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Set the DMAC3I interrupt Enable bit. */
+ 533:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             R_BSP_InterruptRequestEnable(VECT(DMAC,DMAC3I));
+ 534:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 535:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 536:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH4:
+ 537:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH5:
+ 538:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH6:
+ 539:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         case DMACA_CH7:
+ 540:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 541:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* The interrupt number is DMAC74I. */
+ 542:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             if (IPR(DMAC, DMAC74I) < priority)
+ 603                             		.loc 1 542 13 view .LVU158
+ 604                             		.loc 1 542 17 is_stmt 0 view .LVU159
+ 605 0017 FB 5E 00 70 08          		mov.L	#0x87000, r5
+ 606 001c CE 55 7C 03             		mov.B	892[r5], r5
+ 607 0020 64 F5                   		and #15, r5
+ 608                             		.loc 1 542 36 view .LVU160
+ 609 0022 5B 24                   		movu.B	r2, r4
+ 610                             		.loc 1 542 16 view .LVU161
+ 611 0024 47 45                   		cmp	r4, r5
+ 612 0026 28 16                   		bge	.L48
+ 543:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             {
+ 544:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 545:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****                 /* Set the DMAC74I priority level. */
+ 546:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****                 IPR(DMAC, DMAC74I) = priority;
+ 613                             		.loc 1 546 17 is_stmt 1 view .LVU162
+ 614                             		.loc 1 546 36 is_stmt 0 view .LVU163
+ 615 0028 FB 4E 00 70 08          		mov.L	#0x87000, r4
+ 616 002d CE 45 7C 03             		mov.B	892[r4], r5
+ 617 0031 64 F2                   		and #15, r2
+ 618                             	.LVL42:
+ 619                             		.loc 1 546 36 view .LVU164
+ 620 0033 75 25 F0                		and #-16, r5
+ 621 0036 57 52                   		or	r5, r2
+ 622 0038 CB 42 7C 03             		mov.B	r2, 892[r4]
+ 623                             	.L48:
+ 547:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             }
+ 548:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 549:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* Set the DMAC3I interrupt Enable bit. */
+ 550:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             R_BSP_InterruptRequestEnable(VECT(DMAC,DMAC74I));
+ 624                             		.loc 1 550 13 is_stmt 1 view .LVU165
+ 625 003c 75 41 7C                		mov.L	#0x7c, r1
+ 626                             	.LVL43:
+ 627                             		.loc 1 550 13 is_stmt 0 view .LVU166
+ 628 003f 05 00 00 00             		bsr	_R_BSP_InterruptRequestEnable
+ 629                             	.LVL44:
+ 551:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 630                             		.loc 1 551 13 is_stmt 1 view .LVU167
+ 631 0043 2E 45                   		bra	.L47
+ 632                             	.LVL45:
+ 633                             	.L51:
+ 495:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     {
+ 634                             		.loc 1 495 5 is_stmt 0 view .LVU168
+ 635 0045 61 05                   		cmp	#0, r5
+ 636 0047 20 26                   		beq	.L42
+ 637 0049 61 15                   		cmp	#1, r5
+ 638 004b 21 1F                   		bne	.L53
+ 510:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 639                             		.loc 1 510 13 is_stmt 1 view .LVU169
+ 510:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 640                             		.loc 1 510 31 is_stmt 0 view .LVU170
+ 641 004d FB 4E 00 70 08          		mov.L	#0x87000, r4
+ 642 0052 CE 45 79 03             		mov.B	889[r4], r5
+ 643 0056 64 F2                   		and #15, r2
+ 644                             	.LVL46:
+ 510:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 645                             		.loc 1 510 31 view .LVU171
+ 646 0058 75 25 F0                		and #-16, r5
+ 647 005b 57 52                   		or	r5, r2
+ 648 005d CB 42 79 03             		mov.B	r2, 889[r4]
+ 513:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 649                             		.loc 1 513 13 is_stmt 1 view .LVU172
+ 650 0061 75 41 79                		mov.L	#0x79, r1
+ 651                             	.LVL47:
+ 513:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 652                             		.loc 1 513 13 is_stmt 0 view .LVU173
+ 653 0064 05 00 00 00             		bsr	_R_BSP_InterruptRequestEnable
+ 654                             	.LVL48:
+ 514:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 655                             		.loc 1 514 13 is_stmt 1 view .LVU174
+ 656 0068 2E 20                   		bra	.L47
+ 657                             	.LVL49:
+ 658                             	.L53:
+ 552:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 553:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         default:
+ 554:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         {
+ 555:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             /* The channel number is invalid. */
+ 556:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             return DMACA_ERR_INVALID_CH;
+ 659                             		.loc 1 556 20 is_stmt 0 view .LVU175
+ 660 006a 66 31                   		mov.L	#3, r1
+ 661                             	.LVL50:
+ 662                             		.loc 1 556 20 view .LVU176
+ 663 006c 02                      		rts
+ 664                             	.LVL51:
+ 665                             	.L42:
+ 501:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 666                             		.loc 1 501 13 is_stmt 1 view .LVU177
+ 501:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 667                             		.loc 1 501 31 is_stmt 0 view .LVU178
+ 668 006d FB 4E 00 70 08          		mov.L	#0x87000, r4
+ 669 0072 CE 45 78 03             		mov.B	888[r4], r5
+ 670 0076 64 F2                   		and #15, r2
+ 671                             	.LVL52:
+ 501:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 672                             		.loc 1 501 31 view .LVU179
+ 673 0078 75 25 F0                		and #-16, r5
+ 674 007b 57 52                   		or	r5, r2
+ 675 007d CB 42 78 03             		mov.B	r2, 888[r4]
+ 504:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 676                             		.loc 1 504 13 is_stmt 1 view .LVU180
+ 677 0081 75 41 78                		mov.L	#0x78, r1
+ 678                             	.LVL53:
+ 504:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 679                             		.loc 1 504 13 is_stmt 0 view .LVU181
+ 680 0084 05 00 00 00             		bsr	_R_BSP_InterruptRequestEnable
+ 681                             	.LVL54:
+ 505:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 682                             		.loc 1 505 13 is_stmt 1 view .LVU182
+ 683                             		.balign 8,3,4
+ 684                             	.L47:
+ 557:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 685                             		.loc 1 557 13 view .LVU183
+ 558:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 559:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     }
+ 560:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 561:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* Check interrupt enable of DMAC0I*/
+ 562:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     if (0x00 == IEN(DMAC, DMAC0I))
+ 686                             		.loc 1 562 5 view .LVU184
+ 687                             		.loc 1 562 17 is_stmt 0 view .LVU185
+ 688 0088 FB 5E 00 70 08          		mov.L	#0x87000, r5
+ 689 008d CE 55 0F 02             		mov.B	527[r5], r5
+ 563:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     {
+ 564:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         /* do nothing */
+ 565:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     }
+ 690                             		.loc 1 565 5 is_stmt 1 view .LVU186
+ 566:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 567:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     return DMACA_SUCCESS;
+ 691                             		.loc 1 567 5 view .LVU187
+ 692                             		.loc 1 567 12 is_stmt 0 view .LVU188
+ 693 0091 66 21                   		mov.L	#2, r1
+ 694 0093 02                      		rts
+ 695                             	.LVL55:
+ 696                             	.L40:
+ 520:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 697                             		.loc 1 520 13 is_stmt 1 view .LVU189
+ 520:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 698                             		.loc 1 520 31 is_stmt 0 view .LVU190
+ 699 0094 FB 4E 00 70 08          		mov.L	#0x87000, r4
+ 700 0099 CE 45 7A 03             		mov.B	890[r4], r5
+ 701 009d 64 F2                   		and #15, r2
+ 702                             	.LVL56:
+ 520:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 703                             		.loc 1 520 31 view .LVU191
+ 704 009f 75 25 F0                		and #-16, r5
+ 705 00a2 57 52                   		or	r5, r2
+ 706 00a4 CB 42 7A 03             		mov.B	r2, 890[r4]
+ 523:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 707                             		.loc 1 523 13 is_stmt 1 view .LVU192
+ 708 00a8 75 41 7A                		mov.L	#0x7a, r1
+ 709                             	.LVL57:
+ 523:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 710                             		.loc 1 523 13 is_stmt 0 view .LVU193
+ 711 00ab 05 00 00 00             		bsr	_R_BSP_InterruptRequestEnable
+ 712                             	.LVL58:
+ 524:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 713                             		.loc 1 524 13 is_stmt 1 view .LVU194
+ 714 00af 2E D9                   		bra	.L47
+ 715                             	.LVL59:
+ 716                             	.L45:
+ 530:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 717                             		.loc 1 530 13 view .LVU195
+ 530:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 718                             		.loc 1 530 31 is_stmt 0 view .LVU196
+ 719 00b1 FB 4E 00 70 08          		mov.L	#0x87000, r4
+ 720 00b6 CE 45 7B 03             		mov.B	891[r4], r5
+ 721 00ba 64 F2                   		and #15, r2
+ 722                             	.LVL60:
+ 530:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 723                             		.loc 1 530 31 view .LVU197
+ 724 00bc 75 25 F0                		and #-16, r5
+ 725 00bf 57 52                   		or	r5, r2
+ 726 00c1 CB 42 7B 03             		mov.B	r2, 891[r4]
+ 533:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 727                             		.loc 1 533 13 is_stmt 1 view .LVU198
+ 728 00c5 75 41 7B                		mov.L	#0x7b, r1
+ 729                             	.LVL61:
+ 533:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 730                             		.loc 1 533 13 is_stmt 0 view .LVU199
+ 731 00c8 05 00 00 00             		bsr	_R_BSP_InterruptRequestEnable
+ 732                             	.LVL62:
+ 534:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****         }
+ 733                             		.loc 1 534 13 is_stmt 1 view .LVU200
+ 734 00cc 2E BC                   		bra	.L47
+ 735                             	.LVL63:
+ 736                             	.L52:
+ 556:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****             break;
+ 737                             		.loc 1 556 20 is_stmt 0 view .LVU201
+ 738 00ce 66 31                   		mov.L	#3, r1
+ 739                             	.LVL64:
+ 568:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** }
+ 740                             		.loc 1 568 1 view .LVU202
+ 741 00d0 02                      		rts
+ 742                             	.LFE10:
+ 744 00d1 FD 70 40 00 00 00 80    		.section	.text.r_dmaca_module_enable,"ax",@progbits
+ 745                             		.global	_r_dmaca_module_enable
+ 747                             	_r_dmaca_module_enable:
+ 748                             	.LFB11:
+ 569:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /**************************************************************************
+ 570:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * End of function r_dmaca_int_enable
+ 571:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *************************************************************************/
+ 572:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 573:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /*******************************************************************************
+ 574:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Function Name: r_dmaca_module_enable
+ 575:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Description  : Releases module stop state.
+ 576:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Arguments    : None
+ 577:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Return Value : None
+ 578:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *******************************************************************************/
+ 579:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** void r_dmaca_module_enable(void)
+ 580:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** {
+ 749                             		.loc 1 580 1 is_stmt 1 view -0
+ 750 0000 60 40                   		sub	#4, r0
+ 751                             	.LCFI19:
+ 581:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** #if ((R_BSP_VERSION_MAJOR == 5) && (R_BSP_VERSION_MINOR >= 30)) || (R_BSP_VERSION_MAJOR >= 6)
+ 582:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** bsp_int_ctrl_t int_ctrl;
+ 752                             		.loc 1 582 1 view .LVU204
+ 583:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** #endif
+ 584:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* Enable writing to MSTP registers. */
+ 585:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LPC_CGC_SWR);
+ 753                             		.loc 1 585 5 view .LVU205
+ 754 0002 66 11                   		mov.L	#1, r1
+ 755 0004 05 00 00 00             		bsr	_R_BSP_RegisterProtectDisable
+ 756                             	.LVL65:
+ 586:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 587:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** #if ((R_BSP_VERSION_MAJOR == 5) && (R_BSP_VERSION_MINOR >= 30)) || (R_BSP_VERSION_MAJOR >= 6)
+ 588:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     R_BSP_InterruptControl(BSP_INT_SRC_EMPTY, BSP_INT_CMD_FIT_INTERRUPT_DISABLE, &int_ctrl);
+ 757                             		.loc 1 588 5 view .LVU206
+ 758 0008 EF 03                   		mov.L	r0, r3
+ 759 000a 66 62                   		mov.L	#6, r2
+ 760 000c 75 41 6E                		mov.L	#0x6e, r1
+ 761 000f 05 00 00 00             		bsr	_R_BSP_InterruptControl
+ 762                             	.LVL66:
+ 589:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** #endif
+ 590:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 591:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* Release from module stop state. */
+ 592:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     MSTP(DMAC) = 0;
+ 763                             		.loc 1 592 5 view .LVU207
+ 764                             		.loc 1 592 16 is_stmt 0 view .LVU208
+ 765 0013 FB 5E 00 00 08          		mov.L	#0x80000, r5
+ 766 0018 A9 54                   		mov.L	16[r5], r4
+ 767 001a 7B C4                   		bclr	#28, r4
+ 768 001c A1 54                   		mov.L	r4, 16[r5]
+ 593:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 594:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** #if ((R_BSP_VERSION_MAJOR == 5) && (R_BSP_VERSION_MINOR >= 30)) || (R_BSP_VERSION_MAJOR >= 6)
+ 595:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     R_BSP_InterruptControl(BSP_INT_SRC_EMPTY, BSP_INT_CMD_FIT_INTERRUPT_ENABLE, &int_ctrl);
+ 769                             		.loc 1 595 5 is_stmt 1 view .LVU209
+ 770 001e EF 03                   		mov.L	r0, r3
+ 771 0020 66 52                   		mov.L	#5, r2
+ 772 0022 75 41 6E                		mov.L	#0x6e, r1
+ 773 0025 05 00 00 00             		bsr	_R_BSP_InterruptControl
+ 774                             	.LVL67:
+ 596:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** #endif
+ 597:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 598:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* Disable writing to MSTP registers. */
+ 599:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LPC_CGC_SWR);
+ 775                             		.loc 1 599 5 view .LVU210
+ 776 0029 66 11                   		mov.L	#1, r1
+ 777 002b 05 00 00 00             		bsr	_R_BSP_RegisterProtectEnable
+ 778                             	.LVL68:
+ 600:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 601:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     return;
+ 779                             		.loc 1 601 5 view .LVU211
+ 602:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** }
+ 780                             		.loc 1 602 1 is_stmt 0 view .LVU212
+ 781 002f 67 01                   		rtsd	#4
+ 782                             	.LFE11:
+ 784                             		.section	.text.r_dmaca_module_disable,"ax",@progbits
+ 785                             		.global	_r_dmaca_module_disable
+ 787                             	_r_dmaca_module_disable:
+ 788                             	.LFB12:
+ 603:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /**************************************************************************
+ 604:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * End of function r_dmaca_module_enable
+ 605:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *************************************************************************/
+ 606:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 607:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /*******************************************************************************
+ 608:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Function Name: r_dmaca_module_disable
+ 609:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Description  : Sets to module stop state.
+ 610:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Arguments    : None
+ 611:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Return Value : None
+ 612:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *******************************************************************************/
+ 613:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** void r_dmaca_module_disable(void)
+ 614:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** {
+ 789                             		.loc 1 614 1 is_stmt 1 view -0
+ 790 0000 60 40                   		sub	#4, r0
+ 791                             	.LCFI20:
+ 615:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** #if ((R_BSP_VERSION_MAJOR == 5) && (R_BSP_VERSION_MINOR >= 30)) || (R_BSP_VERSION_MAJOR >= 6)
+ 616:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** bsp_int_ctrl_t int_ctrl;
+ 792                             		.loc 1 616 1 view .LVU214
+ 617:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** #endif
+ 618:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* Enable writing to MSTP registers. */
+ 619:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LPC_CGC_SWR);
+ 793                             		.loc 1 619 5 view .LVU215
+ 794 0002 66 11                   		mov.L	#1, r1
+ 795 0004 05 00 00 00             		bsr	_R_BSP_RegisterProtectDisable
+ 796                             	.LVL69:
+ 620:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 621:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** #if ((R_BSP_VERSION_MAJOR == 5) && (R_BSP_VERSION_MINOR >= 30)) || (R_BSP_VERSION_MAJOR >= 6)
+ 622:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     R_BSP_InterruptControl(BSP_INT_SRC_EMPTY, BSP_INT_CMD_FIT_INTERRUPT_DISABLE, &int_ctrl);
+ 797                             		.loc 1 622 5 view .LVU216
+ 798 0008 EF 03                   		mov.L	r0, r3
+ 799 000a 66 62                   		mov.L	#6, r2
+ 800 000c 75 41 6E                		mov.L	#0x6e, r1
+ 801 000f 05 00 00 00             		bsr	_R_BSP_InterruptControl
+ 802                             	.LVL70:
+ 623:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** #endif
+ 624:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 625:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* Set to module stop state. */
+ 626:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     MSTP(DMAC) = 1;
+ 803                             		.loc 1 626 5 view .LVU217
+ 804                             		.loc 1 626 16 is_stmt 0 view .LVU218
+ 805 0013 FB 5E 00 00 08          		mov.L	#0x80000, r5
+ 806 0018 A9 54                   		mov.L	16[r5], r4
+ 807 001a 79 C4                   		bset	#28, r4
+ 808 001c A1 54                   		mov.L	r4, 16[r5]
+ 627:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 628:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** #if ((R_BSP_VERSION_MAJOR == 5) && (R_BSP_VERSION_MINOR >= 30)) || (R_BSP_VERSION_MAJOR >= 6)
+ 629:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     R_BSP_InterruptControl(BSP_INT_SRC_EMPTY, BSP_INT_CMD_FIT_INTERRUPT_ENABLE, &int_ctrl);
+ 809                             		.loc 1 629 5 is_stmt 1 view .LVU219
+ 810 001e EF 03                   		mov.L	r0, r3
+ 811 0020 66 52                   		mov.L	#5, r2
+ 812 0022 75 41 6E                		mov.L	#0x6e, r1
+ 813 0025 05 00 00 00             		bsr	_R_BSP_InterruptControl
+ 814                             	.LVL71:
+ 630:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** #endif
+ 631:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* Disable writing to MSTP registers. */
+ 632:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_LPC_CGC_SWR);
+ 815                             		.loc 1 632 5 view .LVU220
+ 816 0029 66 11                   		mov.L	#1, r1
+ 817 002b 05 00 00 00             		bsr	_R_BSP_RegisterProtectEnable
+ 818                             	.LVL72:
+ 633:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 634:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     return;
+ 819                             		.loc 1 634 5 view .LVU221
+ 635:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** }
+ 820                             		.loc 1 635 1 is_stmt 0 view .LVU222
+ 821 002f 67 01                   		rtsd	#4
+ 822                             	.LFE12:
+ 824                             		.section	.text.r_dmaca_check_dtc_locking_byuser,"ax",@progbits
+ 825                             		.global	_r_dmaca_check_dtc_locking_byuser
+ 827                             	_r_dmaca_check_dtc_locking_byuser:
+ 828                             	.LFB13:
+ 636:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /**************************************************************************
+ 637:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * End of function r_dmaca_module_disable
+ 638:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *************************************************************************/
+ 639:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 640:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** #if ((0 == BSP_CFG_USER_LOCKING_ENABLED) && (bsp_lock_t == BSP_CFG_USER_LOCKING_TYPE))
+ 641:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** #if (1 != DMACA_CFG_USE_DTC_FIT_MODULE)
+ 642:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** /*******************************************************************************
+ 643:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Function Name: r_dmaca_check_dtc_locking_byuser
+ 644:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Description  : Checks DTC locking by user.
+ 645:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Arguments    : none -
+ 646:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** * Return Value : DMACA_ALL_CH_UNLOCKED_AND_DTC_UNLOCKED -
+ 647:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                    All DMAC channels and DTC are unlocked.
+ 648:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                DMACA_ALL_CH_UNLOCKED_BUT_DTC_LOCKED -
+ 649:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *                    All DMAC channels are unlocked, but DTC is locked.
+ 650:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** *******************************************************************************/
+ 651:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** dmaca_chk_locking_sw_t r_dmaca_check_dtc_locking_byuser(void)
+ 652:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** {
+ 829                             		.loc 1 652 1 is_stmt 1 view -0
+ 653:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     dmaca_chk_locking_sw_t  ret = DMACA_ALL_CH_UNLOCKED_AND_DTC_UNLOCKED;
+ 830                             		.loc 1 653 5 view .LVU224
+ 831                             	.LVL73:
+ 654:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     
+ 655:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* User has to check the locking of DTC by themselves. */
+ 656:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     /* do something */
+ 657:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** 
+ 658:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c ****     return ret;
+ 832                             		.loc 1 658 5 view .LVU225
+ 659:../src/smc_gen/r_dmaca_rx/src/targets/rx72n/r_dmaca_rx_target.c **** }
+ 833                             		.loc 1 659 1 is_stmt 0 view .LVU226
+ 834 0000 66 01                   		mov.L	#0, r1
+ 835 0002 02                      		rts
+ 836                             	.LFE13:
+ 838                             		.global	_g_icu_dmrsr
+ 839                             		.section	.data.g_icu_dmrsr,"aw"
+ 840                             		.balign 4
+ 843                             	_g_icu_dmrsr:
+ 844 0000 00 74 08 00             		.long	0x87400
+ 845 0004 04 74 08 00             		.long	0x87404
+ 846 0008 08 74 08 00             		.long	0x87408
+ 847 000c 0C 74 08 00             		.long	0x8740c
+ 848 0010 10 74 08 00             		.long	0x87410
+ 849 0014 14 74 08 00             		.long	0x87414
+ 850 0018 18 74 08 00             		.long	0x87418
+ 851 001c 1C 74 08 00             		.long	0x8741c
+ 1148                             	.Letext0:
+ 1149                             		.file 2 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 1150                             		.file 3 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 1151                             		.file 4 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\lib\\gcc\\rx-
+ 1152                             		.file 5 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 1153                             		.file 6 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 1154                             		.file 7 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 1155                             		.file 8 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/all/r_rx_compi
+ 1156                             		.file 9 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/rx72n/register
+ 1157                             		.file 10 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/rx72n/mcu_loc
+ 1158                             		.file 11 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/rx72n/r_bsp_c
+ 1159                             		.file 12 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/rx72n/mcu_int
+ 1160                             		.file 13 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_dmaca_rx/r_dmaca_rx_i
+ 1161                             		.file 14 "d:\\e2_studio\\workspace\\fullmoni_wide\\firmware\\src\\smc_gen\\r_dmaca_rx\\src\\r_dmac
+ 1162                             		.file 15 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/all/r_bsp_int

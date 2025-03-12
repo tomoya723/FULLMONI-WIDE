@@ -1,0 +1,553 @@
+   1                             		.file	"dave_hardware.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.d2hw_acquire,"ax",@progbits
+   5                             		.global	_d2hw_acquire
+   7                             	_d2hw_acquire:
+   8                             	.LVL0:
+   9                             	.LFB6:
+  10                             		.file 1 "../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c"
+   1:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** /*--------------------------------------------------------------------------
+   2:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  * Project: D/AVE
+   3:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  * File:    dave_hardware.c (%version: 18 %)
+   4:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *          created Wed Aug 24 12:57:58 2005 by hh04027
+   5:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *
+   6:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  * Description:
+   7:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *  %date_modified: Thu Mar 08 15:05:38 2007 %  (%derived_by:  hh74026 %)
+   8:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *
+   9:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  * Changes:
+  10:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *  2005-12-22 CSe  - d2hw_start():  added copy of dlist to vidmem
+  11:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *                  - d2hw_finish(): added wait for dlist irq
+  12:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *  2006-02-28 CSe  - d2hw_start():  added flush of dlist blocks
+  13:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *  2006-04-12 CSe  - d2hw_start():  removed flush of complete data cache
+  14:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *  2006-05-10 CSe  - d2hw_start():  added map of dlist for systems with
+  15:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *                                   statically mapped vidmem
+  16:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *  2006-10-30 CSe  - d2hw_finish(): changed waiting for dlist irq
+  17:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *  2006-11-07 CSe  - d2hw_start():  changes for new 'd2_df_low_localmem' mode
+  18:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *  2007-03-08 CSe  - d2hw_start():  moved copying and flushing of dlist to
+  19:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *                                   d2_preparedlist_read_intern()
+  20:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *  2007-08-29 ASc  - changed g_d1refcount and g_d1handle to static variables
+  21:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *                    removed tabs, changed C++ to C comments
+  22:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *  2010-11-25 MRe  - fixed d2hw_acquire for multiple calls in case of 
+  23:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *                    multithreading
+  24:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *  2011-02-07 SSt  - moved instance management for multithreading to d1 driver
+  25:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *  2012-09-25 BSp  - MISRA cleanup
+  26:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  *-------------------------------------------------------------------------- */
+  27:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+  28:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** #include "dave_driver.h"
+  29:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** #include "dave_intern.h"
+  30:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** #include "dave_render.h"
+  31:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+  32:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** /*--------------------------------------------------------------------------
+  33:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  * */
+  34:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** d1_device * d2hw_acquire( d2_device *handle, d2_u32 flags )
+  35:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** {
+  11                             		.loc 1 35 1 view -0
+  12                             		.loc 1 35 1 is_stmt 0 view .LVU1
+  13 0000 6E 7A                   		pushm	r7-r10
+  14                             	.LCFI0:
+  15 0002 EF 1A                   		mov.L	r1, r10
+  36:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    d1_device *d1handle;
+  16                             		.loc 1 36 4 is_stmt 1 view .LVU2
+  37:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+  38:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    d1handle = d1_opendevice( (d2_slong) flags );
+  17                             		.loc 1 38 4 view .LVU3
+  18                             		.loc 1 38 15 is_stmt 0 view .LVU4
+  19 0004 EF 21                   		mov.L	r2, r1
+  20                             	.LVL1:
+  21                             		.loc 1 38 15 view .LVU5
+  22 0006 05 00 00 00             		bsr	_d1_opendevice
+  23                             	.LVL2:
+  24                             		.loc 1 38 15 view .LVU6
+  25 000a EF 17                   		mov.L	r1, r7
+  26                             	.LVL3:
+  39:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+  40:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    if(NULL != d1handle)
+  27                             		.loc 1 40 4 is_stmt 1 view .LVU7
+  28                             		.loc 1 40 6 is_stmt 0 view .LVU8
+  29 000c 61 01                   		cmp	#0, r1
+  30 000e 20 40                   		beq	.L1
+  41:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    {
+  42:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       D2_DEV(handle)->hwrevision = (d2_u32) d1_getregister( d1handle, D1_DAVE2D, D2_HWREVISION );
+  31                             		.loc 1 42 7 is_stmt 1 view .LVU9
+  32                             		.loc 1 42 45 is_stmt 0 view .LVU10
+  33 0010 66 13                   		mov.L	#1, r3
+  34 0012 EF 32                   		mov.L	r3, r2
+  35 0014 05 00 00 00             		bsr	_d1_getregister
+  36                             	.LVL4:
+  37                             		.loc 1 42 34 view .LVU11
+  38 0018 E7 A1 20                		mov.L	r1, 128[r10]
+  43:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+  44:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       if(0 != (D2_DEV(handle)->hwrevision & D2FB_HILIMITERPRECISION))
+  39                             		.loc 1 44 7 is_stmt 1 view .LVU12
+  40                             		.loc 1 44 9 is_stmt 0 view .LVU13
+  41 001b FD 70 C1 00 00 00 04    		tst	#0x4000000, r1
+  42 0022 16                      		beq	.L3
+  45:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       {
+  46:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          D2_DEV(handle)->hilimiterprecision_supported = 1;
+  43                             		.loc 1 46 10 is_stmt 1 view .LVU14
+  44                             		.loc 1 46 55 is_stmt 0 view .LVU15
+  45 0023 FA A4 C8 01 01          		mov.B	#1, 456[r10]
+  46                             	.L3:
+  47:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       }
+  48:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+  49:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       if(0 == (D2_DEV(handle)->hwrevision & D2FB_DLR))
+  47                             		.loc 1 49 7 is_stmt 1 view .LVU16
+  48                             		.loc 1 49 9 is_stmt 0 view .LVU17
+  49 0028 FD 7C C1 00 00 02       		tst	#0x20000, r1
+  50 002e 19                      		bne	.L4
+  50:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       {
+  51:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          D2_DEV(handle)->flags |= d2_df_no_dlist;
+  51                             		.loc 1 51 10 is_stmt 1 view .LVU18
+  52                             		.loc 1 51 32 is_stmt 0 view .LVU19
+  53 002f ED A5 1A                		mov.L	104[r10], r5
+  54 0032 78 05                   		bset	#0, r5
+  55 0034 E7 A5 1A                		mov.L	r5, 104[r10]
+  56                             	.L4:
+  52:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       }
+  53:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+  54:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       /* attention: don't change cache settings while HW is running -> added caution note in doc of
+  55:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       d1_setregister( d1handle, D1_DAVE2D, D2_CACHECTL, (d2_slong) D2_DEV(handle)->cachectlmask );
+  57                             		.loc 1 55 7 is_stmt 1 view .LVU20
+  58 0037 ED A4 17                		mov.L	92[r10], r4
+  59 003a 75 43 31                		mov.L	#49, r3
+  60 003d 66 12                   		mov.L	#1, r2
+  61 003f EF 71                   		mov.L	r7, r1
+  62 0041 05 00 00 00             		bsr	_d1_setregister
+  63                             	.LVL5:
+  56:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+  57:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       D2_DEV(handle)->hwmemarchitecture = (d2_u32) d1_queryarchitecture(d1handle);
+  64                             		.loc 1 57 7 view .LVU21
+  65                             		.loc 1 57 52 is_stmt 0 view .LVU22
+  66 0045 EF 71                   		mov.L	r7, r1
+  67 0047 05 00 00 00             		bsr	_d1_queryarchitecture
+  68                             	.LVL6:
+  69                             		.loc 1 57 41 view .LVU23
+  70 004b E7 A1 21                		mov.L	r1, 132[r10]
+  58:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    }
+  59:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+  60:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    return d1handle;
+  71                             		.loc 1 60 4 is_stmt 1 view .LVU24
+  72                             	.L1:
+  61:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** }
+  73                             		.loc 1 61 1 is_stmt 0 view .LVU25
+  74 004e EF 71                   		mov.L	r7, r1
+  75 0050 3F 7A 04                		rtsd	#16, r7-r10
+  76                             		.loc 1 61 1 view .LVU26
+  77                             	.LFE6:
+  79                             		.section	.text.d2hw_release,"ax",@progbits
+  80                             		.global	_d2hw_release
+  82                             	_d2hw_release:
+  83                             	.LVL7:
+  84                             	.LFB7:
+  62:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+  63:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** /*--------------------------------------------------------------------------
+  64:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  * */
+  65:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** d2_s32 d2hw_release( d1_device * hwid )
+  66:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** {
+  85                             		.loc 1 66 1 is_stmt 1 view -0
+  67:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    if(1 == d1_closedevice( hwid ))
+  86                             		.loc 1 67 4 view .LVU28
+  87                             		.loc 1 67 12 is_stmt 0 view .LVU29
+  88 0000 05 00 00 00             		bsr	_d1_closedevice
+  89                             	.LVL8:
+  90                             		.loc 1 67 6 view .LVU30
+  91 0004 61 11                   		cmp	#1, r1
+  92 0006 14                      		beq	.L9
+  68:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    {
+  69:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       return D2_OK;
+  70:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    }
+  71:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    else
+  72:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    {
+  73:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       return D2_INVALIDDEVICE;
+  93                             		.loc 1 73 14 view .LVU31
+  94 0007 66 21                   		mov.L	#2, r1
+  74:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    }
+  75:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** }
+  95                             		.loc 1 75 1 view .LVU32
+  96 0009 02                      		rts
+  97                             	.L9:
+  69:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    }
+  98                             		.loc 1 69 14 view .LVU33
+  99 000a 66 01                   		mov.L	#0, r1
+ 100 000c 02                      		rts
+ 101                             	.LFE7:
+ 103                             		.section	.text.d2hw_set,"ax",@progbits
+ 104                             		.global	_d2hw_set
+ 106                             	_d2hw_set:
+ 107                             	.LVL9:
+ 108                             	.LFB8:
+  76:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+  77:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** /*--------------------------------------------------------------------------
+  78:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  * */
+  79:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** void d2hw_set(d1_device * hwid, d2_u32 index, d2_s32 value)
+  80:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** {
+ 109                             		.loc 1 80 1 is_stmt 1 view -0
+  81:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    d1_setregister( hwid, D1_DAVE2D, (d2_s32)index, value );
+ 110                             		.loc 1 81 4 view .LVU35
+ 111 0000 EF 34                   		mov.L	r3, r4
+ 112 0002 EF 23                   		mov.L	r2, r3
+ 113                             	.LVL10:
+ 114                             		.loc 1 81 4 is_stmt 0 view .LVU36
+ 115 0004 66 12                   		mov.L	#1, r2
+ 116                             	.LVL11:
+ 117                             		.loc 1 81 4 view .LVU37
+ 118 0006 05 00 00 00             		bsr	_d1_setregister
+ 119                             	.LVL12:
+  82:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** }
+ 120                             		.loc 1 82 1 view .LVU38
+ 121 000a 02                      		rts
+ 122                             	.LFE8:
+ 124                             		.section	.text.d2hw_get,"ax",@progbits
+ 125                             		.global	_d2hw_get
+ 127                             	_d2hw_get:
+ 128                             	.LVL13:
+ 129                             	.LFB9:
+  83:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+  84:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** /*--------------------------------------------------------------------------
+  85:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  * */
+  86:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** d2_s32 d2hw_get(d1_device * hwid, d2_u32 index)
+  87:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** {
+ 130                             		.loc 1 87 1 is_stmt 1 view -0
+  88:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    return d1_getregister( hwid, D1_DAVE2D, (d2_s32)index );
+ 131                             		.loc 1 88 4 view .LVU40
+ 132                             		.loc 1 88 11 is_stmt 0 view .LVU41
+ 133 0000 EF 23                   		mov.L	r2, r3
+ 134 0002 66 12                   		mov.L	#1, r2
+ 135                             	.LVL14:
+ 136                             		.loc 1 88 11 view .LVU42
+ 137 0004 05 00 00 00             		bsr	_d1_getregister
+ 138                             	.LVL15:
+  89:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** }
+ 139                             		.loc 1 89 1 view .LVU43
+ 140 0008 02                      		rts
+ 141                             	.LFE9:
+ 143                             		.section	.text.d2hw_wait,"ax",@progbits
+ 144                             		.global	_d2hw_wait
+ 146                             	_d2hw_wait:
+ 147                             	.LVL16:
+ 148                             	.LFB10:
+  90:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+  91:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** /*--------------------------------------------------------------------------
+  92:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  * */
+  93:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** void d2hw_wait(d1_device * hwid)
+  94:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** {
+ 149                             		.loc 1 94 1 is_stmt 1 view -0
+ 150                             		.loc 1 94 1 is_stmt 0 view .LVU45
+ 151 0000 7E A7                   		push.l	r7
+ 152                             	.LCFI1:
+ 153 0002 EF 17                   		mov.L	r1, r7
+  95:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    /* wait for enum ready state */
+  96:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    while(0 != ((d2_u32)d1_getregister( hwid, D1_DAVE2D, D2_STATUS ) & D2C_BUSY_ENUM) )
+ 154                             		.loc 1 96 4 is_stmt 1 view .LVU46
+ 155                             	.LVL17:
+ 156                             	.L13:
+  97:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    {}
+ 157                             		.loc 1 97 5 discriminator 1 view .LVU47
+  96:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    {}
+ 158                             		.loc 1 96 24 is_stmt 0 discriminator 1 view .LVU48
+ 159 0004 66 03                   		mov.L	#0, r3
+ 160 0006 66 12                   		mov.L	#1, r2
+ 161 0008 EF 71                   		mov.L	r7, r1
+ 162 000a 05 00 00 00             		bsr	_d1_getregister
+ 163                             	.LVL18:
+  96:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    {}
+ 164                             		.loc 1 96 9 discriminator 1 view .LVU49
+ 165 000e FD 74 C1 01             		tst	#1, r1
+ 166 0012 21 F2                   		bne	.L13
+  98:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** }
+ 167                             		.loc 1 98 1 view .LVU50
+ 168 0014 3F 77 01                		rtsd	#4, r7-r7
+ 169                             		.loc 1 98 1 view .LVU51
+ 170                             	.LFE10:
+ 172                             		.section	.text.d2hw_finish,"ax",@progbits
+ 173                             		.global	_d2hw_finish
+ 175                             	_d2hw_finish:
+ 176                             	.LVL19:
+ 177                             	.LFB11:
+  99:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+ 100:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+ 101:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** /*---------------------------------------------------------------------------
+ 102:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  * return only after all rendering has finished
+ 103:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  * */
+ 104:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** void d2hw_finish(const d2_device *handle)
+ 105:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** {
+ 178                             		.loc 1 105 1 is_stmt 1 view -0
+ 179                             		.loc 1 105 1 is_stmt 0 view .LVU53
+ 180 0000 6E 7A                   		pushm	r7-r10
+ 181                             	.LCFI2:
+ 182 0002 EF 1A                   		mov.L	r1, r10
+ 106:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    d1_device * hwId = (d1_device *) D2_DEV(handle)->hwid;
+ 183                             		.loc 1 106 4 is_stmt 1 view .LVU54
+ 184                             		.loc 1 106 16 is_stmt 0 view .LVU55
+ 185 0004 A9 97                   		mov.L	24[r1], r7
+ 186                             	.LVL20:
+ 107:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+ 108:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    if(0 != (D2_DEV(handle)->flags & d2_df_no_dlist))
+ 187                             		.loc 1 108 4 is_stmt 1 view .LVU56
+ 188                             		.loc 1 108 27 is_stmt 0 view .LVU57
+ 189 0006 AE 95                   		mov.L	104[r1], r5
+ 190                             		.loc 1 108 6 view .LVU58
+ 191 0008 FD 74 C5 01             		tst	#1, r5
+ 192 000c 20 15                   		beq	.L19
+ 193                             	.LVL21:
+ 194                             	.L17:
+ 109:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    {
+ 110:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       /* wait for ready state */
+ 111:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       while(0 != ((d2_u32)d1_getregister( hwId, D1_DAVE2D, D2_STATUS ) & ( D2C_BUSY_ENUM | D2C_BUSY
+ 112:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       {}
+ 195                             		.loc 1 112 8 is_stmt 1 discriminator 1 view .LVU59
+ 111:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       {}
+ 196                             		.loc 1 111 27 is_stmt 0 discriminator 1 view .LVU60
+ 197 000e 66 03                   		mov.L	#0, r3
+ 198 0010 66 12                   		mov.L	#1, r2
+ 199 0012 EF 71                   		mov.L	r7, r1
+ 200 0014 05 00 00 00             		bsr	_d1_getregister
+ 201                             	.LVL22:
+ 111:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       {}
+ 202                             		.loc 1 111 12 discriminator 1 view .LVU61
+ 203 0018 FD 74 C1 03             		tst	#3, r1
+ 204 001c 21 F2                   		bne	.L17
+ 205                             	.L15:
+ 113:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    }
+ 114:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    else
+ 115:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    {
+ 116:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       /* wait for dlist finish signal */
+ 117:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       while(0 != ((d2_u32)d1_getregister( hwId, D1_DAVE2D, D2_STATUS ) & D2C_DLISTACTIVE))
+ 118:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       {
+ 119:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          if(0 == (D2_DEV(handle)->flags & d2_df_no_irq))
+ 120:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          {
+ 121:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****             /* don't wait forever in case another driver instance is scheduled between
+ 122:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****              * the register check and the wait for the irq and takes the event */
+ 123:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****             (void)d1_queryirq(hwId, d1_irq_dlist, 200);
+ 124:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          }
+ 125:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       }
+ 126:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    }
+ 127:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** }
+ 206                             		.loc 1 127 1 view .LVU62
+ 207 001e 3F 7A 04                		rtsd	#16, r7-r10
+ 208                             	.LVL23:
+ 209                             	.L19:
+ 117:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       {
+ 210                             		.loc 1 117 27 view .LVU63
+ 211 0021 66 03                   		mov.L	#0, r3
+ 212 0023 66 12                   		mov.L	#1, r2
+ 213 0025 EF 71                   		mov.L	r7, r1
+ 214 0027 05 00 00 00             		bsr	_d1_getregister
+ 215                             	.LVL24:
+ 117:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       {
+ 216                             		.loc 1 117 12 view .LVU64
+ 217 002b FD 74 C1 08             		tst	#8, r1
+ 218 002f 20 EF                   		beq	.L15
+ 119:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          {
+ 219                             		.loc 1 119 10 is_stmt 1 view .LVU65
+ 119:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          {
+ 220                             		.loc 1 119 33 is_stmt 0 view .LVU66
+ 221 0031 ED A5 1A                		mov.L	104[r10], r5
+ 119:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          {
+ 222                             		.loc 1 119 12 view .LVU67
+ 223 0034 FD 74 C5 02             		tst	#2, r5
+ 224 0038 21 E9                   		bne	.L19
+ 123:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          }
+ 225                             		.loc 1 123 13 is_stmt 1 view .LVU68
+ 123:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          }
+ 226                             		.loc 1 123 19 is_stmt 0 view .LVU69
+ 227 003a 75 43 C8                		mov.L	#0xc8, r3
+ 228 003d 66 42                   		mov.L	#4, r2
+ 229 003f EF 71                   		mov.L	r7, r1
+ 230 0041 05 00 00 00             		bsr	_d1_queryirq
+ 231                             	.LVL25:
+ 232 0045 2E DC                   		bra	.L19
+ 233                             	.LFE11:
+ 235                             		.section	.text.d2hw_start,"ax",@progbits
+ 236                             		.global	_d2hw_start
+ 238                             	_d2hw_start:
+ 239                             	.LVL26:
+ 240                             	.LFB12:
+ 128:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+ 129:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** /*---------------------------------------------------------------------------
+ 130:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  * start rendering primitives
+ 131:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****  * */
+ 132:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** void d2hw_start( d2_device *handle, const d2_dlist *dlist, d2_s32 startnoblk )
+ 133:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** {
+ 241                             		.loc 1 133 1 is_stmt 1 view -0
+ 242                             		.loc 1 133 1 is_stmt 0 view .LVU71
+ 243 0000 6E 7A                   		pushm	r7-r10
+ 244                             	.LCFI3:
+ 245 0002 EF 1A                   		mov.L	r1, r10
+ 134:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    d2_devicedata  *dev        = D2_DEV(handle);
+ 246                             		.loc 1 134 4 is_stmt 1 view .LVU72
+ 247                             	.LVL27:
+ 135:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    d1_device      *id         = D2_DEV(handle)->hwid;
+ 248                             		.loc 1 135 4 view .LVU73
+ 249                             		.loc 1 135 20 is_stmt 0 view .LVU74
+ 250 0004 A9 91                   		mov.L	24[r1], r1
+ 251                             	.LVL28:
+ 136:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    d2_dlist_block *blk        = dlist->firstblock;
+ 252                             		.loc 1 136 4 is_stmt 1 view .LVU75
+ 253                             		.loc 1 136 20 is_stmt 0 view .LVU76
+ 254 0006 A8 2F                   		mov.L	4[r2], r7
+ 255                             	.LVL29:
+ 137:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    d2_s32         *dlist_list = (d2_s32 *) dlist->dlist_addresses;
+ 256                             		.loc 1 137 4 is_stmt 1 view .LVU77
+ 257                             		.loc 1 137 20 is_stmt 0 view .LVU78
+ 258 0008 AB 24                   		mov.L	48[r2], r4
+ 259                             	.LVL30:
+ 138:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+ 139:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    if(0 != (dev->flags & d2_df_no_dlist))
+ 260                             		.loc 1 139 4 is_stmt 1 view .LVU79
+ 261                             		.loc 1 139 16 is_stmt 0 view .LVU80
+ 262 000a ED A5 1A                		mov.L	104[r10], r5
+ 263                             		.loc 1 139 6 view .LVU81
+ 264 000d FD 74 C5 01             		tst	#1, r5
+ 265 0011 21 1C                   		bne	.L30
+ 140:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    {
+ 141:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       /* emulated display list processing */
+ 142:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+ 143:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       /* note that no video memory has been allocated to store dlists */
+ 144:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+ 145:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       if(0 != startnoblk)
+ 146:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       {
+ 147:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          /* we come from d2_executedlist */
+ 148:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          (void)d2_executedlist_intern(handle, (d2_dlist_entry *)*dlist_list);
+ 149:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       }
+ 150:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       else
+ 151:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       {
+ 152:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          while(NULL != blk)
+ 153:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          {
+ 154:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****             d2_dlist_entry *pos = blk->block;
+ 155:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+ 156:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****             if(3 == d2_executedlist_intern(handle, pos))
+ 157:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****             {
+ 158:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****                break;
+ 159:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****             }
+ 160:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+ 161:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****             blk = blk->next;
+ 162:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          }
+ 163:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       }
+ 164:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+ 165:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       return;
+ 166:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    }
+ 167:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+ 168:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    if(0 != dlist_list[0])
+ 266                             		.loc 1 168 4 is_stmt 1 view .LVU82
+ 267                             		.loc 1 168 22 is_stmt 0 view .LVU83
+ 268 0013 EC 43                   		mov.L	[r4], r3
+ 269                             	.LVL31:
+ 270                             		.loc 1 168 6 view .LVU84
+ 271 0015 61 03                   		cmp	#0, r3
+ 272 0017 20 13                   		beq	.L22
+ 169:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    {
+ 170:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       if(0 != dev->dlist_indirect_supported)
+ 273                             		.loc 1 170 7 is_stmt 1 view .LVU85
+ 274                             		.loc 1 170 9 is_stmt 0 view .LVU86
+ 275 0019 CE A7 C9 01             		mov.B	457[r10], r7
+ 276                             	.LVL32:
+ 277                             		.loc 1 170 9 view .LVU87
+ 278 001d 61 07                   		cmp	#0, r7
+ 279 001f 20 30                   		beq	.L28
+ 171:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       {
+ 172:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          d2hw_set( id, D2_DLISTSTART , (d2_s32)&dlist_list[0] );
+ 280                             		.loc 1 172 10 is_stmt 1 view .LVU88
+ 281 0021 EF 43                   		mov.L	r4, r3
+ 282 0023 75 42 32                		mov.L	#50, r2
+ 283                             	.LVL33:
+ 284                             		.loc 1 172 10 is_stmt 0 view .LVU89
+ 285 0026 05 00 00 00             		bsr	_d2hw_set
+ 286                             	.LVL34:
+ 287                             		.balign 8,3,2
+ 288                             	.L22:
+ 173:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       }
+ 174:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       else
+ 175:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       {
+ 176:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          d2hw_set( id, D2_DLISTSTART , dlist_list[0] );
+ 177:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       }
+ 178:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****    }
+ 179:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+ 180:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** }
+ 289                             		.loc 1 180 1 view .LVU90
+ 290 002a 3F 7A 04                		rtsd	#16, r7-r10
+ 291                             	.LVL35:
+ 292                             	.L30:
+ 145:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       {
+ 293                             		.loc 1 145 7 is_stmt 1 view .LVU91
+ 145:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       {
+ 294                             		.loc 1 145 9 is_stmt 0 view .LVU92
+ 295 002d 61 03                   		cmp	#0, r3
+ 296 002f 21 16                   		bne	.L31
+ 297                             	.LVL36:
+ 298                             	.L24:
+ 152:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          {
+ 299                             		.loc 1 152 15 view .LVU93
+ 300 0031 61 07                   		cmp	#0, r7
+ 301 0033 20 F7                   		beq	.L22
+ 302                             	.LBB2:
+ 154:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c **** 
+ 303                             		.loc 1 154 13 is_stmt 1 view .LVU94
+ 304                             	.LVL37:
+ 156:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****             {
+ 305                             		.loc 1 156 13 view .LVU95
+ 156:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****             {
+ 306                             		.loc 1 156 21 is_stmt 0 view .LVU96
+ 307 0035 A8 7A                   		mov.L	4[r7], r2
+ 308 0037 EF A1                   		mov.L	r10, r1
+ 309 0039 05 00 00 00             		bsr	_d2_executedlist_intern
+ 310                             	.LVL38:
+ 156:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****             {
+ 311                             		.loc 1 156 15 view .LVU97
+ 312 003d 61 31                   		cmp	#3, r1
+ 313 003f 20 EB                   		beq	.L22
+ 161:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          }
+ 314                             		.loc 1 161 13 is_stmt 1 view .LVU98
+ 161:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          }
+ 315                             		.loc 1 161 17 is_stmt 0 view .LVU99
+ 316 0041 EC 77                   		mov.L	[r7], r7
+ 317                             	.LVL39:
+ 161:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          }
+ 318                             		.loc 1 161 17 view .LVU100
+ 319 0043 2E EE                   		bra	.L24
+ 320                             	.LVL40:
+ 321                             	.L31:
+ 161:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****          }
+ 322                             		.loc 1 161 17 view .LVU101
+ 323                             	.LBE2:
+ 148:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       }
+ 324                             		.loc 1 148 10 is_stmt 1 view .LVU102
+ 148:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       }
+ 325                             		.loc 1 148 16 is_stmt 0 view .LVU103
+ 326 0045 EC 42                   		mov.L	[r4], r2
+ 327                             	.LVL41:
+ 148:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       }
+ 328                             		.loc 1 148 16 view .LVU104
+ 329 0047 EF A1                   		mov.L	r10, r1
+ 330                             	.LVL42:
+ 148:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       }
+ 331                             		.loc 1 148 16 view .LVU105
+ 332 0049 05 00 00 00             		bsr	_d2_executedlist_intern
+ 333                             	.LVL43:
+ 148:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       }
+ 334                             		.loc 1 148 16 view .LVU106
+ 335 004d 2E DD                   		bra	.L22
+ 336                             	.LVL44:
+ 337                             	.L28:
+ 176:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       }
+ 338                             		.loc 1 176 10 is_stmt 1 view .LVU107
+ 339 004f 75 42 32                		mov.L	#50, r2
+ 340                             	.LVL45:
+ 176:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       }
+ 341                             		.loc 1 176 10 is_stmt 0 view .LVU108
+ 342 0052 05 00 00 00             		bsr	_d2hw_set
+ 343                             	.LVL46:
+ 176:../src/smc_gen/r_drw2d_rx/src/tes/dave_hardware.c ****       }
+ 344                             		.loc 1 176 10 view .LVU109
+ 345 0056 2E D4                   		bra	.L22
+ 346                             	.LFE12:
+ 464                             	.Letext0:
+ 465                             		.file 2 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_drw2d_rx\\inc\\tes/dav
+ 466                             		.file 3 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_drw2d_rx\\inc\\tes/dav
+ 467                             		.file 4 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_drw2d_rx\\inc\\tes/dav
+ 468                             		.file 5 "../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h"
+ 469                             		.file 6 "../src/smc_gen/r_drw2d_rx/src/tes/dave_dlist.h"
+ 470                             		.file 7 "../src/smc_gen/r_drw2d_rx/src/tes/dave_rbuffer.h"
+ 471                             		.file 8 "../src/smc_gen/r_drw2d_rx/src/tes/dave_gradient.h"
+ 472                             		.file 9 "../src/smc_gen/r_drw2d_rx/src/tes/dave_context.h"
