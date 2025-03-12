@@ -1,0 +1,30 @@
+# e² studio (Eclipse ベース) の不要ファイル
+*.o
+*.bin
+*.elf
+*.hex
+*.map
+*.axf
+Debug/
+Release/
+build/
+.metadata/
+*.bak
+*.tmp
+*.d
+*.cproject.bak
+*.project.bak
+
+# その他更新対象外
+hardware/
+IMG/
+.setteings/
+LICENSE
+
+# OS依存の不要ファイル
+Thumbs.db
+Desktop.ini
+.DS_Store
+._*
+*.swp
+*~
