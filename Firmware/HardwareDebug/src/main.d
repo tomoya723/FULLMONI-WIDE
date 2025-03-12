@@ -122,8 +122,7 @@ src/main.o: ../src/main.c \
  D:\e2_studio\workspace\FULLMONI_WIDE\Firmware\src\smc_gen\r_emwin_rx\lib\GUI/LISTBOX_Private.h \
  D:\e2_studio\workspace\FULLMONI_WIDE\Firmware\src\smc_gen\r_emwin_rx\lib\GUI/WHEEL_Private.h \
  D:\e2_studio\workspace\FULLMONI_WIDE\Firmware\src\smc_gen\r_emwin_rx\lib\GUI/MOVIE_Private.h \
- ../src/../aw/Source/Generated/Resource.h ../src/TFTLCD102.h \
- ../src/neopixel.h ../src/dataregister.h ../src/can.h \
+ ../src/TFTLCD102.h ../src/neopixel.h ../src/dataregister.h ../src/can.h \
  D:\e2_studio\workspace\FULLMONI_WIDE\Firmware\src\smc_gen\r_config/r_can_rx_config.h \
  D:\e2_studio\workspace\FULLMONI_WIDE\Firmware\src\smc_gen\r_can_rx/r_can_rx_if.h \
  ../src/aprx72n0a.h ../src/smc_gen/general/r_cg_rtc.h
@@ -373,8 +372,6 @@ D:\e2_studio\workspace\FULLMONI_WIDE\Firmware\src\smc_gen\r_emwin_rx\lib\GUI/LIS
 D:\e2_studio\workspace\FULLMONI_WIDE\Firmware\src\smc_gen\r_emwin_rx\lib\GUI/WHEEL_Private.h:
 
 D:\e2_studio\workspace\FULLMONI_WIDE\Firmware\src\smc_gen\r_emwin_rx\lib\GUI/MOVIE_Private.h:
-
-../src/../aw/Source/Generated/Resource.h:
 
 ../src/TFTLCD102.h:
 
