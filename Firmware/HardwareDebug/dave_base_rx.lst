@@ -1,0 +1,606 @@
+   1                             		.file	"dave_base_rx.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.d1_mstp_set,"ax",@progbits
+   6                             	_d1_mstp_set:
+   7                             	.LVL0:
+   8                             	.LFB5:
+   9                             		.file 1 "../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c"
+   1:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //--------------------------------------------------------------------------
+   2:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** // Project: D/AVE
+   3:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** // File:    dave_base_rx.c (%version: 8 %)
+   4:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //          created Fri Aug 19 15:32:32 2005 by hh04027
+   5:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //
+   6:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** // Description:
+   7:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //  %date_modified: Thu Oct 18 13:18:03 2007 %  (%derived_by:  hh74040 %)
+   8:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //
+   9:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** // Changes:
+  10:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //  2005-04-12 CSe  fully implemented missing d1 driver functionality
+  11:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //  2006-10-18 ASc  add ifdefs to allow compilation with no altera lcd
+  12:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //  2009-03-17 MMa  added support for TES Display Controller
+  13:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //  2011-08-03 CSe  additional ifdefs in case single SOPC components not used
+  14:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //  2011-10-04 CSe  removed references to BT656 generator (component no longer used)
+  15:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //  2018-03-26      added support for RX
+  16:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //
+  17:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //--------------------------------------------------------------------------
+  18:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+  19:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** #include <stdlib.h>
+  20:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** #include <stdbool.h>
+  21:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** #include "dave_base.h"
+  22:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** #include "dave_base_rx.h"
+  23:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+  24:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** static void d1_registerprotectenable();
+  25:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** static void d1_registerprotectdisable();
+  26:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** static void d1_mstp_set(bool enable, int mstp_char, int mstp_num);
+  27:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+  28:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //--------------------------------------------------------------------------
+  29:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //
+  30:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** d1_device * d1_opendevice(long flags)
+  31:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** {
+  32:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     d1_device_rx *handle;
+  33:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+  34:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     /* unused arguments */
+  35:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     INTERNAL_NOT_USED(flags);
+  36:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+  37:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     /* get new device context structure */
+  38:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     handle = (d1_device_rx *)malloc(sizeof(d1_device_rx));
+  39:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     if (!handle)
+  40:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     {
+  41:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         return NULL;
+  42:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     }
+  43:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+  44:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     /* init device data */
+  45:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     handle->dlist_indirect = 0;
+  46:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+  47:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     /* apply power to peripheral */
+  48:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     d1_registerprotectdisable();
+  49:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     d1_mstp_set (true, MSTP_C, DAVE2D_MSTP_NUM);
+  50:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     d1_registerprotectenable();
+  51:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+  52:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     /* reset irq handlers */
+  53:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     d1_initirq_intern(handle);
+  54:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+  55:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     return (d1_device *)handle;
+  56:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** }
+  57:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+  58:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //--------------------------------------------------------------------------
+  59:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //
+  60:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** int d1_closedevice(d1_device *handle)
+  61:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** {
+  62:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     int ret = 0;
+  63:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+  64:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     if (!handle)
+  65:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     {
+  66:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         return 0;
+  67:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     }
+  68:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+  69:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     /* close irq handlers */
+  70:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     ret = d1_shutdownirq_intern((d1_device_rx *) handle);
+  71:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+  72:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     /* power down peripheral */
+  73:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     d1_registerprotectdisable();
+  74:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     d1_mstp_set (false, MSTP_C, DAVE2D_MSTP_NUM);
+  75:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     d1_registerprotectenable();
+  76:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+  77:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     free (handle);
+  78:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     return ret;
+  79:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** }
+  80:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+  81:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //--------------------------------------------------------------------------
+  82:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //
+  83:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** void d1_setregister(d1_device *handle, int deviceid, int index, long value)
+  84:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** {
+  85:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     d1_device_rx *dev = (d1_device_rx*) handle;
+  86:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+  87:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     switch (deviceid)
+  88:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     {
+  89:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     case D1_DAVE2D:
+  90:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         if ((index == D2_DLISTSTART) && (dev->dlist_indirect))
+  91:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         {
+  92:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****             int *dlistp = (int*)value;
+  93:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****             dev->dlist_start = (long*)(dlistp + 1);
+  94:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****             WRITE_REG(DAVE2D_0_BASE, index, (unsigned long)(*dlistp));
+  95:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         }
+  96:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         else
+  97:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         {
+  98:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****             WRITE_REG(DAVE2D_0_BASE, index, (unsigned long)value);
+  99:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         }
+ 100:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     break;
+ 101:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 102:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     case D1_DLISTINDIRECT:
+ 103:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** #if RX_USE_DLIST_INDIRECT
+ 104:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         dev->dlist_indirect = value;
+ 105:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** #else
+ 106:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         dev->dlist_indirect = 0;
+ 107:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** #endif
+ 108:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     break;
+ 109:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 110:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     default:
+ 111:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         
+ 112:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         /* unknown device */
+ 113:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     break;
+ 114:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     }
+ 115:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** }
+ 116:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 117:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //--------------------------------------------------------------------------
+ 118:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //
+ 119:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** long d1_getregister(d1_device *handle, int deviceid, int index)
+ 120:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** {
+ 121:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     d1_device_rx *dev = (d1_device_rx*)handle;
+ 122:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 123:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     switch (deviceid)
+ 124:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     {
+ 125:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     case D1_DAVE2D:
+ 126:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         return READ_REG(DAVE2D_0_BASE, index);
+ 127:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 128:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     case D1_DLISTINDIRECT:
+ 129:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         return dev->dlist_indirect;
+ 130:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 131:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     default:
+ 132:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 133:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         /* unknown device */
+ 134:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         return 0;
+ 135:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     }
+ 136:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** }
+ 137:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 138:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //--------------------------------------------------------------------------
+ 139:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** //
+ 140:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** int d1_devicesupported(d1_device *handle, int deviceid)
+ 141:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** {
+ 142:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     /* unused arguments */
+ 143:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     INTERNAL_NOT_USED(handle);
+ 144:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 145:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     switch (deviceid)
+ 146:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     {
+ 147:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     case D1_DAVE2D:
+ 148:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** #if RX_USE_DLIST_INDIRECT
+ 149:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     case D1_DLISTINDIRECT:
+ 150:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** #endif
+ 151:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         return 1;
+ 152:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 153:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     default:
+ 154:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 155:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         /* unknown device */
+ 156:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         return 0;
+ 157:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     }
+ 158:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** }
+ 159:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 160:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** /***********************************************************************
+ 161:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****  * Function Name: d1_mstp_set
+ 162:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****  * Description  : Write the MSTP register.
+ 163:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****  * Arguments    : enable
+ 164:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****  *                    Enable or disable the register bit.
+ 165:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****  *                mstp_char
+ 166:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****  *                    MSTP register offset position. 
+ 167:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****  *                mstp_num
+ 168:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****  *                    The register bit position.
+ 169:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****  * Return Value : none
+ 170:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****  **********************************************************************/
+ 171:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** static void d1_mstp_set(bool enable, int mstp_char, int mstp_num)
+ 172:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** {
+  10                             		.loc 1 172 1 view -0
+ 173:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     unsigned long *p_mstp_addr;
+  11                             		.loc 1 173 5 view .LVU1
+ 174:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 175:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     /* The address offset from the address of the base register is cast to match the size of the re
+ 176:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     p_mstp_addr = ((unsigned long *)MSTP_0_BASE) + mstp_char;
+  12                             		.loc 1 176 5 view .LVU2
+  13                             		.loc 1 176 50 is_stmt 0 view .LVU3
+  14 0000 6C 22                   		shll	#2, r2
+  15                             	.LVL1:
+  16                             		.loc 1 176 17 view .LVU4
+  17 0002 73 22 10 00 08          		add	#0x80010, r2
+  18                             	.LVL2:
+ 177:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 178:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     if (true == enable)
+  19                             		.loc 1 178 5 is_stmt 1 view .LVU5
+  20                             		.loc 1 178 8 is_stmt 0 view .LVU6
+  21 0007 FD 78 C1 FF 00          		tst	#0xff, r1
+  22 000c 20 0F                   		beq	.L2
+ 179:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     {
+ 180:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         *p_mstp_addr = ((*p_mstp_addr) & (~(1 << mstp_num)));
+  23                             		.loc 1 180 9 is_stmt 1 view .LVU7
+  24                             		.loc 1 180 47 is_stmt 0 view .LVU8
+  25 000e 66 15                   		mov.L	#1, r5
+  26 0010 FD 62 35                		shll	r3, r5
+  27                             		.loc 1 180 43 view .LVU9
+  28 0013 7E 05                   		not	r5
+  29                             		.loc 1 180 40 view .LVU10
+  30 0015 06 90 25                		and	[r2], r5
+  31                             		.loc 1 180 22 view .LVU11
+  32 0018 E3 25                   		mov.L	r5, [r2]
+  33 001a 02                      		rts
+  34                             	.L2:
+ 181:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     }
+ 182:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     else
+ 183:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     {
+ 184:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         *p_mstp_addr = ((*p_mstp_addr) | (1 << mstp_num));
+  35                             		.loc 1 184 9 is_stmt 1 view .LVU12
+  36                             		.loc 1 184 26 is_stmt 0 view .LVU13
+  37 001b EC 25                   		mov.L	[r2], r5
+  38                             		.loc 1 184 40 view .LVU14
+  39 001d FC 63 53                		bset	r3, r5
+  40                             		.loc 1 184 22 view .LVU15
+  41 0020 E3 25                   		mov.L	r5, [r2]
+ 185:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     }
+ 186:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** } /* End of function d1_mstp_set() */
+  42                             		.loc 1 186 1 view .LVU16
+  43 0022 02                      		rts
+  44                             	.LFE5:
+  46                             		.section	.text.d1_registerprotectenable,"ax",@progbits
+  48                             	_d1_registerprotectenable:
+  49                             	.LFB6:
+ 187:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 188:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** /***********************************************************************
+ 189:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****  * Function Name: d1_registerprotectenable
+ 190:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****  * Description  : Enable protect bit 1 of PRCR register.
+ 191:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****  * Arguments    : none
+ 192:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****  * Return Value : none
+ 193:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****  **********************************************************************/
+ 194:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** static void d1_registerprotectenable()
+ 195:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** {
+  50                             		.loc 1 195 1 is_stmt 1 view -0
+ 196:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     unsigned short *p_prcr_addr;
+  51                             		.loc 1 196 5 view .LVU18
+ 197:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 198:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     /* The address of the base register is cast to match the size of the register. */
+ 199:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     p_prcr_addr = (unsigned short *)PRCR_0_BASE;
+  52                             		.loc 1 199 5 view .LVU19
+  53                             	.LVL3:
+ 200:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     *p_prcr_addr = (((*p_prcr_addr) | PRCR_KEY) & (~PRCR_PRC1));
+  54                             		.loc 1 200 5 view .LVU20
+  55                             		.loc 1 200 23 is_stmt 0 view .LVU21
+  56 0000 FB 4E FE 03 08          		mov.L	#0x803fe, r4
+  57 0005 DC 45                   		mov.W	[r4], r5
+  58                             		.loc 1 200 49 view .LVU22
+  59 0007 76 25 FD 5A             		and #0x5afd, r5
+  60 000b 76 35 00 A5             		or	#-23296, r5
+  61                             		.loc 1 200 18 view .LVU23
+  62 000f D3 45                   		mov.W	r5, [r4]
+ 201:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** } /* End of function d1_registerprotectenable() */
+  63                             		.loc 1 201 1 view .LVU24
+  64 0011 02                      		rts
+  65                             	.LFE6:
+  67                             		.section	.text.d1_registerprotectdisable,"ax",@progbits
+  69                             	_d1_registerprotectdisable:
+  70                             	.LFB7:
+ 202:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 203:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** /***********************************************************************
+ 204:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****  * Function Name: d1_registerprotectdisable
+ 205:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****  * Description  : Disable protect bit 1 of PRCR register.
+ 206:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****  * Arguments    : none
+ 207:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****  * Return Value : none
+ 208:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****  **********************************************************************/
+ 209:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** static void d1_registerprotectdisable()
+ 210:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** {
+  71                             		.loc 1 210 1 is_stmt 1 view -0
+ 211:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     unsigned short *p_prcr_addr;
+  72                             		.loc 1 211 5 view .LVU26
+ 212:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 213:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     /* The address of the base register is cast to match the size of the register. */
+ 214:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     p_prcr_addr = (unsigned short *)PRCR_0_BASE;
+  73                             		.loc 1 214 5 view .LVU27
+  74                             	.LVL4:
+ 215:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     *p_prcr_addr = (((*p_prcr_addr) | PRCR_KEY) | PRCR_PRC1);
+  75                             		.loc 1 215 5 view .LVU28
+  76                             		.loc 1 215 23 is_stmt 0 view .LVU29
+  77 0000 FB 4E FE 03 08          		mov.L	#0x803fe, r4
+  78 0005 DC 45                   		mov.W	[r4], r5
+  79                             		.loc 1 215 18 view .LVU30
+  80 0007 76 35 02 A5             		or	#-23294, r5
+  81 000b D3 45                   		mov.W	r5, [r4]
+ 216:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** } /* End of function d1_registerprotectdisable() */
+  82                             		.loc 1 216 1 view .LVU31
+  83 000d 02                      		rts
+  84                             	.LFE7:
+  86                             		.section	.text.d1_opendevice,"ax",@progbits
+  87                             		.global	_d1_opendevice
+  89                             	_d1_opendevice:
+  90                             	.LVL5:
+  91                             	.LFB0:
+  31:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     d1_device_rx *handle;
+  92                             		.loc 1 31 1 is_stmt 1 view -0
+  31:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     d1_device_rx *handle;
+  93                             		.loc 1 31 1 is_stmt 0 view .LVU33
+  94 0000 7E A7                   		push.l	r7
+  95                             	.LCFI0:
+  32:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+  96                             		.loc 1 32 5 is_stmt 1 view .LVU34
+  35:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+  97                             		.loc 1 35 5 view .LVU35
+  38:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     if (!handle)
+  98                             		.loc 1 38 5 view .LVU36
+  38:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     if (!handle)
+  99                             		.loc 1 38 30 is_stmt 0 view .LVU37
+ 100 0002 66 81                   		mov.L	#8, r1
+ 101                             	.LVL6:
+  38:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     if (!handle)
+ 102                             		.loc 1 38 30 view .LVU38
+ 103 0004 05 00 00 00             		bsr	_malloc
+ 104                             	.LVL7:
+ 105 0008 EF 17                   		mov.L	r1, r7
+ 106                             	.LVL8:
+  39:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     {
+ 107                             		.loc 1 39 5 is_stmt 1 view .LVU39
+  39:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     {
+ 108                             		.loc 1 39 8 is_stmt 0 view .LVU40
+ 109 000a 61 01                   		cmp	#0, r1
+ 110 000c 20 1E                   		beq	.L6
+  45:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 111                             		.loc 1 45 5 is_stmt 1 view .LVU41
+  45:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 112                             		.loc 1 45 28 is_stmt 0 view .LVU42
+ 113 000e 3E 11 00                		mov.L	#0, 4[r1]
+  48:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     d1_mstp_set (true, MSTP_C, DAVE2D_MSTP_NUM);
+ 114                             		.loc 1 48 5 is_stmt 1 view .LVU43
+ 115 0011 05 00 00 00             		bsr	_d1_registerprotectdisable
+ 116                             	.LVL9:
+  49:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     d1_registerprotectenable();
+ 117                             		.loc 1 49 5 view .LVU44
+ 118 0015 75 43 1C                		mov.L	#28, r3
+ 119 0018 66 22                   		mov.L	#2, r2
+ 120 001a 66 11                   		mov	#1, r1
+ 121 001c 05 00 00 00             		bsr	_d1_mstp_set
+ 122                             	.LVL10:
+  50:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 123                             		.loc 1 50 5 view .LVU45
+ 124 0020 05 00 00 00             		bsr	_d1_registerprotectenable
+ 125                             	.LVL11:
+  53:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 126                             		.loc 1 53 5 view .LVU46
+ 127 0024 EF 71                   		mov.L	r7, r1
+ 128 0026 05 00 00 00             		bsr	_d1_initirq_intern
+ 129                             	.LVL12:
+  55:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** }
+ 130                             		.loc 1 55 5 view .LVU47
+ 131                             	.L6:
+  56:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 132                             		.loc 1 56 1 is_stmt 0 view .LVU48
+ 133 002a EF 71                   		mov.L	r7, r1
+ 134 002c 3F 77 01                		rtsd	#4, r7-r7
+  56:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 135                             		.loc 1 56 1 view .LVU49
+ 136                             	.LFE0:
+ 138                             		.section	.text.d1_closedevice,"ax",@progbits
+ 139                             		.global	_d1_closedevice
+ 141                             	_d1_closedevice:
+ 142                             	.LVL13:
+ 143                             	.LFB1:
+  61:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     int ret = 0;
+ 144                             		.loc 1 61 1 is_stmt 1 view -0
+  61:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     int ret = 0;
+ 145                             		.loc 1 61 1 is_stmt 0 view .LVU51
+ 146 0000 6E 7A                   		pushm	r7-r10
+ 147                             	.LCFI1:
+  62:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 148                             		.loc 1 62 5 is_stmt 1 view .LVU52
+ 149                             	.LVL14:
+  64:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     {
+ 150                             		.loc 1 64 5 view .LVU53
+  64:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     {
+ 151                             		.loc 1 64 8 is_stmt 0 view .LVU54
+ 152 0002 61 01                   		cmp	#0, r1
+ 153 0004 20 28                   		beq	.L11
+ 154 0006 EF 17                   		mov.L	r1, r7
+  70:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 155                             		.loc 1 70 5 is_stmt 1 view .LVU55
+  70:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 156                             		.loc 1 70 11 is_stmt 0 view .LVU56
+ 157 0008 05 00 00 00             		bsr	_d1_shutdownirq_intern
+ 158                             	.LVL15:
+  70:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 159                             		.loc 1 70 11 view .LVU57
+ 160 000c EF 1A                   		mov.L	r1, r10
+ 161                             	.LVL16:
+  73:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     d1_mstp_set (false, MSTP_C, DAVE2D_MSTP_NUM);
+ 162                             		.loc 1 73 5 is_stmt 1 view .LVU58
+ 163 000e 05 00 00 00             		bsr	_d1_registerprotectdisable
+ 164                             	.LVL17:
+  74:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     d1_registerprotectenable();
+ 165                             		.loc 1 74 5 view .LVU59
+ 166 0012 75 43 1C                		mov.L	#28, r3
+ 167 0015 66 22                   		mov.L	#2, r2
+ 168 0017 66 01                   		mov	#0, r1
+ 169 0019 05 00 00 00             		bsr	_d1_mstp_set
+ 170                             	.LVL18:
+  75:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 171                             		.loc 1 75 5 view .LVU60
+ 172 001d 05 00 00 00             		bsr	_d1_registerprotectenable
+ 173                             	.LVL19:
+  77:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     return ret;
+ 174                             		.loc 1 77 5 view .LVU61
+ 175 0021 EF 71                   		mov.L	r7, r1
+ 176 0023 05 00 00 00             		bsr	_free
+ 177                             	.LVL20:
+  78:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** }
+ 178                             		.loc 1 78 5 view .LVU62
+ 179                             	.L9:
+  79:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 180                             		.loc 1 79 1 is_stmt 0 view .LVU63
+ 181 0027 EF A1                   		mov.L	r10, r1
+ 182 0029 3F 7A 04                		rtsd	#16, r7-r10
+ 183                             	.LVL21:
+ 184                             	.L11:
+  66:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     }
+ 185                             		.loc 1 66 16 view .LVU64
+ 186 002c 66 0A                   		mov.L	#0, r10
+ 187 002e 2E F9                   		bra	.L9
+ 188                             	.LFE1:
+ 190                             		.section	.text.d1_setregister,"ax",@progbits
+ 191                             		.global	_d1_setregister
+ 193                             	_d1_setregister:
+ 194                             	.LVL22:
+ 195                             	.LFB2:
+  84:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     d1_device_rx *dev = (d1_device_rx*) handle;
+ 196                             		.loc 1 84 1 is_stmt 1 view -0
+  85:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 197                             		.loc 1 85 5 view .LVU66
+  87:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     {
+ 198                             		.loc 1 87 5 view .LVU67
+ 199 0000 61 12                   		cmp	#1, r2
+ 200 0002 16                      		beq	.L14
+ 201 0003 61 A2                   		cmp	#10, r2
+ 202 0005 20 27                   		beq	.L15
+ 203 0007 02                      		rts
+ 204                             	.L14:
+  90:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         {
+ 205                             		.loc 1 90 9 view .LVU68
+  90:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         {
+ 206                             		.loc 1 90 12 is_stmt 0 view .LVU69
+ 207 0008 75 53 32                		cmp	#50, r3
+ 208 000b 20 0C                   		beq	.L18
+ 209                             	.L17:
+  98:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         }
+ 210                             		.loc 1 98 13 is_stmt 1 view .LVU70
+ 211 000d 6C 23                   		shll	#2, r3
+ 212                             	.LVL23:
+  98:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         }
+ 213                             		.loc 1 98 13 is_stmt 0 view .LVU71
+ 214 000f 73 33 00 30 0E          		add	#0xe3000, r3
+ 215 0014 E3 34                   		mov.L	r4, [r3]
+ 216 0016 02                      		rts
+ 217                             	.LVL24:
+ 218                             	.L18:
+  90:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         {
+ 219                             		.loc 1 90 45 discriminator 1 view .LVU72
+ 220 0017 A8 1D                   		mov.L	4[r1], r5
+  90:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         {
+ 221                             		.loc 1 90 38 discriminator 1 view .LVU73
+ 222 0019 61 05                   		cmp	#0, r5
+ 223 001b 20 F2                   		beq	.L17
+ 224                             	.LBB2:
+  92:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****             dev->dlist_start = (long*)(dlistp + 1);
+ 225                             		.loc 1 92 13 is_stmt 1 view .LVU74
+ 226                             	.LVL25:
+  93:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****             WRITE_REG(DAVE2D_0_BASE, index, (unsigned long)(*dlistp));
+ 227                             		.loc 1 93 13 view .LVU75
+  93:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****             WRITE_REG(DAVE2D_0_BASE, index, (unsigned long)(*dlistp));
+ 228                             		.loc 1 93 47 is_stmt 0 view .LVU76
+ 229 001d 71 45 04                		add	#4, r4, r5
+  93:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****             WRITE_REG(DAVE2D_0_BASE, index, (unsigned long)(*dlistp));
+ 230                             		.loc 1 93 30 view .LVU77
+ 231 0020 E3 15                   		mov.L	r5, [r1]
+  94:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         }
+ 232                             		.loc 1 94 13 is_stmt 1 view .LVU78
+ 233 0022 6C 23                   		shll	#2, r3
+ 234                             	.LVL26:
+  94:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****         }
+ 235                             		.loc 1 94 13 is_stmt 0 view .LVU79
+ 236 0024 73 33 00 30 0E          		add	#0xe3000, r3
+ 237 0029 E0 43                   		mov.L	[r4], [r3]
+ 238                             	.LBE2:
+  91:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****             int *dlistp = (int*)value;
+ 239                             		.loc 1 91 9 view .LVU80
+ 240 002b 02                      		rts
+ 241                             	.LVL27:
+ 242                             	.L15:
+ 104:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** #else
+ 243                             		.loc 1 104 9 is_stmt 1 view .LVU81
+ 104:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** #else
+ 244                             		.loc 1 104 29 is_stmt 0 view .LVU82
+ 245 002c A0 1C                   		mov.L	r4, 4[r1]
+ 108:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 246                             		.loc 1 108 5 is_stmt 1 view .LVU83
+ 115:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 247                             		.loc 1 115 1 is_stmt 0 view .LVU84
+ 248 002e 02                      		rts
+ 249                             	.LFE2:
+ 251                             		.section	.text.d1_getregister,"ax",@progbits
+ 252                             		.global	_d1_getregister
+ 254                             	_d1_getregister:
+ 255                             	.LVL28:
+ 256                             	.LFB3:
+ 120:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     d1_device_rx *dev = (d1_device_rx*)handle;
+ 257                             		.loc 1 120 1 is_stmt 1 view -0
+ 121:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 258                             		.loc 1 121 5 view .LVU86
+ 123:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     {
+ 259                             		.loc 1 123 5 view .LVU87
+ 260 0000 61 12                   		cmp	#1, r2
+ 261 0002 10                      		beq	.L20
+ 262 0003 61 A2                   		cmp	#10, r2
+ 263 0005 20 0F                   		beq	.L21
+ 134:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     }
+ 264                             		.loc 1 134 16 is_stmt 0 view .LVU88
+ 265 0007 66 01                   		mov.L	#0, r1
+ 266                             	.LVL29:
+ 134:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     }
+ 267                             		.loc 1 134 16 view .LVU89
+ 268 0009 02                      		rts
+ 269                             	.LVL30:
+ 270                             	.L20:
+ 126:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 271                             		.loc 1 126 9 is_stmt 1 view .LVU90
+ 126:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 272                             		.loc 1 126 16 is_stmt 0 view .LVU91
+ 273 000a 6C 23                   		shll	#2, r3
+ 274                             	.LVL31:
+ 126:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 275                             		.loc 1 126 16 view .LVU92
+ 276 000c 73 33 00 30 0E          		add	#0xe3000, r3
+ 277 0011 EC 31                   		mov.L	[r3], r1
+ 278                             	.LVL32:
+ 126:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 279                             		.loc 1 126 16 view .LVU93
+ 280 0013 02                      		rts
+ 281                             	.LVL33:
+ 282                             	.L21:
+ 129:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 283                             		.loc 1 129 9 is_stmt 1 view .LVU94
+ 129:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 284                             		.loc 1 129 19 is_stmt 0 view .LVU95
+ 285 0014 A8 19                   		mov.L	4[r1], r1
+ 286                             	.LVL34:
+ 136:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 287                             		.loc 1 136 1 view .LVU96
+ 288 0016 02                      		rts
+ 289                             	.LFE3:
+ 291                             		.section	.text.d1_devicesupported,"ax",@progbits
+ 292                             		.global	_d1_devicesupported
+ 294                             	_d1_devicesupported:
+ 295                             	.LVL35:
+ 296                             	.LFB4:
+ 141:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     /* unused arguments */
+ 297                             		.loc 1 141 1 is_stmt 1 view -0
+ 143:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 298                             		.loc 1 143 5 view .LVU98
+ 145:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     {
+ 299                             		.loc 1 145 5 view .LVU99
+ 300 0000 61 12                   		cmp	#1, r2
+ 301 0002 17                      		beq	.L25
+ 302 0003 61 A2                   		cmp	#10, r2
+ 303 0005 17                      		beq	.L26
+ 156:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     }
+ 304                             		.loc 1 156 16 is_stmt 0 view .LVU100
+ 305 0006 66 01                   		mov.L	#0, r1
+ 306                             	.LVL36:
+ 156:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c ****     }
+ 307                             		.loc 1 156 16 view .LVU101
+ 308 0008 02                      		rts
+ 309                             	.LVL37:
+ 310                             	.L25:
+ 151:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 311                             		.loc 1 151 16 view .LVU102
+ 312 0009 66 11                   		mov.L	#1, r1
+ 313                             	.LVL38:
+ 151:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 314                             		.loc 1 151 16 view .LVU103
+ 315 000b 02                      		rts
+ 316                             	.LVL39:
+ 317                             	.L26:
+ 151:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 318                             		.loc 1 151 16 view .LVU104
+ 319 000c 66 11                   		mov.L	#1, r1
+ 320                             	.LVL40:
+ 158:../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.c **** 
+ 321                             		.loc 1 158 1 view .LVU105
+ 322 000e 02                      		rts
+ 323                             	.LFE4:
+ 425                             	.Letext0:
+ 426                             		.file 2 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\lib\\gcc\\rx-
+ 427                             		.file 3 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 428                             		.file 4 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 429                             		.file 5 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 430                             		.file 6 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 431                             		.file 7 "../src/smc_gen/r_drw2d_rx/src/rx/dave_base_rx.h"
+ 432                             		.file 8 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_drw2d_rx\\inc\\tes/dav

@@ -1,0 +1,13 @@
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
+arg1 = $(1)
+export PATH=C:\ProgramData\GCC for Renesas RX 8.3.0.202311-GNURX-ELF\rx-elf\rx-elf\bin\;C:\ProgramData\GCC for Renesas RX 8.3.0.202311-GNURX-ELF\rx-elf\rx-elf\libexec\gcc\rx-elf\8.3.0.202311-GNURX\;C:\Users\tomoyasato\AppData\Local\Programs\Renesas\e2_studio\eclipse\plugins\com.renesas.ide.exttools.busybox.win32.x86_64_1.3.6.v20230615-0931\bin\;C:\Users\tomoyasato\AppData\Local\Programs\Renesas\e2_studio\eclipse\plugins\com.renesas.ide.exttools.gnumake.win32.x86_64_4.3.0.v20220121-1024\mk\;C:\Users\tomoyasato\AppData\Local\Programs\Renesas\e2_studio\eclipse\plugins\com.renesas.ide.exttools.scandep.win32.x86_64_1.0.0.v20230915-1033\sd\;C:/Users/tomoyasato/AppData/Local/Programs/Renesas/e2_studio/eclipse//plugins/org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_17.0.10.v20240120-1143/jre/bin/server;C:/Users/tomoyasato/AppData/Local/Programs/Renesas/e2_studio/eclipse//plugins/org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_17.0.10.v20240120-1143/jre/bin;C:\ProgramData\GCC for Renesas RX 8.3.0.202311-GNURX-ELF\rx-elf\rx-elf\bin;;C:\ProgramData\GCC for Renesas RX 8.3.0.202311-GNURX-ELF\rx-elf\rx-elf\binC:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\Git\cmd;;C:\Program Files\Tailscale\;C:\Program Files\dotnet\;C:\Users\tomoyasato\AppData\Local\Programs\Python\Python313\Scripts\;C:\Users\tomoyasato\AppData\Local\Programs\Python\Python313\;C:\ProgramData\GCC for Renesas RX 8.3.0.202311-GNURX-ELF\rx-elf\rx-elf\bin;C:\Users\tomoyasato\AppData\Local\Programs\Python\Launcher\;C:\ProgramData\GCC for Renesas RX 8.3.0.202311-GNURX-ELF\rx-elf\rx-elf\bin;C:\ProgramData\GCC for Renesas RX 8.3.0.202311-GNURX-ELF\rx-elf\rx-elf\bin;C:\ProgramData\GCC for Renesas RX 8.3.0.202305-GNURX-ELF\rx-elf\rx-elf\bin;C:\Users\tomoyasato\AppData\Local\Microsoft\WindowsApps;C:\Users\tomoyasato\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\tomoyasato\AppData\Local\GitHubDesktop\bin;C:\Users\tomoyasato\AppData\Local\Programs\Renesas\e2_studio\eclipse
+export TCINSTALL=C:\ProgramData\GCC for Renesas RX 8.3.0.202311-GNURX-ELF\rx-elf\rx-elf$(call arg1,\)
+export CWD=$(CURDIR)
+export AMS_LICENSE_PATH=
+export TC_VERSION=8.3.0.202311
+export AMS_KEEP_FILE=
+export PWD=$(CURDIR)
+export GCC_VERSION=8.3.0.202311-GNURX

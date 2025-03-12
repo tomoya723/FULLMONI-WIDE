@@ -1,0 +1,603 @@
+   1                             		.file	"ID_SCREEN_02.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.global	_ID_SCREEN_02_RootInfo
+   5                             		.section	.data.ID_SCREEN_02_RootInfo,"aw"
+   6                             		.balign 4
+   9                             	_ID_SCREEN_02_RootInfo:
+  10 0000 03 18                   		.short	0x1803
+  11 0002 00 00                   		.zero	2
+  12 0004 00 00 00 00             		.long	__aCreate
+  13 0008 0B 00 00 00             		.long	11
+  14 000c 00 00 00 00             		.long	__aSetup
+  15 0010 15 00 00 00             		.long	21
+  16 0014 00 00 00 00             		.long	0
+  17 0018 00 00 00 00             		.long	0
+  18 001c 00 00 00 00             		.long	_cbID_SCREEN_02
+  19 0020 00 00 00 00             		.long	0
+  20                             		.section	.rodata._aSetup,"a"
+  21                             		.balign 4
+  24                             	__aSetup:
+  25 0000 03 18 00 00             		.long	0x1803
+  26 0004 52 00 00 00             		.long	0x52
+  27 0008 00 00 00 00             		.long	0
+  28 000c 00 00 00 00             		.long	0
+  29 0010 00 00 00 00             		.long	0
+  30 0014 00 00 00 00 00 00 00 00 		.zero	60
+  30      00 00 00 00 00 00 00 00 
+  30      00 00 00 00 00 00 00 00 
+  30      00 00 00 00 00 00 00 00 
+  30      00 00 00 00 00 00 00 00 
+  31 0050 01 08 00 00             		.long	0x801
+  32 0054 05 00 00 00             		.long	5
+  33 0058 00 00 00 00             		.long	0
+  34 005c 00 00 00 00             		.long	0
+  35 0060 00 00 00 00             		.long	0
+  36 0064 00 00 00 00 00 00 00 00 		.zero	60
+  36      00 00 00 00 00 00 00 00 
+  36      00 00 00 00 00 00 00 00 
+  36      00 00 00 00 00 00 00 00 
+  36      00 00 00 00 00 00 00 00 
+  37 00a0 01 08 00 00             		.long	0x801
+  38 00a4 0B 00 00 00             		.long	11
+  39 00a8 00 00 00 00             		.long	0
+  40 00ac 00 00 00 00             		.long	_acw_back
+  41 00b0 00 00 00 00             		.long	0
+  42 00b4 9C 00 00 00             		.long	0x9c
+  43 00b8 00 00 00 00             		.long	0
+  44 00bc 00 00 00 00             		.long	0
+  45 00c0 00 00 00 00 00 00 00 00 		.zero	48
+  45      00 00 00 00 00 00 00 00 
+  45      00 00 00 00 00 00 00 00 
+  45      00 00 00 00 00 00 00 00 
+  45      00 00 00 00 00 00 00 00 
+  46 00f0 1A 08 00 00             		.long	0x81a
+  47 00f4 0B 00 00 00             		.long	11
+  48 00f8 00 00 00 00             		.long	0
+  49 00fc 00 00 00 00             		.long	_acws_masterwarning
+  50 0100 00 00 00 00             		.long	0
+  51 0104 53 02 00 00             		.long	0x253
+  52 0108 00 00 00 00             		.long	0
+  53 010c 00 00 00 00             		.long	0
+  54 0110 00 00 00 00 00 00 00 00 		.zero	48
+  54      00 00 00 00 00 00 00 00 
+  54      00 00 00 00 00 00 00 00 
+  54      00 00 00 00 00 00 00 00 
+  54      00 00 00 00 00 00 00 00 
+  55 0140 1A 08 00 00             		.long	0x81a
+  56 0144 51 00 00 00             		.long	0x51
+  57 0148 00 00 00 00             		.long	0
+  58 014c 00 00 00 00             		.long	0
+  59 0150 00 00 00 00             		.long	0
+  60 0154 00 00 00 00 00 00 00 00 		.zero	60
+  60      00 00 00 00 00 00 00 00 
+  60      00 00 00 00 00 00 00 00 
+  60      00 00 00 00 00 00 00 00 
+  60      00 00 00 00 00 00 00 00 
+  61 0190 1B 08 00 00             		.long	0x81b
+  62 0194 0B 00 00 00             		.long	11
+  63 0198 00 00 00 00             		.long	0
+  64 019c 00 00 00 00             		.long	_acws_oilpresswarning
+  65 01a0 00 00 00 00             		.long	0
+  66 01a4 66 02 00 00             		.long	0x266
+  67 01a8 00 00 00 00             		.long	0
+  68 01ac 00 00 00 00             		.long	0
+  69 01b0 00 00 00 00 00 00 00 00 		.zero	48
+  69      00 00 00 00 00 00 00 00 
+  69      00 00 00 00 00 00 00 00 
+  69      00 00 00 00 00 00 00 00 
+  69      00 00 00 00 00 00 00 00 
+  70 01e0 1B 08 00 00             		.long	0x81b
+  71 01e4 51 00 00 00             		.long	0x51
+  72 01e8 00 00 00 00             		.long	0
+  73 01ec 00 00 00 00             		.long	0
+  74 01f0 00 00 00 00             		.long	0
+  75 01f4 00 00 00 00 00 00 00 00 		.zero	60
+  75      00 00 00 00 00 00 00 00 
+  75      00 00 00 00 00 00 00 00 
+  75      00 00 00 00 00 00 00 00 
+  75      00 00 00 00 00 00 00 00 
+  76 0230 1C 08 00 00             		.long	0x81c
+  77 0234 0B 00 00 00             		.long	11
+  78 0238 00 00 00 00             		.long	0
+  79 023c 00 00 00 00             		.long	_acws_watarcool
+  80 0240 00 00 00 00             		.long	0
+  81 0244 18 04 00 00             		.long	0x418
+  82 0248 00 00 00 00             		.long	0
+  83 024c 00 00 00 00             		.long	0
+  84 0250 00 00 00 00 00 00 00 00 		.zero	48
+  84      00 00 00 00 00 00 00 00 
+  84      00 00 00 00 00 00 00 00 
+  84      00 00 00 00 00 00 00 00 
+  84      00 00 00 00 00 00 00 00 
+  85 0280 1C 08 00 00             		.long	0x81c
+  86 0284 51 00 00 00             		.long	0x51
+  87 0288 00 00 00 00             		.long	0
+  88 028c 00 00 00 00             		.long	0
+  89 0290 00 00 00 00             		.long	0
+  90 0294 00 00 00 00 00 00 00 00 		.zero	60
+  90      00 00 00 00 00 00 00 00 
+  90      00 00 00 00 00 00 00 00 
+  90      00 00 00 00 00 00 00 00 
+  90      00 00 00 00 00 00 00 00 
+  91 02d0 02 08 00 00             		.long	0x802
+  92 02d4 0B 00 00 00             		.long	11
+  93 02d8 00 00 00 00             		.long	0
+  94 02dc 00 00 00 00             		.long	_acws_waterwarning
+  95 02e0 00 00 00 00             		.long	0
+  96 02e4 45 03 00 00             		.long	0x345
+  97 02e8 00 00 00 00             		.long	0
+  98 02ec 00 00 00 00             		.long	0
+  99 02f0 00 00 00 00 00 00 00 00 		.zero	48
+  99      00 00 00 00 00 00 00 00 
+  99      00 00 00 00 00 00 00 00 
+  99      00 00 00 00 00 00 00 00 
+  99      00 00 00 00 00 00 00 00 
+ 100 0320 02 08 00 00             		.long	0x802
+ 101 0324 51 00 00 00             		.long	0x51
+ 102 0328 00 00 00 00             		.long	0
+ 103 032c 00 00 00 00             		.long	0
+ 104 0330 00 00 00 00             		.long	0
+ 105 0334 00 00 00 00 00 00 00 00 		.zero	60
+ 105      00 00 00 00 00 00 00 00 
+ 105      00 00 00 00 00 00 00 00 
+ 105      00 00 00 00 00 00 00 00 
+ 105      00 00 00 00 00 00 00 00 
+ 106 0370 03 08 00 00             		.long	0x803
+ 107 0374 0B 00 00 00             		.long	11
+ 108 0378 00 00 00 00             		.long	0
+ 109 037c 00 00 00 00             		.long	_acws_exhaustwarning
+ 110 0380 00 00 00 00             		.long	0
+ 111 0384 17 03 00 00             		.long	0x317
+ 112 0388 00 00 00 00             		.long	0
+ 113 038c 00 00 00 00             		.long	0
+ 114 0390 00 00 00 00 00 00 00 00 		.zero	48
+ 114      00 00 00 00 00 00 00 00 
+ 114      00 00 00 00 00 00 00 00 
+ 114      00 00 00 00 00 00 00 00 
+ 114      00 00 00 00 00 00 00 00 
+ 115 03c0 03 08 00 00             		.long	0x803
+ 116 03c4 51 00 00 00             		.long	0x51
+ 117 03c8 00 00 00 00             		.long	0
+ 118 03cc 00 00 00 00             		.long	0
+ 119 03d0 00 00 00 00             		.long	0
+ 120 03d4 00 00 00 00 00 00 00 00 		.zero	60
+ 120      00 00 00 00 00 00 00 00 
+ 120      00 00 00 00 00 00 00 00 
+ 120      00 00 00 00 00 00 00 00 
+ 120      00 00 00 00 00 00 00 00 
+ 121 0410 1D 08 00 00             		.long	0x81d
+ 122 0414 0B 00 00 00             		.long	11
+ 123 0418 00 00 00 00             		.long	0
+ 124 041c 00 00 00 00             		.long	_acws_batterywarning
+ 125 0420 00 00 00 00             		.long	0
+ 126 0424 C8 02 00 00             		.long	0x2c8
+ 127 0428 00 00 00 00             		.long	0
+ 128 042c 00 00 00 00             		.long	0
+ 129 0430 00 00 00 00 00 00 00 00 		.zero	48
+ 129      00 00 00 00 00 00 00 00 
+ 129      00 00 00 00 00 00 00 00 
+ 129      00 00 00 00 00 00 00 00 
+ 129      00 00 00 00 00 00 00 00 
+ 130 0460 1D 08 00 00             		.long	0x81d
+ 131 0464 51 00 00 00             		.long	0x51
+ 132 0468 00 00 00 00             		.long	0
+ 133 046c 00 00 00 00             		.long	0
+ 134 0470 00 00 00 00             		.long	0
+ 135 0474 00 00 00 00 00 00 00 00 		.zero	60
+ 135      00 00 00 00 00 00 00 00 
+ 135      00 00 00 00 00 00 00 00 
+ 135      00 00 00 00 00 00 00 00 
+ 135      00 00 00 00 00 00 00 00 
+ 136 04b0 1E 08 00 00             		.long	0x81e
+ 137 04b4 0B 00 00 00             		.long	11
+ 138 04b8 00 00 00 00             		.long	0
+ 139 04bc 00 00 00 00             		.long	_acws_breakwarning
+ 140 04c0 00 00 00 00             		.long	0
+ 141 04c4 F8 03 00 00             		.long	0x3f8
+ 142 04c8 00 00 00 00             		.long	0
+ 143 04cc 00 00 00 00             		.long	0
+ 144 04d0 00 00 00 00 00 00 00 00 		.zero	48
+ 144      00 00 00 00 00 00 00 00 
+ 144      00 00 00 00 00 00 00 00 
+ 144      00 00 00 00 00 00 00 00 
+ 144      00 00 00 00 00 00 00 00 
+ 145 0500 1E 08 00 00             		.long	0x81e
+ 146 0504 51 00 00 00             		.long	0x51
+ 147 0508 00 00 00 00             		.long	0
+ 148 050c 00 00 00 00             		.long	0
+ 149 0510 00 00 00 00             		.long	0
+ 150 0514 00 00 00 00 00 00 00 00 		.zero	60
+ 150      00 00 00 00 00 00 00 00 
+ 150      00 00 00 00 00 00 00 00 
+ 150      00 00 00 00 00 00 00 00 
+ 150      00 00 00 00 00 00 00 00 
+ 151 0550 1F 08 00 00             		.long	0x81f
+ 152 0554 0B 00 00 00             		.long	11
+ 153 0558 00 00 00 00             		.long	0
+ 154 055c 00 00 00 00             		.long	_acws_beltwarning
+ 155 0560 00 00 00 00             		.long	0
+ 156 0564 1D 03 00 00             		.long	0x31d
+ 157 0568 00 00 00 00             		.long	0
+ 158 056c 00 00 00 00             		.long	0
+ 159 0570 00 00 00 00 00 00 00 00 		.zero	48
+ 159      00 00 00 00 00 00 00 00 
+ 159      00 00 00 00 00 00 00 00 
+ 159      00 00 00 00 00 00 00 00 
+ 159      00 00 00 00 00 00 00 00 
+ 160 05a0 1F 08 00 00             		.long	0x81f
+ 161 05a4 51 00 00 00             		.long	0x51
+ 162 05a8 00 00 00 00             		.long	0
+ 163 05ac 00 00 00 00             		.long	0
+ 164 05b0 00 00 00 00             		.long	0
+ 165 05b4 00 00 00 00 00 00 00 00 		.zero	60
+ 165      00 00 00 00 00 00 00 00 
+ 165      00 00 00 00 00 00 00 00 
+ 165      00 00 00 00 00 00 00 00 
+ 165      00 00 00 00 00 00 00 00 
+ 166 05f0 20 08 00 00             		.long	0x820
+ 167 05f4 0B 00 00 00             		.long	11
+ 168 05f8 00 00 00 00             		.long	0
+ 169 05fc 00 00 00 00             		.long	_acws_fuelcheck
+ 170 0600 00 00 00 00             		.long	0
+ 171 0604 4A 04 00 00             		.long	0x44a
+ 172 0608 00 00 00 00             		.long	0
+ 173 060c 00 00 00 00             		.long	0
+ 174 0610 00 00 00 00 00 00 00 00 		.zero	48
+ 174      00 00 00 00 00 00 00 00 
+ 174      00 00 00 00 00 00 00 00 
+ 174      00 00 00 00 00 00 00 00 
+ 174      00 00 00 00 00 00 00 00 
+ 175 0640 20 08 00 00             		.long	0x820
+ 176 0644 51 00 00 00             		.long	0x51
+ 177 0648 00 00 00 00             		.long	0
+ 178 064c 00 00 00 00             		.long	0
+ 179 0650 00 00 00 00             		.long	0
+ 180 0654 00 00 00 00 00 00 00 00 		.zero	60
+ 180      00 00 00 00 00 00 00 00 
+ 180      00 00 00 00 00 00 00 00 
+ 180      00 00 00 00 00 00 00 00 
+ 180      00 00 00 00 00 00 00 00 
+ 181                             		.section	.data._aCreate,"aw"
+ 182                             		.balign 4
+ 185                             	__aCreate:
+ 186 0000 00 00 00 00             		.long	_WM_OBJECT_WINDOW_Create
+ 187 0004 03 18 00 00             		.long	0x1803
+ 188 0008 00 00 00 00             		.long	0
+ 189 000c 02 00 00 00             		.long	2
+ 190 0010 00 00 00 00             		.long	0
+ 191 0014 00 00 00 00             		.long	0
+ 192 0018 00 00 00 00             		.long	0
+ 193 001c 02 00 00 00             		.long	2
+ 194 0020 00 00 00 00             		.long	0
+ 195 0024 00 00 00 00             		.long	0
+ 196 0028 00 00 00 00             		.long	0
+ 197 002c 02 00 00 00             		.long	2
+ 198 0030 FD 02 00 00             		.long	0x2fd
+ 199 0034 00 00 00 00             		.long	0
+ 200 0038 00 00 00 00             		.long	0
+ 201 003c 02 00 00 00             		.long	2
+ 202 0040 00 00 00 00             		.long	0
+ 203 0044 00 00 00 00             		.long	0
+ 204 0048 00 00 00 00             		.long	0
+ 205 004c 00 00 00 00             		.long	0
+ 206 0050 00 00 00 00             		.long	0
+ 207 0054 00 00 00 00             		.long	0
+ 208 0058 00 00 00 00             		.long	0
+ 209 005c 00                      		.byte	0
+ 210 005d 00 00 00                		.zero	3
+ 211 0060 00 00 00 00             		.long	0
+ 212 0064 00 00                   		.short	0
+ 213 0066 00 00                   		.short	0
+ 214 0068 00 00 00 00             		.long	_WM_OBJECT_IMAGE_Create
+ 215 006c 01 08 00 00             		.long	0x801
+ 216 0070 03 18 00 00             		.long	0x1803
+ 217 0074 02 00 00 00             		.long	2
+ 218 0078 00 00 00 00             		.long	0
+ 219 007c 00 00 00 00             		.long	0
+ 220 0080 00 00 00 00             		.long	0
+ 221 0084 02 00 00 00             		.long	2
+ 222 0088 00 00 00 00             		.long	0
+ 223 008c 00 00 00 00             		.long	0
+ 224 0090 00 00 00 00             		.long	0
+ 225 0094 00 00 00 00             		.long	0
+ 226 0098 00 00 00 00             		.long	0
+ 227 009c 00 00 00 00             		.long	0
+ 228 00a0 00 00 00 00             		.long	0
+ 229 00a4 00 00 00 00             		.long	0
+ 230 00a8 00 00 00 00             		.long	0
+ 231 00ac 00 00 00 00             		.long	0
+ 232 00b0 00 00 00 00             		.long	0
+ 233 00b4 23 00 00 00             		.long	35
+ 234 00b8 00 01 00 00             		.long	0x100
+ 235 00bc 00 00 00 00             		.long	0
+ 236 00c0 00 00 00 00             		.long	0
+ 237 00c4 00                      		.byte	0
+ 238 00c5 00 00 00                		.zero	3
+ 239 00c8 00 00 00 00             		.long	0
+ 240 00cc 00 00                   		.short	0
+ 241 00ce 00 00                   		.short	0
+ 242 00d0 00 00 00 00             		.long	_WM_OBJECT_IMAGE_Create
+ 243 00d4 1A 08 00 00             		.long	0x81a
+ 244 00d8 03 18 00 00             		.long	0x1803
+ 245 00dc 02 00 00 00             		.long	2
+ 246 00e0 05 00 00 00             		.long	5
+ 247 00e4 00 00 00 00             		.long	0
+ 248 00e8 00 00 00 00             		.long	0
+ 249 00ec 02 00 00 00             		.long	2
+ 250 00f0 0A 00 00 00             		.long	10
+ 251 00f4 00 00 00 00             		.long	0
+ 252 00f8 00 00 00 00             		.long	0
+ 253 00fc 00 00 00 00             		.long	0
+ 254 0100 00 00 00 00             		.long	0
+ 255 0104 00 00 00 00             		.long	0
+ 256 0108 00 00 00 00             		.long	0
+ 257 010c 00 00 00 00             		.long	0
+ 258 0110 00 00 00 00             		.long	0
+ 259 0114 00 00 00 00             		.long	0
+ 260 0118 00 00 00 00             		.long	0
+ 261 011c 19 00 00 00             		.long	25
+ 262 0120 19 00 00 00             		.long	25
+ 263 0124 00 00 00 00             		.long	0
+ 264 0128 00 00 00 00             		.long	0
+ 265 012c 00                      		.byte	0
+ 266 012d 00 00 00                		.zero	3
+ 267 0130 00 00 00 00             		.long	0
+ 268 0134 00 00                   		.short	0
+ 269 0136 00 00                   		.short	0
+ 270 0138 00 00 00 00             		.long	_WM_OBJECT_IMAGE_Create
+ 271 013c 1B 08 00 00             		.long	0x81b
+ 272 0140 03 18 00 00             		.long	0x1803
+ 273 0144 02 00 00 00             		.long	2
+ 274 0148 05 00 00 00             		.long	5
+ 275 014c 00 00 00 00             		.long	0
+ 276 0150 00 00 00 00             		.long	0
+ 277 0154 02 00 00 00             		.long	2
+ 278 0158 28 00 00 00             		.long	40
+ 279 015c 00 00 00 00             		.long	0
+ 280 0160 00 00 00 00             		.long	0
+ 281 0164 00 00 00 00             		.long	0
+ 282 0168 00 00 00 00             		.long	0
+ 283 016c 00 00 00 00             		.long	0
+ 284 0170 00 00 00 00             		.long	0
+ 285 0174 00 00 00 00             		.long	0
+ 286 0178 00 00 00 00             		.long	0
+ 287 017c 00 00 00 00             		.long	0
+ 288 0180 00 00 00 00             		.long	0
+ 289 0184 19 00 00 00             		.long	25
+ 290 0188 19 00 00 00             		.long	25
+ 291 018c 00 00 00 00             		.long	0
+ 292 0190 00 00 00 00             		.long	0
+ 293 0194 00                      		.byte	0
+ 294 0195 00 00 00                		.zero	3
+ 295 0198 00 00 00 00             		.long	0
+ 296 019c 00 00                   		.short	0
+ 297 019e 00 00                   		.short	0
+ 298 01a0 00 00 00 00             		.long	_WM_OBJECT_IMAGE_Create
+ 299 01a4 1C 08 00 00             		.long	0x81c
+ 300 01a8 03 18 00 00             		.long	0x1803
+ 301 01ac 02 00 00 00             		.long	2
+ 302 01b0 05 00 00 00             		.long	5
+ 303 01b4 00 00 00 00             		.long	0
+ 304 01b8 00 00 00 00             		.long	0
+ 305 01bc 02 00 00 00             		.long	2
+ 306 01c0 46 00 00 00             		.long	0x46
+ 307 01c4 00 00 00 00             		.long	0
+ 308 01c8 00 00 00 00             		.long	0
+ 309 01cc 00 00 00 00             		.long	0
+ 310 01d0 00 00 00 00             		.long	0
+ 311 01d4 00 00 00 00             		.long	0
+ 312 01d8 00 00 00 00             		.long	0
+ 313 01dc 00 00 00 00             		.long	0
+ 314 01e0 00 00 00 00             		.long	0
+ 315 01e4 00 00 00 00             		.long	0
+ 316 01e8 00 00 00 00             		.long	0
+ 317 01ec 19 00 00 00             		.long	25
+ 318 01f0 19 00 00 00             		.long	25
+ 319 01f4 00 00 00 00             		.long	0
+ 320 01f8 00 00 00 00             		.long	0
+ 321 01fc 00                      		.byte	0
+ 322 01fd 00 00 00                		.zero	3
+ 323 0200 00 00 00 00             		.long	0
+ 324 0204 00 00                   		.short	0
+ 325 0206 00 00                   		.short	0
+ 326 0208 00 00 00 00             		.long	_WM_OBJECT_IMAGE_Create
+ 327 020c 02 08 00 00             		.long	0x802
+ 328 0210 03 18 00 00             		.long	0x1803
+ 329 0214 02 00 00 00             		.long	2
+ 330 0218 05 00 00 00             		.long	5
+ 331 021c 00 00 00 00             		.long	0
+ 332 0220 00 00 00 00             		.long	0
+ 333 0224 02 00 00 00             		.long	2
+ 334 0228 46 00 00 00             		.long	0x46
+ 335 022c 00 00 00 00             		.long	0
+ 336 0230 00 00 00 00             		.long	0
+ 337 0234 00 00 00 00             		.long	0
+ 338 0238 00 00 00 00             		.long	0
+ 339 023c 00 00 00 00             		.long	0
+ 340 0240 00 00 00 00             		.long	0
+ 341 0244 00 00 00 00             		.long	0
+ 342 0248 00 00 00 00             		.long	0
+ 343 024c 00 00 00 00             		.long	0
+ 344 0250 00 00 00 00             		.long	0
+ 345 0254 19 00 00 00             		.long	25
+ 346 0258 19 00 00 00             		.long	25
+ 347 025c 00 00 00 00             		.long	0
+ 348 0260 00 00 00 00             		.long	0
+ 349 0264 00                      		.byte	0
+ 350 0265 00 00 00                		.zero	3
+ 351 0268 00 00 00 00             		.long	0
+ 352 026c 00 00                   		.short	0
+ 353 026e 00 00                   		.short	0
+ 354 0270 00 00 00 00             		.long	_WM_OBJECT_IMAGE_Create
+ 355 0274 03 08 00 00             		.long	0x803
+ 356 0278 03 18 00 00             		.long	0x1803
+ 357 027c 02 00 00 00             		.long	2
+ 358 0280 05 00 00 00             		.long	5
+ 359 0284 00 00 00 00             		.long	0
+ 360 0288 00 00 00 00             		.long	0
+ 361 028c 02 00 00 00             		.long	2
+ 362 0290 64 00 00 00             		.long	0x64
+ 363 0294 00 00 00 00             		.long	0
+ 364 0298 00 00 00 00             		.long	0
+ 365 029c 00 00 00 00             		.long	0
+ 366 02a0 00 00 00 00             		.long	0
+ 367 02a4 00 00 00 00             		.long	0
+ 368 02a8 00 00 00 00             		.long	0
+ 369 02ac 00 00 00 00             		.long	0
+ 370 02b0 00 00 00 00             		.long	0
+ 371 02b4 00 00 00 00             		.long	0
+ 372 02b8 00 00 00 00             		.long	0
+ 373 02bc 19 00 00 00             		.long	25
+ 374 02c0 19 00 00 00             		.long	25
+ 375 02c4 00 00 00 00             		.long	0
+ 376 02c8 00 00 00 00             		.long	0
+ 377 02cc 00                      		.byte	0
+ 378 02cd 00 00 00                		.zero	3
+ 379 02d0 00 00 00 00             		.long	0
+ 380 02d4 00 00                   		.short	0
+ 381 02d6 00 00                   		.short	0
+ 382 02d8 00 00 00 00             		.long	_WM_OBJECT_IMAGE_Create
+ 383 02dc 1D 08 00 00             		.long	0x81d
+ 384 02e0 03 18 00 00             		.long	0x1803
+ 385 02e4 02 00 00 00             		.long	2
+ 386 02e8 05 00 00 00             		.long	5
+ 387 02ec 00 00 00 00             		.long	0
+ 388 02f0 00 00 00 00             		.long	0
+ 389 02f4 02 00 00 00             		.long	2
+ 390 02f8 82 00 00 00             		.long	0x82
+ 391 02fc 00 00 00 00             		.long	0
+ 392 0300 00 00 00 00             		.long	0
+ 393 0304 00 00 00 00             		.long	0
+ 394 0308 00 00 00 00             		.long	0
+ 395 030c 00 00 00 00             		.long	0
+ 396 0310 00 00 00 00             		.long	0
+ 397 0314 00 00 00 00             		.long	0
+ 398 0318 00 00 00 00             		.long	0
+ 399 031c 00 00 00 00             		.long	0
+ 400 0320 00 00 00 00             		.long	0
+ 401 0324 19 00 00 00             		.long	25
+ 402 0328 19 00 00 00             		.long	25
+ 403 032c 00 00 00 00             		.long	0
+ 404 0330 00 00 00 00             		.long	0
+ 405 0334 00                      		.byte	0
+ 406 0335 00 00 00                		.zero	3
+ 407 0338 00 00 00 00             		.long	0
+ 408 033c 00 00                   		.short	0
+ 409 033e 00 00                   		.short	0
+ 410 0340 00 00 00 00             		.long	_WM_OBJECT_IMAGE_Create
+ 411 0344 1E 08 00 00             		.long	0x81e
+ 412 0348 03 18 00 00             		.long	0x1803
+ 413 034c 02 00 00 00             		.long	2
+ 414 0350 05 00 00 00             		.long	5
+ 415 0354 00 00 00 00             		.long	0
+ 416 0358 00 00 00 00             		.long	0
+ 417 035c 02 00 00 00             		.long	2
+ 418 0360 A0 00 00 00             		.long	0xa0
+ 419 0364 00 00 00 00             		.long	0
+ 420 0368 00 00 00 00             		.long	0
+ 421 036c 00 00 00 00             		.long	0
+ 422 0370 00 00 00 00             		.long	0
+ 423 0374 00 00 00 00             		.long	0
+ 424 0378 00 00 00 00             		.long	0
+ 425 037c 00 00 00 00             		.long	0
+ 426 0380 00 00 00 00             		.long	0
+ 427 0384 00 00 00 00             		.long	0
+ 428 0388 00 00 00 00             		.long	0
+ 429 038c 19 00 00 00             		.long	25
+ 430 0390 19 00 00 00             		.long	25
+ 431 0394 00 00 00 00             		.long	0
+ 432 0398 00 00 00 00             		.long	0
+ 433 039c 00                      		.byte	0
+ 434 039d 00 00 00                		.zero	3
+ 435 03a0 00 00 00 00             		.long	0
+ 436 03a4 00 00                   		.short	0
+ 437 03a6 00 00                   		.short	0
+ 438 03a8 00 00 00 00             		.long	_WM_OBJECT_IMAGE_Create
+ 439 03ac 1F 08 00 00             		.long	0x81f
+ 440 03b0 03 18 00 00             		.long	0x1803
+ 441 03b4 02 00 00 00             		.long	2
+ 442 03b8 05 00 00 00             		.long	5
+ 443 03bc 00 00 00 00             		.long	0
+ 444 03c0 00 00 00 00             		.long	0
+ 445 03c4 02 00 00 00             		.long	2
+ 446 03c8 BE 00 00 00             		.long	0xbe
+ 447 03cc 00 00 00 00             		.long	0
+ 448 03d0 00 00 00 00             		.long	0
+ 449 03d4 00 00 00 00             		.long	0
+ 450 03d8 00 00 00 00             		.long	0
+ 451 03dc 00 00 00 00             		.long	0
+ 452 03e0 00 00 00 00             		.long	0
+ 453 03e4 00 00 00 00             		.long	0
+ 454 03e8 00 00 00 00             		.long	0
+ 455 03ec 00 00 00 00             		.long	0
+ 456 03f0 00 00 00 00             		.long	0
+ 457 03f4 19 00 00 00             		.long	25
+ 458 03f8 19 00 00 00             		.long	25
+ 459 03fc 00 00 00 00             		.long	0
+ 460 0400 00 00 00 00             		.long	0
+ 461 0404 00                      		.byte	0
+ 462 0405 00 00 00                		.zero	3
+ 463 0408 00 00 00 00             		.long	0
+ 464 040c 00 00                   		.short	0
+ 465 040e 00 00                   		.short	0
+ 466 0410 00 00 00 00             		.long	_WM_OBJECT_IMAGE_Create
+ 467 0414 20 08 00 00             		.long	0x820
+ 468 0418 03 18 00 00             		.long	0x1803
+ 469 041c 02 00 00 00             		.long	2
+ 470 0420 05 00 00 00             		.long	5
+ 471 0424 00 00 00 00             		.long	0
+ 472 0428 00 00 00 00             		.long	0
+ 473 042c 02 00 00 00             		.long	2
+ 474 0430 DC 00 00 00             		.long	0xdc
+ 475 0434 00 00 00 00             		.long	0
+ 476 0438 00 00 00 00             		.long	0
+ 477 043c 00 00 00 00             		.long	0
+ 478 0440 00 00 00 00             		.long	0
+ 479 0444 00 00 00 00             		.long	0
+ 480 0448 00 00 00 00             		.long	0
+ 481 044c 00 00 00 00             		.long	0
+ 482 0450 00 00 00 00             		.long	0
+ 483 0454 00 00 00 00             		.long	0
+ 484 0458 00 00 00 00             		.long	0
+ 485 045c 19 00 00 00             		.long	25
+ 486 0460 19 00 00 00             		.long	25
+ 487 0464 00 00 00 00             		.long	0
+ 488 0468 00 00 00 00             		.long	0
+ 489 046c 00                      		.byte	0
+ 490 046d 00 00 00                		.zero	3
+ 491 0470 00 00 00 00             		.long	0
+ 492 0474 00 00                   		.short	0
+ 493 0476 00 00                   		.short	0
+ 494                             		.section P,"ax"
+ 495                             	.Letext0:
+ 496                             		.file 1 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\lib\\gcc\\rx-
+ 497                             		.file 2 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/LCD
+ 498                             		.file 3 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/GUI
+ 499                             		.file 4 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/GUI
+ 500                             		.file 5 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/WM.
+ 501                             		.file 6 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/WID
+ 502                             		.file 7 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/KEY
+ 503                             		.file 8 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/LCD
+ 504                             		.file 9 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/GUI
+ 505                             		.file 10 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/WM
+ 506                             		.file 11 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/BU
+ 507                             		.file 12 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/WI
+ 508                             		.file 13 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/IM
+ 509                             		.file 14 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/TE
+ 510                             		.file 15 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/SL
+ 511                             		.file 16 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/RO
+ 512                             		.file 17 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/SW
+ 513                             		.file 18 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/ED
+ 514                             		.file 19 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/QR
+ 515                             		.file 20 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/GA
+ 516                             		.file 21 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/KE
+ 517                             		.file 22 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/MU
+ 518                             		.file 23 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/SC
+ 519                             		.file 24 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/DR
+ 520                             		.file 25 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/LI
+ 521                             		.file 26 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/LI
+ 522                             		.file 27 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/WH
+ 523                             		.file 28 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_emwin_rx\\lib\\GUI/Ap
+ 524                             		.file 29 "../aw/Source/Generated/Resource.h"
+ 525                             		.file 30 "../aw/Source/Generated/ID_SCREEN_02.c"

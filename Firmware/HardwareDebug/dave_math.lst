@@ -1,0 +1,414 @@
+   1                             		.file	"dave_math.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.d2_sqrt,"ax",@progbits
+   5                             		.global	_d2_sqrt
+   7                             	_d2_sqrt:
+   8                             	.LVL0:
+   9                             	.LFB6:
+  10                             		.file 1 "../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c"
+   1:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** /*--------------------------------------------------------------------------
+   2:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****  * Project: D/AVE
+   3:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****  * File:    dave_math.c (%version: 4 %)
+   4:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****  *          created Tue Feb 08 10:17:38 2005 by hh04027
+   5:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****  *
+   6:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****  * Description:
+   7:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****  *  %date_modified: Thu Jul 14 14:56:42 2005 %  (%derived_by:  hh04027 %)
+   8:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****  *
+   9:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****  * Changes:
+  10:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****  *  2007-08-29 ASc  removed tabs, add comments, changed C++ to C comments
+  11:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****  *  2012-09-25 BSp  MISRA cleanup
+  12:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****  *-------------------------------------------------------------------------- */
+  13:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** 
+  14:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** #include "dave_driver.h"
+  15:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** #include "dave_intern.h"
+  16:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** #include "dave_math.h"
+  17:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** 
+  18:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** /*-------------------------------------------------------------------------- */
+  19:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** 
+  20:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** #define D2_INNER_SQRT(s)                        \
+  21:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    temp = (y << (s)) + (1 << (((s) * 2) - 2));  \
+  22:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    if(x >= temp)                                \
+  23:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    {                                            \
+  24:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****       y += 1 << ((s) - 1);                      \
+  25:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****       x -= temp;                                \
+  26:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    }(void)0                                     /* PRQA S 3412 */ /* $Misra: #MACRO_COMPILER_WARNIN
+  27:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** 
+  28:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** /*--------------------------------------------------------------------------
+  29:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****  * minimalistic 32->16 bit integer square root (no hw divide/multiply needed)
+  30:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****  * unrolled for speed
+  31:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****  * */
+  32:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** d2_s32 d2_sqrt(d2_u32 x)
+  33:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** {
+  11                             		.loc 1 33 1 view -0
+  34:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    d2_u32 temp, y=0;
+  12                             		.loc 1 34 4 view .LVU1
+  35:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** 
+  36:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    if (x >= 0x40000000u)
+  13                             		.loc 1 36 4 view .LVU2
+  14                             		.loc 1 36 7 is_stmt 0 view .LVU3
+  15 0000 74 01 FF FF FF 3F       		cmp	#0x3fffffff, r1
+  16 0006 25 0E                   		bleu	.L18
+  37:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    {
+  38:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****       y = 0x8000u;
+  17                             		.loc 1 38 7 is_stmt 1 view .LVU4
+  18                             	.LVL1:
+  39:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****       x -= 0x40000000u;
+  19                             		.loc 1 39 7 view .LVU5
+  20                             		.loc 1 39 9 is_stmt 0 view .LVU6
+  21 0008 70 11 00 00 00 C0       		add	#-1073741824, r1
+  22                             	.LVL2:
+  38:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****       x -= 0x40000000u;
+  23                             		.loc 1 38 9 view .LVU7
+  24 000e FB 5E 00 80 00          		mov.L	#0x8000, r5
+  25 0013 0B                      		bra	.L2
+  26                             	.LVL3:
+  27                             	.L18:
+  34:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** 
+  28                             		.loc 1 34 17 view .LVU8
+  29 0014 66 05                   		mov.L	#0, r5
+  30                             	.LVL4:
+  31                             	.L2:
+  40:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    }
+  41:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** 
+  42:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    D2_INNER_SQRT (15); /* PRQA S 3112 */ /* $Misra: #MACRO_COMPILER_WARNING_NOP $*/ /* PRQA S 3382 
+  32                             		.loc 1 42 4 is_stmt 1 view .LVU9
+  33 0016 FD CF 54                		shll	#15, r5, r4
+  34 0019 70 44 00 00 00 10       		add	#0x10000000, r4
+  35                             	.LVL5:
+  36                             		.loc 1 42 4 view .LVU10
+  37 001f 47 41                   		cmp	r4, r1
+  38 0021 23 08                   		bltu	.L3
+  39                             		.loc 1 42 4 discriminator 1 view .LVU11
+  40 0023 72 55 00 40             		add	#0x4000, r5
+  41                             	.LVL6:
+  42                             		.loc 1 42 4 discriminator 1 view .LVU12
+  43 0027 43 41                   		sub	r4, r1
+  44                             	.LVL7:
+  45                             	.L3:
+  46                             		.loc 1 42 4 discriminator 3 view .LVU13
+  43:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    D2_INNER_SQRT (14); /* PRQA S 3112 */ /* $Misra: #MACRO_COMPILER_WARNING_NOP $*/ /* PRQA S 3382 
+  47                             		.loc 1 43 4 discriminator 3 view .LVU14
+  48 0029 FD CE 54                		shll	#14, r5, r4
+  49                             	.LVL8:
+  50                             		.loc 1 43 4 is_stmt 0 discriminator 3 view .LVU15
+  51 002c 70 44 00 00 00 04       		add	#0x4000000, r4
+  52                             	.LVL9:
+  53                             		.loc 1 43 4 is_stmt 1 discriminator 3 view .LVU16
+  54 0032 47 41                   		cmp	r4, r1
+  55 0034 23 08                   		bltu	.L4
+  56                             		.loc 1 43 4 discriminator 1 view .LVU17
+  57 0036 72 55 00 20             		add	#0x2000, r5
+  58                             	.LVL10:
+  59                             		.loc 1 43 4 discriminator 1 view .LVU18
+  60 003a 43 41                   		sub	r4, r1
+  61                             	.LVL11:
+  62                             	.L4:
+  63                             		.loc 1 43 4 discriminator 3 view .LVU19
+  44:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    D2_INNER_SQRT (13); /* PRQA S 3112 */ /* $Misra: #MACRO_COMPILER_WARNING_NOP $*/ /* PRQA S 3382 
+  64                             		.loc 1 44 4 discriminator 3 view .LVU20
+  65 003c FD CD 54                		shll	#13, r5, r4
+  66                             	.LVL12:
+  67                             		.loc 1 44 4 is_stmt 0 discriminator 3 view .LVU21
+  68 003f 70 44 00 00 00 01       		add	#0x1000000, r4
+  69                             	.LVL13:
+  70                             		.loc 1 44 4 is_stmt 1 discriminator 3 view .LVU22
+  71 0045 47 41                   		cmp	r4, r1
+  72 0047 23 08                   		bltu	.L5
+  73                             		.loc 1 44 4 discriminator 1 view .LVU23
+  74 0049 72 55 00 10             		add	#0x1000, r5
+  75                             	.LVL14:
+  76                             		.loc 1 44 4 discriminator 1 view .LVU24
+  77 004d 43 41                   		sub	r4, r1
+  78                             	.LVL15:
+  79                             	.L5:
+  80                             		.loc 1 44 4 discriminator 3 view .LVU25
+  45:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    D2_INNER_SQRT (12); /* PRQA S 3112 */ /* $Misra: #MACRO_COMPILER_WARNING_NOP $*/ /* PRQA S 3382 
+  81                             		.loc 1 45 4 discriminator 3 view .LVU26
+  82 004f FD CC 54                		shll	#12, r5, r4
+  83                             	.LVL16:
+  84                             		.loc 1 45 4 is_stmt 0 discriminator 3 view .LVU27
+  85 0052 73 44 00 00 40          		add	#0x400000, r4
+  86                             	.LVL17:
+  87                             		.loc 1 45 4 is_stmt 1 discriminator 3 view .LVU28
+  88 0057 47 41                   		cmp	r4, r1
+  89 0059 23 08                   		bltu	.L6
+  90                             		.loc 1 45 4 discriminator 1 view .LVU29
+  91 005b 72 55 00 08             		add	#0x800, r5
+  92                             	.LVL18:
+  93                             		.loc 1 45 4 discriminator 1 view .LVU30
+  94 005f 43 41                   		sub	r4, r1
+  95                             	.LVL19:
+  96                             	.L6:
+  97                             		.loc 1 45 4 discriminator 3 view .LVU31
+  46:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    D2_INNER_SQRT (11); /* PRQA S 3112 */ /* $Misra: #MACRO_COMPILER_WARNING_NOP $*/ /* PRQA S 3382 
+  98                             		.loc 1 46 4 discriminator 3 view .LVU32
+  99 0061 FD CB 54                		shll	#11, r5, r4
+ 100                             	.LVL20:
+ 101                             		.loc 1 46 4 is_stmt 0 discriminator 3 view .LVU33
+ 102 0064 73 44 00 00 10          		add	#0x100000, r4
+ 103                             	.LVL21:
+ 104                             		.loc 1 46 4 is_stmt 1 discriminator 3 view .LVU34
+ 105 0069 47 41                   		cmp	r4, r1
+ 106 006b 23 08                   		bltu	.L7
+ 107                             		.loc 1 46 4 discriminator 1 view .LVU35
+ 108 006d 72 55 00 04             		add	#0x400, r5
+ 109                             	.LVL22:
+ 110                             		.loc 1 46 4 discriminator 1 view .LVU36
+ 111 0071 43 41                   		sub	r4, r1
+ 112                             	.LVL23:
+ 113                             	.L7:
+ 114                             		.loc 1 46 4 discriminator 3 view .LVU37
+  47:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    D2_INNER_SQRT (10); /* PRQA S 3112 */ /* $Misra: #MACRO_COMPILER_WARNING_NOP $*/ /* PRQA S 3382 
+ 115                             		.loc 1 47 4 discriminator 3 view .LVU38
+ 116 0073 FD CA 54                		shll	#10, r5, r4
+ 117                             	.LVL24:
+ 118                             		.loc 1 47 4 is_stmt 0 discriminator 3 view .LVU39
+ 119 0076 73 44 00 00 04          		add	#0x40000, r4
+ 120                             	.LVL25:
+ 121                             		.loc 1 47 4 is_stmt 1 discriminator 3 view .LVU40
+ 122 007b 47 41                   		cmp	r4, r1
+ 123 007d 23 08                   		bltu	.L8
+ 124                             		.loc 1 47 4 discriminator 1 view .LVU41
+ 125 007f 72 55 00 02             		add	#0x200, r5
+ 126                             	.LVL26:
+ 127                             		.loc 1 47 4 discriminator 1 view .LVU42
+ 128 0083 43 41                   		sub	r4, r1
+ 129                             	.LVL27:
+ 130                             	.L8:
+ 131                             		.loc 1 47 4 discriminator 3 view .LVU43
+  48:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    D2_INNER_SQRT ( 9); /* PRQA S 3112 */ /* $Misra: #MACRO_COMPILER_WARNING_NOP $*/ /* PRQA S 3382 
+ 132                             		.loc 1 48 4 discriminator 3 view .LVU44
+ 133 0085 FD C9 54                		shll	#9, r5, r4
+ 134                             	.LVL28:
+ 135                             		.loc 1 48 4 is_stmt 0 discriminator 3 view .LVU45
+ 136 0088 73 44 00 00 01          		add	#0x10000, r4
+ 137                             	.LVL29:
+ 138                             		.loc 1 48 4 is_stmt 1 discriminator 3 view .LVU46
+ 139 008d 47 41                   		cmp	r4, r1
+ 140 008f 23 08                   		bltu	.L9
+ 141                             		.loc 1 48 4 discriminator 1 view .LVU47
+ 142 0091 72 55 00 01             		add	#0x100, r5
+ 143                             	.LVL30:
+ 144                             		.loc 1 48 4 discriminator 1 view .LVU48
+ 145 0095 43 41                   		sub	r4, r1
+ 146                             	.LVL31:
+ 147                             	.L9:
+ 148                             		.loc 1 48 4 discriminator 3 view .LVU49
+  49:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    D2_INNER_SQRT ( 8); /* PRQA S 3112 */ /* $Misra: #MACRO_COMPILER_WARNING_NOP $*/ /* PRQA S 3382 
+ 149                             		.loc 1 49 4 discriminator 3 view .LVU50
+ 150 0097 FD C8 54                		shll	#8, r5, r4
+ 151                             	.LVL32:
+ 152                             		.loc 1 49 4 is_stmt 0 discriminator 3 view .LVU51
+ 153 009a 72 44 00 40             		add	#0x4000, r4
+ 154                             	.LVL33:
+ 155                             		.loc 1 49 4 is_stmt 1 discriminator 3 view .LVU52
+ 156 009e 47 41                   		cmp	r4, r1
+ 157 00a0 23 08                   		bltu	.L10
+ 158                             		.loc 1 49 4 discriminator 1 view .LVU53
+ 159 00a2 72 55 80 00             		add	#0x80, r5
+ 160                             	.LVL34:
+ 161                             		.loc 1 49 4 discriminator 1 view .LVU54
+ 162 00a6 43 41                   		sub	r4, r1
+ 163                             	.LVL35:
+ 164                             	.L10:
+ 165                             		.loc 1 49 4 discriminator 3 view .LVU55
+  50:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    D2_INNER_SQRT ( 7); /* PRQA S 3112 */ /* $Misra: #MACRO_COMPILER_WARNING_NOP $*/ /* PRQA S 3382 
+ 166                             		.loc 1 50 4 discriminator 3 view .LVU56
+ 167 00a8 FD C7 54                		shll	#7, r5, r4
+ 168                             	.LVL36:
+ 169                             		.loc 1 50 4 is_stmt 0 discriminator 3 view .LVU57
+ 170 00ab 72 44 00 10             		add	#0x1000, r4
+ 171                             	.LVL37:
+ 172                             		.loc 1 50 4 is_stmt 1 discriminator 3 view .LVU58
+ 173 00af 47 41                   		cmp	r4, r1
+ 174 00b1 23 07                   		bltu	.L11
+ 175                             		.loc 1 50 4 discriminator 1 view .LVU59
+ 176 00b3 71 55 40                		add	#0x40, r5
+ 177                             	.LVL38:
+ 178                             		.loc 1 50 4 discriminator 1 view .LVU60
+ 179 00b6 43 41                   		sub	r4, r1
+ 180                             	.LVL39:
+ 181                             	.L11:
+ 182                             		.loc 1 50 4 discriminator 3 view .LVU61
+  51:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    D2_INNER_SQRT ( 6); /* PRQA S 3112 */ /* $Misra: #MACRO_COMPILER_WARNING_NOP $*/ /* PRQA S 3382 
+ 183                             		.loc 1 51 4 discriminator 3 view .LVU62
+ 184 00b8 FD C6 54                		shll	#6, r5, r4
+ 185                             	.LVL40:
+ 186                             		.loc 1 51 4 is_stmt 0 discriminator 3 view .LVU63
+ 187 00bb 72 44 00 04             		add	#0x400, r4
+ 188                             	.LVL41:
+ 189                             		.loc 1 51 4 is_stmt 1 discriminator 3 view .LVU64
+ 190 00bf 47 41                   		cmp	r4, r1
+ 191 00c1 23 07                   		bltu	.L12
+ 192                             		.loc 1 51 4 discriminator 1 view .LVU65
+ 193 00c3 71 55 20                		add	#32, r5
+ 194                             	.LVL42:
+ 195                             		.loc 1 51 4 discriminator 1 view .LVU66
+ 196 00c6 43 41                   		sub	r4, r1
+ 197                             	.LVL43:
+ 198                             	.L12:
+ 199                             		.loc 1 51 4 discriminator 3 view .LVU67
+  52:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    D2_INNER_SQRT ( 5); /* PRQA S 3112 */ /* $Misra: #MACRO_COMPILER_WARNING_NOP $*/ /* PRQA S 3382 
+ 200                             		.loc 1 52 4 discriminator 3 view .LVU68
+ 201 00c8 FD C5 54                		shll	#5, r5, r4
+ 202                             	.LVL44:
+ 203                             		.loc 1 52 4 is_stmt 0 discriminator 3 view .LVU69
+ 204 00cb 72 44 00 01             		add	#0x100, r4
+ 205                             	.LVL45:
+ 206                             		.loc 1 52 4 is_stmt 1 discriminator 3 view .LVU70
+ 207 00cf 47 41                   		cmp	r4, r1
+ 208 00d1 23 07                   		bltu	.L13
+ 209                             		.loc 1 52 4 discriminator 1 view .LVU71
+ 210 00d3 71 55 10                		add	#16, r5
+ 211                             	.LVL46:
+ 212                             		.loc 1 52 4 discriminator 1 view .LVU72
+ 213 00d6 43 41                   		sub	r4, r1
+ 214                             	.LVL47:
+ 215                             	.L13:
+ 216                             		.loc 1 52 4 discriminator 3 view .LVU73
+  53:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    D2_INNER_SQRT ( 4); /* PRQA S 3112 */ /* $Misra: #MACRO_COMPILER_WARNING_NOP $*/ /* PRQA S 3382 
+ 217                             		.loc 1 53 4 discriminator 3 view .LVU74
+ 218 00d8 FD C4 54                		shll	#4, r5, r4
+ 219                             	.LVL48:
+ 220                             		.loc 1 53 4 is_stmt 0 discriminator 3 view .LVU75
+ 221 00db 71 44 40                		add	#0x40, r4
+ 222                             	.LVL49:
+ 223                             		.loc 1 53 4 is_stmt 1 discriminator 3 view .LVU76
+ 224 00de 47 41                   		cmp	r4, r1
+ 225 00e0 23 06                   		bltu	.L14
+ 226                             		.loc 1 53 4 discriminator 1 view .LVU77
+ 227 00e2 62 85                   		add	#8, r5
+ 228                             	.LVL50:
+ 229                             		.loc 1 53 4 discriminator 1 view .LVU78
+ 230 00e4 43 41                   		sub	r4, r1
+ 231                             	.LVL51:
+ 232                             	.L14:
+ 233                             		.loc 1 53 4 discriminator 3 view .LVU79
+  54:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    D2_INNER_SQRT ( 3); /* PRQA S 3112 */ /* $Misra: #MACRO_COMPILER_WARNING_NOP $*/ /* PRQA S 3382 
+ 234                             		.loc 1 54 4 discriminator 3 view .LVU80
+ 235 00e6 FD C3 54                		shll	#3, r5, r4
+ 236                             	.LVL52:
+ 237                             		.loc 1 54 4 is_stmt 0 discriminator 3 view .LVU81
+ 238 00e9 71 44 10                		add	#16, r4
+ 239                             	.LVL53:
+ 240                             		.loc 1 54 4 is_stmt 1 discriminator 3 view .LVU82
+ 241 00ec 47 41                   		cmp	r4, r1
+ 242 00ee 23 06                   		bltu	.L15
+ 243                             		.loc 1 54 4 discriminator 1 view .LVU83
+ 244 00f0 62 45                   		add	#4, r5
+ 245                             	.LVL54:
+ 246                             		.loc 1 54 4 discriminator 1 view .LVU84
+ 247 00f2 43 41                   		sub	r4, r1
+ 248                             	.LVL55:
+ 249                             	.L15:
+ 250                             		.loc 1 54 4 discriminator 3 view .LVU85
+  55:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    D2_INNER_SQRT ( 2); /* PRQA S 3112 */ /* $Misra: #MACRO_COMPILER_WARNING_NOP $*/ /* PRQA S 3382 
+ 251                             		.loc 1 55 4 discriminator 3 view .LVU86
+ 252 00f4 FD C2 54                		shll	#2, r5, r4
+ 253                             	.LVL56:
+ 254                             		.loc 1 55 4 is_stmt 0 discriminator 3 view .LVU87
+ 255 00f7 62 44                   		add	#4, r4
+ 256                             	.LVL57:
+ 257                             		.loc 1 55 4 is_stmt 1 discriminator 3 view .LVU88
+ 258 00f9 47 41                   		cmp	r4, r1
+ 259 00fb 23 06                   		bltu	.L16
+ 260                             		.loc 1 55 4 discriminator 1 view .LVU89
+ 261 00fd 62 25                   		add	#2, r5
+ 262                             	.LVL58:
+ 263                             		.loc 1 55 4 discriminator 1 view .LVU90
+ 264 00ff 43 41                   		sub	r4, r1
+ 265                             	.LVL59:
+ 266                             	.L16:
+ 267                             		.loc 1 55 4 discriminator 3 view .LVU91
+  56:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** 
+  57:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    temp = (y + y) + 1;
+ 268                             		.loc 1 57 4 discriminator 3 view .LVU92
+ 269                             		.loc 1 57 14 is_stmt 0 discriminator 3 view .LVU93
+ 270 0101 FF 24 55                		add	r5, r5, r4
+ 271                             	.LVL60:
+ 272                             		.loc 1 57 9 discriminator 3 view .LVU94
+ 273 0104 62 14                   		add	#1, r4
+ 274                             	.LVL61:
+  58:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    if(x >= temp)
+ 275                             		.loc 1 58 4 is_stmt 1 discriminator 3 view .LVU95
+ 276                             		.loc 1 58 6 is_stmt 0 discriminator 3 view .LVU96
+ 277 0106 47 41                   		cmp	r4, r1
+ 278 0108 23 04                   		bltu	.L17
+  59:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    {
+  60:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****       y++;
+ 279                             		.loc 1 60 7 is_stmt 1 view .LVU97
+ 280                             		.loc 1 60 8 is_stmt 0 view .LVU98
+ 281 010a 62 15                   		add	#1, r5
+ 282                             	.LVL62:
+ 283                             	.L17:
+  61:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    }
+  62:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    return (d2_s32) y;
+ 284                             		.loc 1 62 4 is_stmt 1 view .LVU99
+  63:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** }
+ 285                             		.loc 1 63 1 is_stmt 0 view .LVU100
+ 286 010c EF 51                   		mov.L	r5, r1
+ 287                             	.LVL63:
+ 288                             		.loc 1 63 1 view .LVU101
+ 289 010e 02                      		rts
+ 290                             	.LFE6:
+ 292                             		.section	.text.d2_pow2mask,"ax",@progbits
+ 293                             		.global	_d2_pow2mask
+ 295                             	_d2_pow2mask:
+ 296                             	.LVL64:
+ 297                             	.LFB7:
+  64:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** 
+  65:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** /*--------------------------------------------------------------------------
+  66:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****  * Find next larger power of two - 1
+  67:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****  * e.g. given number x=73 -> next larger power of two is 128,
+  68:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****  * the result is 128-1 = 127 (number with all bits set)
+  69:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****  * */
+  70:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** d2_u32 d2_pow2mask(d2_u32 x)
+  71:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** {
+ 298                             		.loc 1 71 1 is_stmt 1 view -0
+  72:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    x |= (x >> 1);
+ 299                             		.loc 1 72 4 view .LVU103
+ 300                             		.loc 1 72 12 is_stmt 0 view .LVU104
+ 301 0000 FD 81 15                		shlr	#1, r1, r5
+ 302                             		.loc 1 72 6 view .LVU105
+ 303 0003 57 51                   		or	r5, r1
+ 304                             	.LVL65:
+  73:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    x |= (x >> 2);
+ 305                             		.loc 1 73 4 is_stmt 1 view .LVU106
+ 306                             		.loc 1 73 12 is_stmt 0 view .LVU107
+ 307 0005 FD 82 15                		shlr	#2, r1, r5
+ 308                             		.loc 1 73 6 view .LVU108
+ 309 0008 57 15                   		or	r1, r5
+ 310                             	.LVL66:
+  74:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    x |= (x >> 4);
+ 311                             		.loc 1 74 4 is_stmt 1 view .LVU109
+ 312                             		.loc 1 74 12 is_stmt 0 view .LVU110
+ 313 000a FD 84 51                		shlr	#4, r5, r1
+ 314                             		.loc 1 74 6 view .LVU111
+ 315 000d 57 51                   		or	r5, r1
+ 316                             	.LVL67:
+  75:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    x |= (x >> 8);
+ 317                             		.loc 1 75 4 is_stmt 1 view .LVU112
+ 318                             		.loc 1 75 12 is_stmt 0 view .LVU113
+ 319 000f FD 88 15                		shlr	#8, r1, r5
+ 320                             		.loc 1 75 6 view .LVU114
+ 321 0012 57 15                   		or	r1, r5
+ 322                             	.LVL68:
+  76:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    x |= (x >> 16);
+ 323                             		.loc 1 76 4 is_stmt 1 view .LVU115
+ 324                             		.loc 1 76 12 is_stmt 0 view .LVU116
+ 325 0014 FD 90 51                		shlr	#16, r5, r1
+ 326                             	.LVL69:
+  77:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** 
+  78:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c ****    return x;
+ 327                             		.loc 1 78 4 is_stmt 1 view .LVU117
+  79:../src/smc_gen/r_drw2d_rx/src/tes/dave_math.c **** }
+ 328                             		.loc 1 79 1 is_stmt 0 view .LVU118
+ 329 0017 57 51                   		or	r5, r1
+ 330                             	.LVL70:
+ 331                             		.loc 1 79 1 view .LVU119
+ 332 0019 02                      		rts
+ 333                             	.LFE7:
+ 369                             	.Letext0:
+ 370                             		.file 2 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_drw2d_rx\\inc\\tes/dav
+ 371                             		.file 3 "../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h"

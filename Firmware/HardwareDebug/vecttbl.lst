@@ -1,0 +1,100 @@
+   1                             		.file	"vecttbl.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.global	_Reset_Vector
+   5                             		.section	.fvectors,"a"
+   6                             		.balign 4
+   9                             	_Reset_Vector:
+  10 0000 00 00 00 00             		.long	_PowerON_Reset_PC
+  11                             		.global	_Except_Vectors
+  12                             		.section	.exvectors,"a"
+  13                             		.balign 4
+  16                             	_Except_Vectors:
+  17 0000 FF FF FF FF             		.long	-1
+  18 0004 FF FF FF FF             		.long	-1
+  19 0008 FF FF FF FF             		.long	-1
+  20 000c FF FF FF FF             		.long	-1
+  21 0010 FF FF FF FF             		.long	-1
+  22 0014 FF FF FF FF             		.long	-1
+  23 0018 FF FF FF FF             		.long	-1
+  24 001c FF FF FF FF             		.long	-1
+  25 0020 FF FF FF FF             		.long	-1
+  26 0024 FF FF FF FF             		.long	-1
+  27 0028 FF FF FF FF             		.long	-1
+  28 002c FF FF FF FF             		.long	-1
+  29 0030 FF FF FF FF             		.long	-1
+  30 0034 FF FF FF FF             		.long	-1
+  31 0038 FF FF FF FF             		.long	-1
+  32 003c FF FF FF FF             		.long	-1
+  33 0040 FF FF FF FF             		.long	-1
+  34 0044 FF FF FF FF             		.long	-1
+  35 0048 FF FF FF FF             		.long	-1
+  36 004c FF FF FF FF             		.long	-1
+  37 0050 00 00 00 00             		.long	_excep_supervisor_inst_isr
+  38 0054 00 00 00 00             		.long	_excep_access_isr
+  39 0058 00 00 00 00             		.long	_undefined_interrupt_source_isr
+  40 005c 00 00 00 00             		.long	_excep_undefined_inst_isr
+  41 0060 00 00 00 00             		.long	_excep_address_isr
+  42 0064 00 00 00 00             		.long	_excep_floating_point_isr
+  43 0068 00 00 00 00             		.long	_undefined_interrupt_source_isr
+  44 006c 00 00 00 00             		.long	_undefined_interrupt_source_isr
+  45 0070 00 00 00 00             		.long	_undefined_interrupt_source_isr
+  46 0074 00 00 00 00             		.long	_undefined_interrupt_source_isr
+  47 0078 00 00 00 00             		.long	_non_maskable_isr
+  48                             		.global	___ROMCODEreg
+  49                             		.section	.ofs8,"a"
+  50                             		.balign 4
+  53                             	___ROMCODEreg:
+  54 0000 FF FF FF FF             		.long	-1
+  55                             		.global	___FAWreg
+  56                             		.section	.ofs7,"a"
+  57                             		.balign 4
+  60                             	___FAWreg:
+  61 0000 FF FF FF FF             		.long	-1
+  62                             		.global	___ofsm_sec_ofs6
+  63                             		.section	.ofs6,"a"
+  64                             		.balign 4
+  67                             	___ofsm_sec_ofs6:
+  68 0000 FF FF FF FF             		.long	-1
+  69 0004 FF FF FF FF             		.long	-1
+  70 0008 FF FF FF FF             		.long	-1
+  71 000c FF FF FF FF             		.long	-1
+  72                             		.global	___TMEFreg
+  73                             		.section	.ofs5,"a"
+  74                             		.balign 4
+  77                             	___TMEFreg:
+  78 0000 FF FF FF FF             		.long	-1
+  79                             		.global	___SPCCreg
+  80                             		.section	.ofs4,"a"
+  81                             		.balign 4
+  84                             	___SPCCreg:
+  85 0000 FF FF FF FF             		.long	-1
+  86                             		.global	___BANKSELreg
+  87                             		.section	.ofs3,"a"
+  88                             		.balign 4
+  91                             	___BANKSELreg:
+  92 0000 FF FF FF FF             		.long	-1
+  93                             		.global	___TMINFreg
+  94                             		.section	.ofs2,"a"
+  95                             		.balign 4
+  98                             	___TMINFreg:
+  99 0000 FF FF FF FF             		.long	-1
+ 100                             		.global	___ofsm_sec_ofs1
+ 101                             		.section	.ofs1,"a"
+ 102                             		.balign 4
+ 105                             	___ofsm_sec_ofs1:
+ 106 0000 FF FF FF FF             		.long	-1
+ 107 0004 FF FF FF FF             		.long	-1
+ 108 0008 FF FF FF FF             		.long	-1
+ 109                             		.section P,"ax"
+ 110                             	.Letext0:
+ 111                             		.file 1 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 112                             		.file 2 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 113                             		.file 3 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\lib\\gcc\\rx-
+ 114                             		.file 4 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 115                             		.file 5 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 116                             		.file 6 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 117                             		.file 7 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/all/r_rx_compi
+ 118                             		.file 8 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/rx72n/mcu_lock
+ 119                             		.file 9 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/rx72n/vecttbl.
+ 120                             		.file 10 "../src/smc_gen/r_bsp/mcu/rx72n/vecttbl.c"

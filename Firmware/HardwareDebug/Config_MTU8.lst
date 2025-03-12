@@ -1,0 +1,240 @@
+   1                             		.file	"Config_MTU8.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.R_Config_MTU8_Create,"ax",@progbits
+   5                             		.global	_R_Config_MTU8_Create
+   7                             	_R_Config_MTU8_Create:
+   8                             	.LFB3:
+   9                             		.file 1 "../src/smc_gen/Config_MTU8/Config_MTU8.c"
+   1:../src/smc_gen/Config_MTU8/Config_MTU8.c **** /**************************************************************************************************
+   2:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * DISCLAIMER
+   3:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * This software is supplied by Renesas Electronics Corporation and is only intended for use with Re
+   4:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * No other uses are authorized. This software is owned by Renesas Electronics Corporation and is pr
+   5:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * applicable laws, including copyright laws. 
+   6:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING THIS SOFTWARE, WHETHE
+   7:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULA
+   8:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * NON-INFRINGEMENT.  ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.TO THE MAXIMUM EXTENT PERMITTED N
+   9:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE 
+  10:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS SOFTWARE, E
+  11:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+  12:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * Renesas reserves the right, without notice, to make changes to this software and to discontinue t
+  13:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * of this software. By using this software, you agree to the additional terms and conditions found 
+  14:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * following link:
+  15:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * http://www.renesas.com/disclaimer
+  16:../src/smc_gen/Config_MTU8/Config_MTU8.c **** *
+  17:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * Copyright (C) 2022 Renesas Electronics Corporation. All rights reserved.
+  18:../src/smc_gen/Config_MTU8/Config_MTU8.c **** ***************************************************************************************************
+  19:../src/smc_gen/Config_MTU8/Config_MTU8.c **** 
+  20:../src/smc_gen/Config_MTU8/Config_MTU8.c **** /**************************************************************************************************
+  21:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * File Name        : Config_MTU8.c
+  22:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * Component Version: 1.12.0
+  23:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * Device(s)        : R5F572NNDxFP
+  24:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * Description      : This file implements device driver for Config_MTU8.
+  25:../src/smc_gen/Config_MTU8/Config_MTU8.c **** ***************************************************************************************************
+  26:../src/smc_gen/Config_MTU8/Config_MTU8.c **** 
+  27:../src/smc_gen/Config_MTU8/Config_MTU8.c **** /**************************************************************************************************
+  28:../src/smc_gen/Config_MTU8/Config_MTU8.c **** Pragma directive
+  29:../src/smc_gen/Config_MTU8/Config_MTU8.c **** ***************************************************************************************************
+  30:../src/smc_gen/Config_MTU8/Config_MTU8.c **** /* Start user code for pragma. Do not edit comment generated here */
+  31:../src/smc_gen/Config_MTU8/Config_MTU8.c **** /* End user code. Do not edit comment generated here */
+  32:../src/smc_gen/Config_MTU8/Config_MTU8.c **** 
+  33:../src/smc_gen/Config_MTU8/Config_MTU8.c **** /**************************************************************************************************
+  34:../src/smc_gen/Config_MTU8/Config_MTU8.c **** Includes
+  35:../src/smc_gen/Config_MTU8/Config_MTU8.c **** ***************************************************************************************************
+  36:../src/smc_gen/Config_MTU8/Config_MTU8.c **** #include "r_cg_macrodriver.h"
+  37:../src/smc_gen/Config_MTU8/Config_MTU8.c **** #include "Config_MTU8.h"
+  38:../src/smc_gen/Config_MTU8/Config_MTU8.c **** /* Start user code for include. Do not edit comment generated here */
+  39:../src/smc_gen/Config_MTU8/Config_MTU8.c **** /* End user code. Do not edit comment generated here */
+  40:../src/smc_gen/Config_MTU8/Config_MTU8.c **** #include "r_cg_userdefine.h"
+  41:../src/smc_gen/Config_MTU8/Config_MTU8.c **** 
+  42:../src/smc_gen/Config_MTU8/Config_MTU8.c **** /**************************************************************************************************
+  43:../src/smc_gen/Config_MTU8/Config_MTU8.c **** Global variables and functions
+  44:../src/smc_gen/Config_MTU8/Config_MTU8.c **** ***************************************************************************************************
+  45:../src/smc_gen/Config_MTU8/Config_MTU8.c **** /* Start user code for global. Do not edit comment generated here */
+  46:../src/smc_gen/Config_MTU8/Config_MTU8.c **** /* End user code. Do not edit comment generated here */
+  47:../src/smc_gen/Config_MTU8/Config_MTU8.c **** 
+  48:../src/smc_gen/Config_MTU8/Config_MTU8.c **** /**************************************************************************************************
+  49:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * Function Name: R_Config_MTU8_Create
+  50:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * Description  : This function initializes the MTU8 channel
+  51:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * Arguments    : None
+  52:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * Return Value : None
+  53:../src/smc_gen/Config_MTU8/Config_MTU8.c **** ***************************************************************************************************
+  54:../src/smc_gen/Config_MTU8/Config_MTU8.c **** 
+  55:../src/smc_gen/Config_MTU8/Config_MTU8.c **** void R_Config_MTU8_Create(void)
+  56:../src/smc_gen/Config_MTU8/Config_MTU8.c **** {
+  10                             		.loc 1 56 1 view -0
+  57:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     /* Release MTU channel 8 from stop state */
+  58:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     MSTP(MTU3) = 0U;
+  11                             		.loc 1 58 5 view .LVU1
+  12                             		.loc 1 58 16 is_stmt 0 view .LVU2
+  13 0000 FB 5E 00 00 08          		mov.L	#0x80000, r5
+  14 0005 A9 54                   		mov.L	16[r5], r4
+  15 0007 7A 94                   		bclr	#9, r4
+  16 0009 A1 54                   		mov.L	r4, 16[r5]
+  59:../src/smc_gen/Config_MTU8/Config_MTU8.c **** 
+  60:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     /* Stop MTU channel 8 counter */
+  61:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     MTU.TSTRA.BIT.CST8 = 0U;
+  17                             		.loc 1 61 5 is_stmt 1 view .LVU3
+  18                             		.loc 1 61 24 is_stmt 0 view .LVU4
+  19 000b FB 5E 0A 12 0C          		mov.L	#0xc120a, r5
+  20 0010 CD 54 76                		mov.B	118[r5], r4
+  21 0013 7A 34                   		bclr	#3, r4
+  22 0015 C7 54 76                		mov.B	r4, 118[r5]
+  62:../src/smc_gen/Config_MTU8/Config_MTU8.c **** 
+  63:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     /* Set TGIA8 interrupt priority level */
+  64:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     ICU.SLIAR246.BYTE = 0x29U;
+  23                             		.loc 1 64 5 is_stmt 1 view .LVU5
+  24                             		.loc 1 64 23 is_stmt 0 view .LVU6
+  25 0018 FB 5E 00 70 08          		mov.L	#0x87000, r5
+  26 001d FA 54 F6 09 29          		mov.B	#41, 2550[r5]
+  65:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     IPR(PERIA, INTA246) = _0F_MTU_PRIORITY_LEVEL15;
+  27                             		.loc 1 65 5 is_stmt 1 view .LVU7
+  28                             		.loc 1 65 25 is_stmt 0 view .LVU8
+  29 0022 CE 53 F6 03             		mov.B	1014[r5], r3
+  30 0026 66 F4                   		mov.L	#15, r4
+  31 0028 57 34                   		or	r3, r4
+  32 002a CB 54 F6 03             		mov.B	r4, 1014[r5]
+  66:../src/smc_gen/Config_MTU8/Config_MTU8.c **** 
+  67:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     /* MTU channel 8 is used as normal mode */
+  68:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     MTU8.TCR.BYTE = _00_MTU_CKEG_RISE | _20_MTU_CKCL_A;
+  33                             		.loc 1 68 5 is_stmt 1 view .LVU9
+  34                             		.loc 1 68 19 is_stmt 0 view .LVU10
+  35 002e FB 5E 98 12 0C          		mov.L	#0xc1298, r5
+  36 0033 FA 54 68 03 20          		mov.B	#32, 872[r5]
+  69:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     MTU8.TCR2.BYTE = _05_MTU_PCLK_1024;
+  37                             		.loc 1 69 5 is_stmt 1 view .LVU11
+  38                             		.loc 1 69 20 is_stmt 0 view .LVU12
+  39 0038 FA 54 6E 03 05          		mov.B	#5, 878[r5]
+  70:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     MTU8.TIER.BYTE = _01_MTU_TGIEA_ENABLE | _00_MTU_TGIEB_DISABLE | _00_MTU_TGIEC_DISABLE | _00_MTU
+  40                             		.loc 1 70 5 is_stmt 1 view .LVU13
+  41                             		.loc 1 70 20 is_stmt 0 view .LVU14
+  42 003d FA 54 6C 03 01          		mov.B	#1, 876[r5]
+  71:../src/smc_gen/Config_MTU8/Config_MTU8.c ****                      _00_MTU_TCIEV_DISABLE;
+  72:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     MTU8.NFCR8.BYTE = _01_MTU_NFAEN_ENABLE | _20_MTU_NFCS_PCLK_32;
+  43                             		.loc 1 72 5 is_stmt 1 view .LVU15
+  44                             		.loc 1 72 21 is_stmt 0 view .LVU16
+  45 0042 F8 54 21                		mov.B	#33, [r5]
+  73:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     MTU8.TIORH.BYTE = _08_MTU_IOA_IR | _00_MTU_IOB_DISABLE;
+  46                             		.loc 1 73 5 is_stmt 1 view .LVU17
+  47                             		.loc 1 73 21 is_stmt 0 view .LVU18
+  48 0045 FA 54 6A 03 08          		mov.B	#8, 874[r5]
+  74:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     MTU8.TIORL.BYTE = _00_MTU_IOC_DISABLE | _00_MTU_IOD_DISABLE;
+  49                             		.loc 1 74 5 is_stmt 1 view .LVU19
+  50                             		.loc 1 74 21 is_stmt 0 view .LVU20
+  51 004a FA 54 6B 03 00          		mov.B	#0, 875[r5]
+  75:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     MTU8.TGRB = _0000000B_TGRB8_VALUE;
+  52                             		.loc 1 75 5 is_stmt 1 view .LVU21
+  53                             		.loc 1 75 15 is_stmt 0 view .LVU22
+  54 004f F9 56 DE 0B             		mov.L	#11, 888[r5]
+  76:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     MTU8.TGRC = _0000000B_TGRC8_VALUE;
+  55                             		.loc 1 76 5 is_stmt 1 view .LVU23
+  56                             		.loc 1 76 15 is_stmt 0 view .LVU24
+  57 0053 F9 56 DF 0B             		mov.L	#11, 892[r5]
+  77:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     MTU8.TGRD = _0000000B_TGRD8_VALUE;
+  58                             		.loc 1 77 5 is_stmt 1 view .LVU25
+  59                             		.loc 1 77 15 is_stmt 0 view .LVU26
+  60 0057 F9 56 E0 0B             		mov.L	#11, 896[r5]
+  78:../src/smc_gen/Config_MTU8/Config_MTU8.c **** 
+  79:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     /* Set MTIOC8A pin */
+  80:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     MPC.PD6PFS.BYTE = 0x08U;
+  61                             		.loc 1 80 5 is_stmt 1 view .LVU27
+  62                             		.loc 1 80 21 is_stmt 0 view .LVU28
+  63 005b FB 5E 00 C1 08          		mov.L	#0x8c100, r5
+  64 0060 F9 54 AE 08             		mov.B	#8, 174[r5]
+  81:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     PORTD.PMR.BYTE |= 0x40U;
+  65                             		.loc 1 81 5 is_stmt 1 view .LVU29
+  66                             		.loc 1 81 20 is_stmt 0 view .LVU30
+  67 0064 FB 5E 0D C0 08          		mov.L	#0x8c00d, r5
+  68 0069 F1 56 60                		bset	#6, 96[r5].B
+  82:../src/smc_gen/Config_MTU8/Config_MTU8.c **** 
+  83:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     R_Config_MTU8_Create_UserInit();
+  69                             		.loc 1 83 5 is_stmt 1 view .LVU31
+  70 006c 05 00 00 00             		bsr	_R_Config_MTU8_Create_UserInit
+  71                             	.LVL0:
+  84:../src/smc_gen/Config_MTU8/Config_MTU8.c **** }
+  72                             		.loc 1 84 1 is_stmt 0 view .LVU32
+  73 0070 02                      		rts
+  74                             	.LFE3:
+  76                             		.section	.text.R_Config_MTU8_Start,"ax",@progbits
+  77                             		.global	_R_Config_MTU8_Start
+  79                             	_R_Config_MTU8_Start:
+  80                             	.LFB4:
+  85:../src/smc_gen/Config_MTU8/Config_MTU8.c **** 
+  86:../src/smc_gen/Config_MTU8/Config_MTU8.c **** /**************************************************************************************************
+  87:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * Function Name: R_Config_MTU8_Start
+  88:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * Description  : This function starts the MTU8 channel counter
+  89:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * Arguments    : None
+  90:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * Return Value : None
+  91:../src/smc_gen/Config_MTU8/Config_MTU8.c **** ***************************************************************************************************
+  92:../src/smc_gen/Config_MTU8/Config_MTU8.c **** 
+  93:../src/smc_gen/Config_MTU8/Config_MTU8.c **** void R_Config_MTU8_Start(void)
+  94:../src/smc_gen/Config_MTU8/Config_MTU8.c **** {
+  81                             		.loc 1 94 1 is_stmt 1 view -0
+  95:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     /* Enable TGIA8 interrupt in ICU */
+  96:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     IEN(PERIA, INTA246) = 1U;
+  82                             		.loc 1 96 5 view .LVU34
+  83                             		.loc 1 96 25 is_stmt 0 view .LVU35
+  84 0000 FB 5E 00 70 08          		mov.L	#0x87000, r5
+  85 0005 CE 54 1E 02             		mov.B	542[r5], r4
+  86 0009 78 64                   		bset	#6, r4
+  87 000b CB 54 1E 02             		mov.B	r4, 542[r5]
+  97:../src/smc_gen/Config_MTU8/Config_MTU8.c **** 
+  98:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     /* Start MTU channel 8 counter */
+  99:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     MTU.TSTRA.BIT.CST8 = 1U;
+  88                             		.loc 1 99 5 is_stmt 1 view .LVU36
+  89                             		.loc 1 99 24 is_stmt 0 view .LVU37
+  90 000f FB 5E 0A 12 0C          		mov.L	#0xc120a, r5
+  91 0014 CD 54 76                		mov.B	118[r5], r4
+  92 0017 78 34                   		bset	#3, r4
+  93 0019 C7 54 76                		mov.B	r4, 118[r5]
+ 100:../src/smc_gen/Config_MTU8/Config_MTU8.c **** }
+  94                             		.loc 1 100 1 view .LVU38
+  95 001c 02                      		rts
+  96                             	.LFE4:
+  98                             		.section	.text.R_Config_MTU8_Stop,"ax",@progbits
+  99                             		.global	_R_Config_MTU8_Stop
+ 101                             	_R_Config_MTU8_Stop:
+ 102                             	.LFB5:
+ 101:../src/smc_gen/Config_MTU8/Config_MTU8.c **** 
+ 102:../src/smc_gen/Config_MTU8/Config_MTU8.c **** /**************************************************************************************************
+ 103:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * Function Name: R_Config_MTU8_Stop
+ 104:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * Description  : This function stops the MTU8 channel counter
+ 105:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * Arguments    : None
+ 106:../src/smc_gen/Config_MTU8/Config_MTU8.c **** * Return Value : None
+ 107:../src/smc_gen/Config_MTU8/Config_MTU8.c **** ***************************************************************************************************
+ 108:../src/smc_gen/Config_MTU8/Config_MTU8.c **** 
+ 109:../src/smc_gen/Config_MTU8/Config_MTU8.c **** void R_Config_MTU8_Stop(void)
+ 110:../src/smc_gen/Config_MTU8/Config_MTU8.c **** {
+ 103                             		.loc 1 110 1 is_stmt 1 view -0
+ 111:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     /* Disable TGIA8 interrupt in ICU */
+ 112:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     IEN(PERIA, INTA246) = 0U;
+ 104                             		.loc 1 112 5 view .LVU40
+ 105                             		.loc 1 112 25 is_stmt 0 view .LVU41
+ 106 0000 FB 5E 00 70 08          		mov.L	#0x87000, r5
+ 107 0005 CE 54 1E 02             		mov.B	542[r5], r4
+ 108 0009 7A 64                   		bclr	#6, r4
+ 109 000b CB 54 1E 02             		mov.B	r4, 542[r5]
+ 113:../src/smc_gen/Config_MTU8/Config_MTU8.c **** 
+ 114:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     /* Stop MTU channel 8 counter */
+ 115:../src/smc_gen/Config_MTU8/Config_MTU8.c ****     MTU.TSTRA.BIT.CST8 = 0U;
+ 110                             		.loc 1 115 5 is_stmt 1 view .LVU42
+ 111                             		.loc 1 115 24 is_stmt 0 view .LVU43
+ 112 000f FB 5E 0A 12 0C          		mov.L	#0xc120a, r5
+ 113 0014 CD 54 76                		mov.B	118[r5], r4
+ 114 0017 7A 34                   		bclr	#3, r4
+ 115 0019 C7 54 76                		mov.B	r4, 118[r5]
+ 116:../src/smc_gen/Config_MTU8/Config_MTU8.c **** }
+ 116                             		.loc 1 116 1 view .LVU44
+ 117 001c 02                      		rts
+ 118                             	.LFE5:
+ 162                             	.Letext0:
+ 163                             		.file 2 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 164                             		.file 3 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 165                             		.file 4 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\lib\\gcc\\rx-
+ 166                             		.file 5 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 167                             		.file 6 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 168                             		.file 7 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 169                             		.file 8 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/all/r_rx_compi
+ 170                             		.file 9 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/rx72n/register
+ 171                             		.file 10 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/rx72n/mcu_loc
+ 172                             		.file 11 "../src/smc_gen/Config_MTU8/Config_MTU8.h"

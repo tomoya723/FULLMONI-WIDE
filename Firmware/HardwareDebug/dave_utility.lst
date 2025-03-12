@@ -1,0 +1,1449 @@
+   1                             		.file	"dave_utility.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.d2_utility_maptriangle,"ax",@progbits
+   5                             		.global	_d2_utility_maptriangle
+   7                             	_d2_utility_maptriangle:
+   8                             	.LVL0:
+   9                             	.LFB6:
+  10                             		.file 1 "../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c"
+   1:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** /*--------------------------------------------------------------------------
+   2:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * Project: D/AVE
+   3:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * File:    dave_utility.c (%version: 8 %)
+   4:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *          created Tue Jul 19 12:53:28 2005 by hh04027
+   5:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+   6:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * Description:
+   7:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *  %date_modified: Thu Nov 16 10:56:45 2006 %  (%derived_by:  hh74040 %)
+   8:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+   9:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * Changes:
+  10:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *  2007-12-07 ASc  add error checking to d2_utility_perspectivewarp() 
+  11:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *  2008-01-14 ASc  changed comments from C++ to C, removed tabs 
+  12:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *  2012-09-25 BSp  MISRA cleanup
+  13:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *  2016-06-29 MHo  bugfix in fbblitcopy: handle SRC below DST in case of overlapping rects correct
+  14:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *  2017-07-27 HFu  bugfix in fbblitcopy: corrected wait-insert to full wait instead of pipeline on
+  15:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  */
+  16:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+  17:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** /*--------------------------------------------------------------------------
+  18:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+  19:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * Title: Utility Functions
+  20:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * Triangle mapping and perspective warp operations
+  21:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+  22:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *-------------------------------------------------------------------------- */
+  23:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+  24:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** #include "dave_driver.h"
+  25:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** #include "dave_intern.h"
+  26:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** #include "dave_texture.h"
+  27:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** #include "dave_utility.h"
+  28:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+  29:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+  30:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** /*--------------------------------------------------------------------------
+  31:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * function: d2_utility_maptriangle
+  32:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * This function uses d2_settexturemapping to map a texture on a triangle.
+  33:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+  34:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * parameters:
+  35:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   handle - device pointer (see: <d2_opendevice>)
+  36:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   points - ptr to array of six floats containing the screen positions (x,y pairs)
+  37:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   uvs - ptr to array of six floats containing the texture coordinates (u,v pairs)
+  38:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+  39:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * Please remember that this function has to access the current texture details
+  40:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * (width, height and pitch) in order to calculate a correct mapping. So the
+  41:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * final texture must be active in the selected context at the time
+  42:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * d2_utility_maptriangle is called.
+  43:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * d2_utility_maptriangle is internally using d2_settexturemapping
+  44:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * and is overwriting the current values.
+  45:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+  46:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * returns:
+  47:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   errorcode (D2_OK if successfull) see list of <Errorcodes> for details
+  48:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+  49:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * see also:
+  50:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *  <d2_settexturemapping> */
+  51:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** d2_s32 d2_utility_maptriangle( d2_device *handle, const d2_f32 *points, const d2_f32 *uvs )
+  52:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** {
+  11                             		.loc 1 52 1 view -0
+  12                             		.loc 1 52 1 is_stmt 0 view .LVU1
+  13 0000 6E 6D                   		pushm	r6-r13
+  14                             	.LCFI0:
+  15 0002 71 00 E0                		add	#-32, r0
+  16                             	.LCFI1:
+  53:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_contextdata *ctx;
+  17                             		.loc 1 53 4 is_stmt 1 view .LVU2
+  54:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_s32 dxu, dxv, dyu, dyv;
+  18                             		.loc 1 54 4 view .LVU3
+  55:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_f32 d, dx, dy;
+  19                             		.loc 1 55 4 view .LVU4
+  56:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_f32 tw, th;
+  20                             		.loc 1 56 4 view .LVU5
+  57:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+  58:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    ctx = D2_DEV(handle)->ctxselected;
+  21                             		.loc 1 58 4 view .LVU6
+  22                             		.loc 1 58 8 is_stmt 0 view .LVU7
+  23 0005 AA 1F                   		mov.L	36[r1], r7
+  24                             	.LVL1:
+  59:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    tw = ((d2_f32)ctx->texwidth) * 65536.0f;
+  25                             		.loc 1 59 4 is_stmt 1 view .LVU8
+  26                             		.loc 1 59 21 is_stmt 0 view .LVU9
+  27 0007 ED 74 3C                		mov.L	240[r7], r4
+  28                             		.loc 1 59 10 view .LVU10
+  29 000a FC 47 44                		itof	r4, r4
+  30                             		.loc 1 59 7 view .LVU11
+  31 000d FD 72 34 00 00 80 47    		fmul	#0x47800000, r4
+  32                             	.LVL2:
+  60:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    th = ((d2_f32)ctx->texheight) * 65536.0f;
+  33                             		.loc 1 60 4 is_stmt 1 view .LVU12
+  34                             		.loc 1 60 21 is_stmt 0 view .LVU13
+  35 0014 ED 76 3D                		mov.L	244[r7], r6
+  36                             		.loc 1 60 10 view .LVU14
+  37 0017 FC 47 66                		itof	r6, r6
+  38                             		.loc 1 60 7 view .LVU15
+  39 001a FD 72 36 00 00 80 47    		fmul	#0x47800000, r6
+  40                             	.LVL3:
+  61:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+  62:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d = 
+  41                             		.loc 1 62 4 is_stmt 1 view .LVU16
+  63:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       (
+  64:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          (points[0 * 2] - points[2 * 2]) 
+  42                             		.loc 1 64 17 is_stmt 0 view .LVU17
+  43 0021 E4 20 05                		mov.L	[r2], 20[r0]
+  44                             		.loc 1 64 33 view .LVU18
+  45 0024 A9 27                   		mov.L	16[r2], r7
+  46                             	.LVL4:
+  47                             		.loc 1 64 25 view .LVU19
+  48 0026 ED 0E 05                		mov.L	20[r0], r14
+  49 0029 FC 83 7E                		fsub	r7, r14
+  65:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          * 
+  66:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          (points[(1 * 2) + 1] - points[(2 * 2) + 1])
+  50                             		.loc 1 66 17 view .LVU20
+  51 002c A8 AD                   		mov.L	12[r2], r5
+  52                             		.loc 1 66 39 view .LVU21
+  53 002e ED 2F 05                		mov.L	20[r2], r15
+  54                             		.loc 1 66 31 view .LVU22
+  55 0031 FC 83 F5                		fsub	r15, r5
+  65:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          * 
+  56                             		.loc 1 65 10 view .LVU23
+  57 0034 FF BA E5                		fmul	r14, r5, r10
+  67:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****        )
+  68:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       -
+  69:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       (
+  70:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          (points[1 * 2] - points[2*2])
+  58                             		.loc 1 70 17 view .LVU24
+  59 0037 ED 2B 02                		mov.L	8[r2], r11
+  60                             		.loc 1 70 25 view .LVU25
+  61 003a FF 87 7B                		fsub	r7, r11, r7
+  71:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          *
+  72:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          (points[(0 * 2) + 1] - points[(2 * 2) + 1])
+  62                             		.loc 1 72 17 view .LVU26
+  63 003d E5 20 01 06             		mov.L	4[r2], 24[r0]
+  64                             		.loc 1 72 31 view .LVU27
+  65 0041 A9 82                   		mov.L	24[r0], r2
+  66                             	.LVL5:
+  67                             		.loc 1 72 31 view .LVU28
+  68 0043 FF 8F F2                		fsub	r15, r2, r15
+  71:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          *
+  69                             		.loc 1 71 10 view .LVU29
+  70 0046 FF B2 7F                		fmul	r7, r15, r2
+  62:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       (
+  71                             		.loc 1 62 6 view .LVU30
+  72 0049 FC 83 2A                		fsub	r2, r10
+  73                             	.LVL6:
+  73:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****        )
+  74:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       ;
+  75:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    /* validate. if d==0 use dxyuv=0 [no area triangle] */
+  76:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    dx = tw / d;
+  74                             		.loc 1 76 4 is_stmt 1 view .LVU31
+  75                             		.loc 1 76 7 is_stmt 0 view .LVU32
+  76 004c EF 48                   		mov.L	r4, r8
+  77 004e FC 93 A8                		fdiv	r10, r8
+  78                             	.LVL7:
+  77:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    dy = th / d;
+  79                             		.loc 1 77 4 is_stmt 1 view .LVU33
+  80                             		.loc 1 77 7 is_stmt 0 view .LVU34
+  81 0051 EF 6C                   		mov.L	r6, r12
+  82 0053 FC 93 AC                		fdiv	r10, r12
+  83                             	.LVL8:
+  78:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+  79:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    dxu = (d2_s32)
+  84                             		.loc 1 79 4 is_stmt 1 view .LVU35
+  80:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       (
+  81:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          (
+  82:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****             (
+  83:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                (
+  84:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   uvs[0 * 2]
+  85                             		.loc 1 84 22 is_stmt 0 view .LVU36
+  86 0056 E4 30 07                		mov.L	[r3], 28[r0]
+  85:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   -
+  86:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   uvs[2 * 2]
+  87                             		.loc 1 86 22 view .LVU37
+  88 0059 A9 32                   		mov.L	16[r3], r2
+  85:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   -
+  89                             		.loc 1 85 19 view .LVU38
+  90 005b ED 0B 07                		mov.L	28[r0], r11
+  91 005e FC 83 2B                		fsub	r2, r11
+  87:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                 )
+  88:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                *
+  92                             		.loc 1 88 16 view .LVU39
+  93 0061 FF BA 5B                		fmul	r5, r11, r10
+  94                             	.LVL9:
+  89:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                (
+  90:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   points[(1 * 2) + 1]
+  91:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   -
+  92:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   points[(2 * 2) + 1]
+  93:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                 )
+  94:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****              )
+  95:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****             -
+  96:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****             (
+  97:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                (
+  98:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   uvs[1 * 2]
+  95                             		.loc 1 98 22 view .LVU40
+  96 0064 ED 39 02                		mov.L	8[r3], r9
+  99:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   -
+  97                             		.loc 1 99 19 view .LVU41
+  98 0067 FF 82 29                		fsub	r2, r9, r2
+ 100:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   uvs[2 * 2]
+ 101:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                 )
+ 102:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                *
+  99                             		.loc 1 102 16 view .LVU42
+ 100 006a FF B9 F2                		fmul	r15, r2, r9
+  95:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****             (
+ 101                             		.loc 1 95 13 view .LVU43
+ 102 006d FC 83 9A                		fsub	r9, r10
+ 103:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                (
+ 104:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   points[(0 * 2) + 1]
+ 105:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   -
+ 106:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   points[(2 * 2) + 1]
+ 107:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                 )
+ 108:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****              )
+ 109:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****           )
+ 110:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          * dx
+ 103                             		.loc 1 110 10 view .LVU44
+ 104 0070 FC 8F 8A                		fmul	r8, r10
+  79:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       (
+ 105                             		.loc 1 79 8 view .LVU45
+ 106 0073 FC 97 AA                		ftoi	r10, r10
+ 107 0076 E7 0A 01                		mov.L	r10, 4[r0]
+ 108                             	.LVL10:
+ 111:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****        );
+ 112:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 113:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    dxv = (d2_s32)
+ 109                             		.loc 1 113 4 is_stmt 1 view .LVU46
+ 114:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       (
+ 115:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          (
+ 116:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****             (
+ 117:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                (
+ 118:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   uvs[(0 * 2) + 1]
+ 110                             		.loc 1 118 22 is_stmt 0 view .LVU47
+ 111 0079 ED 3A 01                		mov.L	4[r3], r10
+ 112                             	.LVL11:
+ 119:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   -
+ 120:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   uvs[(2 * 2) + 1]
+ 113                             		.loc 1 120 22 view .LVU48
+ 114 007c ED 3D 05                		mov.L	20[r3], r13
+ 119:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   -
+ 115                             		.loc 1 119 19 view .LVU49
+ 116 007f FF 89 DA                		fsub	r13, r10, r9
+ 121:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                 )
+ 122:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                *
+ 117                             		.loc 1 122 16 view .LVU50
+ 118 0082 FC 8F 95                		fmul	r9, r5
+ 119                             	.LVL12:
+ 123:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                (
+ 124:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   points[(1 * 2) + 1]
+ 125:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   -
+ 126:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   points[(2 * 2) + 1]
+ 127:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                 )
+ 128:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****              )
+ 129:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****             - 
+ 130:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****             (
+ 131:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                (
+ 132:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   uvs[(1 * 2) + 1]
+ 120                             		.loc 1 132 22 view .LVU51
+ 121 0085 A8 BB                   		mov.L	12[r3], r3
+ 122                             	.LVL13:
+ 133:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   -
+ 123                             		.loc 1 133 19 view .LVU52
+ 124 0087 FF 8D D3                		fsub	r13, r3, r13
+ 134:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   uvs[(2 * 2) + 1]
+ 135:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                 )
+ 136:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                *
+ 125                             		.loc 1 136 16 view .LVU53
+ 126 008a FC 8F DF                		fmul	r13, r15
+ 129:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****             (
+ 127                             		.loc 1 129 13 view .LVU54
+ 128 008d FC 83 F5                		fsub	r15, r5
+ 137:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                (
+ 138:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   points[(0 * 2) + 1]
+ 139:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   - 
+ 140:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   points[(2 * 2) + 1]
+ 141:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                 )
+ 142:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****              )
+ 143:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****           )
+ 144:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          * dy
+ 129                             		.loc 1 144 10 view .LVU55
+ 130 0090 FC 8F C5                		fmul	r12, r5
+ 113:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       (
+ 131                             		.loc 1 113 8 view .LVU56
+ 132 0093 FC 97 55                		ftoi	r5, r5
+ 133                             	.LVL14:
+ 145:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****        );
+ 146:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    
+ 147:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    dyu = (d2_s32)
+ 134                             		.loc 1 147 4 is_stmt 1 view .LVU57
+ 148:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       (
+ 149:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          (
+ 150:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****             (
+ 151:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                (
+ 152:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   uvs[1 * 2]
+ 153:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   -
+ 154:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   uvs[2 * 2]
+ 155:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                 )
+ 156:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                *
+ 135                             		.loc 1 156 16 is_stmt 0 view .LVU58
+ 136 0096 FC 8F E2                		fmul	r14, r2
+ 157:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                (
+ 158:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   points[0 * 2]
+ 159:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   -
+ 160:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   points[2 * 2]
+ 161:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                 )
+ 162:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****              )
+ 163:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****             -
+ 164:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****             (
+ 165:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                (
+ 166:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   uvs[0 * 2]
+ 167:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   -
+ 168:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   uvs[2 * 2]
+ 169:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                 )
+ 170:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                *
+ 137                             		.loc 1 170 16 view .LVU59
+ 138 0099 FC 8F 7B                		fmul	r7, r11
+ 163:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****             (
+ 139                             		.loc 1 163 13 view .LVU60
+ 140 009c FC 83 B2                		fsub	r11, r2
+ 171:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                (
+ 172:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   points[1 * 2]
+ 173:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   -
+ 174:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   points[2 * 2]
+ 175:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                 )
+ 176:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****              )
+ 177:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****           )
+ 178:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          * dx
+ 141                             		.loc 1 178 10 view .LVU61
+ 142 009f FC 8F 82                		fmul	r8, r2
+ 147:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       (
+ 143                             		.loc 1 147 8 view .LVU62
+ 144 00a2 FC 97 2B                		ftoi	r2, r11
+ 145                             	.LVL15:
+ 179:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****        );
+ 180:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 181:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    dyv = (d2_s32)
+ 146                             		.loc 1 181 4 is_stmt 1 view .LVU63
+ 182:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       (
+ 183:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          (
+ 184:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****             (
+ 185:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                (
+ 186:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   uvs[(1 * 2) + 1]
+ 187:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   -
+ 188:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   uvs[(2 * 2) + 1]
+ 189:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                 )
+ 190:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                *
+ 147                             		.loc 1 190 16 is_stmt 0 view .LVU64
+ 148 00a5 FC 8F ED                		fmul	r14, r13
+ 191:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                (
+ 192:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   points[0 * 2]
+ 193:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   -
+ 194:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   points[2 * 2]
+ 195:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                 )
+ 196:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****              )
+ 197:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****             -
+ 198:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****             (
+ 199:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                (
+ 200:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   uvs[(0 * 2) + 1]
+ 201:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   -
+ 202:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   uvs[(2 * 2) + 1]
+ 203:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                 )
+ 204:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                *
+ 149                             		.loc 1 204 16 view .LVU65
+ 150 00a8 FC 8F 97                		fmul	r9, r7
+ 197:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****             (
+ 151                             		.loc 1 197 13 view .LVU66
+ 152 00ab FC 83 7D                		fsub	r7, r13
+ 205:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                (
+ 206:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   points[1 * 2]
+ 207:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   -
+ 208:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                   points[2 * 2]
+ 209:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                 )
+ 210:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****              )
+ 211:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****           )
+ 212:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          * dy
+ 153                             		.loc 1 212 10 view .LVU67
+ 154 00ae FC 8F DC                		fmul	r13, r12
+ 155                             	.LVL16:
+ 181:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       (
+ 156                             		.loc 1 181 8 view .LVU68
+ 157 00b1 FC 97 CC                		ftoi	r12, r12
+ 158                             	.LVL17:
+ 213:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****        );
+ 214:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****        
+ 215:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    
+ 216:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    return d2_settexturemapping( handle, (d2_point) (points[0] * 16), (d2_point) (points[1] * 16), (
+ 159                             		.loc 1 216 4 is_stmt 1 view .LVU69
+ 160                             		.loc 1 216 63 is_stmt 0 view .LVU70
+ 161 00b4 A9 0A                   		mov.L	20[r0], r2
+ 162 00b6 FD 72 32 00 00 80 41    		fmul	#0x41800000, r2
+ 163                             		.loc 1 216 92 view .LVU71
+ 164 00bd A9 83                   		mov.L	24[r0], r3
+ 165 00bf FD 72 33 00 00 80 41    		fmul	#0x41800000, r3
+ 166                             		.loc 1 216 115 view .LVU72
+ 167 00c6 A9 8F                   		mov.L	28[r0], r7
+ 168 00c8 FC 8F 74                		fmul	r7, r4
+ 169                             	.LVL18:
+ 170                             		.loc 1 216 138 view .LVU73
+ 171 00cb FC 8F 6A                		fmul	r6, r10
+ 172                             		.loc 1 216 11 view .LVU74
+ 173 00ce E7 0C 04                		mov.L	r12, 16[r0]
+ 174 00d1 A0 8D                   		mov.L	r5, 12[r0]
+ 175 00d3 E7 0B 02                		mov.L	r11, 8[r0]
+ 176 00d6 FC 97 AA                		ftoi	r10, r10
+ 177 00d9 E3 0A                   		mov.L	r10, [r0]
+ 178 00db FC 97 44                		ftoi	r4, r4
+ 179 00de FC 97 33                		ftoi	r3, r3
+ 180 00e1 FC 97 22                		ftoi	r2, r2
+ 181 00e4 05 00 00 00             		bsr	_d2_settexturemapping
+ 182                             	.LVL19:
+ 217:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** }
+ 183                             		.loc 1 217 1 view .LVU75
+ 184 00e8 3F 6D 10                		rtsd	#64, r6-r13
+ 185                             		.loc 1 217 1 view .LVU76
+ 186                             	.LFE6:
+ 188                             		.section	.text.d2_utility_perspectivewarp,"ax",@progbits
+ 189                             		.global	_d2_utility_perspectivewarp
+ 191                             	_d2_utility_perspectivewarp:
+ 192                             	.LVL20:
+ 193                             	.LFB7:
+ 218:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 219:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 220:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** /*--------------------------------------------------------------------------
+ 221:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * function: d2_utility_perspectivewarp
+ 222:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * Copies an image in perspective manner to a destination rectangle.
+ 223:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+ 224:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * d2_utility_perspectivewarp is internally using d2_settexturemapping
+ 225:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * and is overwriting the current values.
+ 226:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+ 227:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * (see pwe.gif)
+ 228:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+ 229:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * parameters:
+ 230:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   handle - device pointer (see: <d2_opendevice>)
+ 231:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   srcwidth - width of source rectangle in pixels
+ 232:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   srcheight - heigth of source rectangle in pixels
+ 233:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   srcx - x position in source bitmap
+ 234:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   srcy - y position in source bitmap
+ 235:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   dstwidth - width of destination rectangle in pixels
+ 236:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   dstheight - height of destination rectangle in pixels
+ 237:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   dstx - x position in destination bitmap
+ 238:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   dsty - y position in destination bitmap
+ 239:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   wt - 1/z (z>1) value in 16 Bit fraction (z=2 -> wt=65536/2)
+ 240:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+ 241:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * returns:
+ 242:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   errorcode (D2_OK if successfull) see list of <Errorcodes> for details
+ 243:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+ 244:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * example:
+ 245:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * Copy a 256x256 source texture into a 640x480 destination rectangle:
+ 246:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+ 247:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * (start code)
+ 248:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * ...
+ 249:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * d2_settexture( handle, texture, 256, 256, 256, d2_mode_rgb565 );
+ 250:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * d2_settexturemode( handle, 0 );
+ 251:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * d2_setfillmode( handle, d2_fm_texture );
+ 252:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * d2_utility_perspectivewarp(  handle, 256, 256, 0, 0, 640, 480, 0, 0, 65536/4 );
+ 253:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * ...
+ 254:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * (end code)
+ 255:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+ 256:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * limitations:
+ 257:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * This function is not meant for dynamic perspective animations.
+ 258:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+ 259:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * see also:
+ 260:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *  <d2_settexturemapping>
+ 261:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * */
+ 262:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** d2_s32 d2_utility_perspectivewarp( d2_device *handle, d2_u16 srcwidth, d2_u16 srcheight, d2_s16 src
+ 263:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** {
+ 194                             		.loc 1 263 1 is_stmt 1 view -0
+ 195                             		.loc 1 263 1 is_stmt 0 view .LVU78
+ 196 0000 6E 6D                   		pushm	r6-r13
+ 197                             	.LCFI2:
+ 198                             		.loc 1 263 1 view .LVU79
+ 199 0002 71 00 C0                		add	#-64, r0
+ 200                             	.LCFI3:
+ 201 0005 75 47 64                		mov.L	#0x64, r7
+ 202 0008 4B 07                   		add	r0, r7
+ 203 000a A1 09                   		mov.L	r1, 20[r0]
+ 204 000c 94 02                   		mov.W	r2, 32[r0]
+ 205 000e 94 0B                   		mov.W	r3, 34[r0]
+ 206 0010 DF 4D                   		mov.W	r4, r13
+ 207 0012 DC 78                   		mov.W	[r7], r8
+ 208 0014 D5 70 01 0C             		mov.W	2[r7], 24[r0]
+ 209 0018 D5 70 02 0D             		mov.W	4[r7], 26[r0]
+ 210 001c D5 70 03 12             		mov.W	6[r7], 36[r0]
+ 211 0020 D5 70 04 13             		mov.W	8[r7], 38[r0]
+ 212 0024 DD 7B 05                		mov.W	10[r7], r11
+ 264:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_u32 y;
+ 213                             		.loc 1 264 4 is_stmt 1 view .LVU80
+ 265:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_u32 pu  = 0;
+ 214                             		.loc 1 265 4 view .LVU81
+ 215                             	.LVL21:
+ 266:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_u32 pv  = 0;
+ 216                             		.loc 1 266 4 view .LVU82
+ 267:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_u32 aw  = (d2_u32) ( (65536 - wt) / dstheight );
+ 217                             		.loc 1 267 4 view .LVU83
+ 218                             		.loc 1 267 35 is_stmt 0 view .LVU84
+ 219 0027 5F B7                   		movu.W	r11, r7
+ 220 0029 FB 5E 00 00 01          		mov.L	#0x10000, r5
+ 221 002e FF 04 75                		sub	r7, r5, r4
+ 222                             	.LVL22:
+ 223                             		.loc 1 267 41 view .LVU85
+ 224 0031 DD 0A 0D                		mov.W	26[r0], r10
+ 225 0034 FC 23 A4                		div	r10, r4
+ 226 0037 A2 84                   		mov.L	r4, 40[r0]
+ 227                             	.LVL23:
+ 268:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_u32 ayv = (d2_u32) ( (1 << 16) / dstheight );
+ 228                             		.loc 1 268 4 is_stmt 1 view .LVU86
+ 229                             		.loc 1 268 11 is_stmt 0 view .LVU87
+ 230 0039 FC 23 A5                		div	r10, r5
+ 231 003c A2 8D                   		mov.L	r5, 44[r0]
+ 232                             	.LVL24:
+ 269:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_u32 axu = wt;
+ 233                             		.loc 1 269 4 is_stmt 1 view .LVU88
+ 234                             		.loc 1 269 11 is_stmt 0 view .LVU89
+ 235 003e A1 8F                   		mov.L	r7, 28[r0]
+ 236                             	.LVL25:
+ 270:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_u32 ayu = (d2_u32) ( (32767 - (wt >> 1)) / dstheight );
+ 237                             		.loc 1 270 4 is_stmt 1 view .LVU90
+ 238                             		.loc 1 270 41 is_stmt 0 view .LVU91
+ 239 0040 68 17                   		shlr	#1, r7
+ 240                             	.LVL26:
+ 241                             		.loc 1 270 35 view .LVU92
+ 242 0042 FB 5A FF 7F             		mov.L	#0x7fff, r5
+ 243                             	.LVL27:
+ 244                             		.loc 1 270 35 view .LVU93
+ 245 0046 FF 07 75                		sub	r7, r5, r7
+ 246                             		.loc 1 270 11 view .LVU94
+ 247 0049 FC 23 A7                		div	r10, r7
+ 248 004c A3 07                   		mov.L	r7, 48[r0]
+ 249                             	.LVL28:
+ 271:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 272:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    for(y=0; y<(d2_u32)dstheight; y++ )
+ 250                             		.loc 1 272 4 is_stmt 1 view .LVU95
+ 266:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_u32 aw  = (d2_u32) ( (65536 - wt) / dstheight );
+ 251                             		.loc 1 266 11 is_stmt 0 view .LVU96
+ 252 004e 66 09                   		mov.L	#0, r9
+ 265:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_u32 pv  = 0;
+ 253                             		.loc 1 265 11 view .LVU97
+ 254 0050 66 0C                   		mov.L	#0, r12
+ 255                             		.loc 1 272 9 view .LVU98
+ 256 0052 66 06                   		mov.L	#0, r6
+ 257                             	.LVL29:
+ 258                             	.L4:
+ 259                             		.loc 1 272 15 discriminator 1 view .LVU99
+ 260 0054 9B 0F                   		mov.W	26[r0], r7
+ 261                             		.loc 1 272 4 discriminator 1 view .LVU100
+ 262 0056 47 67                   		cmp	r6, r7
+ 263 0058 25 7D                   		bleu	.L10
+ 264                             	.LBB2:
+ 273:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 274:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       d2_s32 result;
+ 265                             		.loc 1 274 7 is_stmt 1 view .LVU101
+ 275:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       d2_u32 tty = ((pv << 16) / wt) * srcheight;
+ 266                             		.loc 1 275 7 view .LVU102
+ 267                             		.loc 1 275 25 is_stmt 0 view .LVU103
+ 268 005a FD D0 93                		shll	#16, r9, r3
+ 269                             		.loc 1 275 32 view .LVU104
+ 270 005d 5F BA                   		movu.W	r11, r10
+ 271 005f FC 27 A3                		divu	r10, r3
+ 272                             		.loc 1 275 38 view .LVU105
+ 273 0062 BC 0F                   		movu.W	34[r0], r7
+ 274                             		.loc 1 275 14 view .LVU106
+ 275 0064 4F 73                   		mul	r7, r3
+ 276                             	.LVL30:
+ 276:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       d2_u32 tlx = ((pu << 16) / wt) * srcwidth;
+ 277                             		.loc 1 276 7 is_stmt 1 view .LVU107
+ 278                             		.loc 1 276 25 is_stmt 0 view .LVU108
+ 279 0066 FD D0 C4                		shll	#16, r12, r4
+ 280                             		.loc 1 276 32 view .LVU109
+ 281 0069 FC 27 A4                		divu	r10, r4
+ 282                             		.loc 1 276 38 view .LVU110
+ 283 006c BC 07                   		movu.W	32[r0], r7
+ 284                             		.loc 1 276 14 view .LVU111
+ 285 006e 4F 74                   		mul	r7, r4
+ 286                             	.LVL31:
+ 277:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       d2_u32 dxu = (d2_u32) ( (((axu << 16) / wt) * srcwidth) / (d2_u16)dstwidth );
+ 287                             		.loc 1 277 7 is_stmt 1 view .LVU112
+ 288                             		.loc 1 277 38 is_stmt 0 view .LVU113
+ 289 0070 A9 8D                   		mov.L	28[r0], r5
+ 290 0072 6D 05                   		shll	#16, r5
+ 291                             		.loc 1 277 45 view .LVU114
+ 292 0074 FC 27 A5                		divu	r10, r5
+ 293                             		.loc 1 277 51 view .LVU115
+ 294 0077 4F 75                   		mul	r7, r5
+ 295                             		.loc 1 277 65 view .LVU116
+ 296 0079 BB 07                   		movu.W	24[r0], r7
+ 297                             		.loc 1 277 14 view .LVU117
+ 298 007b FC 27 75                		divu	r7, r5
+ 299                             	.LVL32:
+ 278:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 279:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       result = d2_settexturemapping(
+ 300                             		.loc 1 279 7 is_stmt 1 view .LVU118
+ 280:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          handle,
+ 281:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          (d2_point)(dstx << 4),                 /* PRQA S 4131 */ /* $Misra: #PERF_ARITHMETIC_SHIFT
+ 301                             		.loc 1 281 26 is_stmt 0 view .LVU119
+ 302 007e DD 0A 12                		mov.W	36[r0], r10
+ 303 0081 6C 4A                   		shll	#4, r10
+ 282:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          (d2_point)((dsty + (d2_s16)y) << 4),   /* PRQA S 4131 */ /* $Misra: #PERF_ARITHMETIC_SHIFT
+ 304                             		.loc 1 282 29 view .LVU120
+ 305 0083 DF 67                   		mov.W	r6, r7
+ 306                             		.loc 1 282 27 view .LVU121
+ 307 0085 9C 8A                   		mov.W	38[r0], r2
+ 308 0087 4B 27                   		add	r2, r7
+ 309                             		.loc 1 282 40 view .LVU122
+ 310 0089 6C 47                   		shll	#4, r7
+ 283:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          (d2_s32)tlx + ((d2_s32)srcx << 16),    /* PRQA S 4131 */ /* $Misra: #PERF_ARITHMETIC_SHIFT
+ 311                             		.loc 1 283 38 view .LVU123
+ 312 008b FD D0 D1                		shll	#16, r13, r1
+ 284:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          (d2_s32)tty + ((d2_s32)srcy << 16),    /* PRQA S 4131 */ /* $Misra: #PERF_ARITHMETIC_SHIFT
+ 313                             		.loc 1 284 38 view .LVU124
+ 314 008e FD D0 82                		shll	#16, r8, r2
+ 279:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          handle,
+ 315                             		.loc 1 279 16 view .LVU125
+ 316 0091 3E 04 00                		mov.L	#0, 16[r0]
+ 317 0094 3E 03 00                		mov.L	#0, 12[r0]
+ 318 0097 3E 02 00                		mov.L	#0, 8[r0]
+ 319 009a A0 0D                   		mov.L	r5, 4[r0]
+ 320 009c 4B 23                   		add	r2, r3
+ 321                             	.LVL33:
+ 279:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          handle,
+ 322                             		.loc 1 279 16 view .LVU126
+ 323 009e E3 03                   		mov.L	r3, [r0]
+ 324 00a0 4B 14                   		add	r1, r4
+ 325                             	.LVL34:
+ 279:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          handle,
+ 326                             		.loc 1 279 16 view .LVU127
+ 327 00a2 DF 73                   		mov.W	r7, r3
+ 328 00a4 DF A2                   		mov.W	r10, r2
+ 329 00a6 A9 09                   		mov.L	20[r0], r1
+ 330 00a8 05 00 00 00             		bsr	_d2_settexturemapping
+ 331                             	.LVL35:
+ 285:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          (d2_s32)dxu,
+ 286:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          0, 0, 0
+ 287:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                                     );
+ 288:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       if(D2_OK != result)
+ 332                             		.loc 1 288 7 is_stmt 1 view .LVU128
+ 333                             		.loc 1 288 9 is_stmt 0 view .LVU129
+ 334 00ac 61 01                   		cmp	#0, r1
+ 335 00ae 21 29                   		bne	.L3
+ 289:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       {
+ 290:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          return result;
+ 291:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       }
+ 292:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 293:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       result = d2_renderbox( handle, (d2_point)(dstx << 4), (d2_point)((dsty + (d2_s16)y) << 4), (d
+ 336                             		.loc 1 293 7 is_stmt 1 view .LVU130
+ 337                             		.loc 1 293 118 is_stmt 0 view .LVU131
+ 338 00b0 9B 04                   		mov.W	24[r0], r4
+ 339                             		.loc 1 293 16 view .LVU132
+ 340 00b2 F8 05 10                		mov.W	#16, [r0]
+ 341 00b5 6C 44                   		shll	#4, r4
+ 342 00b7 DF 73                   		mov.W	r7, r3
+ 343 00b9 DF A2                   		mov.W	r10, r2
+ 344 00bb A9 09                   		mov.L	20[r0], r1
+ 345                             	.LVL36:
+ 346                             		.loc 1 293 16 view .LVU133
+ 347 00bd 05 00 00 00             		bsr	_d2_renderbox
+ 348                             	.LVL37:
+ 294:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       if(D2_OK != result)
+ 349                             		.loc 1 294 7 is_stmt 1 view .LVU134
+ 350                             		.loc 1 294 9 is_stmt 0 view .LVU135
+ 351 00c1 61 01                   		cmp	#0, r1
+ 352 00c3 21 14                   		bne	.L3
+ 295:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       {
+ 296:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          return result;
+ 297:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       }
+ 298:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 299:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       pu += ayu;
+ 353                             		.loc 1 299 7 is_stmt 1 discriminator 2 view .LVU136
+ 354                             		.loc 1 299 10 is_stmt 0 discriminator 2 view .LVU137
+ 355 00c5 06 89 0C 0C             		add	48[r0], r12
+ 356                             	.LVL38:
+ 300:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       pv += ayv;
+ 357                             		.loc 1 300 7 is_stmt 1 discriminator 2 view .LVU138
+ 358                             		.loc 1 300 10 is_stmt 0 discriminator 2 view .LVU139
+ 359 00c9 06 89 09 0B             		add	44[r0], r9
+ 360                             	.LVL39:
+ 301:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       wt = (d2_u16)(wt + (d2_u16)aw);
+ 361                             		.loc 1 301 7 is_stmt 1 discriminator 2 view .LVU140
+ 362                             		.loc 1 301 10 is_stmt 0 discriminator 2 view .LVU141
+ 363 00cd 06 89 0B 0A             		add	40[r0], r11
+ 364                             	.LVL40:
+ 365                             		.loc 1 301 10 discriminator 2 view .LVU142
+ 366                             	.LBE2:
+ 272:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 367                             		.loc 1 272 35 discriminator 2 view .LVU143
+ 368 00d1 62 16                   		add	#1, r6
+ 369                             	.LVL41:
+ 272:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 370                             		.loc 1 272 35 discriminator 2 view .LVU144
+ 371 00d3 2E 81                   		bra	.L4
+ 372                             	.LVL42:
+ 373                             	.L10:
+ 302:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    }
+ 303:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 304:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    return D2_OK;
+ 374                             		.loc 1 304 11 view .LVU145
+ 375 00d5 66 01                   		mov.L	#0, r1
+ 376                             	.L3:
+ 305:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** }
+ 377                             		.loc 1 305 1 view .LVU146
+ 378 00d7 3F 6D 18                		rtsd	#96, r6-r13
+ 379                             		.loc 1 305 1 view .LVU147
+ 380                             	.LFE7:
+ 382                             		.section	.text.d2_utility_fbblitcopy,"ax",@progbits
+ 383                             		.global	_d2_utility_fbblitcopy
+ 385                             	_d2_utility_fbblitcopy:
+ 386                             	.LVL43:
+ 387                             	.LFB8:
+ 306:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 307:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 308:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** /*--------------------------------------------------------------------------
+ 309:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * function: d2_utility_fbblitcopy
+ 310:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * Copy a rectangular part inside the current framebuffer.
+ 311:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+ 312:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * This is a wrapper function around <d2_blitcopy>, which copies a rectangular region inside a sing
+ 313:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * Source and destination buffer are the current framebuffer, set via <d2_framebuffer>.
+ 314:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * This function handles the different cases of potentially overlapping source and destination area
+ 315:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * no read-after-write problems arise.
+ 316:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * Note that both source and destination rectangles need to lie fully inside the framebuffer for th
+ 317:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * correctly.
+ 318:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+ 319:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * parameters:
+ 320:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   handle - device pointer (see: <d2_opendevice>)
+ 321:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   width, height - size of source/destination rectangle in pixels (integer)
+ 322:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   srcx, srcy  - top/left coordinate of source rectangle (integer)
+ 323:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   dstx, dsty - top/left coordinate of destination rectangle (integer)
+ 324:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   flags - any combination of blit flag bits (see below), passed on to <d2_blitcopy>
+ 325:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+ 326:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * flags parameter bits (only one bit allowed):
+ 327:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   d2_bf_no_blitctxbackup - for this blit don't backup context data for better performance; previ
+ 328:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+ 329:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * returns:
+ 330:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   errorcode (D2_OK if successful) see list of <Errorcodes> for details
+ 331:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * */
+ 332:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** d2_s32 d2_utility_fbblitcopy( d2_device *handle, d2_u16 width, d2_u16 height, d2_blitpos srcx, d2_b
+ 333:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** {
+ 388                             		.loc 1 333 1 is_stmt 1 view -0
+ 389                             		.loc 1 333 1 is_stmt 0 view .LVU149
+ 390 0000 6E 6D                   		pushm	r6-r13
+ 391                             	.LCFI4:
+ 392                             		.loc 1 333 1 view .LVU150
+ 393 0002 71 00 C0                		add	#-64, r0
+ 394                             	.LCFI5:
+ 395 0005 75 47 64                		mov.L	#0x64, r7
+ 396 0008 4B 07                   		add	r0, r7
+ 397 000a EF 1A                   		mov.L	r1, r10
+ 398 000c 94 02                   		mov.W	r2, 32[r0]
+ 399 000e DF 3C                   		mov.W	r3, r12
+ 400 0010 DF 48                   		mov.W	r4, r8
+ 401 0012 DC 76                   		mov.W	[r7], r6
+ 402 0014 D5 70 01 0C             		mov.W	2[r7], 24[r0]
+ 403 0018 D5 70 02 08             		mov.W	4[r7], 16[r0]
+ 404 001c ED 7D 02                		mov.L	8[r7], r13
+ 334:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_s32 result = D2_OK;
+ 405                             		.loc 1 334 4 is_stmt 1 view .LVU151
+ 406                             	.LVL44:
+ 335:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    void *fb_ptr, *fb_ptr_blit;
+ 407                             		.loc 1 335 4 view .LVU152
+ 336:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_s32 fb_pitch, fb_pitch_blit;
+ 408                             		.loc 1 336 4 view .LVU153
+ 337:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_u16 fb_width, fb_height;
+ 409                             		.loc 1 337 4 view .LVU154
+ 338:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_u8 fb_format, fb_bpp;
+ 410                             		.loc 1 338 4 view .LVU155
+ 339:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_blitpos srcy_blit;
+ 411                             		.loc 1 339 4 view .LVU156
+ 340:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_u8 flipped = 0;
+ 412                             		.loc 1 340 4 view .LVU157
+ 341:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_s16 clip_ymin, clip_ymax;
+ 413                             		.loc 1 341 4 view .LVU158
+ 342:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 343:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    D2_VALIDATEP( handle, D2_INVALIDDEVICE );                                                     /*
+ 414                             		.loc 1 343 4 view .LVU159
+ 344:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    D2_VALIDATE( width>0, D2_INVALIDWIDTH );                                                      /*
+ 415                             		.loc 1 344 4 view .LVU160
+ 345:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    D2_VALIDATE( height>0, D2_INVALIDHEIGHT );                                                    /*
+ 416                             		.loc 1 345 4 view .LVU161
+ 346:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    D2_VALIDATE( width<=1024, D2_INVALIDWIDTH );                                                  /*
+ 417                             		.loc 1 346 4 view .LVU162
+ 347:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    D2_VALIDATE( height<=1024, D2_INVALIDHEIGHT );                                                /*
+ 418                             		.loc 1 347 4 view .LVU163
+ 348:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 349:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    /* get current framebuffer parameters and set as blit source */
+ 350:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    fb_ptr    = D2_DEV(handle)->framebuffer;
+ 419                             		.loc 1 350 4 view .LVU164
+ 420                             		.loc 1 350 14 is_stmt 0 view .LVU165
+ 421 001f E5 10 0F 05             		mov.L	60[r1], 20[r0]
+ 422                             	.LVL45:
+ 351:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    fb_format = (d2_u8)(D2_DEV(handle)->fbformat);
+ 423                             		.loc 1 351 4 is_stmt 1 view .LVU166
+ 424                             		.loc 1 351 38 is_stmt 0 view .LVU167
+ 425 0023 AC 95                   		mov.L	72[r1], r5
+ 426                             	.LVL46:
+ 352:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    fb_bpp    = (d2_u8)(D2_DEV(handle)->bpp);
+ 427                             		.loc 1 352 4 is_stmt 1 view .LVU168
+ 428                             		.loc 1 352 38 is_stmt 0 view .LVU169
+ 429 0025 E5 10 11 09             		mov.L	68[r1], 36[r0]
+ 430                             	.LVL47:
+ 353:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    fb_pitch  = D2_DEV(handle)->pitch;
+ 431                             		.loc 1 353 4 is_stmt 1 view .LVU170
+ 432                             		.loc 1 353 14 is_stmt 0 view .LVU171
+ 433 0029 AC 17                   		mov.L	64[r1], r7
+ 434                             	.LVL48:
+ 354:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    fb_width  = (d2_u16)(D2_DEV(handle)->fbwidth);
+ 435                             		.loc 1 354 4 is_stmt 1 view .LVU172
+ 436                             		.loc 1 354 39 is_stmt 0 view .LVU173
+ 437 002b AC 9C                   		mov.L	76[r1], r4
+ 438                             	.LVL49:
+ 355:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    fb_height = (d2_u16)(D2_DEV(handle)->fbheight);
+ 439                             		.loc 1 355 4 is_stmt 1 view .LVU174
+ 440                             		.loc 1 355 39 is_stmt 0 view .LVU175
+ 441 002d ED 19 14                		mov.L	80[r1], r9
+ 442                             	.LVL50:
+ 356:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 357:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    /* blit pitch has to be positive. flip vertical axis for blit source/texture if required */
+ 358:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    if (fb_pitch < 0)
+ 443                             		.loc 1 358 4 is_stmt 1 view .LVU176
+ 444                             		.loc 1 358 7 is_stmt 0 view .LVU177
+ 445 0030 61 07                   		cmp	#0, r7
+ 446 0032 29 26                   		blt	.L25
+ 359:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 360:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       d2_s32 fb_ptr_offset = (d2_s32)(fb_height-1)*fb_pitch*(d2_s32)fb_bpp;
+ 361:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       fb_ptr_blit   = (void*)( ((d2_char*)fb_ptr) + fb_ptr_offset );
+ 362:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       fb_pitch_blit = -fb_pitch;
+ 363:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       srcy_blit     = (d2_blitpos)(d2_s32)(fb_height-height-srcy);
+ 364:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       flags        ^= d2_bf_mirrorv;
+ 365:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    }
+ 366:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    else
+ 367:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 368:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       fb_ptr_blit   = fb_ptr;
+ 369:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       fb_pitch_blit = fb_pitch;
+ 370:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       srcy_blit     = srcy;
+ 447                             		.loc 1 370 21 view .LVU178
+ 448 0034 93 86                   		mov.W	r6, 28[r0]
+ 369:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       srcy_blit     = srcy;
+ 449                             		.loc 1 369 21 view .LVU179
+ 450 0036 EF 73                   		mov.L	r7, r3
+ 451                             	.LVL51:
+ 368:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       fb_pitch_blit = fb_pitch;
+ 452                             		.loc 1 368 21 view .LVU180
+ 453 0038 A9 0A                   		mov.L	20[r0], r2
+ 454                             	.LVL52:
+ 455                             	.L12:
+ 371:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    }
+ 372:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 373:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    result = d2_setblitsrc(handle, fb_ptr_blit, fb_pitch_blit, (d2_s32)fb_width, (d2_s32)fb_height, 
+ 456                             		.loc 1 373 4 is_stmt 1 view .LVU181
+ 457                             		.loc 1 373 13 is_stmt 0 view .LVU182
+ 458 003a FB BE FF FF 00          		mov.L	#0xffff, r11
+ 459 003f 53 9B                   		and	r9, r11
+ 460 0041 76 25 FF 00             		and #0xff, r5
+ 461                             	.LVL53:
+ 462                             		.loc 1 373 13 view .LVU183
+ 463 0045 A0 0D                   		mov.L	r5, 4[r0]
+ 464                             	.LVL54:
+ 465                             		.loc 1 373 13 view .LVU184
+ 466 0047 E3 0B                   		mov.L	r11, [r0]
+ 467 0049 5F 44                   		movu.W	r4, r4
+ 468                             	.LVL55:
+ 469                             		.loc 1 373 13 view .LVU185
+ 470 004b EF A1                   		mov.L	r10, r1
+ 471 004d 05 00 00 00             		bsr	_d2_setblitsrc
+ 472                             	.LVL56:
+ 374:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    if (D2_OK != result)
+ 473                             		.loc 1 374 4 is_stmt 1 view .LVU186
+ 474                             		.loc 1 374 7 is_stmt 0 view .LVU187
+ 475 0051 61 01                   		cmp	#0, r1
+ 476 0053 20 2B                   		beq	.L26
+ 477                             	.LVL57:
+ 478                             		.balign 8,3,2
+ 479                             	.L11:
+ 375:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 376:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       return result;
+ 377:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    }
+ 378:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 379:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    /* since we now read the framebuffer as texture, we need to make sure everything has been flushe
+ 380:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    (void)d2_insertwaitfulldlist_intern(handle);
+ 381:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 382:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    /* worst case: horizontal offset, destination region right of source region, overlap */
+ 383:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    if ((dsty == srcy) && (dstx > srcx) && (dstx < (srcx+width)))
+ 384:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 385:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       /* calculate stripe size */
+ 386:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       d2_blitpos offset = (d2_blitpos)(dstx-srcx);
+ 387:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       d2_u16 strwidth   = offset;
+ 388:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       d2_blitpos strx   = (d2_blitpos)(srcx+width);  /* start on the right side */
+ 389:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       
+ 390:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       do
+ 391:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       {
+ 392:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          /* advance to next stripe: last columns need a slimmer stripe */
+ 393:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          if (((d2_s32)strx-(d2_s32)strwidth) < (d2_s32)srcx)
+ 394:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          {
+ 395:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****             strwidth = (d2_u16)(strx-srcx);
+ 396:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          }
+ 397:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          strx = (d2_blitpos)(strx-strwidth);
+ 398:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          result = d2_blitcopy(handle, (d2_s32)strwidth,            (d2_s32)height,            strx,
+ 399:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                                       (d2_width)D2_FIX4(strwidth), (d2_width)D2_FIX4(height), (d2_p
+ 400:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          if (D2_OK != result)
+ 401:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          {
+ 402:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****             return result;
+ 403:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          }
+ 404:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       } while (strx > srcx);
+ 405:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       return result;
+ 406:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    }
+ 407:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 408:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    /* vertical offset with destination region AFTER source region and overlap: vertical flip in sou
+ 409:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    if ( (dsty > srcy)
+ 410:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****         && (dsty < (srcy+height))
+ 411:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****         && ((dstx+width) > srcx) && (dstx < (srcx+width)) )
+ 412:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 413:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       /* go to start of last line */
+ 414:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       d2_s32 fb_ptr_offset = (d2_s32)(fb_height-1)*fb_pitch*(d2_s32)fb_bpp;
+ 415:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->framebuffer = (void*)( ((d2_u8*)fb_ptr) + fb_ptr_offset );
+ 416:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->pitch       = -fb_pitch;
+ 417:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       dsty = (d2_blitpos)(fb_height-height-dsty);
+ 418:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       clip_ymax = D2_DEV(handle)->clipymax; 
+ 419:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       clip_ymin = D2_DEV(handle)->clipymin;
+ 420:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->clipymax = (d2_point) ((d2_s16)(D2_FIX4(fb_height-1)) - clip_ymin);  // MHO: 
+ 421:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->clipymin = (d2_point) ((d2_s16)(D2_FIX4(fb_height-1)) - clip_ymax);  // MHO: 
+ 422:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       flags ^= d2_bf_mirrorv;
+ 423:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       flipped = 1;
+ 424:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    }
+ 425:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 426:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    result = d2_blitcopy(handle, (d2_s32)width,            (d2_s32)height,            srcx,         
+ 427:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                                 (d2_width)D2_FIX4(width), (d2_width)D2_FIX4(height), (d2_point)D2_F
+ 428:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 429:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    if (1 == flipped)
+ 430:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 431:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       /* restore framebuffer settings */
+ 432:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->framebuffer = fb_ptr;
+ 433:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->pitch       = fb_pitch;
+ 434:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->clipymax = clip_ymax;   // MHO: undo the mirroring of the clip rect
+ 435:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->clipymin = clip_ymin;  
+ 436:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    }
+ 437:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 438:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    return result;
+ 439:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** }
+ 480                             		.loc 1 439 1 view .LVU188
+ 481 0055 3F 6D 18                		rtsd	#96, r6-r13
+ 482                             	.LVL58:
+ 483                             	.L25:
+ 484                             	.LBB3:
+ 360:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       fb_ptr_blit   = (void*)( ((d2_char*)fb_ptr) + fb_ptr_offset );
+ 485                             		.loc 1 360 7 is_stmt 1 view .LVU189
+ 360:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       fb_ptr_blit   = (void*)( ((d2_char*)fb_ptr) + fb_ptr_offset );
+ 486                             		.loc 1 360 30 is_stmt 0 view .LVU190
+ 487 0058 FB 2E FF FF 00          		mov.L	#0xffff, r2
+ 488                             	.LVL59:
+ 360:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       fb_ptr_blit   = (void*)( ((d2_char*)fb_ptr) + fb_ptr_offset );
+ 489                             		.loc 1 360 30 view .LVU191
+ 490 005d 53 92                   		and	r9, r2
+ 491 005f 60 12                   		sub	#1, r2
+ 360:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       fb_ptr_blit   = (void*)( ((d2_char*)fb_ptr) + fb_ptr_offset );
+ 492                             		.loc 1 360 51 view .LVU192
+ 493 0061 4F 72                   		mul	r7, r2
+ 360:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       fb_ptr_blit   = (void*)( ((d2_char*)fb_ptr) + fb_ptr_offset );
+ 494                             		.loc 1 360 14 view .LVU193
+ 495 0063 AA 0B                   		mov.L	36[r0], r3
+ 496                             	.LVL60:
+ 360:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       fb_ptr_blit   = (void*)( ((d2_char*)fb_ptr) + fb_ptr_offset );
+ 497                             		.loc 1 360 14 view .LVU194
+ 498 0065 76 23 FF 00             		and #0xff, r3
+ 499 0069 4F 32                   		mul	r3, r2
+ 500                             	.LVL61:
+ 361:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       fb_pitch_blit = -fb_pitch;
+ 501                             		.loc 1 361 7 is_stmt 1 view .LVU195
+ 361:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       fb_pitch_blit = -fb_pitch;
+ 502                             		.loc 1 361 21 is_stmt 0 view .LVU196
+ 503 006b 06 89 02 05             		add	20[r0], r2
+ 504                             	.LVL62:
+ 362:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       srcy_blit     = (d2_blitpos)(d2_s32)(fb_height-height-srcy);
+ 505                             		.loc 1 362 7 is_stmt 1 view .LVU197
+ 362:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       srcy_blit     = (d2_blitpos)(d2_s32)(fb_height-height-srcy);
+ 506                             		.loc 1 362 21 is_stmt 0 view .LVU198
+ 507 006f FC 07 73                		neg	r7, r3
+ 508                             	.LVL63:
+ 363:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       flags        ^= d2_bf_mirrorv;
+ 509                             		.loc 1 363 7 is_stmt 1 view .LVU199
+ 363:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       flags        ^= d2_bf_mirrorv;
+ 510                             		.loc 1 363 53 is_stmt 0 view .LVU200
+ 511 0072 FF 01 C9                		sub	r12, r9, r1
+ 512                             	.LVL64:
+ 363:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       flags        ^= d2_bf_mirrorv;
+ 513                             		.loc 1 363 21 view .LVU201
+ 514 0075 43 61                   		sub	r6, r1
+ 515 0077 93 81                   		mov.W	r1, 28[r0]
+ 516                             	.LVL65:
+ 364:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    }
+ 517                             		.loc 1 364 7 is_stmt 1 view .LVU202
+ 364:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    }
+ 518                             		.loc 1 364 20 is_stmt 0 view .LVU203
+ 519 0079 FD EA FD                		bnot	#10, r13
+ 520                             	.LVL66:
+ 364:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    }
+ 521                             		.loc 1 364 20 view .LVU204
+ 522                             	.LBE3:
+ 523 007c 2E BE                   		bra	.L12
+ 524                             	.LVL67:
+ 525                             	.L26:
+ 380:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 526                             		.loc 1 380 4 is_stmt 1 view .LVU205
+ 380:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 527                             		.loc 1 380 10 is_stmt 0 view .LVU206
+ 528 007e EF A1                   		mov.L	r10, r1
+ 529                             	.LVL68:
+ 380:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 530                             		.loc 1 380 10 view .LVU207
+ 531 0080 05 00 00 00             		bsr	_d2_insertwaitfulldlist_intern
+ 532                             	.LVL69:
+ 383:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 533                             		.loc 1 383 4 is_stmt 1 view .LVU208
+ 383:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 534                             		.loc 1 383 7 is_stmt 0 view .LVU209
+ 535 0084 5F 65                   		movu.W	r6, r5
+ 536 0086 BA 04                   		movu.W	16[r0], r4
+ 537 0088 47 45                   		cmp	r4, r5
+ 538 008a 20 7B                   		beq	.L27
+ 539                             	.L14:
+ 409:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****         && (dsty < (srcy+height))
+ 540                             		.loc 1 409 4 is_stmt 1 view .LVU210
+ 409:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****         && (dsty < (srcy+height))
+ 541                             		.loc 1 409 7 is_stmt 0 view .LVU211
+ 542 008c 5F 65                   		movu.W	r6, r5
+ 543 008e BA 04                   		movu.W	16[r0], r4
+ 544 0090 47 45                   		cmp	r4, r5
+ 545 0092 23 05 38 F0 00          		bgeu	.L19
+ 410:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****         && ((dstx+width) > srcx) && (dstx < (srcx+width)) )
+ 546                             		.loc 1 410 18 view .LVU212
+ 547 0097 EF 45                   		mov.L	r4, r5
+ 410:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****         && ((dstx+width) > srcx) && (dstx < (srcx+width)) )
+ 548                             		.loc 1 410 25 view .LVU213
+ 549 0099 5F 66                   		movu.W	r6, r6
+ 550 009b 5F C4                   		movu.W	r12, r4
+ 551 009d 4B 46                   		add	r4, r6
+ 410:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****         && ((dstx+width) > srcx) && (dstx < (srcx+width)) )
+ 552                             		.loc 1 410 9 view .LVU214
+ 553 009f 47 65                   		cmp	r6, r5
+ 554 00a1 29 05 38 28 01          		bge	.L20
+ 411:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 555                             		.loc 1 411 18 view .LVU215
+ 556 00a6 BB 04                   		movu.W	24[r0], r4
+ 557 00a8 BC 05                   		movu.W	32[r0], r5
+ 558 00aa FF 22 54                		add	r5, r4, r2
+ 411:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 559                             		.loc 1 411 26 view .LVU216
+ 560 00ad 5F 83                   		movu.W	r8, r3
+ 411:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 561                             		.loc 1 411 9 view .LVU217
+ 562 00af 47 32                   		cmp	r3, r2
+ 563 00b1 2A 05 38 1C 01          		ble	.L21
+ 411:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 564                             		.loc 1 411 50 discriminator 1 view .LVU218
+ 565 00b6 4B 35                   		add	r3, r5
+ 411:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 566                             		.loc 1 411 34 discriminator 1 view .LVU219
+ 567 00b8 47 54                   		cmp	r5, r4
+ 568 00ba 29 05 38 17 01          		bge	.L22
+ 569                             	.LBB4:
+ 414:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->framebuffer = (void*)( ((d2_u8*)fb_ptr) + fb_ptr_offset );
+ 570                             		.loc 1 414 7 is_stmt 1 view .LVU220
+ 414:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->framebuffer = (void*)( ((d2_u8*)fb_ptr) + fb_ptr_offset );
+ 571                             		.loc 1 414 30 is_stmt 0 view .LVU221
+ 572 00bf 71 B5 FF                		add	#-1, r11, r5
+ 414:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->framebuffer = (void*)( ((d2_u8*)fb_ptr) + fb_ptr_offset );
+ 573                             		.loc 1 414 51 view .LVU222
+ 574 00c2 FF 33 75                		mul	r7, r5, r3
+ 414:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->framebuffer = (void*)( ((d2_u8*)fb_ptr) + fb_ptr_offset );
+ 575                             		.loc 1 414 14 view .LVU223
+ 576 00c5 AA 0C                   		mov.L	36[r0], r4
+ 577 00c7 76 24 FF 00             		and #0xff, r4
+ 578 00cb 4F 34                   		mul	r3, r4
+ 579                             	.LVL70:
+ 415:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->pitch       = -fb_pitch;
+ 580                             		.loc 1 415 7 is_stmt 1 view .LVU224
+ 415:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->pitch       = -fb_pitch;
+ 581                             		.loc 1 415 37 is_stmt 0 view .LVU225
+ 582 00cd 06 89 04 05             		add	20[r0], r4
+ 583                             	.LVL71:
+ 415:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->pitch       = -fb_pitch;
+ 584                             		.loc 1 415 35 view .LVU226
+ 585 00d1 E7 A4 0F                		mov.L	r4, 60[r10]
+ 416:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       dsty = (d2_blitpos)(fb_height-height-dsty);
+ 586                             		.loc 1 416 7 is_stmt 1 view .LVU227
+ 416:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       dsty = (d2_blitpos)(fb_height-height-dsty);
+ 587                             		.loc 1 416 37 is_stmt 0 view .LVU228
+ 588 00d4 FC 07 74                		neg	r7, r4
+ 416:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       dsty = (d2_blitpos)(fb_height-height-dsty);
+ 589                             		.loc 1 416 35 view .LVU229
+ 590 00d7 E7 A4 10                		mov.L	r4, 64[r10]
+ 417:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       clip_ymax = D2_DEV(handle)->clipymax; 
+ 591                             		.loc 1 417 7 is_stmt 1 view .LVU230
+ 417:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       clip_ymax = D2_DEV(handle)->clipymax; 
+ 592                             		.loc 1 417 36 is_stmt 0 view .LVU231
+ 593 00da 43 C9                   		sub	r12, r9
+ 594                             	.LVL72:
+ 417:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       clip_ymax = D2_DEV(handle)->clipymax; 
+ 595                             		.loc 1 417 12 view .LVU232
+ 596 00dc 9A 03                   		mov.W	16[r0], r3
+ 597                             	.LVL73:
+ 417:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       clip_ymax = D2_DEV(handle)->clipymax; 
+ 598                             		.loc 1 417 12 view .LVU233
+ 599 00de FF 03 39                		sub	r3, r9, r3
+ 600 00e1 92 03                   		mov.W	r3, 16[r0]
+ 418:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       clip_ymin = D2_DEV(handle)->clipymin;
+ 601                             		.loc 1 418 7 is_stmt 1 view .LVU234
+ 418:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       clip_ymin = D2_DEV(handle)->clipymin;
+ 602                             		.loc 1 418 17 is_stmt 0 view .LVU235
+ 603 00e3 D5 A0 3C 16             		mov.W	120[r10], 44[r0]
+ 604                             	.LVL74:
+ 419:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->clipymax = (d2_point) ((d2_s16)(D2_FIX4(fb_height-1)) - clip_ymin);  // MHO: 
+ 605                             		.loc 1 419 7 is_stmt 1 view .LVU236
+ 419:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->clipymax = (d2_point) ((d2_s16)(D2_FIX4(fb_height-1)) - clip_ymin);  // MHO: 
+ 606                             		.loc 1 419 17 is_stmt 0 view .LVU237
+ 607 00e7 D5 A0 3A 14             		mov.W	116[r10], 40[r0]
+ 608                             	.LVL75:
+ 420:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->clipymin = (d2_point) ((d2_s16)(D2_FIX4(fb_height-1)) - clip_ymax);  // MHO: 
+ 609                             		.loc 1 420 7 is_stmt 1 view .LVU238
+ 420:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->clipymin = (d2_point) ((d2_s16)(D2_FIX4(fb_height-1)) - clip_ymax);  // MHO: 
+ 610                             		.loc 1 420 55 is_stmt 0 view .LVU239
+ 611 00eb 6C 45                   		shll	#4, r5
+ 612                             	.LVL76:
+ 420:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->clipymin = (d2_point) ((d2_s16)(D2_FIX4(fb_height-1)) - clip_ymax);  // MHO: 
+ 613                             		.loc 1 420 77 view .LVU240
+ 614 00ed DD 0E 14                		mov.W	40[r0], r14
+ 615 00f0 FF 04 E5                		sub	r14, r5, r4
+ 420:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->clipymin = (d2_point) ((d2_s16)(D2_FIX4(fb_height-1)) - clip_ymax);  // MHO: 
+ 616                             		.loc 1 420 32 view .LVU241
+ 617 00f3 D7 A4 3C                		mov.W	r4, 120[r10]
+ 618                             	.LVL77:
+ 421:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       flags ^= d2_bf_mirrorv;
+ 619                             		.loc 1 421 7 is_stmt 1 view .LVU242
+ 421:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       flags ^= d2_bf_mirrorv;
+ 620                             		.loc 1 421 77 is_stmt 0 view .LVU243
+ 621 00f6 9D 83                   		mov.W	44[r0], r3
+ 622 00f8 43 35                   		sub	r3, r5
+ 421:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       flags ^= d2_bf_mirrorv;
+ 623                             		.loc 1 421 32 view .LVU244
+ 624 00fa D7 A5 3A                		mov.W	r5, 116[r10]
+ 625                             	.LVL78:
+ 422:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       flipped = 1;
+ 626                             		.loc 1 422 7 is_stmt 1 view .LVU245
+ 422:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       flipped = 1;
+ 627                             		.loc 1 422 13 is_stmt 0 view .LVU246
+ 628 00fd FD EA FD                		bnot	#10, r13
+ 629                             	.LVL79:
+ 423:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    }
+ 630                             		.loc 1 423 7 is_stmt 1 view .LVU247
+ 423:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    }
+ 631                             		.loc 1 423 15 is_stmt 0 view .LVU248
+ 632 0100 66 16                   		mov	#1, r6
+ 633 0102 38 86 00                		bra	.L17
+ 634                             	.LVL80:
+ 635                             	.L27:
+ 423:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    }
+ 636                             		.loc 1 423 15 view .LVU249
+ 637                             	.LBE4:
+ 383:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 638                             		.loc 1 383 23 discriminator 1 view .LVU250
+ 639 0105 BB 05                   		movu.W	24[r0], r5
+ 640 0107 5F 84                   		movu.W	r8, r4
+ 641 0109 47 45                   		cmp	r4, r5
+ 642 010b 25 81                   		bleu	.L14
+ 383:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 643                             		.loc 1 383 49 discriminator 2 view .LVU251
+ 644 010d EF 54                   		mov.L	r5, r4
+ 383:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 645                             		.loc 1 383 56 discriminator 2 view .LVU252
+ 646 010f 5F 83                   		movu.W	r8, r3
+ 647 0111 A3 03                   		mov.L	r3, 48[r0]
+ 648 0113 BC 05                   		movu.W	32[r0], r5
+ 649 0115 4B 35                   		add	r3, r5
+ 383:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 650                             		.loc 1 383 40 discriminator 2 view .LVU253
+ 651 0117 47 54                   		cmp	r5, r4
+ 652 0119 29 05 38 71 FF          		bge	.L14
+ 653                             	.LBB5:
+ 386:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       d2_u16 strwidth   = offset;
+ 654                             		.loc 1 386 7 is_stmt 1 view .LVU254
+ 386:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       d2_u16 strwidth   = offset;
+ 655                             		.loc 1 386 18 is_stmt 0 view .LVU255
+ 656 011e DD 09 0C                		mov.W	24[r0], r9
+ 657                             	.LVL81:
+ 386:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       d2_u16 strwidth   = offset;
+ 658                             		.loc 1 386 18 view .LVU256
+ 659 0121 43 89                   		sub	r8, r9
+ 660 0123 D7 09 08                		mov.W	r9, 16[r0]
+ 661                             	.LVL82:
+ 387:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       d2_blitpos strx   = (d2_blitpos)(srcx+width);  /* start on the right side */
+ 662                             		.loc 1 387 7 is_stmt 1 view .LVU257
+ 388:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       
+ 663                             		.loc 1 388 7 view .LVU258
+ 388:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       
+ 664                             		.loc 1 388 18 is_stmt 0 view .LVU259
+ 665 0126 DD 0B 10                		mov.W	32[r0], r11
+ 666 0129 4B 8B                   		add	r8, r11
+ 667                             	.LVL83:
+ 387:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       d2_blitpos strx   = (d2_blitpos)(srcx+width);  /* start on the right side */
+ 668                             		.loc 1 387 14 view .LVU260
+ 669 012b E7 0A 05                		mov.L	r10, 20[r0]
+ 670                             	.LVL84:
+ 387:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       d2_blitpos strx   = (d2_blitpos)(srcx+width);  /* start on the right side */
+ 671                             		.loc 1 387 14 view .LVU261
+ 672 012e EF 3A                   		mov.L	r3, r10
+ 673                             	.LVL85:
+ 387:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       d2_blitpos strx   = (d2_blitpos)(srcx+width);  /* start on the right side */
+ 674                             		.loc 1 387 14 view .LVU262
+ 675 0130 2E 45                   		bra	.L16
+ 676                             	.LVL86:
+ 677                             	.L15:
+ 397:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          result = d2_blitcopy(handle, (d2_s32)strwidth,            (d2_s32)height,            strx,
+ 678                             		.loc 1 397 10 is_stmt 1 view .LVU263
+ 397:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          result = d2_blitcopy(handle, (d2_s32)strwidth,            (d2_s32)height,            strx,
+ 679                             		.loc 1 397 15 is_stmt 0 view .LVU264
+ 680 0132 FF 07 9B                		sub	r9, r11, r7
+ 681 0135 DF 7B                   		mov.W	r7, r11
+ 682                             	.LVL87:
+ 398:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                                       (d2_width)D2_FIX4(strwidth), (d2_width)D2_FIX4(height), (d2_p
+ 683                             		.loc 1 398 10 is_stmt 1 view .LVU265
+ 398:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                                       (d2_width)D2_FIX4(strwidth), (d2_width)D2_FIX4(height), (d2_p
+ 684                             		.loc 1 398 19 is_stmt 0 view .LVU266
+ 685 0137 5F 92                   		movu.W	r9, r2
+ 686 0139 5F C3                   		movu.W	r12, r3
+ 399:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          if (D2_OK != result)
+ 687                             		.loc 1 399 49 view .LVU267
+ 688 013b FD C4 24                		shll	#4, r2, r4
+ 399:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          if (D2_OK != result)
+ 689                             		.loc 1 399 78 view .LVU268
+ 690 013e FD C4 31                		shll	#4, r3, r1
+ 399:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          if (D2_OK != result)
+ 691                             		.loc 1 399 105 view .LVU269
+ 692 0141 5F 75                   		movu.W	r7, r5
+ 693 0143 5D 0E 08                		movu.W	16[r0], r14
+ 694 0146 4B E5                   		add	r14, r5
+ 695 0148 6C 45                   		shll	#4, r5
+ 399:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          if (D2_OK != result)
+ 696                             		.loc 1 399 137 view .LVU270
+ 697 014a 5F 6E                   		movu.W	r6, r14
+ 698 014c 6C 4E                   		shll	#4, r14
+ 398:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                                       (d2_width)D2_FIX4(strwidth), (d2_width)D2_FIX4(height), (d2_p
+ 699                             		.loc 1 398 19 view .LVU271
+ 700 014e E7 0D 03                		mov.L	r13, 12[r0]
+ 701 0151 D7 0E 04                		mov.W	r14, 8[r0]
+ 702 0154 90 8D                   		mov.W	r5, 6[r0]
+ 703 0156 90 81                   		mov.W	r1, 4[r0]
+ 704 0158 90 0C                   		mov.W	r4, 2[r0]
+ 705 015a D1 00 0E                		mov.W	28[r0], [r0]
+ 706 015d DF 74                   		mov.W	r7, r4
+ 707 015f A9 09                   		mov.L	20[r0], r1
+ 708 0161 05 00 00 00             		bsr	_d2_blitcopy
+ 709                             	.LVL88:
+ 400:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          {
+ 710                             		.loc 1 400 10 is_stmt 1 view .LVU272
+ 400:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          {
+ 711                             		.loc 1 400 13 is_stmt 0 view .LVU273
+ 712 0165 61 01                   		cmp	#0, r1
+ 713 0167 3B EE FE                		bne	.L11
+ 404:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       return result;
+ 714                             		.loc 1 404 7 view .LVU274
+ 715 016a 5F 85                   		movu.W	r8, r5
+ 716 016c 5F 77                   		movu.W	r7, r7
+ 717                             	.LVL89:
+ 404:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       return result;
+ 718                             		.loc 1 404 7 view .LVU275
+ 719 016e 47 75                   		cmp	r7, r5
+ 720 0170 23 05 38 E3 FE          		bgeu	.L11
+ 721                             	.LVL90:
+ 722                             	.L16:
+ 390:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       {
+ 723                             		.loc 1 390 7 is_stmt 1 view .LVU276
+ 393:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          {
+ 724                             		.loc 1 393 10 view .LVU277
+ 393:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          {
+ 725                             		.loc 1 393 15 is_stmt 0 view .LVU278
+ 726 0175 5F B7                   		movu.W	r11, r7
+ 393:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          {
+ 727                             		.loc 1 393 28 view .LVU279
+ 728 0177 5F 95                   		movu.W	r9, r5
+ 393:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          {
+ 729                             		.loc 1 393 27 view .LVU280
+ 730 0179 43 57                   		sub	r5, r7
+ 393:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          {
+ 731                             		.loc 1 393 13 view .LVU281
+ 732 017b 47 7A                   		cmp	r7, r10
+ 733 017d 2B B5                   		ble	.L15
+ 395:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          }
+ 734                             		.loc 1 395 13 is_stmt 1 view .LVU282
+ 395:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          }
+ 735                             		.loc 1 395 22 is_stmt 0 view .LVU283
+ 736 017f FF 09 8B                		sub	r8, r11, r9
+ 737                             	.LVL91:
+ 395:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          }
+ 738                             		.loc 1 395 22 view .LVU284
+ 739 0182 2E B0                   		bra	.L15
+ 740                             	.LVL92:
+ 741                             	.L19:
+ 395:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          }
+ 742                             		.loc 1 395 22 view .LVU285
+ 743                             	.LBE5:
+ 340:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_s16 clip_ymin, clip_ymax;
+ 744                             		.loc 1 340 10 view .LVU286
+ 745 0184 66 06                   		mov	#0, r6
+ 746                             	.LVL93:
+ 747 0186 EF 00                   		.balign 8,3,3
+ 748                             	.L17:
+ 426:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                                 (d2_width)D2_FIX4(width), (d2_width)D2_FIX4(height), (d2_point)D2_F
+ 749                             		.loc 1 426 4 is_stmt 1 view .LVU287
+ 426:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                                 (d2_width)D2_FIX4(width), (d2_width)D2_FIX4(height), (d2_point)D2_F
+ 750                             		.loc 1 426 13 is_stmt 0 view .LVU288
+ 751 0188 BC 02                   		movu.W	32[r0], r2
+ 752 018a 5F C3                   		movu.W	r12, r3
+ 427:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 753                             		.loc 1 427 43 view .LVU289
+ 754 018c FD C4 24                		shll	#4, r2, r4
+ 427:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 755                             		.loc 1 427 69 view .LVU290
+ 756 018f FD C4 31                		shll	#4, r3, r1
+ 427:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 757                             		.loc 1 427 96 view .LVU291
+ 758 0192 5D 09 0C                		movu.W	24[r0], r9
+ 759 0195 6C 49                   		shll	#4, r9
+ 427:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 760                             		.loc 1 427 121 view .LVU292
+ 761 0197 BA 05                   		movu.W	16[r0], r5
+ 762 0199 6C 45                   		shll	#4, r5
+ 426:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****                                 (d2_width)D2_FIX4(width), (d2_width)D2_FIX4(height), (d2_point)D2_F
+ 763                             		.loc 1 426 13 view .LVU293
+ 764 019b E7 0D 03                		mov.L	r13, 12[r0]
+ 765 019e 91 05                   		mov.W	r5, 8[r0]
+ 766 01a0 D7 09 03                		mov.W	r9, 6[r0]
+ 767 01a3 90 81                   		mov.W	r1, 4[r0]
+ 768 01a5 90 0C                   		mov.W	r4, 2[r0]
+ 769 01a7 D1 00 0E                		mov.W	28[r0], [r0]
+ 770 01aa DF 84                   		mov.W	r8, r4
+ 771 01ac EF A1                   		mov.L	r10, r1
+ 772 01ae 05 00 00 00             		bsr	_d2_blitcopy
+ 773                             	.LVL94:
+ 429:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 774                             		.loc 1 429 4 is_stmt 1 view .LVU294
+ 429:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 775                             		.loc 1 429 7 is_stmt 0 view .LVU295
+ 776 01b2 5B 66                   		movu.B	r6, r6
+ 429:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 777                             		.loc 1 429 7 view .LVU296
+ 778 01b4 61 16                   		cmp	#1, r6
+ 779 01b6 3B 9F FE                		bne	.L11
+ 432:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->pitch       = fb_pitch;
+ 780                             		.loc 1 432 7 is_stmt 1 view .LVU297
+ 432:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->pitch       = fb_pitch;
+ 781                             		.loc 1 432 35 is_stmt 0 view .LVU298
+ 782 01b9 E5 0A 05 0F             		mov.L	20[r0], 60[r10]
+ 433:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->clipymax = clip_ymax;   // MHO: undo the mirroring of the clip rect
+ 783                             		.loc 1 433 7 is_stmt 1 view .LVU299
+ 433:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->clipymax = clip_ymax;   // MHO: undo the mirroring of the clip rect
+ 784                             		.loc 1 433 35 is_stmt 0 view .LVU300
+ 785 01bd E7 A7 10                		mov.L	r7, 64[r10]
+ 434:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->clipymin = clip_ymin;  
+ 786                             		.loc 1 434 7 is_stmt 1 view .LVU301
+ 434:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->clipymin = clip_ymin;  
+ 787                             		.loc 1 434 32 is_stmt 0 view .LVU302
+ 788 01c0 D5 0A 16 3C             		mov.W	44[r0], 120[r10]
+ 435:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    }
+ 789                             		.loc 1 435 7 is_stmt 1 view .LVU303
+ 435:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    }
+ 790                             		.loc 1 435 32 is_stmt 0 view .LVU304
+ 791 01c4 D5 0A 14 3A             		mov.W	40[r0], 116[r10]
+ 792 01c8 38 8D FE                		bra	.L11
+ 793                             	.LVL95:
+ 794                             	.L20:
+ 340:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_s16 clip_ymin, clip_ymax;
+ 795                             		.loc 1 340 10 view .LVU305
+ 796 01cb 66 06                   		mov	#0, r6
+ 797 01cd 2E BB                   		bra	.L17
+ 798                             	.L21:
+ 340:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    d2_s16 clip_ymin, clip_ymax;
+ 799                             		.loc 1 340 10 view .LVU306
+ 800 01cf 66 06                   		mov	#0, r6
+ 801 01d1 2E B7                   		bra	.L17
+ 802                             	.L22:
+ 803 01d3 66 06                   		mov	#0, r6
+ 804 01d5 2E B3                   		bra	.L17
+ 805                             	.LFE8:
+ 807 01d7 03                      		.section	.text.d2_rendercircle_no_hilimiterprecision,"ax",@progbits
+ 808                             		.global	_d2_rendercircle_no_hilimiterprecision
+ 810                             	_d2_rendercircle_no_hilimiterprecision:
+ 811                             	.LVL96:
+ 812                             	.LFB9:
+ 440:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 441:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** 
+ 442:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** /*--------------------------------------------------------------------------
+ 443:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * function: d2_rendercircle_no_hilimiterprecision
+ 444:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * Enable or disable the high limiter precision feature of the latest 
+ 445:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * D/AVE 2D renderer for drawing blurred circles with higher image quality. 
+ 446:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * Note: This function can be used to de-activate the feature for 
+ 447:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * compatibility reasons (clear D2FB_HILIMITERPRECISION bit in HW revision)!
+ 448:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+ 449:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * parameters:
+ 450:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   handle - device pointer (see: <d2_opendevice>)
+ 451:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *   flag - 0 will activate the high limiter precision if possible,
+ 452:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *          1 will deactivate the feature even on newer version of D/AVE 2D.
+ 453:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  *
+ 454:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****  * */
+ 455:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** void d2_rendercircle_no_hilimiterprecision( d2_device *handle, d2_u32 flag )
+ 456:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** {
+ 813                             		.loc 1 456 1 is_stmt 1 view -0
+ 457:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    if(0 == flag)
+ 814                             		.loc 1 457 4 view .LVU308
+ 815                             		.loc 1 457 6 is_stmt 0 view .LVU309
+ 816 0000 61 02                   		cmp	#0, r2
+ 817 0002 21 13                   		bne	.L29
+ 458:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 459:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       /* set the hilimiterprecision bit if possible to support this feature from now on */
+ 460:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       if(0 != D2_DEV(handle)->hilimiterprecision_supported)
+ 818                             		.loc 1 460 7 is_stmt 1 view .LVU310
+ 819                             		.loc 1 460 9 is_stmt 0 view .LVU311
+ 820 0004 CE 15 C8 01             		mov.B	456[r1], r5
+ 821 0008 61 05                   		cmp	#0, r5
+ 822 000a 20 13                   		beq	.L28
+ 461:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       {
+ 462:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****          D2_DEV(handle)->hwrevision |= D2FB_HILIMITERPRECISION;
+ 823                             		.loc 1 462 10 is_stmt 1 view .LVU312
+ 824                             		.loc 1 462 37 is_stmt 0 view .LVU313
+ 825 000c ED 15 20                		mov.L	128[r1], r5
+ 826 000f 79 A5                   		bset	#26, r5
+ 827 0011 E7 15 20                		mov.L	r5, 128[r1]
+ 828 0014 02                      		rts
+ 829                             	.L29:
+ 463:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       }
+ 464:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    }
+ 465:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    else
+ 466:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    {
+ 467:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       /* clear the hilimiterprecision bit to not support this feature from now on */
+ 468:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****       D2_DEV(handle)->hwrevision &= ~D2FB_HILIMITERPRECISION;
+ 830                             		.loc 1 468 7 is_stmt 1 view .LVU314
+ 831                             		.loc 1 468 34 is_stmt 0 view .LVU315
+ 832 0015 ED 15 20                		mov.L	128[r1], r5
+ 833 0018 7B A5                   		bclr	#26, r5
+ 834 001a E7 15 20                		mov.L	r5, 128[r1]
+ 835                             	.L28:
+ 469:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c ****    }
+ 470:../src/smc_gen/r_drw2d_rx/src/tes/dave_utility.c **** }
+ 836                             		.loc 1 470 1 view .LVU316
+ 837 001d 02                      		rts
+ 838                             	.LFE9:
+ 962                             	.Letext0:
+ 963                             		.file 2 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_drw2d_rx\\inc\\tes/dav
+ 964                             		.file 3 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_drw2d_rx\\inc\\tes/dav
+ 965                             		.file 4 "../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h"
+ 966                             		.file 5 "../src/smc_gen/r_drw2d_rx/src/tes/dave_dlist.h"
+ 967                             		.file 6 "../src/smc_gen/r_drw2d_rx/src/tes/dave_rbuffer.h"
+ 968                             		.file 7 "../src/smc_gen/r_drw2d_rx/src/tes/dave_gradient.h"
+ 969                             		.file 8 "../src/smc_gen/r_drw2d_rx/src/tes/dave_context.h"

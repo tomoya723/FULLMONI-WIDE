@@ -1,0 +1,467 @@
+   1                             		.file	"dave_memory_rx.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.d1_allocmem,"ax",@progbits
+   5                             		.global	_d1_allocmem
+   7                             	_d1_allocmem:
+   8                             	.LVL0:
+   9                             	.LFB0:
+  10                             		.file 1 "../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c"
+   1:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //--------------------------------------------------------------------------
+   2:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** // Project: D/AVE
+   3:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** // File:    dave_memory_rx.c (%version: 12 %)
+   4:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //          created Mon Aug 22 14:53:41 2005 by hh04027
+   5:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //
+   6:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** // Description:
+   7:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //  %date_modified: Wed Oct 18 16:58:18 2006 %  (%derived_by:  hh74045 %)
+   8:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //
+   9:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** // Changes:
+  10:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //  2006-01-04 CSe  adapted to changes in dave_base.h
+  11:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //  2006-02-28 CSe  added d1_cacheblockflush function
+  12:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //  2005-04-12 CSe  fully implemented missing d1 driver functionality
+  13:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //  2005-05-03 CSe  flush at end of d1_copytovidmem
+  14:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //  2005-06-09 CSe  flush also in d1_copyfromvidmem
+  15:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //  2018-01-24      added support for RX
+  16:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //
+  17:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //--------------------------------------------------------------------------
+  18:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+  19:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** #include <stdlib.h>
+  20:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** #include <string.h>
+  21:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** #include "dave_base.h"
+  22:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** #include "dave_base_rx.h"
+  23:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+  24:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //--------------------------------------------------------------------------
+  25:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+  26:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //--------------------------------------------------------------------------
+  27:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //  d1_allocmem
+  28:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //
+  29:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** void * d1_allocmem(unsigned int size)
+  30:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** {
+  11                             		.loc 1 30 1 view -0
+  31:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     unsigned int *ptr;
+  12                             		.loc 1 31 5 view .LVU1
+  32:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+  33:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     ptr = (unsigned int *)malloc((size_t)size);
+  13                             		.loc 1 33 5 view .LVU2
+  14                             		.loc 1 33 27 is_stmt 0 view .LVU3
+  15 0000 05 00 00 00             		bsr	_malloc
+  16                             	.LVL1:
+  34:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     if (!ptr)
+  17                             		.loc 1 34 5 is_stmt 1 view .LVU4
+  35:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     {
+  36:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****         return NULL;
+  37:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     }
+  38:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+  39:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     return (void *)ptr;
+  40:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** }
+  18                             		.loc 1 40 1 is_stmt 0 view .LVU5
+  19 0004 02                      		rts
+  20                             	.LFE0:
+  22                             		.section	.text.d1_freemem,"ax",@progbits
+  23                             		.global	_d1_freemem
+  25                             	_d1_freemem:
+  26                             	.LVL2:
+  27                             	.LFB1:
+  41:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+  42:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //--------------------------------------------------------------------------
+  43:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //  d1_freemem
+  44:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** // Release system memory.
+  45:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //
+  46:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** void d1_freemem(void *ptr)
+  47:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** {
+  28                             		.loc 1 47 1 is_stmt 1 view -0
+  48:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     free(ptr);
+  29                             		.loc 1 48 5 view .LVU7
+  30 0000 05 00 00 00             		bsr	_free
+  31                             	.LVL3:
+  49:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** }
+  32                             		.loc 1 49 1 is_stmt 0 view .LVU8
+  33 0004 02                      		rts
+  34                             	.LFE1:
+  36                             		.section	.text.d1_memsize,"ax",@progbits
+  37                             		.global	_d1_memsize
+  39                             	_d1_memsize:
+  40                             	.LVL4:
+  41                             	.LFB2:
+  50:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+  51:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //--------------------------------------------------------------------------
+  52:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //   d1_memsize
+  53:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //
+  54:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** unsigned int d1_memsize(void * ptr)
+  55:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** {
+  42                             		.loc 1 55 1 is_stmt 1 view -0
+  56:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* unused arguments */
+  57:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(ptr);
+  43                             		.loc 1 57 5 view .LVU10
+  58:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+  59:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     return 1;
+  44                             		.loc 1 59 5 view .LVU11
+  60:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** }
+  45                             		.loc 1 60 1 is_stmt 0 view .LVU12
+  46 0000 66 11                   		mov.L	#1, r1
+  47                             	.LVL5:
+  48                             		.loc 1 60 1 view .LVU13
+  49 0002 02                      		rts
+  50                             	.LFE2:
+  52                             		.section	.text.d1_allocvidmem,"ax",@progbits
+  53                             		.global	_d1_allocvidmem
+  55                             	_d1_allocvidmem:
+  56                             	.LVL6:
+  57                             	.LFB3:
+  61:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+  62:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //--------------------------------------------------------------------------
+  63:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //
+  64:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** void * d1_allocvidmem(d1_device *handle, int memtype, unsigned int size)
+  65:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** {
+  58                             		.loc 1 65 1 is_stmt 1 view -0
+  66:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* unused arguments */
+  67:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(handle);
+  59                             		.loc 1 67 5 view .LVU15
+  68:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(memtype);
+  60                             		.loc 1 68 5 view .LVU16
+  69:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+  70:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* read all requests directly to standard heap */
+  71:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     return (d1_allocmem(size));
+  61                             		.loc 1 71 5 view .LVU17
+  62                             		.loc 1 71 13 is_stmt 0 view .LVU18
+  63 0000 EF 31                   		mov.L	r3, r1
+  64                             	.LVL7:
+  65                             		.loc 1 71 13 view .LVU19
+  66 0002 05 00 00 00             		bsr	_d1_allocmem
+  67                             	.LVL8:
+  72:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** }
+  68                             		.loc 1 72 1 view .LVU20
+  69 0006 02                      		rts
+  70                             	.LFE3:
+  72                             		.section	.text.d1_freevidmem,"ax",@progbits
+  73                             		.global	_d1_freevidmem
+  75                             	_d1_freevidmem:
+  76                             	.LVL9:
+  77                             	.LFB4:
+  73:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+  74:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //--------------------------------------------------------------------------
+  75:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //
+  76:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** void d1_freevidmem(d1_device *handle, int memtype, void *ptr)
+  77:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** {
+  78                             		.loc 1 77 1 is_stmt 1 view -0
+  78:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* unused arguments */
+  79:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(handle);
+  79                             		.loc 1 79 5 view .LVU22
+  80:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(memtype);
+  80                             		.loc 1 80 5 view .LVU23
+  81:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+  82:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* feed all requests directly to standard heap */
+  83:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     d1_freemem(ptr);
+  81                             		.loc 1 83 5 view .LVU24
+  82 0000 EF 31                   		mov.L	r3, r1
+  83                             	.LVL10:
+  84                             		.loc 1 83 5 is_stmt 0 view .LVU25
+  85 0002 05 00 00 00             		bsr	_d1_freemem
+  86                             	.LVL11:
+  84:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** }
+  87                             		.loc 1 84 1 view .LVU26
+  88 0006 02                      		rts
+  89                             	.LFE4:
+  91                             		.section	.text.d1_queryvidmem,"ax",@progbits
+  92                             		.global	_d1_queryvidmem
+  94                             	_d1_queryvidmem:
+  95                             	.LVL12:
+  96                             	.LFB5:
+  85:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+  86:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //--------------------------------------------------------------------------
+  87:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //
+  88:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** int d1_queryvidmem(d1_device *handle, int memtype, int query)
+  89:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** {
+  97                             		.loc 1 89 1 is_stmt 1 view -0
+  90:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* unused arguments */
+  91:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(handle);
+  98                             		.loc 1 91 5 view .LVU28
+  92:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(memtype);
+  99                             		.loc 1 92 5 view .LVU29
+  93:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(query);
+ 100                             		.loc 1 93 5 view .LVU30
+  94:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+  95:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     return 0;
+ 101                             		.loc 1 95 5 view .LVU31
+  96:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** }
+ 102                             		.loc 1 96 1 is_stmt 0 view .LVU32
+ 103 0000 66 01                   		mov.L	#0, r1
+ 104                             	.LVL13:
+ 105                             		.loc 1 96 1 view .LVU33
+ 106 0002 02                      		rts
+ 107                             	.LFE5:
+ 109                             		.section	.text.d1_queryarchitecture,"ax",@progbits
+ 110                             		.global	_d1_queryarchitecture
+ 112                             	_d1_queryarchitecture:
+ 113                             	.LVL14:
+ 114                             	.LFB6:
+  97:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+  98:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //--------------------------------------------------------------------------
+  99:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //
+ 100:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** int d1_queryarchitecture(d1_device *handle)
+ 101:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** {
+ 115                             		.loc 1 101 1 is_stmt 1 view -0
+ 102:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* unused arguments */
+ 103:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(handle);
+ 116                             		.loc 1 103 5 view .LVU35
+ 104:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+ 105:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     return d1_ma_unified;
+ 117                             		.loc 1 105 5 view .LVU36
+ 106:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** }
+ 118                             		.loc 1 106 1 is_stmt 0 view .LVU37
+ 119 0000 66 11                   		mov.L	#1, r1
+ 120                             	.LVL15:
+ 121                             		.loc 1 106 1 view .LVU38
+ 122 0002 02                      		rts
+ 123                             	.LFE6:
+ 125                             		.section	.text.d1_mapvidmem,"ax",@progbits
+ 126                             		.global	_d1_mapvidmem
+ 128                             	_d1_mapvidmem:
+ 129                             	.LVL16:
+ 130                             	.LFB7:
+ 107:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+ 108:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //--------------------------------------------------------------------------
+ 109:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //
+ 110:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** void * d1_mapvidmem(d1_device *handle, void *ptr, int flags)
+ 111:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** {
+ 131                             		.loc 1 111 1 is_stmt 1 view -0
+ 112:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* unused arguments */
+ 113:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(handle);
+ 132                             		.loc 1 113 5 view .LVU40
+ 114:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(flags);
+ 133                             		.loc 1 114 5 view .LVU41
+ 115:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+ 116:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* map memory into uncached area (test) */
+ 117:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     return ptr;
+ 134                             		.loc 1 117 5 view .LVU42
+ 118:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** }
+ 135                             		.loc 1 118 1 is_stmt 0 view .LVU43
+ 136 0000 EF 21                   		mov.L	r2, r1
+ 137                             	.LVL17:
+ 138                             		.loc 1 118 1 view .LVU44
+ 139 0002 02                      		rts
+ 140                             	.LFE7:
+ 142                             		.section	.text.d1_unmapvidmem,"ax",@progbits
+ 143                             		.global	_d1_unmapvidmem
+ 145                             	_d1_unmapvidmem:
+ 146                             	.LVL18:
+ 147                             	.LFB8:
+ 119:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+ 120:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //--------------------------------------------------------------------------
+ 121:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //
+ 122:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** int d1_unmapvidmem(d1_device *handle, void *ptr)
+ 123:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** {
+ 148                             		.loc 1 123 1 is_stmt 1 view -0
+ 124:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* unused arguments */
+ 125:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(handle);
+ 149                             		.loc 1 125 5 view .LVU46
+ 126:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(ptr);
+ 150                             		.loc 1 126 5 view .LVU47
+ 127:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+ 128:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* no unmapping necessary */
+ 129:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     return 1;
+ 151                             		.loc 1 129 5 view .LVU48
+ 130:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** }
+ 152                             		.loc 1 130 1 is_stmt 0 view .LVU49
+ 153 0000 66 11                   		mov.L	#1, r1
+ 154                             	.LVL19:
+ 155                             		.loc 1 130 1 view .LVU50
+ 156 0002 02                      		rts
+ 157                             	.LFE8:
+ 159                             		.section	.text.d1_maptovidmem,"ax",@progbits
+ 160                             		.global	_d1_maptovidmem
+ 162                             	_d1_maptovidmem:
+ 163                             	.LVL20:
+ 164                             	.LFB9:
+ 131:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+ 132:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //--------------------------------------------------------------------------
+ 133:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //
+ 134:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** void * d1_maptovidmem(d1_device *handle, void *ptr)
+ 135:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** {
+ 165                             		.loc 1 135 1 is_stmt 1 view -0
+ 136:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* unused arguments */
+ 137:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(handle);
+ 166                             		.loc 1 137 5 view .LVU52
+ 138:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+ 139:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* nothing special necessary */
+ 140:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     return ptr;
+ 167                             		.loc 1 140 5 view .LVU53
+ 141:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** }
+ 168                             		.loc 1 141 1 is_stmt 0 view .LVU54
+ 169 0000 EF 21                   		mov.L	r2, r1
+ 170                             	.LVL21:
+ 171                             		.loc 1 141 1 view .LVU55
+ 172 0002 02                      		rts
+ 173                             	.LFE9:
+ 175                             		.section	.text.d1_mapfromvidmem,"ax",@progbits
+ 176                             		.global	_d1_mapfromvidmem
+ 178                             	_d1_mapfromvidmem:
+ 179                             	.LVL22:
+ 180                             	.LFB10:
+ 142:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+ 143:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //--------------------------------------------------------------------------
+ 144:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //
+ 145:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** void * d1_mapfromvidmem(d1_device *handle, void *ptr)
+ 146:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** {
+ 181                             		.loc 1 146 1 is_stmt 1 view -0
+ 147:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* unused arguments */
+ 148:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(handle);
+ 182                             		.loc 1 148 5 view .LVU57
+ 149:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+ 150:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* map memory into uncached area (test) */
+ 151:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     return ptr;
+ 183                             		.loc 1 151 5 view .LVU58
+ 152:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** }
+ 184                             		.loc 1 152 1 is_stmt 0 view .LVU59
+ 185 0000 EF 21                   		mov.L	r2, r1
+ 186                             	.LVL23:
+ 187                             		.loc 1 152 1 view .LVU60
+ 188 0002 02                      		rts
+ 189                             	.LFE10:
+ 191                             		.section	.text.d1_copytovidmem,"ax",@progbits
+ 192                             		.global	_d1_copytovidmem
+ 194                             	_d1_copytovidmem:
+ 195                             	.LVL24:
+ 196                             	.LFB11:
+ 153:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+ 154:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //--------------------------------------------------------------------------
+ 155:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //
+ 156:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** int d1_copytovidmem(d1_device *handle, void *dst, const void *src, unsigned int size, int flags)
+ 157:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** {
+ 197                             		.loc 1 157 1 is_stmt 1 view -0
+ 198                             		.loc 1 157 1 is_stmt 0 view .LVU62
+ 199 0000 60 40                   		sub	#4, r0
+ 200                             	.LCFI0:
+ 158:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* unused arguments */
+ 159:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(handle);
+ 201                             		.loc 1 159 5 is_stmt 1 view .LVU63
+ 160:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(flags);
+ 202                             		.loc 1 160 5 view .LVU64
+ 161:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+ 162:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* can use direct memcpy */
+ 163:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     memcpy(dst, src, size);
+ 203                             		.loc 1 163 5 view .LVU65
+ 204 0002 EF 21                   		mov.L	r2, r1
+ 205                             	.LVL25:
+ 206                             		.loc 1 163 5 is_stmt 0 view .LVU66
+ 207 0004 EF 32                   		mov.L	r3, r2
+ 208                             	.LVL26:
+ 209                             		.loc 1 163 5 view .LVU67
+ 210 0006 EF 43                   		mov.L	r4, r3
+ 211                             	.LVL27:
+ 212                             		.loc 1 163 5 view .LVU68
+ 213 0008 7F 8F                   		smovf
+ 214                             	.LVL28:
+ 164:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+ 165:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     return 1;
+ 215                             		.loc 1 165 5 is_stmt 1 view .LVU69
+ 166:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** }
+ 216                             		.loc 1 166 1 is_stmt 0 view .LVU70
+ 217 000a 66 11                   		mov.L	#1, r1
+ 218 000c 67 01                   		rtsd	#4
+ 219                             	.LFE11:
+ 221                             		.section	.text.d1_copyfromvidmem,"ax",@progbits
+ 222                             		.global	_d1_copyfromvidmem
+ 224                             	_d1_copyfromvidmem:
+ 225                             	.LVL29:
+ 226                             	.LFB12:
+ 167:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+ 168:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //--------------------------------------------------------------------------
+ 169:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //
+ 170:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** int d1_copyfromvidmem(d1_device *handle, void *dst, const void *src, unsigned int size, int flags)
+ 171:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** {
+ 227                             		.loc 1 171 1 is_stmt 1 view -0
+ 228                             		.loc 1 171 1 is_stmt 0 view .LVU72
+ 229 0000 60 40                   		sub	#4, r0
+ 230                             	.LCFI1:
+ 172:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* unused arguments */
+ 173:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(handle);
+ 231                             		.loc 1 173 5 is_stmt 1 view .LVU73
+ 174:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(flags);
+ 232                             		.loc 1 174 5 view .LVU74
+ 175:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+ 176:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* can use direct memcpy */
+ 177:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     memcpy(dst, src, size);
+ 233                             		.loc 1 177 5 view .LVU75
+ 234 0002 EF 21                   		mov.L	r2, r1
+ 235                             	.LVL30:
+ 236                             		.loc 1 177 5 is_stmt 0 view .LVU76
+ 237 0004 EF 32                   		mov.L	r3, r2
+ 238                             	.LVL31:
+ 239                             		.loc 1 177 5 view .LVU77
+ 240 0006 EF 43                   		mov.L	r4, r3
+ 241                             	.LVL32:
+ 242                             		.loc 1 177 5 view .LVU78
+ 243 0008 7F 8F                   		smovf
+ 244                             	.LVL33:
+ 178:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+ 179:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     return 1;
+ 245                             		.loc 1 179 5 is_stmt 1 view .LVU79
+ 180:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** }
+ 246                             		.loc 1 180 1 is_stmt 0 view .LVU80
+ 247 000a 66 11                   		mov.L	#1, r1
+ 248 000c 67 01                   		rtsd	#4
+ 249                             	.LFE12:
+ 251                             		.section	.text.d1_cacheflush,"ax",@progbits
+ 252                             		.global	_d1_cacheflush
+ 254                             	_d1_cacheflush:
+ 255                             	.LVL34:
+ 256                             	.LFB13:
+ 181:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+ 182:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //--------------------------------------------------------------------------
+ 183:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //
+ 184:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** int d1_cacheflush(d1_device *handle, int memtype)
+ 185:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** {
+ 257                             		.loc 1 185 1 is_stmt 1 view -0
+ 186:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* unused arguments */
+ 187:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(handle);
+ 258                             		.loc 1 187 5 view .LVU82
+ 188:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(memtype);
+ 259                             		.loc 1 188 5 view .LVU83
+ 189:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+ 190:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     return 1;
+ 260                             		.loc 1 190 5 view .LVU84
+ 191:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** }
+ 261                             		.loc 1 191 1 is_stmt 0 view .LVU85
+ 262 0000 66 11                   		mov.L	#1, r1
+ 263                             	.LVL35:
+ 264                             		.loc 1 191 1 view .LVU86
+ 265 0002 02                      		rts
+ 266                             	.LFE13:
+ 268                             		.section	.text.d1_cacheblockflush,"ax",@progbits
+ 269                             		.global	_d1_cacheblockflush
+ 271                             	_d1_cacheblockflush:
+ 272                             	.LVL36:
+ 273                             	.LFB14:
+ 192:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+ 193:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //--------------------------------------------------------------------------
+ 194:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** //
+ 195:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** int d1_cacheblockflush(d1_device *handle, int memtype, const void *ptr, unsigned int size)
+ 196:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** {
+ 274                             		.loc 1 196 1 is_stmt 1 view -0
+ 197:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     /* unused arguments */
+ 198:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(handle);
+ 275                             		.loc 1 198 5 view .LVU88
+ 199:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(memtype);
+ 276                             		.loc 1 199 5 view .LVU89
+ 200:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(ptr);
+ 277                             		.loc 1 200 5 view .LVU90
+ 201:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     INTERNAL_NOT_USED(size);
+ 278                             		.loc 1 201 5 view .LVU91
+ 202:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** 
+ 203:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c ****     return 1;
+ 279                             		.loc 1 203 5 view .LVU92
+ 204:../src/smc_gen/r_drw2d_rx/src/rx/dave_memory_rx.c **** }
+ 280                             		.loc 1 204 1 is_stmt 0 view .LVU93
+ 281 0000 66 11                   		mov.L	#1, r1
+ 282                             	.LVL37:
+ 283                             		.loc 1 204 1 view .LVU94
+ 284 0002 02                      		rts
+ 285                             	.LFE14:
+ 433                             	.Letext0:
+ 434                             		.file 2 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\lib\\gcc\\rx-
+ 435                             		.file 3 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 436                             		.file 4 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 437                             		.file 5 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 438                             		.file 6 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 439                             		.file 7 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_drw2d_rx\\inc\\tes/dav

@@ -1,0 +1,980 @@
+   1                             		.file	"Config_RIIC0.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.R_Config_RIIC0_Create,"ax",@progbits
+   5                             		.global	_R_Config_RIIC0_Create
+   7                             	_R_Config_RIIC0_Create:
+   8                             	.LFB3:
+   9                             		.file 1 "../src/smc_gen/Config_RIIC0/Config_RIIC0.c"
+   1:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** /**************************************************************************************************
+   2:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * DISCLAIMER
+   3:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * This software is supplied by Renesas Electronics Corporation and is only intended for use with Re
+   4:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * No other uses are authorized. This software is owned by Renesas Electronics Corporation and is pr
+   5:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * applicable laws, including copyright laws. 
+   6:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING THIS SOFTWARE, WHETHE
+   7:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULA
+   8:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * NON-INFRINGEMENT.  ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.TO THE MAXIMUM EXTENT PERMITTED N
+   9:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE 
+  10:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS SOFTWARE, E
+  11:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+  12:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Renesas reserves the right, without notice, to make changes to this software and to discontinue t
+  13:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * of this software. By using this software, you agree to the additional terms and conditions found 
+  14:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * following link:
+  15:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * http://www.renesas.com/disclaimer
+  16:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *
+  17:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Copyright (C) 2022 Renesas Electronics Corporation. All rights reserved.
+  18:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** ***************************************************************************************************
+  19:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+  20:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** /**************************************************************************************************
+  21:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * File Name        : Config_RIIC0.c
+  22:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Component Version: 1.12.0
+  23:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Device(s)        : R5F572NNDxFP
+  24:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Description      : This file implements device driver for Config_RIIC0.
+  25:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** ***************************************************************************************************
+  26:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+  27:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** /**************************************************************************************************
+  28:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** Pragma directive
+  29:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** ***************************************************************************************************
+  30:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** /* Start user code for pragma. Do not edit comment generated here */
+  31:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** /* End user code. Do not edit comment generated here */
+  32:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+  33:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** /**************************************************************************************************
+  34:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** Includes
+  35:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** ***************************************************************************************************
+  36:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** #include "r_cg_macrodriver.h"
+  37:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** #include "Config_RIIC0.h"
+  38:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** /* Start user code for include. Do not edit comment generated here */
+  39:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** /* End user code. Do not edit comment generated here */
+  40:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** #include "r_cg_userdefine.h"
+  41:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+  42:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** /**************************************************************************************************
+  43:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** Global variables and functions
+  44:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** ***************************************************************************************************
+  45:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** volatile uint8_t  g_riic0_mode_flag;               /* RIIC0 master transmit receive flag */
+  46:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** volatile uint8_t  g_riic0_state;                   /* RIIC0 state */
+  47:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** volatile uint16_t g_riic0_slave_address;           /* RIIC0 slave address */
+  48:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** volatile uint8_t *gp_riic0_tx_address;             /* RIIC0 transmit buffer address */
+  49:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** volatile uint16_t g_riic0_tx_count;                /* RIIC0 transmit data number */
+  50:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** volatile uint8_t *gp_riic0_rx_address;             /* RIIC0 receive buffer address */
+  51:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** volatile uint16_t g_riic0_rx_count;                /* RIIC0 receive data number */
+  52:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** volatile uint16_t g_riic0_rx_length;               /* RIIC0 receive data length */
+  53:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** volatile uint8_t  g_riic0_dummy_read_count;        /* RIIC0 count for dummy read */
+  54:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** volatile uint8_t  g_riic0_stop_generation;         /* RIIC0 stop condition generation flag */
+  55:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** /* Start user code for global. Do not edit comment generated here */
+  56:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** /* End user code. Do not edit comment generated here */
+  57:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+  58:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** /**************************************************************************************************
+  59:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Function Name: R_Config_RIIC0_Create
+  60:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Description  : This function initializes the RIIC0 channel
+  61:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Arguments    : None
+  62:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Return Value : None
+  63:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** ***************************************************************************************************
+  64:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+  65:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** void R_Config_RIIC0_Create(void)
+  66:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** {
+  10                             		.loc 1 66 1 view -0
+  67:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     /* Cancel RIIC stop state */
+  68:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     MSTP(RIIC0) = 0U;
+  11                             		.loc 1 68 5 view .LVU1
+  12                             		.loc 1 68 17 is_stmt 0 view .LVU2
+  13 0000 FB 5E 00 00 08          		mov.L	#0x80000, r5
+  14 0005 A9 5C                   		mov.L	20[r5], r4
+  15 0007 7B 54                   		bclr	#21, r4
+  16 0009 A1 5C                   		mov.L	r4, 20[r5]
+  69:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     RIIC0.ICCR1.BIT.ICE = 0U;
+  17                             		.loc 1 69 5 is_stmt 1 view .LVU3
+  18                             		.loc 1 69 25 is_stmt 0 view .LVU4
+  19 000b FB 5E 00 83 08          		mov.L	#0x88300, r5
+  20 0010 CC 54                   		mov.B	[r5], r4
+  21 0012 7A 74                   		bclr	#7, r4
+  22 0014 C3 54                   		mov.B	r4, [r5]
+  70:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     RIIC0.ICCR1.BIT.IICRST = 1U;
+  23                             		.loc 1 70 5 is_stmt 1 view .LVU5
+  24                             		.loc 1 70 28 is_stmt 0 view .LVU6
+  25 0016 CC 54                   		mov.B	[r5], r4
+  26 0018 78 64                   		bset	#6, r4
+  27 001a C3 54                   		mov.B	r4, [r5]
+  71:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     RIIC0.ICCR1.BIT.ICE = 1U;
+  28                             		.loc 1 71 5 is_stmt 1 view .LVU7
+  29                             		.loc 1 71 25 is_stmt 0 view .LVU8
+  30 001c CC 54                   		mov.B	[r5], r4
+  31 001e 78 74                   		bset	#7, r4
+  32 0020 C3 54                   		mov.B	r4, [r5]
+  72:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+  73:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     /* Set transfer bit rate */
+  74:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     RIIC0.ICMR1.BYTE |= _10_IIC_PCLK_DIV_2;
+  33                             		.loc 1 74 5 is_stmt 1 view .LVU9
+  34                             		.loc 1 74 22 is_stmt 0 view .LVU10
+  35 0022 F1 54 02                		bset	#4, 2[r5].B
+  75:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     RIIC0.ICBRL.BYTE = _FB_IIC0_SCL_LOW_LEVEL_PERIOD;
+  36                             		.loc 1 75 5 is_stmt 1 view .LVU11
+  37                             		.loc 1 75 22 is_stmt 0 view .LVU12
+  38 0025 F9 54 10 FB             		mov.B	#-5, 16[r5]
+  76:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     RIIC0.ICBRH.BYTE = _FC_IIC0_SCL_HIGH_LEVEL_PERIOD;
+  39                             		.loc 1 76 5 is_stmt 1 view .LVU13
+  40                             		.loc 1 76 22 is_stmt 0 view .LVU14
+  41 0029 F9 54 11 FC             		mov.B	#-4, 17[r5]
+  77:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     RIIC0.ICMR2.BYTE = 0x00U;
+  42                             		.loc 1 77 5 is_stmt 1 view .LVU15
+  43                             		.loc 1 77 22 is_stmt 0 view .LVU16
+  44 002d 3C 53 00                		mov.B	#0, 3[r5]
+  78:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     RIIC0.ICMR3.BIT.NF = _00_IIC_NOISE_FILTER_1;
+  45                             		.loc 1 78 5 is_stmt 1 view .LVU17
+  46                             		.loc 1 78 24 is_stmt 0 view .LVU18
+  47 0030 89 53                   		mov.B	4[r5], r3
+  48 0032 FB 46 FC                		mov.L	#-4, r4
+  49 0035 53 34                   		and	r3, r4
+  50 0037 81 54                   		mov.B	r4, 4[r5]
+  79:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     RIIC0.ICMR3.BIT.SMBS = 0U;
+  51                             		.loc 1 79 5 is_stmt 1 view .LVU19
+  52                             		.loc 1 79 26 is_stmt 0 view .LVU20
+  53 0039 89 54                   		mov.B	4[r5], r4
+  54 003b 7A 74                   		bclr	#7, r4
+  55 003d 81 54                   		mov.B	r4, 4[r5]
+  80:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+  81:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     /* Set ICFER */
+  82:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     RIIC0.ICFER.BYTE = _00_IIC_TIMEOUT_FUNCTION_DISABLE | _02_IIC_MASTER_ARBITRATION_ENABLE | 
+  56                             		.loc 1 82 5 is_stmt 1 view .LVU21
+  57                             		.loc 1 82 22 is_stmt 0 view .LVU22
+  58 003f 3C 55 72                		mov.B	#0x72, 5[r5]
+  83:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                        _00_IIC_NACK_ARBITRATION_DISABLE | _10_IIC_NACK_SUSPENSION_ENABLE | _20_IIC_
+  84:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                        _40_IIC_SCL_SYNCHRONOUS_USED | _00_IIC_FASTPLUS_MODE_DISABLE;
+  85:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+  86:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     /* Set ICIER */
+  87:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     RIIC0.ICIER.BYTE = _02_IIC_ARBITRATION_LOST_INTERRUPT_ENABLE | _04_IIC_START_CONDITION_INTERRUP
+  59                             		.loc 1 87 5 is_stmt 1 view .LVU23
+  60                             		.loc 1 87 22 is_stmt 0 view .LVU24
+  61 0042 F9 54 07 FE             		mov.B	#-2, 7[r5]
+  88:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                        _08_IIC_STOP_CONDITION_INTERRUPT_ENABLE | _10_IIC_NACK_INTERRUPT_ENABLE | 
+  89:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                        _20_IIC_RECEIVE_DATA_INTERRUPT_ENABLE | _40_IIC_TRANSMIT_END_INTERRUPT_ENABL
+  90:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                        _80_IIC_TRANSMIT_EMPTY_INTERRUPT_ENABLE;
+  91:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+  92:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     /* Cancel internal reset */
+  93:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     RIIC0.ICCR1.BIT.IICRST = 0U;
+  62                             		.loc 1 93 5 is_stmt 1 view .LVU25
+  63                             		.loc 1 93 28 is_stmt 0 view .LVU26
+  64 0046 CC 54                   		mov.B	[r5], r4
+  65 0048 7A 64                   		bclr	#6, r4
+  66 004a C3 54                   		mov.B	r4, [r5]
+  94:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+  95:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     /* Set interrupt priority */
+  96:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     IPR(RIIC0, RXI0) = _06_IIC_PRIORITY_LEVEL6;
+  67                             		.loc 1 96 5 is_stmt 1 view .LVU27
+  68                             		.loc 1 96 22 is_stmt 0 view .LVU28
+  69 004c FB 5E 00 70 08          		mov.L	#0x87000, r5
+  70 0051 CE 54 34 03             		mov.B	820[r5], r4
+  71 0055 75 24 F0                		and #-16, r4
+  72 0058 66 63                   		mov.L	#6, r3
+  73 005a 57 43                   		or	r4, r3
+  74 005c CB 53 34 03             		mov.B	r3, 820[r5]
+  97:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     IPR(RIIC0, TXI0) = _06_IIC_PRIORITY_LEVEL6;
+  75                             		.loc 1 97 5 is_stmt 1 view .LVU29
+  76                             		.loc 1 97 22 is_stmt 0 view .LVU30
+  77 0060 CE 54 35 03             		mov.B	821[r5], r4
+  78 0064 75 24 F0                		and #-16, r4
+  79 0067 66 63                   		mov.L	#6, r3
+  80 0069 57 43                   		or	r4, r3
+  81 006b CB 53 35 03             		mov.B	r3, 821[r5]
+  98:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+  99:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     /* Set SCL0 pin */
+ 100:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     MPC.P12PFS.BYTE = 0x0FU;
+  82                             		.loc 1 100 5 is_stmt 1 view .LVU31
+  83                             		.loc 1 100 21 is_stmt 0 view .LVU32
+  84 006f FB 4E 00 C1 08          		mov.L	#0x8c100, r4
+  85 0074 F9 44 4A 0F             		mov.B	#15, 74[r4]
+ 101:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     PORT1.PMR.BYTE |= 0x04U;
+  86                             		.loc 1 101 5 is_stmt 1 view .LVU33
+  87                             		.loc 1 101 20 is_stmt 0 view .LVU34
+  88 0078 FB 5E 01 C0 08          		mov.L	#0x8c001, r5
+  89 007d F1 52 60                		bset	#2, 96[r5].B
+ 102:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 103:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     /* Set SDA0 pin */
+ 104:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     MPC.P13PFS.BYTE = 0x0FU;
+  90                             		.loc 1 104 5 is_stmt 1 view .LVU35
+  91                             		.loc 1 104 21 is_stmt 0 view .LVU36
+  92 0080 F9 44 4B 0F             		mov.B	#15, 75[r4]
+ 105:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     PORT1.PMR.BYTE |= 0x08U;
+  93                             		.loc 1 105 5 is_stmt 1 view .LVU37
+  94                             		.loc 1 105 20 is_stmt 0 view .LVU38
+  95 0084 F1 53 60                		bset	#3, 96[r5].B
+ 106:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 107:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     R_Config_RIIC0_Create_UserInit();
+  96                             		.loc 1 107 5 is_stmt 1 view .LVU39
+  97 0087 05 00 00 00             		bsr	_R_Config_RIIC0_Create_UserInit
+  98                             	.LVL0:
+ 108:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** }
+  99                             		.loc 1 108 1 is_stmt 0 view .LVU40
+ 100 008b 02                      		rts
+ 101                             	.LFE3:
+ 103                             		.section	.text.R_Config_RIIC0_Start,"ax",@progbits
+ 104                             		.global	_R_Config_RIIC0_Start
+ 106                             	_R_Config_RIIC0_Start:
+ 107                             	.LFB4:
+ 109:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 110:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** /**************************************************************************************************
+ 111:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Function Name: R_Config_RIIC0_Start
+ 112:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Description  : This function starts the RIIC0 channel
+ 113:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Arguments    : None
+ 114:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Return Value : None
+ 115:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** ***************************************************************************************************
+ 116:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 117:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** void R_Config_RIIC0_Start(void)
+ 118:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** {
+ 108                             		.loc 1 118 1 is_stmt 1 view -0
+ 119:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     /* Clear interrupt flag */
+ 120:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     IR(RIIC0,TXI0) = 0U;
+ 109                             		.loc 1 120 5 view .LVU42
+ 110                             		.loc 1 120 20 is_stmt 0 view .LVU43
+ 111 0000 FB 5E 00 70 08          		mov.L	#0x87000, r5
+ 112 0005 CD 54 35                		mov.B	53[r5], r4
+ 113 0008 7A 04                   		bclr	#0, r4
+ 114 000a C7 54 35                		mov.B	r4, 53[r5]
+ 121:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     IR(RIIC0,RXI0) = 0U;
+ 115                             		.loc 1 121 5 is_stmt 1 view .LVU44
+ 116                             		.loc 1 121 20 is_stmt 0 view .LVU45
+ 117 000d CD 54 34                		mov.B	52[r5], r4
+ 118 0010 7A 04                   		bclr	#0, r4
+ 119 0012 C7 54 34                		mov.B	r4, 52[r5]
+ 122:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 123:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     /* Enable RIIC0 interrupt */
+ 124:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     IEN(RIIC0,TXI0) = 1U;
+ 120                             		.loc 1 124 5 is_stmt 1 view .LVU46
+ 121                             		.loc 1 124 21 is_stmt 0 view .LVU47
+ 122 0015 CE 54 06 02             		mov.B	518[r5], r4
+ 123 0019 78 54                   		bset	#5, r4
+ 124 001b CB 54 06 02             		mov.B	r4, 518[r5]
+ 125:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     IEN(RIIC0,RXI0) = 1U;
+ 125                             		.loc 1 125 5 is_stmt 1 view .LVU48
+ 126                             		.loc 1 125 21 is_stmt 0 view .LVU49
+ 127 001f CE 54 06 02             		mov.B	518[r5], r4
+ 128 0023 78 44                   		bset	#4, r4
+ 129 0025 CB 54 06 02             		mov.B	r4, 518[r5]
+ 126:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     ICU.GENBL1.BIT.EN13 = 1U;
+ 130                             		.loc 1 126 5 is_stmt 1 view .LVU50
+ 131                             		.loc 1 126 25 is_stmt 0 view .LVU51
+ 132 0029 EE 54 9D 01             		mov.L	1652[r5], r4
+ 133 002d 78 D4                   		bset	#13, r4
+ 134 002f EB 54 9D 01             		mov.L	r4, 1652[r5]
+ 127:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     ICU.GENBL1.BIT.EN14 = 1U;
+ 135                             		.loc 1 127 5 is_stmt 1 view .LVU52
+ 136                             		.loc 1 127 25 is_stmt 0 view .LVU53
+ 137 0033 EE 54 9D 01             		mov.L	1652[r5], r4
+ 138 0037 78 E4                   		bset	#14, r4
+ 139 0039 EB 54 9D 01             		mov.L	r4, 1652[r5]
+ 128:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** }
+ 140                             		.loc 1 128 1 view .LVU54
+ 141 003d 02                      		rts
+ 142                             	.LFE4:
+ 144                             		.section	.text.R_Config_RIIC0_Stop,"ax",@progbits
+ 145                             		.global	_R_Config_RIIC0_Stop
+ 147                             	_R_Config_RIIC0_Stop:
+ 148                             	.LFB5:
+ 129:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 130:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** /**************************************************************************************************
+ 131:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Function Name: R_Config_RIIC0_Stop
+ 132:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Description  : This function stops the RIIC0 channel
+ 133:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Arguments    : None
+ 134:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Return Value : None
+ 135:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** ***************************************************************************************************
+ 136:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 137:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** void R_Config_RIIC0_Stop(void)
+ 138:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** {
+ 149                             		.loc 1 138 1 is_stmt 1 view -0
+ 139:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     /* Clear interrupt flag */
+ 140:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     IR(RIIC0,TXI0) = 0U;
+ 150                             		.loc 1 140 5 view .LVU56
+ 151                             		.loc 1 140 20 is_stmt 0 view .LVU57
+ 152 0000 FB 5E 00 70 08          		mov.L	#0x87000, r5
+ 153 0005 CD 54 35                		mov.B	53[r5], r4
+ 154 0008 7A 04                   		bclr	#0, r4
+ 155 000a C7 54 35                		mov.B	r4, 53[r5]
+ 141:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     IR(RIIC0,RXI0) = 0U;
+ 156                             		.loc 1 141 5 is_stmt 1 view .LVU58
+ 157                             		.loc 1 141 20 is_stmt 0 view .LVU59
+ 158 000d CD 54 34                		mov.B	52[r5], r4
+ 159 0010 7A 04                   		bclr	#0, r4
+ 160 0012 C7 54 34                		mov.B	r4, 52[r5]
+ 142:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 143:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     /* Disable RIIC0 interrupt */
+ 144:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     IEN(RIIC0,TXI0) = 0U;
+ 161                             		.loc 1 144 5 is_stmt 1 view .LVU60
+ 162                             		.loc 1 144 21 is_stmt 0 view .LVU61
+ 163 0015 CE 54 06 02             		mov.B	518[r5], r4
+ 164 0019 7A 54                   		bclr	#5, r4
+ 165 001b CB 54 06 02             		mov.B	r4, 518[r5]
+ 145:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     IEN(RIIC0,RXI0) = 0U;
+ 166                             		.loc 1 145 5 is_stmt 1 view .LVU62
+ 167                             		.loc 1 145 21 is_stmt 0 view .LVU63
+ 168 001f CE 54 06 02             		mov.B	518[r5], r4
+ 169 0023 7A 44                   		bclr	#4, r4
+ 170 0025 CB 54 06 02             		mov.B	r4, 518[r5]
+ 146:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     ICU.GENBL1.BIT.EN13 = 0U;
+ 171                             		.loc 1 146 5 is_stmt 1 view .LVU64
+ 172                             		.loc 1 146 25 is_stmt 0 view .LVU65
+ 173 0029 EE 54 9D 01             		mov.L	1652[r5], r4
+ 174 002d 7A D4                   		bclr	#13, r4
+ 175 002f EB 54 9D 01             		mov.L	r4, 1652[r5]
+ 147:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     ICU.GENBL1.BIT.EN14 = 0U;
+ 176                             		.loc 1 147 5 is_stmt 1 view .LVU66
+ 177                             		.loc 1 147 25 is_stmt 0 view .LVU67
+ 178 0033 EE 54 9D 01             		mov.L	1652[r5], r4
+ 179 0037 7A E4                   		bclr	#14, r4
+ 180 0039 EB 54 9D 01             		mov.L	r4, 1652[r5]
+ 148:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** }
+ 181                             		.loc 1 148 1 view .LVU68
+ 182 003d 02                      		rts
+ 183                             	.LFE5:
+ 185                             		.section	.text.R_Config_RIIC0_IIC_StartCondition,"ax",@progbits
+ 186                             		.global	_R_Config_RIIC0_IIC_StartCondition
+ 188                             	_R_Config_RIIC0_IIC_StartCondition:
+ 189                             	.LFB6:
+ 149:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 150:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** /**************************************************************************************************
+ 151:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Function Name: R_Config_RIIC0_IIC_StartCondition
+ 152:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Description  : This function generates I2C start condition
+ 153:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Arguments    : None
+ 154:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Return Value : None
+ 155:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** ***************************************************************************************************
+ 156:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 157:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** void R_Config_RIIC0_IIC_StartCondition(void)
+ 158:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** {
+ 190                             		.loc 1 158 1 is_stmt 1 view -0
+ 159:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     RIIC0.ICCR2.BIT.ST = 1U;    /* Set start condition flag */
+ 191                             		.loc 1 159 5 view .LVU70
+ 192                             		.loc 1 159 24 is_stmt 0 view .LVU71
+ 193 0000 FB 5E 00 83 08          		mov.L	#0x88300, r5
+ 194 0005 88 5C                   		mov.B	1[r5], r4
+ 195 0007 78 14                   		bset	#1, r4
+ 196 0009 80 5C                   		mov.B	r4, 1[r5]
+ 160:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** }
+ 197                             		.loc 1 160 1 view .LVU72
+ 198 000b 02                      		rts
+ 199                             	.LFE6:
+ 201                             		.section	.text.R_Config_RIIC0_IIC_StopCondition,"ax",@progbits
+ 202                             		.global	_R_Config_RIIC0_IIC_StopCondition
+ 204                             	_R_Config_RIIC0_IIC_StopCondition:
+ 205                             	.LFB7:
+ 161:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 162:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** /**************************************************************************************************
+ 163:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Function Name: R_Config_RIIC0_IIC_StopCondition
+ 164:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Description  : This function generates I2C stop condition
+ 165:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Arguments    : None
+ 166:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Return Value : None
+ 167:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** ***************************************************************************************************
+ 168:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 169:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** void R_Config_RIIC0_IIC_StopCondition(void)
+ 170:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** {
+ 206                             		.loc 1 170 1 is_stmt 1 view -0
+ 171:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     RIIC0.ICCR2.BIT.SP = 1U;    /* Set stop condition flag */
+ 207                             		.loc 1 171 5 view .LVU74
+ 208                             		.loc 1 171 24 is_stmt 0 view .LVU75
+ 209 0000 FB 5E 00 83 08          		mov.L	#0x88300, r5
+ 210 0005 88 5C                   		mov.B	1[r5], r4
+ 211 0007 78 34                   		bset	#3, r4
+ 212 0009 80 5C                   		mov.B	r4, 1[r5]
+ 172:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** }
+ 213                             		.loc 1 172 1 view .LVU76
+ 214 000b 02                      		rts
+ 215                             	.LFE7:
+ 217                             		.section	.text.R_Config_RIIC0_Master_Send,"ax",@progbits
+ 218                             		.global	_R_Config_RIIC0_Master_Send
+ 220                             	_R_Config_RIIC0_Master_Send:
+ 221                             	.LVL1:
+ 222                             	.LFB8:
+ 173:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 174:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** /**************************************************************************************************
+ 175:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Function Name: R_Config_RIIC0_Master_Send
+ 176:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Description  : This function sends RIIC0 data to slave device and generates stop condition when t
+ 177:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Arguments    : adr -
+ 178:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                    address of slave device
+ 179:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                tx_buf -
+ 180:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                    transmit buffer pointer
+ 181:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                tx_num -
+ 182:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                    transmit data length
+ 183:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Return Value : status -
+ 184:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                    MD_OK: OK
+ 185:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                    MD_ERROR1: Bus is busy
+ 186:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                    MD_ERROR2: Slave address is invalid
+ 187:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** ***************************************************************************************************
+ 188:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 189:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** MD_STATUS R_Config_RIIC0_Master_Send(uint16_t adr, uint8_t * const tx_buf, uint16_t tx_num)
+ 190:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** {
+ 223                             		.loc 1 190 1 is_stmt 1 view -0
+ 191:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     MD_STATUS status = MD_OK;
+ 224                             		.loc 1 191 5 view .LVU78
+ 192:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 193:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     if (1U == RIIC0.ICCR2.BIT.BBSY)
+ 225                             		.loc 1 193 5 view .LVU79
+ 226                             		.loc 1 193 30 is_stmt 0 view .LVU80
+ 227 0000 FB 5E 00 83 08          		mov.L	#0x88300, r5
+ 228 0005 88 5D                   		mov.B	1[r5], r5
+ 229 0007 5B 55                   		movu.B	r5, r5
+ 230                             		.loc 1 193 8 view .LVU81
+ 231 0009 68 75                   		shlr	#7, r5
+ 232 000b 61 15                   		cmp	#1, r5
+ 233 000d 20 5A                   		beq	.L10
+ 194:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     {
+ 195:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         status = MD_ERROR1;
+ 196:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     }
+ 197:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     else if (0x03FFU < adr)
+ 234                             		.loc 1 197 10 is_stmt 1 view .LVU82
+ 235                             		.loc 1 197 13 is_stmt 0 view .LVU83
+ 236 000f 5F 15                   		movu.W	r1, r5
+ 237 0011 76 05 FF 03             		cmp	#0x3ff, r5
+ 238 0015 24 57                   		bgtu	.L11
+ 198:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     {
+ 199:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         status = MD_ERROR2;
+ 200:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     }
+ 201:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     else
+ 202:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     {
+ 203:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         /* Set parameter */
+ 204:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         g_riic0_tx_count = tx_num;
+ 239                             		.loc 1 204 9 is_stmt 1 view .LVU84
+ 240                             		.loc 1 204 26 is_stmt 0 view .LVU85
+ 241 0017 FB 52 00 00 00 00       		mov.L	#_g_riic0_tx_count, r5
+ 242 001d D3 53                   		mov.W	r3, [r5]
+ 205:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         gp_riic0_tx_address = tx_buf;
+ 243                             		.loc 1 205 9 is_stmt 1 view .LVU86
+ 244                             		.loc 1 205 29 is_stmt 0 view .LVU87
+ 245 001f FB 52 00 00 00 00       		mov.L	#_gp_riic0_tx_address, r5
+ 246 0025 E3 52                   		mov.L	r2, [r5]
+ 206:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         g_riic0_slave_address = adr;
+ 247                             		.loc 1 206 9 is_stmt 1 view .LVU88
+ 248                             		.loc 1 206 31 is_stmt 0 view .LVU89
+ 249 0027 FB 52 00 00 00 00       		mov.L	#_g_riic0_slave_address, r5
+ 250 002d D3 51                   		mov.W	r1, [r5]
+ 207:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         g_riic0_mode_flag = _0D_IIC_MASTER_TRANSMIT;
+ 251                             		.loc 1 207 9 is_stmt 1 view .LVU90
+ 252                             		.loc 1 207 27 is_stmt 0 view .LVU91
+ 253 002f FB 42 00 00 00 00       		mov.L	#_g_riic0_mode_flag, r4
+ 254 0035 F8 44 0D                		mov.B	#13, [r4]
+ 208:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 209:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         if (0x80U > g_riic0_slave_address)
+ 255                             		.loc 1 209 9 is_stmt 1 view .LVU92
+ 256                             		.loc 1 209 19 is_stmt 0 view .LVU93
+ 257 0038 DC 55                   		mov.W	[r5], r5
+ 258                             		.loc 1 209 12 view .LVU94
+ 259 003a 5F 55                   		movu.W	r5, r5
+ 260 003c 75 55 7F                		cmp	#0x7f, r5
+ 261 003f 24 1D                   		bgtu	.L8
+ 210:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         {
+ 211:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             g_riic0_state = _01_IIC_MASTER_SENDS_ADR_7_W;
+ 262                             		.loc 1 211 13 is_stmt 1 view .LVU95
+ 263                             		.loc 1 211 27 is_stmt 0 view .LVU96
+ 264 0041 FB 52 00 00 00 00       		mov.L	#_g_riic0_state, r5
+ 265 0047 F8 54 01                		mov.B	#1, [r5]
+ 266                             	.L9:
+ 212:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         }
+ 213:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         else
+ 214:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         {
+ 215:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             g_riic0_state = _02_IIC_MASTER_SENDS_ADR_10A_W;
+ 216:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         }
+ 217:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 218:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         /* Issue a start condition */
+ 219:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         R_Config_RIIC0_IIC_StartCondition();
+ 267                             		.loc 1 219 9 is_stmt 1 view .LVU97
+ 268 004a 05 00 00 00             		bsr	_R_Config_RIIC0_IIC_StartCondition
+ 269                             	.LVL2:
+ 220:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 221:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         /* Set flag for generating stop condition when transmission finishes */
+ 222:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         g_riic0_stop_generation = 1;
+ 270                             		.loc 1 222 9 view .LVU98
+ 271                             		.loc 1 222 33 is_stmt 0 view .LVU99
+ 272 004e FB 52 00 00 00 00       		mov.L	#_g_riic0_stop_generation, r5
+ 273 0054 F8 54 01                		mov.B	#1, [r5]
+ 191:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 274                             		.loc 1 191 15 view .LVU100
+ 275 0057 66 01                   		mov	#0, r1
+ 276                             	.L7:
+ 277                             	.LVL3:
+ 223:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     }
+ 224:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 225:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     return (status);
+ 278                             		.loc 1 225 5 is_stmt 1 view .LVU101
+ 226:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** }
+ 279                             		.loc 1 226 1 is_stmt 0 view .LVU102
+ 280 0059 5F 11                   		movu.W	r1, r1
+ 281                             		.loc 1 226 1 view .LVU103
+ 282 005b 02                      		rts
+ 283                             	.LVL4:
+ 284                             	.L8:
+ 215:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         }
+ 285                             		.loc 1 215 13 is_stmt 1 view .LVU104
+ 215:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         }
+ 286                             		.loc 1 215 27 is_stmt 0 view .LVU105
+ 287 005c FB 52 00 00 00 00       		mov.L	#_g_riic0_state, r5
+ 288 0062 F8 54 02                		mov.B	#2, [r5]
+ 289 0065 2E E5                   		bra	.L9
+ 290                             	.L10:
+ 195:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     }
+ 291                             		.loc 1 195 16 view .LVU106
+ 292 0067 75 41 82                		mov	#0x82, r1
+ 293                             	.LVL5:
+ 195:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     }
+ 294                             		.loc 1 195 16 view .LVU107
+ 295 006a 2E EF                   		bra	.L7
+ 296                             	.LVL6:
+ 297                             	.L11:
+ 199:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     }
+ 298                             		.loc 1 199 16 view .LVU108
+ 299 006c 75 41 83                		mov	#0x83, r1
+ 300                             	.LVL7:
+ 199:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     }
+ 301                             		.loc 1 199 16 view .LVU109
+ 302 006f 2E EA                   		bra	.L7
+ 303                             	.LFE8:
+ 305                             		.section	.text.R_Config_RIIC0_Master_Send_Without_Stop,"ax",@progbits
+ 306                             		.global	_R_Config_RIIC0_Master_Send_Without_Stop
+ 308                             	_R_Config_RIIC0_Master_Send_Without_Stop:
+ 309                             	.LVL8:
+ 310                             	.LFB9:
+ 227:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 228:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** /**************************************************************************************************
+ 229:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Function Name: R_Config_RIIC0_Master_Send_Without_Stop
+ 230:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Description  : This function sends RIIC0 data to slave device, not generate stop condition when t
+ 231:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Arguments    : adr -
+ 232:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                    address of slave device
+ 233:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                tx_buf -
+ 234:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                    transmit buffer pointer
+ 235:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                tx_num -
+ 236:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                    transmit data length
+ 237:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Return Value : status -
+ 238:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                    MD_OK: OK
+ 239:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                    MD_ERROR1: Bus is busy
+ 240:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                    MD_ERROR2: Slave address is invalid
+ 241:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** ***************************************************************************************************
+ 242:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 243:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** MD_STATUS R_Config_RIIC0_Master_Send_Without_Stop(uint16_t adr, uint8_t * const tx_buf, uint16_t tx
+ 244:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** {
+ 311                             		.loc 1 244 1 is_stmt 1 view -0
+ 245:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     MD_STATUS status = MD_OK;
+ 312                             		.loc 1 245 5 view .LVU111
+ 246:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 247:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     if (1U == RIIC0.ICCR2.BIT.BBSY)
+ 313                             		.loc 1 247 5 view .LVU112
+ 314                             		.loc 1 247 30 is_stmt 0 view .LVU113
+ 315 0000 FB 5E 00 83 08          		mov.L	#0x88300, r5
+ 316 0005 88 5D                   		mov.B	1[r5], r5
+ 317 0007 5B 55                   		movu.B	r5, r5
+ 318                             		.loc 1 247 8 view .LVU114
+ 319 0009 68 75                   		shlr	#7, r5
+ 320 000b 61 15                   		cmp	#1, r5
+ 321 000d 20 5A                   		beq	.L16
+ 248:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     {
+ 249:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         status = MD_ERROR1;
+ 250:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     }
+ 251:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     else if (0x03FFU < adr)
+ 322                             		.loc 1 251 10 is_stmt 1 view .LVU115
+ 323                             		.loc 1 251 13 is_stmt 0 view .LVU116
+ 324 000f 5F 15                   		movu.W	r1, r5
+ 325 0011 76 05 FF 03             		cmp	#0x3ff, r5
+ 326 0015 24 57                   		bgtu	.L17
+ 252:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     {
+ 253:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         status = MD_ERROR2;
+ 254:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     }
+ 255:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     else
+ 256:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     {
+ 257:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         /* Set parameter */
+ 258:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         g_riic0_tx_count = tx_num;
+ 327                             		.loc 1 258 9 is_stmt 1 view .LVU117
+ 328                             		.loc 1 258 26 is_stmt 0 view .LVU118
+ 329 0017 FB 52 00 00 00 00       		mov.L	#_g_riic0_tx_count, r5
+ 330 001d D3 53                   		mov.W	r3, [r5]
+ 259:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         gp_riic0_tx_address = tx_buf;
+ 331                             		.loc 1 259 9 is_stmt 1 view .LVU119
+ 332                             		.loc 1 259 29 is_stmt 0 view .LVU120
+ 333 001f FB 52 00 00 00 00       		mov.L	#_gp_riic0_tx_address, r5
+ 334 0025 E3 52                   		mov.L	r2, [r5]
+ 260:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         g_riic0_slave_address = adr;
+ 335                             		.loc 1 260 9 is_stmt 1 view .LVU121
+ 336                             		.loc 1 260 31 is_stmt 0 view .LVU122
+ 337 0027 FB 52 00 00 00 00       		mov.L	#_g_riic0_slave_address, r5
+ 338 002d D3 51                   		mov.W	r1, [r5]
+ 261:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         g_riic0_mode_flag = _0D_IIC_MASTER_TRANSMIT;
+ 339                             		.loc 1 261 9 is_stmt 1 view .LVU123
+ 340                             		.loc 1 261 27 is_stmt 0 view .LVU124
+ 341 002f FB 42 00 00 00 00       		mov.L	#_g_riic0_mode_flag, r4
+ 342 0035 F8 44 0D                		mov.B	#13, [r4]
+ 262:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 263:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         if (0x80U > g_riic0_slave_address)
+ 343                             		.loc 1 263 9 is_stmt 1 view .LVU125
+ 344                             		.loc 1 263 19 is_stmt 0 view .LVU126
+ 345 0038 DC 55                   		mov.W	[r5], r5
+ 346                             		.loc 1 263 12 view .LVU127
+ 347 003a 5F 55                   		movu.W	r5, r5
+ 348 003c 75 55 7F                		cmp	#0x7f, r5
+ 349 003f 24 1D                   		bgtu	.L14
+ 264:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         {
+ 265:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             g_riic0_state = _01_IIC_MASTER_SENDS_ADR_7_W;
+ 350                             		.loc 1 265 13 is_stmt 1 view .LVU128
+ 351                             		.loc 1 265 27 is_stmt 0 view .LVU129
+ 352 0041 FB 52 00 00 00 00       		mov.L	#_g_riic0_state, r5
+ 353 0047 F8 54 01                		mov.B	#1, [r5]
+ 354                             	.L15:
+ 266:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         }
+ 267:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         else
+ 268:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         {
+ 269:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             g_riic0_state = _02_IIC_MASTER_SENDS_ADR_10A_W;
+ 270:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         }
+ 271:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 272:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         /* Issue a start condition */
+ 273:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         R_Config_RIIC0_IIC_StartCondition();
+ 355                             		.loc 1 273 9 is_stmt 1 view .LVU130
+ 356 004a 05 00 00 00             		bsr	_R_Config_RIIC0_IIC_StartCondition
+ 357                             	.LVL9:
+ 274:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 275:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         /* Set flag for not generating stop condition when transmission finishes */
+ 276:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         g_riic0_stop_generation = 0;
+ 358                             		.loc 1 276 9 view .LVU131
+ 359                             		.loc 1 276 33 is_stmt 0 view .LVU132
+ 360 004e FB 52 00 00 00 00       		mov.L	#_g_riic0_stop_generation, r5
+ 361 0054 F8 54 00                		mov.B	#0, [r5]
+ 245:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 362                             		.loc 1 245 15 view .LVU133
+ 363 0057 66 01                   		mov	#0, r1
+ 364                             	.L13:
+ 365                             	.LVL10:
+ 277:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     }
+ 278:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 279:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     return (status);
+ 366                             		.loc 1 279 5 is_stmt 1 view .LVU134
+ 280:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** }
+ 367                             		.loc 1 280 1 is_stmt 0 view .LVU135
+ 368 0059 5F 11                   		movu.W	r1, r1
+ 369                             		.loc 1 280 1 view .LVU136
+ 370 005b 02                      		rts
+ 371                             	.LVL11:
+ 372                             	.L14:
+ 269:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         }
+ 373                             		.loc 1 269 13 is_stmt 1 view .LVU137
+ 269:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         }
+ 374                             		.loc 1 269 27 is_stmt 0 view .LVU138
+ 375 005c FB 52 00 00 00 00       		mov.L	#_g_riic0_state, r5
+ 376 0062 F8 54 02                		mov.B	#2, [r5]
+ 377 0065 2E E5                   		bra	.L15
+ 378                             	.L16:
+ 249:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     }
+ 379                             		.loc 1 249 16 view .LVU139
+ 380 0067 75 41 82                		mov	#0x82, r1
+ 381                             	.LVL12:
+ 249:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     }
+ 382                             		.loc 1 249 16 view .LVU140
+ 383 006a 2E EF                   		bra	.L13
+ 384                             	.LVL13:
+ 385                             	.L17:
+ 253:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     }
+ 386                             		.loc 1 253 16 view .LVU141
+ 387 006c 75 41 83                		mov	#0x83, r1
+ 388                             	.LVL14:
+ 253:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     }
+ 389                             		.loc 1 253 16 view .LVU142
+ 390 006f 2E EA                   		bra	.L13
+ 391                             	.LFE9:
+ 393                             		.section	.text.R_Config_RIIC0_Master_Receive,"ax",@progbits
+ 394                             		.global	_R_Config_RIIC0_Master_Receive
+ 396                             	_R_Config_RIIC0_Master_Receive:
+ 397                             	.LVL15:
+ 398                             	.LFB10:
+ 281:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 282:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** /**************************************************************************************************
+ 283:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Function Name: R_Config_RIIC0_Master_Receive
+ 284:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Description  : This function receives RIIC0 data from slave device
+ 285:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Arguments    : adr -
+ 286:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                    address of slave device
+ 287:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                rx_buf -
+ 288:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                    receive buffer pointer
+ 289:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                rx_num -
+ 290:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                    receive data length
+ 291:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** * Return Value : status -
+ 292:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                    MD_OK: OK
+ 293:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                    MD_ERROR2: Slave address is invalid
+ 294:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                    MD_ERROR4: Timeout or arbitration-lost error
+ 295:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** *                    MD_ERROR5: Bus is busy
+ 296:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** ***************************************************************************************************
+ 297:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 298:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** MD_STATUS R_Config_RIIC0_Master_Receive(uint16_t adr, uint8_t * const rx_buf, uint16_t rx_num)
+ 299:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** {
+ 399                             		.loc 1 299 1 is_stmt 1 view -0
+ 300:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     MD_STATUS status = MD_OK;
+ 400                             		.loc 1 300 5 view .LVU144
+ 301:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 302:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     if (0x03FFU < adr)
+ 401                             		.loc 1 302 5 view .LVU145
+ 402                             		.loc 1 302 8 is_stmt 0 view .LVU146
+ 403 0000 5F 15                   		movu.W	r1, r5
+ 404 0002 76 05 FF 03             		cmp	#0x3ff, r5
+ 405 0006 25 05 38 E2 00          		bgtu	.L25
+ 303:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     {
+ 304:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         status = MD_ERROR2;
+ 305:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     }
+ 306:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     else
+ 307:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     {
+ 308:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         /* Set parameter */
+ 309:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         g_riic0_rx_length = rx_num;
+ 406                             		.loc 1 309 9 is_stmt 1 view .LVU147
+ 407                             		.loc 1 309 27 is_stmt 0 view .LVU148
+ 408 000b FB 52 00 00 00 00       		mov.L	#_g_riic0_rx_length, r5
+ 409 0011 D3 53                   		mov.W	r3, [r5]
+ 310:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         g_riic0_rx_count = 0U;
+ 410                             		.loc 1 310 9 is_stmt 1 view .LVU149
+ 411                             		.loc 1 310 26 is_stmt 0 view .LVU150
+ 412 0013 FB 52 00 00 00 00       		mov.L	#_g_riic0_rx_count, r5
+ 413 0019 F8 55 00                		mov.W	#0, [r5]
+ 311:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         gp_riic0_rx_address = rx_buf;
+ 414                             		.loc 1 311 9 is_stmt 1 view .LVU151
+ 415                             		.loc 1 311 29 is_stmt 0 view .LVU152
+ 416 001c FB 52 00 00 00 00       		mov.L	#_gp_riic0_rx_address, r5
+ 417 0022 E3 52                   		mov.L	r2, [r5]
+ 312:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         g_riic0_slave_address = adr;
+ 418                             		.loc 1 312 9 is_stmt 1 view .LVU153
+ 419                             		.loc 1 312 31 is_stmt 0 view .LVU154
+ 420 0024 FB 52 00 00 00 00       		mov.L	#_g_riic0_slave_address, r5
+ 421 002a D3 51                   		mov.W	r1, [r5]
+ 313:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         g_riic0_dummy_read_count = 0U;
+ 422                             		.loc 1 313 9 is_stmt 1 view .LVU155
+ 423                             		.loc 1 313 34 is_stmt 0 view .LVU156
+ 424 002c FB 42 00 00 00 00       		mov.L	#_g_riic0_dummy_read_count, r4
+ 425 0032 F8 44 00                		mov.B	#0, [r4]
+ 314:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         g_riic0_mode_flag = _0C_IIC_MASTER_RECEIVE;
+ 426                             		.loc 1 314 9 is_stmt 1 view .LVU157
+ 427                             		.loc 1 314 27 is_stmt 0 view .LVU158
+ 428 0035 FB 42 00 00 00 00       		mov.L	#_g_riic0_mode_flag, r4
+ 429 003b F8 44 0C                		mov.B	#12, [r4]
+ 315:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         if (0x80U > g_riic0_slave_address)
+ 430                             		.loc 1 315 9 is_stmt 1 view .LVU159
+ 431                             		.loc 1 315 19 is_stmt 0 view .LVU160
+ 432 003e DC 55                   		mov.W	[r5], r5
+ 433                             		.loc 1 315 12 view .LVU161
+ 434 0040 5F 55                   		movu.W	r5, r5
+ 435 0042 75 55 7F                		cmp	#0x7f, r5
+ 436 0045 24 47                   		bgtu	.L20
+ 316:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         {
+ 317:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             g_riic0_state = _00_IIC_MASTER_SENDS_ADR_7_R;
+ 437                             		.loc 1 317 13 is_stmt 1 view .LVU162
+ 438                             		.loc 1 317 27 is_stmt 0 view .LVU163
+ 439 0047 FB 52 00 00 00 00       		mov.L	#_g_riic0_state, r5
+ 440 004d F8 54 00                		mov.B	#0, [r5]
+ 441                             	.L21:
+ 318:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         }
+ 319:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         else
+ 320:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         {
+ 321:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             g_riic0_state = _02_IIC_MASTER_SENDS_ADR_10A_W;
+ 322:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         }
+ 323:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 324:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         if (1U == RIIC0.ICCR2.BIT.BBSY)
+ 442                             		.loc 1 324 9 is_stmt 1 view .LVU164
+ 443                             		.loc 1 324 34 is_stmt 0 view .LVU165
+ 444 0050 FB 5E 00 83 08          		mov.L	#0x88300, r5
+ 445 0055 88 5D                   		mov.B	1[r5], r5
+ 446 0057 5B 55                   		movu.B	r5, r5
+ 447                             		.loc 1 324 12 view .LVU166
+ 448 0059 68 75                   		shlr	#7, r5
+ 449 005b 61 15                   		cmp	#1, r5
+ 450 005d 3B 86 00                		bne	.L22
+ 325:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         {
+ 326:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             /* Has a stop been issued or detected? */
+ 327:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             if ((1U == RIIC0.ICCR2.BIT.SP) || (1U == RIIC0.ICSR2.BIT.STOP))
+ 451                             		.loc 1 327 13 is_stmt 1 view .LVU167
+ 452                             		.loc 1 327 39 is_stmt 0 view .LVU168
+ 453 0060 FB 5E 00 83 08          		mov.L	#0x88300, r5
+ 454 0065 88 5D                   		mov.B	1[r5], r5
+ 455                             		.loc 1 327 16 view .LVU169
+ 456 0067 FD 74 C5 08             		tst	#8, r5
+ 457 006b 21 2C                   		bne	.L23
+ 458                             		.loc 1 327 69 discriminator 1 view .LVU170
+ 459 006d FB 5E 00 83 08          		mov.L	#0x88300, r5
+ 460 0072 8A 5D                   		mov.B	9[r5], r5
+ 461                             		.loc 1 327 44 discriminator 1 view .LVU171
+ 462 0074 FD 74 C5 08             		tst	#8, r5
+ 463 0078 21 1F                   		bne	.L23
+ 328:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             {
+ 329:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                 /* Wait for the bus to become idle */
+ 330:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                 do
+ 331:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                 {
+ 332:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                     /* Arbitration lost or timeout? */
+ 333:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                     if ((1U == RIIC0.ICSR2.BIT.TMOF) || (1U == RIIC0.ICSR2.BIT.AL))
+ 334:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                     {
+ 335:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                         return (MD_ERROR4);
+ 336:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                     }
+ 337:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                 } while (1U == RIIC0.ICCR2.BIT.BBSY);
+ 338:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 339:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                 /* Issue a start condition */
+ 340:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                 R_Config_RIIC0_IIC_StartCondition();
+ 341:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             }
+ 342:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             /* Bus is busy and it is master mode (MST = 1) */
+ 343:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             else if (1U == RIIC0.ICCR2.BIT.MST)
+ 464                             		.loc 1 343 18 is_stmt 1 view .LVU172
+ 465                             		.loc 1 343 43 is_stmt 0 view .LVU173
+ 466 007a FB 5E 00 83 08          		mov.L	#0x88300, r5
+ 467 007f 88 5D                   		mov.B	1[r5], r5
+ 468                             		.loc 1 343 21 view .LVU174
+ 469 0081 FD 74 C5 40             		tst	#0x40, r5
+ 470 0085 21 43                   		bne	.L29
+ 344:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             {
+ 345:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                 /* Issue a restart condition */
+ 346:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                 RIIC0.ICSR2.BIT.START = 0U;
+ 347:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                 RIIC0.ICIER.BIT.STIE = 1U;
+ 348:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                 RIIC0.ICCR2.BIT.RS = 1U;
+ 349:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             }
+ 350:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             else
+ 351:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             {
+ 352:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                 /* Another master must have the bus */
+ 353:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                 status = MD_ERROR5;
+ 471                             		.loc 1 353 24 view .LVU175
+ 472 0087 75 41 86                		mov	#0x86, r1
+ 473                             	.LVL16:
+ 474                             		.loc 1 353 24 view .LVU176
+ 475 008a 2E 63                   		bra	.L19
+ 476                             	.LVL17:
+ 477                             	.L20:
+ 321:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         }
+ 478                             		.loc 1 321 13 is_stmt 1 view .LVU177
+ 321:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         }
+ 479                             		.loc 1 321 27 is_stmt 0 view .LVU178
+ 480 008c FB 52 00 00 00 00       		mov.L	#_g_riic0_state, r5
+ 481 0092 F8 54 02                		mov.B	#2, [r5]
+ 482 0095 2E BB                   		bra	.L21
+ 483                             	.L23:
+ 330:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                 {
+ 484                             		.loc 1 330 17 is_stmt 1 view .LVU179
+ 333:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                     {
+ 485                             		.loc 1 333 21 view .LVU180
+ 333:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                     {
+ 486                             		.loc 1 333 47 is_stmt 0 view .LVU181
+ 487 0097 FB 5E 00 83 08          		mov.L	#0x88300, r5
+ 488 009c 8A 5D                   		mov.B	9[r5], r5
+ 333:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                     {
+ 489                             		.loc 1 333 24 view .LVU182
+ 490 009e FD 74 C5 01             		tst	#1, r5
+ 491 00a2 21 4E                   		bne	.L26
+ 333:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                     {
+ 492                             		.loc 1 333 79 discriminator 1 view .LVU183
+ 493 00a4 FB 5E 00 83 08          		mov.L	#0x88300, r5
+ 494 00a9 8A 5D                   		mov.B	9[r5], r5
+ 333:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                     {
+ 495                             		.loc 1 333 54 discriminator 1 view .LVU184
+ 496 00ab FD 74 C5 02             		tst	#2, r5
+ 497 00af 21 46                   		bne	.L27
+ 337:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 498                             		.loc 1 337 47 view .LVU185
+ 499 00b1 FB 5E 00 83 08          		mov.L	#0x88300, r5
+ 500 00b6 88 5D                   		mov.B	1[r5], r5
+ 501 00b8 5B 55                   		movu.B	r5, r5
+ 337:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 502                             		.loc 1 337 32 view .LVU186
+ 503 00ba 68 75                   		shlr	#7, r5
+ 504 00bc 61 15                   		cmp	#1, r5
+ 505 00be 20 D9                   		beq	.L23
+ 340:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             }
+ 506                             		.loc 1 340 17 is_stmt 1 view .LVU187
+ 507 00c0 05 00 00 00             		bsr	_R_Config_RIIC0_IIC_StartCondition
+ 508                             	.LVL18:
+ 300:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 509                             		.loc 1 300 15 is_stmt 0 view .LVU188
+ 510 00c4 66 01                   		mov	#0, r1
+ 340:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             }
+ 511                             		.loc 1 340 17 view .LVU189
+ 512 00c6 2E 27                   		bra	.L19
+ 513                             	.LVL19:
+ 514                             	.L29:
+ 346:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                 RIIC0.ICIER.BIT.STIE = 1U;
+ 515                             		.loc 1 346 17 is_stmt 1 view .LVU190
+ 346:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                 RIIC0.ICIER.BIT.STIE = 1U;
+ 516                             		.loc 1 346 39 is_stmt 0 view .LVU191
+ 517 00c8 FB 5E 00 83 08          		mov.L	#0x88300, r5
+ 518 00cd 8A 5C                   		mov.B	9[r5], r4
+ 519 00cf 7A 24                   		bclr	#2, r4
+ 520 00d1 82 5C                   		mov.B	r4, 9[r5]
+ 347:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                 RIIC0.ICCR2.BIT.RS = 1U;
+ 521                             		.loc 1 347 17 is_stmt 1 view .LVU192
+ 347:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                 RIIC0.ICCR2.BIT.RS = 1U;
+ 522                             		.loc 1 347 38 is_stmt 0 view .LVU193
+ 523 00d3 89 DC                   		mov.B	7[r5], r4
+ 524 00d5 78 24                   		bset	#2, r4
+ 525 00d7 81 DC                   		mov.B	r4, 7[r5]
+ 348:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             }
+ 526                             		.loc 1 348 17 is_stmt 1 view .LVU194
+ 348:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             }
+ 527                             		.loc 1 348 36 is_stmt 0 view .LVU195
+ 528 00d9 88 5C                   		mov.B	1[r5], r4
+ 529 00db 78 24                   		bset	#2, r4
+ 530 00dd 80 5C                   		mov.B	r4, 1[r5]
+ 300:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 531                             		.loc 1 300 15 view .LVU196
+ 532 00df 66 01                   		mov	#0, r1
+ 533                             	.LVL20:
+ 300:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 534                             		.loc 1 300 15 view .LVU197
+ 535 00e1 2E 0C                   		bra	.L19
+ 536                             	.LVL21:
+ 537                             	.L22:
+ 354:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             }
+ 355:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         }
+ 356:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         else
+ 357:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         {
+ 358:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             /* Issue a start condition */
+ 359:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****             R_Config_RIIC0_IIC_StartCondition();
+ 538                             		.loc 1 359 13 is_stmt 1 view .LVU198
+ 539 00e3 05 00 00 00             		bsr	_R_Config_RIIC0_IIC_StartCondition
+ 540                             	.LVL22:
+ 300:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 541                             		.loc 1 300 15 is_stmt 0 view .LVU199
+ 542 00e7 66 01                   		mov	#0, r1
+ 543 00e9 0C                      		bra	.L19
+ 544                             	.LVL23:
+ 545                             	.L25:
+ 304:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     }
+ 546                             		.loc 1 304 16 view .LVU200
+ 547 00ea 75 41 83                		mov	#0x83, r1
+ 548                             	.LVL24:
+ 549                             		.balign 8,3,1
+ 550                             	.L19:
+ 360:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****         }
+ 361:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     }
+ 362:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** 
+ 363:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****     return (status);
+ 364:../src/smc_gen/Config_RIIC0/Config_RIIC0.c **** }
+ 551                             		.loc 1 364 1 view .LVU201
+ 552 00ed 5F 11                   		movu.W	r1, r1
+ 553 00ef 02                      		rts
+ 554                             	.LVL25:
+ 555                             	.L26:
+ 335:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                     }
+ 556                             		.loc 1 335 32 view .LVU202
+ 557 00f0 75 41 85                		mov	#0x85, r1
+ 558                             	.LVL26:
+ 335:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                     }
+ 559                             		.loc 1 335 32 view .LVU203
+ 560 00f3 2E FA                   		bra	.L19
+ 561                             	.LVL27:
+ 562                             	.L27:
+ 335:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                     }
+ 563                             		.loc 1 335 32 view .LVU204
+ 564 00f5 75 41 85                		mov	#0x85, r1
+ 565                             	.LVL28:
+ 335:../src/smc_gen/Config_RIIC0/Config_RIIC0.c ****                     }
+ 566                             		.loc 1 335 32 view .LVU205
+ 567 00f8 2E F5                   		bra	.L19
+ 568                             	.LFE10:
+ 570                             		.comm	_g_riic0_stop_generation,1,1
+ 571                             		.comm	_g_riic0_dummy_read_count,1,1
+ 572                             		.comm	_g_riic0_rx_length,2,2
+ 573                             		.comm	_g_riic0_rx_count,2,2
+ 574                             		.comm	_gp_riic0_rx_address,4,4
+ 575                             		.comm	_g_riic0_tx_count,2,2
+ 576                             		.comm	_gp_riic0_tx_address,4,4
+ 577                             		.comm	_g_riic0_slave_address,2,2
+ 578                             		.comm	_g_riic0_state,1,1
+ 579                             		.comm	_g_riic0_mode_flag,1,1
+ 662                             	.Letext0:
+ 663                             		.file 2 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 664                             		.file 3 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 665                             		.file 4 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\lib\\gcc\\rx-
+ 666                             		.file 5 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 667                             		.file 6 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 668                             		.file 7 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 669                             		.file 8 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/all/r_rx_compi
+ 670                             		.file 9 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/rx72n/register
+ 671                             		.file 10 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/rx72n/mcu_loc
+ 672                             		.file 11 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\general/r_cg_macrodrive
+ 673                             		.file 12 "../src/smc_gen/Config_RIIC0/Config_RIIC0.h"

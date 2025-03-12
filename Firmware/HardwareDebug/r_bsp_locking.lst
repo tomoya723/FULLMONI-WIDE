@@ -1,0 +1,298 @@
+   1                             		.file	"r_bsp_locking.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.R_BSP_SoftwareLock,"ax",@progbits
+   5                             		.global	_R_BSP_SoftwareLock
+   7                             	_R_BSP_SoftwareLock:
+   8                             	.LVL0:
+   9                             	.LFB3:
+  10                             		.file 1 "../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c"
+   1:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** /**************************************************************************************************
+   2:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** * DISCLAIMER
+   3:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** * This software is supplied by Renesas Electronics Corporation and is only intended for use with Re
+   4:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** * other uses are authorized. This software is owned by Renesas Electronics Corporation and is prote
+   5:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** * applicable laws, including copyright laws.
+   6:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+   7:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF 
+   8:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIM
+   9:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AF
+  10:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY RE
+  11:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+  12:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** * Renesas reserves the right, without notice, to make changes to this software and to discontinue t
+  13:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** * this software. By using this software, you agree to the additional terms and conditions found by 
+  14:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** * following link:
+  15:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** * http://www.renesas.com/disclaimer
+  16:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** *
+  17:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** * Copyright (C) 2013 Renesas Electronics Corporation. All rights reserved.
+  18:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** ***************************************************************************************************
+  19:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** /**************************************************************************************************
+  20:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** * File Name    : r_bsp_locking.c
+  21:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** * Description  : This implements a locking mechanism that can be used by all code. The locking is d
+  22:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** *                common resources can be accessed safely.
+  23:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** ***************************************************************************************************
+  24:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** /**************************************************************************************************
+  25:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** * History : DD.MM.YYYY Version  Description
+  26:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** *         : 28.02.2019 2.00     Merged processing of all devices.
+  27:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** *                               Added support for GNUC and ICCRX.
+  28:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** *                               Fixed coding style.
+  29:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** *         : 26.07.2019 2.01     Modified comment of API function to Doxygen style.
+  30:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** *         : 10.12.2019 2.02     Modified comment.
+  31:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** ***************************************************************************************************
+  32:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** 
+  33:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** /**************************************************************************************************
+  34:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** Includes   <System Includes> , "Project Includes"
+  35:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** ***************************************************************************************************
+  36:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** /* Platform configuration. */
+  37:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** #include "platform.h"
+  38:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** 
+  39:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** /**************************************************************************************************
+  40:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** Macro definitions
+  41:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** ***************************************************************************************************
+  42:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** 
+  43:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** /**************************************************************************************************
+  44:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** Typedef definitions
+  45:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** ***************************************************************************************************
+  46:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** 
+  47:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** /**************************************************************************************************
+  48:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** Exported global variables (to be accessed by other files)
+  49:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** ***************************************************************************************************
+  50:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  
+  51:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** /**************************************************************************************************
+  52:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** Private global variables and functions
+  53:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** ***************************************************************************************************
+  54:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** 
+  55:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** /**************************************************************************************************
+  56:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * Function Name: R_BSP_SoftwareLock
+  57:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  **************************************************************************************************
+  58:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @brief Attempts to reserve a lock.
+  59:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @param[out] plock Pointer to lock structure with lock to try and acquire.
+  60:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @retval true Successful, lock was available and acquired.
+  61:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @retval false Failure, lock was already acquired and is not available.
+  62:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @details This function implements an atomic locking mechanism. Locks can be used in numerous way
+  63:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * of locks are to protect critical sections of code and to protect against duplicate resource allo
+  64:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * For protecting critical sections of code the user would require that the code first obtain the c
+  65:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * lock before executing. An example of protecting against duplicate resource allocation would be i
+  66:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * FIT modules that used the same peripheral. For example, the user may have one FIT module that us
+  67:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * peripheral in UART mode and another FIT module that uses the SCI peripheral in I2C mode. To make
+  68:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * modules cannot use the same SCI channel, locks can be used.
+  69:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * Care should be taken when using locks as they do not provide advanced features one might expect 
+  70:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * semaphore or mutex. If used improperly locks can lead to deadlock in the user's system.
+  71:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * Users can override the default locking mechanisms.
+  72:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  */
+  73:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** bool R_BSP_SoftwareLock (BSP_CFG_USER_LOCKING_TYPE * const plock)
+  74:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** {
+  11                             		.loc 1 74 1 view -0
+  12                             		.loc 1 74 1 is_stmt 0 view .LVU1
+  13 0000 60 40                   		sub	#4, r0
+  14                             	.LCFI0:
+  75:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** #if BSP_CFG_USER_LOCKING_ENABLED == 0
+  76:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     bool ret = false;
+  15                             		.loc 1 76 5 is_stmt 1 view .LVU2
+  16                             	.LVL1:
+  77:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** 
+  78:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     /* Variable used in trying to acquire lock. Using the xchg instruction makes this atomic */
+  79:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     int32_t is_locked = true;
+  17                             		.loc 1 79 5 view .LVU3
+  18                             		.loc 1 79 13 is_stmt 0 view .LVU4
+  19 0002 F8 06 01                		mov.L	#1, [r0]
+  80:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     
+  81:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     /* This example uses the RX MCU's atomic xchg() instruction. plock->lock is the lock we are try
+  82:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****        The way this works is that 'is_locked' gets the value of the plock->lock and plock->lock get
+  83:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****        'is_locked' which we just set to 'true'. Basically this is an atomic 'swap' command. If the 
+  84:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****        reserved then its value would be 'false' and after the xchg() instruction finished 'is_locke
+  85:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****        'false'. If it had already been reserved then 'is_locked' would have 'true' after the xchg()
+  86:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****        plock->lock was already 'true' and we just set it back to 'true' everything is ok. To see if
+  87:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****        we just need to check the value of 'is_locked' after this instruction finishes. */
+  88:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** 
+  89:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     /* Try to acquire semaphore to obtain lock */
+  90:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     R_BSP_EXCHANGE(&is_locked, &plock->lock);
+  20                             		.loc 1 90 5 is_stmt 1 view .LVU5
+  21 0005 EC 05                   		mov.L	[r0], r5
+  22 0007 06 A0 10 15             		xchg	[r1].L, r5
+  23 000b E3 05                   		mov.L	r5, [r0]
+  91:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     
+  92:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     /* Check to see if semaphore was successfully taken */
+  93:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     if (false == is_locked)
+  24                             		.loc 1 93 5 view .LVU6
+  25                             		.loc 1 93 15 is_stmt 0 view .LVU7
+  26 000d EC 05                   		mov.L	[r0], r5
+  27                             		.loc 1 93 8 view .LVU8
+  28 000f 61 05                   		cmp	#0, r5
+  29 0011 15                      		beq	.L3
+  94:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     {        
+  95:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****         /* Lock obtained, return success. */
+  96:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****         ret = true;
+  97:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     }
+  98:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     else
+  99:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     {
+ 100:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****         /* Lock was not obtained, another task already has it. */
+ 101:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****         R_BSP_NOP();
+  30                             		.loc 1 101 9 is_stmt 1 view .LVU9
+  31                             	 ; 101 "../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c" 1
+  32 0012 03                      		nop
+  33                             	 ; 0 "" 2
+  76:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** 
+  34                             		.loc 1 76 10 is_stmt 0 view .LVU10
+  35 0013 66 01                   		mov	#0, r1
+  36                             	.LVL2:
+  76:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** 
+  37                             		.loc 1 76 10 view .LVU11
+  38 0015 0B                      		bra	.L2
+  39                             	.LVL3:
+  40                             	.L3:
+  96:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     }
+  41                             		.loc 1 96 13 view .LVU12
+  42 0016 66 11                   		mov	#1, r1
+  43                             	.LVL4:
+  44                             	.L2:
+ 102:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     }
+ 103:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** 
+ 104:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     return ret;
+  45                             		.loc 1 104 5 is_stmt 1 view .LVU13
+ 105:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** #else
+ 106:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     /* User is going to handle the locking themselves. */
+ 107:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     return BSP_CFG_USER_LOCKING_SW_LOCK_FUNCTION(plock);
+ 108:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** #endif
+ 109:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** } /* End of function R_BSP_SoftwareLock() */
+  46                             		.loc 1 109 1 is_stmt 0 view .LVU14
+  47 0018 64 11                   		and #1, r1
+  48                             	.LVL5:
+  49                             		.loc 1 109 1 view .LVU15
+  50 001a 67 01                   		rtsd	#4
+  51                             	.LFE3:
+  53                             		.section	.text.R_BSP_SoftwareUnlock,"ax",@progbits
+  54                             		.global	_R_BSP_SoftwareUnlock
+  56                             	_R_BSP_SoftwareUnlock:
+  57                             	.LVL6:
+  58                             	.LFB4:
+ 110:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** 
+ 111:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** /**************************************************************************************************
+ 112:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * Function Name: R_BSP_SoftwareUnlock
+ 113:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  **************************************************************************************************
+ 114:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @brief Releases a lock.
+ 115:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @param[out] plock Pointer to lock structure with lock to release.
+ 116:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @retval true Successful, lock was released. Or the lock has been already released.
+ 117:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @retval false Failure, lock could not be released.
+ 118:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @details This function releases a lock that was previously acquired using the R_BSP_SoftwareLock
+ 119:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  */
+ 120:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** bool R_BSP_SoftwareUnlock (BSP_CFG_USER_LOCKING_TYPE * const plock)
+ 121:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** {
+  59                             		.loc 1 121 1 is_stmt 1 view -0
+ 122:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** #if BSP_CFG_USER_LOCKING_ENABLED == 0
+ 123:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     /* Set lock back to unlocked. */
+ 124:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     plock->lock = false;
+  60                             		.loc 1 124 5 view .LVU17
+  61                             		.loc 1 124 17 is_stmt 0 view .LVU18
+  62 0000 F8 16 00                		mov.L	#0, [r1]
+ 125:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** 
+ 126:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     return true;
+  63                             		.loc 1 126 5 is_stmt 1 view .LVU19
+ 127:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** #else
+ 128:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     /* User is going to handle the locking themselves. */
+ 129:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     return BSP_CFG_USER_LOCKING_SW_UNLOCK_FUNCTION(plock);
+ 130:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** #endif
+ 131:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** } /* End of function R_BSP_SoftwareUnlock() */
+  64                             		.loc 1 131 1 is_stmt 0 view .LVU20
+  65 0003 66 11                   		mov.L	#1, r1
+  66                             	.LVL7:
+  67                             		.loc 1 131 1 view .LVU21
+  68 0005 02                      		rts
+  69                             	.LFE4:
+  71                             		.section	.text.R_BSP_HardwareLock,"ax",@progbits
+  72                             		.global	_R_BSP_HardwareLock
+  74                             	_R_BSP_HardwareLock:
+  75                             	.LVL8:
+  76                             	.LFB5:
+ 132:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** 
+ 133:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** 
+ 134:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** /**************************************************************************************************
+ 135:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * Function Name: R_BSP_HardwareLock
+ 136:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  **************************************************************************************************
+ 137:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @brief Attempts to reserve a hardware peripheral lock.
+ 138:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @param[in] hw_index Index of lock to acquire from the hardware lock array.
+ 139:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @retval true Successful, lock was available and acquired.
+ 140:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @retval false Failure, lock was already acquired and is not available.
+ 141:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @details This function attempts to acquire the lock for a hardware resource of the MCU. Instead 
+ 142:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * pointer to a lock as with the R_BSP_SoftwareLock() function, the user sends in an index to an ar
+ 143:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * lock per MCU hardware resource. This array is shared amongst all FIT modules and user code there
+ 144:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * multiple FIT modules (and user code) to use the same locks. The user can see the available hardw
+ 145:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * looking at the mcu_lock_t enum in mcu_locks.h. These enum values are also the index into the har
+ 146:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * The same atomic locking mechanisms from the R_BSP_SoftwareLock() function are used with this fun
+ 147:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @note Each entry in the mcu_lock_t enum in mcu_locks.h will be allocated a lock. On RX MCUs, eac
+ 148:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * to be 4-bytes. If RAM space is an issue then the user can remove the entries from the mcu_lock_t
+ 149:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * using. For example, if the user is not using the CRC peripheral then they could delete the BSP_L
+ 150:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * user will save 4-bytes per deleted entry.
+ 151:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  */
+ 152:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** bool R_BSP_HardwareLock (mcu_lock_t const hw_index)
+ 153:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** {
+  77                             		.loc 1 153 1 is_stmt 1 view -0
+ 154:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** #if BSP_CFG_USER_LOCKING_ENABLED == 0
+ 155:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     /* Pass actual lock to software lock function. */
+ 156:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     return R_BSP_SoftwareLock(&g_bsp_Locks[hw_index]);
+  78                             		.loc 1 156 5 view .LVU23
+  79                             		.loc 1 156 12 is_stmt 0 view .LVU24
+  80 0000 6C 21                   		shll	#2, r1
+  81                             	.LVL9:
+  82                             		.loc 1 156 12 view .LVU25
+  83 0002 70 11 00 00 00 00       		add	#_g_bsp_Locks, r1
+  84 0008 05 00 00 00             		bsr	_R_BSP_SoftwareLock
+  85                             	.LVL10:
+ 157:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** #else
+ 158:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     /* User is going to handle the locking themselves. */
+ 159:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     return BSP_CFG_USER_LOCKING_HW_LOCK_FUNCTION(hw_index);
+ 160:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** #endif
+ 161:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** } /* End of function R_BSP_HardwareLock() */
+  86                             		.loc 1 161 1 view .LVU26
+  87 000c 02                      		rts
+  88                             	.LFE5:
+  90                             		.section	.text.R_BSP_HardwareUnlock,"ax",@progbits
+  91                             		.global	_R_BSP_HardwareUnlock
+  93                             	_R_BSP_HardwareUnlock:
+  94                             	.LVL11:
+  95                             	.LFB6:
+ 162:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** 
+ 163:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** /**************************************************************************************************
+ 164:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * Function Name: R_BSP_HardwareUnlock
+ 165:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  **************************************************************************************************
+ 166:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @brief Releases a hardware peripheral lock.
+ 167:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @param[in] hw_index Index of lock to release from the hardware lock array.
+ 168:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @retval true Successful, lock was released.
+ 169:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @retval false Failure, lock could not be released.
+ 170:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @details This function attempts to release the lock for a hardware resource of the MCU that was 
+ 171:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * using the R_BSP_HardwareLock() function.
+ 172:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * @note Each entry in the mcu_lock_t enum in mcu_locks.h will be allocated a lock. On RX MCUs, eac
+ 173:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * to be 4-bytes. If RAM space is an issue then the user can remove the entries from the mcu_lock_t
+ 174:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * not using. For example, if the user is not using the CRC peripheral then they could delete the B
+ 175:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  * The user will save 4-bytes per deleted entry.
+ 176:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****  */
+ 177:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** bool R_BSP_HardwareUnlock (mcu_lock_t const hw_index)
+ 178:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** {
+  96                             		.loc 1 178 1 is_stmt 1 view -0
+ 179:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** #if BSP_CFG_USER_LOCKING_ENABLED == 0
+ 180:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     /* Pass actual lock to software unlock function. */
+ 181:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     return R_BSP_SoftwareUnlock(&g_bsp_Locks[hw_index]);
+  97                             		.loc 1 181 5 view .LVU28
+  98                             		.loc 1 181 12 is_stmt 0 view .LVU29
+  99 0000 6C 21                   		shll	#2, r1
+ 100                             	.LVL12:
+ 101                             		.loc 1 181 12 view .LVU30
+ 102 0002 70 11 00 00 00 00       		add	#_g_bsp_Locks, r1
+ 103 0008 05 00 00 00             		bsr	_R_BSP_SoftwareUnlock
+ 104                             	.LVL13:
+ 182:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** #else
+ 183:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     /* User is going to handle the locking themselves. */
+ 184:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c ****     return BSP_CFG_USER_LOCKING_HW_UNLOCK_FUNCTION(hw_index);
+ 185:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** #endif
+ 186:../src/smc_gen/r_bsp/mcu/all/r_bsp_locking.c **** } /* End of function R_BSP_HardwareUnlock() */
+ 105                             		.loc 1 186 1 view .LVU31
+ 106 000c 02                      		rts
+ 107                             	.LFE6:
+ 163                             	.Letext0:
+ 164                             		.file 2 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 165                             		.file 3 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 166                             		.file 4 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\lib\\gcc\\rx-
+ 167                             		.file 5 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 168                             		.file 6 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 169                             		.file 7 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 170                             		.file 8 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/all/r_rx_compi
+ 171                             		.file 9 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_bsp/mcu/rx72n/mcu_lock

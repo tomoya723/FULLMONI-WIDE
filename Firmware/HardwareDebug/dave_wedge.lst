@@ -1,0 +1,1592 @@
+   1                             		.file	"dave_wedge.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.count_leading_zeroes16,"ax",@progbits
+   6                             	_count_leading_zeroes16:
+   7                             	.LVL0:
+   8                             	.LFB6:
+   9                             		.file 1 "../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c"
+   1:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** /*--------------------------------------------------------------------------
+   2:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  * Project: D/AVE
+   3:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  * File:    dave_wedge.c (%version: 1 %)
+   4:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  *          created Mon Feb 14 14:46:39 2005 by hh04027
+   5:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  *
+   6:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  * Description:
+   7:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  *  %date_modified: Mon Feb 14 14:46:40 2005 %  (%derived_by:  hh04027 %)
+   8:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  *
+   9:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  * Changes:
+  10:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  *  2008-01-14 ASc  changed comments from C++ to C, removed tabs
+  11:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  *  2009-03-31 MRe  improved bbox for convex wedges (less enumeration; fix artefact for very small 
+  12:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  *  2010-09-22 MRe  don't render convex wedges with angle of 0
+  13:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  *  2012-09-25 BSp  MISRA cleanup
+  14:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  *-------------------------------------------------------------------------- */
+  15:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+  16:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** #include "dave_driver.h"
+  17:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** #include "dave_intern.h"
+  18:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** #include "dave_viewport.h"
+  19:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** #include "dave_render.h"
+  20:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** #include "dave_circle.h"
+  21:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** #include "dave_wedge.h"
+  22:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+  23:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** /*--------------------------------------------------------------------------
+  24:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  *
+  25:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  * */
+  26:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** static d2_u32 count_leading_zeroes16(d2_u16 v); /* MISRA */
+  27:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** static d2_s32 is_same_direction(d2_s32 nx1, d2_s32 ny1, d2_s32 nx2, d2_s32 ny2); /* MISRA */
+  28:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** static d2_s32 d2_renderwedge_intern( d2_devicedata *handle, d2_contextdata *ctx, d2_point x, d2_poi
+  29:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+  30:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+  31:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** /*--------------------------------------------------------------------------
+  32:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  *
+  33:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  * */
+  34:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** static d2_u32 count_leading_zeroes16(d2_u16 v)
+  35:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** {
+  10                             		.loc 1 35 1 view -0
+  36:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    d2_u32 c = 0;
+  11                             		.loc 1 36 4 view .LVU1
+  37:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+  38:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    if(0 == v)
+  12                             		.loc 1 38 4 view .LVU2
+  13                             		.loc 1 38 6 is_stmt 0 view .LVU3
+  14 0000 5F 15                   		movu.W	r1, r5
+  15 0002 61 05                   		cmp	#0, r5
+  16 0004 20 3D                   		beq	.L8
+  39:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    {
+  40:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       c = 16;
+  41:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+  42:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    else
+  43:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    {
+  44:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       if(0 == (v & 0xff00))
+  17                             		.loc 1 44 7 is_stmt 1 view .LVU4
+  18                             		.loc 1 44 9 is_stmt 0 view .LVU5
+  19 0006 FD 7C C1 00 FF 00       		tst	#0xff00, r1
+  20 000c 20 25                   		beq	.L9
+  45:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       {
+  46:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          c = 8;
+  47:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+  48:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       else
+  49:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       {
+  50:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          v >>= 8;
+  21                             		.loc 1 50 10 is_stmt 1 view .LVU6
+  22                             		.loc 1 50 12 is_stmt 0 view .LVU7
+  23 000e EF 51                   		mov.L	r5, r1
+  24                             		.loc 1 50 12 view .LVU8
+  25 0010 68 81                   		shlr	#8, r1
+  26                             	.LVL1:
+  36:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+  27                             		.loc 1 36 11 view .LVU9
+  28 0012 66 05                   		mov.L	#0, r5
+  29                             	.LVL2:
+  30                             	.L3:
+  51:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+  52:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****         
+  53:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       if(0 == (v & 0xf0u))
+  31                             		.loc 1 53 7 is_stmt 1 view .LVU10
+  32                             		.loc 1 53 9 is_stmt 0 view .LVU11
+  33 0014 75 44 F0                		mov.L	#0xf0, r4
+  34 0017 53 14                   		and	r1, r4
+  35 0019 21 1C                   		bne	.L4
+  54:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       {
+  55:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          c += 4u;
+  36                             		.loc 1 55 10 is_stmt 1 view .LVU12
+  37                             		.loc 1 55 12 is_stmt 0 view .LVU13
+  38 001b 62 45                   		add	#4, r5
+  39                             	.LVL3:
+  40                             	.L5:
+  56:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+  57:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       else
+  58:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       {
+  59:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          v >>= 4;
+  60:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+  61:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+  62:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       if(0 == (v & 0xcu))
+  41                             		.loc 1 62 7 is_stmt 1 view .LVU14
+  42                             		.loc 1 62 9 is_stmt 0 view .LVU15
+  43 001d 66 C4                   		mov.L	#12, r4
+  44 001f 53 14                   		and	r1, r4
+  45 0021 21 1A                   		bne	.L6
+  63:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       {
+  64:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          c += 2u;
+  46                             		.loc 1 64 10 is_stmt 1 view .LVU16
+  47                             		.loc 1 64 12 is_stmt 0 view .LVU17
+  48 0023 62 25                   		add	#2, r5
+  49                             	.LVL4:
+  50                             	.L7:
+  65:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+  66:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       else
+  67:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       {
+  68:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          v >>= 2;
+  69:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+  70:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+  71:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       c += (0 != (v & 0x2u)) ? 0u : 1u;
+  51                             		.loc 1 71 7 is_stmt 1 view .LVU18
+  52                             		.loc 1 71 35 is_stmt 0 view .LVU19
+  53 0025 DF 11                   		mov.W	r1, r1
+  54                             		.loc 1 71 35 view .LVU20
+  55 0027 6A 11                   		shar	#1, r1
+  56                             	.LVL5:
+  57                             		.loc 1 71 35 view .LVU21
+  58 0029 FD E0 F1                		bnot	#0, r1
+  59 002c 64 11                   		and #1, r1
+  60                             		.loc 1 71 9 view .LVU22
+  61 002e 4B 51                   		add	r5, r1
+  62                             	.LVL6:
+  63                             		.loc 1 71 9 view .LVU23
+  64 0030 02                      		rts
+  65                             	.LVL7:
+  66                             	.L9:
+  46:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+  67                             		.loc 1 46 12 view .LVU24
+  68 0031 66 85                   		mov.L	#8, r5
+  69 0033 2E E1                   		bra	.L3
+  70                             	.LVL8:
+  71                             	.L4:
+  59:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+  72                             		.loc 1 59 10 is_stmt 1 view .LVU25
+  59:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+  73                             		.loc 1 59 12 is_stmt 0 view .LVU26
+  74 0035 5F 11                   		movu.W	r1, r1
+  59:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+  75                             		.loc 1 59 12 view .LVU27
+  76 0037 68 41                   		shlr	#4, r1
+  77                             	.LVL9:
+  59:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+  78                             		.loc 1 59 12 view .LVU28
+  79 0039 2E E4                   		bra	.L5
+  80                             	.L6:
+  68:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+  81                             		.loc 1 68 10 is_stmt 1 view .LVU29
+  68:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+  82                             		.loc 1 68 12 is_stmt 0 view .LVU30
+  83 003b 5F 11                   		movu.W	r1, r1
+  68:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+  84                             		.loc 1 68 12 view .LVU31
+  85 003d 68 21                   		shlr	#2, r1
+  86                             	.LVL10:
+  68:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+  87                             		.loc 1 68 12 view .LVU32
+  88 003f 2E E6                   		bra	.L7
+  89                             	.LVL11:
+  90                             	.L8:
+  40:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+  91                             		.loc 1 40 9 view .LVU33
+  92 0041 75 41 10                		mov.L	#16, r1
+  93                             	.LVL12:
+  72:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+  73:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+  74:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    return c;
+  94                             		.loc 1 74 4 is_stmt 1 view .LVU34
+  75:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** }
+  95                             		.loc 1 75 1 is_stmt 0 view .LVU35
+  96 0044 02                      		rts
+  97                             	.LFE6:
+  99                             		.section	.text.is_same_direction,"ax",@progbits
+ 101                             	_is_same_direction:
+ 102                             	.LVL13:
+ 103                             	.LFB7:
+  76:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+  77:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** /*--------------------------------------------------------------------------
+  78:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  *
+  79:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  * */
+  80:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** static d2_s32 is_same_direction(d2_s32 nx1, d2_s32 ny1, d2_s32 nx2, d2_s32 ny2)
+  81:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** {
+ 104                             		.loc 1 81 1 is_stmt 1 view -0
+  82:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    /* arguments are 16.16 fixedpoint */
+  83:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    d2_u32 leading_zeroes;
+ 105                             		.loc 1 83 4 view .LVU37
+  84:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    d2_s32 scalarprod;
+ 106                             		.loc 1 84 4 view .LVU38
+  85:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+  86:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    /* check 180 deg */
+  87:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    if(
+ 107                             		.loc 1 87 4 view .LVU39
+ 108                             		.loc 1 87 6 is_stmt 0 view .LVU40
+ 109 0000 61 01                   		cmp	#0, r1
+ 110 0002 29 09                   		blt	.L11
+  88:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       ((nx1 >= 0) && (nx2 >= 0)) || ((nx1 < 0) && (nx2 < 0)) || 
+ 111                             		.loc 1 88 19 view .LVU41
+ 112 0004 61 03                   		cmp	#0, r3
+ 113 0006 29 05 38 D8 00          		bge	.L24
+ 114                             	.L11:
+ 115                             		.loc 1 88 34 discriminator 1 view .LVU42
+ 116 000b 61 01                   		cmp	#0, r1
+ 117 000d 28 05 38 A0 00          		blt	.L32
+ 118                             	.L13:
+ 119                             		.loc 1 88 62 discriminator 4 view .LVU43
+ 120 0012 61 02                   		cmp	#0, r2
+ 121 0014 29 09                   		blt	.L14
+  89:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       ((ny1 >= 0) && (ny2 >= 0)) || ((ny1 < 0) && (ny2 < 0))
+ 122                             		.loc 1 89 19 view .LVU44
+ 123 0016 61 04                   		cmp	#0, r4
+ 124 0018 29 05 38 C9 00          		bge	.L26
+ 125                             	.L14:
+ 126                             		.loc 1 89 34 discriminator 1 view .LVU45
+ 127 001d 61 02                   		cmp	#0, r2
+ 128 001f 28 05 38 98 00          		blt	.L33
+ 129                             	.L15:
+  81:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    /* arguments are 16.16 fixedpoint */
+ 130                             		.loc 1 81 1 view .LVU46
+ 131 0024 6E 6B                   		pushm	r6-r11
+ 132                             	.LCFI0:
+  90:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       )
+  91:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    {
+  92:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       return 0;
+  93:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+  94:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+  95:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    /* reduce both vector components to less or equal 1 */
+  96:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    leading_zeroes = count_leading_zeroes16((nx1 > 0) ? (d2_u16)(nx1 >> 16) : (d2_u16)((-nx1) >> 16)
+ 133                             		.loc 1 96 4 is_stmt 1 view .LVU47
+ 134                             		.loc 1 96 21 is_stmt 0 view .LVU48
+ 135 0026 61 01                   		cmp	#0, r1
+ 136 0028 2A 05 38 99 00          		ble	.L16
+ 137                             		.loc 1 96 21 discriminator 1 view .LVU49
+ 138 002d FD 90 15                		shlr	#16, r1, r5
+ 139                             	.L17:
+ 140 0030 EF 4B                   		mov.L	r4, r11
+ 141 0032 EF 3A                   		mov.L	r3, r10
+ 142 0034 EF 26                   		mov.L	r2, r6
+ 143 0036 EF 17                   		mov.L	r1, r7
+ 144                             		.loc 1 96 21 discriminator 4 view .LVU50
+ 145 0038 DF 51                   		mov.W	r5, r1
+ 146                             	.LVL14:
+ 147                             		.loc 1 96 21 discriminator 4 view .LVU51
+ 148 003a 05 00 00 00             		bsr	_count_leading_zeroes16
+ 149                             	.LVL15:
+  97:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    nx1 >>= 16u - leading_zeroes;    /* PRQA S 0502 */ /* $Misra: #PERF_ARITHMETIC_SHIFT_RIGHT $*/
+ 150                             		.loc 1 97 4 is_stmt 1 discriminator 4 view .LVU52
+ 151                             		.loc 1 97 16 is_stmt 0 discriminator 4 view .LVU53
+ 152 003e 75 45 10                		mov.L	#16, r5
+ 153 0041 FF 01 15                		sub	r1, r5, r1
+ 154                             	.LVL16:
+ 155                             		.loc 1 97 8 discriminator 4 view .LVU54
+ 156 0044 FD 61 17                		shar	r1, r7
+ 157                             	.LVL17:
+  98:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    ny1 >>= 16u - leading_zeroes;    /* PRQA S 0502 */ /* $Misra: #PERF_ARITHMETIC_SHIFT_RIGHT $*/
+ 158                             		.loc 1 98 4 is_stmt 1 discriminator 4 view .LVU55
+ 159                             		.loc 1 98 8 is_stmt 0 discriminator 4 view .LVU56
+ 160 0047 FD 61 16                		shar	r1, r6
+ 161                             	.LVL18:
+  99:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 100:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    leading_zeroes = count_leading_zeroes16((ny1 > 0) ? (d2_u16)(ny1 >> 16) : (d2_u16)((-ny1) >> 16)
+ 162                             		.loc 1 100 4 is_stmt 1 discriminator 4 view .LVU57
+ 163                             		.loc 1 100 21 is_stmt 0 discriminator 4 view .LVU58
+ 164 004a 61 06                   		cmp	#0, r6
+ 165 004c 2B 7F                   		ble	.L18
+ 166                             		.loc 1 100 21 discriminator 1 view .LVU59
+ 167 004e FD 90 61                		shlr	#16, r6, r1
+ 168                             	.L19:
+ 169                             		.loc 1 100 21 discriminator 4 view .LVU60
+ 170 0051 05 00 00 00             		bsr	_count_leading_zeroes16
+ 171                             	.LVL19:
+ 101:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    nx1 >>= 16u - leading_zeroes;    /* PRQA S 0502 */ /* $Misra: #PERF_ARITHMETIC_SHIFT_RIGHT $*/
+ 172                             		.loc 1 101 4 is_stmt 1 discriminator 4 view .LVU61
+ 173                             		.loc 1 101 16 is_stmt 0 discriminator 4 view .LVU62
+ 174 0055 75 45 10                		mov.L	#16, r5
+ 175 0058 FF 01 15                		sub	r1, r5, r1
+ 176                             	.LVL20:
+ 177                             		.loc 1 101 8 discriminator 4 view .LVU63
+ 178 005b FD 61 17                		shar	r1, r7
+ 179                             	.LVL21:
+ 102:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    ny1 >>= 16u - leading_zeroes;    /* PRQA S 0502 */ /* $Misra: #PERF_ARITHMETIC_SHIFT_RIGHT $*/
+ 180                             		.loc 1 102 4 is_stmt 1 discriminator 4 view .LVU64
+ 181                             		.loc 1 102 8 is_stmt 0 discriminator 4 view .LVU65
+ 182 005e FD 61 16                		shar	r1, r6
+ 183                             	.LVL22:
+ 103:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 104:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    leading_zeroes = count_leading_zeroes16((nx2 > 0) ? (d2_u16)(nx2 >> 16) : (d2_u16)((-nx2) >> 16)
+ 184                             		.loc 1 104 4 is_stmt 1 discriminator 4 view .LVU66
+ 185                             		.loc 1 104 21 is_stmt 0 discriminator 4 view .LVU67
+ 186 0061 61 0A                   		cmp	#0, r10
+ 187 0063 2B 6F                   		ble	.L20
+ 188                             		.loc 1 104 21 discriminator 1 view .LVU68
+ 189 0065 FD 90 A1                		shlr	#16, r10, r1
+ 190                             	.L21:
+ 191                             		.loc 1 104 21 discriminator 4 view .LVU69
+ 192 0068 05 00 00 00             		bsr	_count_leading_zeroes16
+ 193                             	.LVL23:
+ 105:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    nx2 >>= 16u - leading_zeroes;    /* PRQA S 0502 */ /* $Misra: #PERF_ARITHMETIC_SHIFT_RIGHT $*/
+ 194                             		.loc 1 105 4 is_stmt 1 discriminator 4 view .LVU70
+ 195                             		.loc 1 105 16 is_stmt 0 discriminator 4 view .LVU71
+ 196 006c 75 45 10                		mov.L	#16, r5
+ 197 006f FF 01 15                		sub	r1, r5, r1
+ 198                             	.LVL24:
+ 199                             		.loc 1 105 8 discriminator 4 view .LVU72
+ 200 0072 FD 61 1A                		shar	r1, r10
+ 201                             	.LVL25:
+ 106:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    ny2 >>= 16u - leading_zeroes;    /* PRQA S 0502 */ /* $Misra: #PERF_ARITHMETIC_SHIFT_RIGHT $*/
+ 202                             		.loc 1 106 4 is_stmt 1 discriminator 4 view .LVU73
+ 203                             		.loc 1 106 8 is_stmt 0 discriminator 4 view .LVU74
+ 204 0075 FD 61 1B                		shar	r1, r11
+ 205                             	.LVL26:
+ 107:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 108:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    leading_zeroes = count_leading_zeroes16((ny2 > 0) ? (d2_u16)(ny2 >> 16) : (d2_u16)((-ny2) >> 16)
+ 206                             		.loc 1 108 4 is_stmt 1 discriminator 4 view .LVU75
+ 207                             		.loc 1 108 21 is_stmt 0 discriminator 4 view .LVU76
+ 208 0078 61 0B                   		cmp	#0, r11
+ 209 007a 2B 5F                   		ble	.L22
+ 210                             		.loc 1 108 21 discriminator 1 view .LVU77
+ 211 007c FD 90 B1                		shlr	#16, r11, r1
+ 212                             	.L23:
+ 213                             		.loc 1 108 21 discriminator 4 view .LVU78
+ 214 007f 05 00 00 00             		bsr	_count_leading_zeroes16
+ 215                             	.LVL27:
+ 109:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    nx2 >>= 16u - leading_zeroes;    /* PRQA S 0502 */ /* $Misra: #PERF_ARITHMETIC_SHIFT_RIGHT $*/
+ 216                             		.loc 1 109 4 is_stmt 1 discriminator 4 view .LVU79
+ 217                             		.loc 1 109 16 is_stmt 0 discriminator 4 view .LVU80
+ 218 0083 75 45 10                		mov.L	#16, r5
+ 219 0086 FF 01 15                		sub	r1, r5, r1
+ 220                             	.LVL28:
+ 221                             		.loc 1 109 8 discriminator 4 view .LVU81
+ 222 0089 FD 61 1A                		shar	r1, r10
+ 223                             	.LVL29:
+ 110:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    ny2 >>= 16u - leading_zeroes;    /* PRQA S 0502 */ /* $Misra: #PERF_ARITHMETIC_SHIFT_RIGHT $*/
+ 224                             		.loc 1 110 4 is_stmt 1 discriminator 4 view .LVU82
+ 225                             		.loc 1 110 8 is_stmt 0 discriminator 4 view .LVU83
+ 226 008c EF B5                   		mov.L	r11, r5
+ 227 008e FD 61 15                		shar	r1, r5
+ 228                             	.LVL30:
+ 111:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 112:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    /* if scalar product of v1 * (v2+90�) is zero then both vectors have same direction */
+ 113:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 114:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    nx1 >>= 1; ny1 >>= 1; nx2 >>= 1; ny2 >>= 1;      /* PRQA S 0502 */ /* $Misra: #PERF_ARITHMETIC_S
+ 229                             		.loc 1 114 4 is_stmt 1 discriminator 4 view .LVU84
+ 230                             		.loc 1 114 8 is_stmt 0 discriminator 4 view .LVU85
+ 231 0091 6A 17                   		shar	#1, r7
+ 232                             	.LVL31:
+ 233                             		.loc 1 114 15 is_stmt 1 discriminator 4 view .LVU86
+ 234                             		.loc 1 114 19 is_stmt 0 discriminator 4 view .LVU87
+ 235 0093 6A 16                   		shar	#1, r6
+ 236                             	.LVL32:
+ 237                             		.loc 1 114 26 is_stmt 1 discriminator 4 view .LVU88
+ 238                             		.loc 1 114 30 is_stmt 0 discriminator 4 view .LVU89
+ 239 0095 6A 1A                   		shar	#1, r10
+ 240                             	.LVL33:
+ 241                             		.loc 1 114 37 is_stmt 1 discriminator 4 view .LVU90
+ 242                             		.loc 1 114 41 is_stmt 0 discriminator 4 view .LVU91
+ 243 0097 6A 15                   		shar	#1, r5
+ 244                             	.LVL34:
+ 115:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    scalarprod = (nx1 * ny2) + (ny1 * -nx2);
+ 245                             		.loc 1 115 4 is_stmt 1 discriminator 4 view .LVU92
+ 246                             		.loc 1 115 22 is_stmt 0 discriminator 4 view .LVU93
+ 247 0099 4F 57                   		mul	r5, r7
+ 248                             	.LVL35:
+ 249                             		.loc 1 115 38 discriminator 4 view .LVU94
+ 250 009b 7E 1A                   		neg	r10
+ 251                             	.LVL36:
+ 252                             		.loc 1 115 36 discriminator 4 view .LVU95
+ 253 009d 4F 6A                   		mul	r6, r10
+ 254                             	.LVL37:
+ 255                             		.loc 1 115 15 discriminator 4 view .LVU96
+ 256 009f 4B A7                   		add	r10, r7
+ 257                             	.LVL38:
+ 116:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    scalarprod = (scalarprod < 0) ? -scalarprod : scalarprod;
+ 258                             		.loc 1 116 4 is_stmt 1 discriminator 4 view .LVU97
+ 259                             		.loc 1 116 15 is_stmt 0 discriminator 4 view .LVU98
+ 260 00a1 7E 27                   		abs	r7
+ 261                             	.LVL39:
+ 117:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 118:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    if(scalarprod < D2_FIX16(1)) /* some epsilon */
+ 262                             		.loc 1 118 4 is_stmt 1 discriminator 4 view .LVU99
+ 263                             		.loc 1 118 6 is_stmt 0 discriminator 4 view .LVU100
+ 264 00a3 77 07 FF FF 00          		cmp	#0xffff, r7
+ 265 00a8 2A 3E                   		bgt	.L28
+ 119:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    {
+ 120:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       return 1;
+ 266                             		.loc 1 120 14 view .LVU101
+ 267 00aa 66 11                   		mov.L	#1, r1
+ 268                             	.L10:
+ 121:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 122:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    else
+ 123:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    {
+ 124:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       return 0;
+ 125:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 126:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 127:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** }
+ 269                             		.loc 1 127 1 view .LVU102
+ 270 00ac 3F 6B 06                		rtsd	#24, r6-r11
+ 271                             	.LVL40:
+ 272                             	.L32:
+ 273                             	.LCFI1:
+  88:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       ((ny1 >= 0) && (ny2 >= 0)) || ((ny1 < 0) && (ny2 < 0))
+ 274                             		.loc 1 88 48 discriminator 2 view .LVU103
+ 275 00af 61 03                   		cmp	#0, r3
+ 276 00b1 29 05 38 5F FF          		bge	.L13
+  92:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 277                             		.loc 1 92 14 view .LVU104
+ 278 00b6 66 01                   		mov.L	#0, r1
+ 279                             	.LVL41:
+  92:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 280                             		.loc 1 92 14 view .LVU105
+ 281 00b8 02                      		rts
+ 282                             	.LVL42:
+ 283                             	.L33:
+  89:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       )
+ 284                             		.loc 1 89 48 discriminator 2 view .LVU106
+ 285 00b9 61 04                   		cmp	#0, r4
+ 286 00bb 29 05 38 67 FF          		bge	.L15
+  92:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 287                             		.loc 1 92 14 view .LVU107
+ 288 00c0 66 01                   		mov.L	#0, r1
+ 289                             	.LVL43:
+ 290                             		.loc 1 127 1 view .LVU108
+ 291 00c2 02                      		rts
+ 292                             	.LVL44:
+ 293                             	.L16:
+ 294                             	.LCFI2:
+  96:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    nx1 >>= 16u - leading_zeroes;    /* PRQA S 0502 */ /* $Misra: #PERF_ARITHMETIC_SHIFT_RIGHT $*/
+ 295                             		.loc 1 96 88 discriminator 2 view .LVU109
+ 296 00c3 FC 07 15                		neg	r1, r5
+  96:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    nx1 >>= 16u - leading_zeroes;    /* PRQA S 0502 */ /* $Misra: #PERF_ARITHMETIC_SHIFT_RIGHT $*/
+ 297                             		.loc 1 96 21 discriminator 2 view .LVU110
+ 298 00c6 69 05                   		shlr	#16, r5
+ 299 00c8 38 68 FF                		bra	.L17
+ 300                             	.LVL45:
+ 301                             	.L18:
+ 100:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    nx1 >>= 16u - leading_zeroes;    /* PRQA S 0502 */ /* $Misra: #PERF_ARITHMETIC_SHIFT_RIGHT $*/
+ 302                             		.loc 1 100 88 discriminator 2 view .LVU111
+ 303 00cb FC 07 61                		neg	r6, r1
+ 100:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    nx1 >>= 16u - leading_zeroes;    /* PRQA S 0502 */ /* $Misra: #PERF_ARITHMETIC_SHIFT_RIGHT $*/
+ 304                             		.loc 1 100 21 discriminator 2 view .LVU112
+ 305 00ce 69 01                   		shlr	#16, r1
+ 306 00d0 2E 81                   		bra	.L19
+ 307                             	.L20:
+ 104:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    nx2 >>= 16u - leading_zeroes;    /* PRQA S 0502 */ /* $Misra: #PERF_ARITHMETIC_SHIFT_RIGHT $*/
+ 308                             		.loc 1 104 88 discriminator 2 view .LVU113
+ 309 00d2 FC 07 A1                		neg	r10, r1
+ 104:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    nx2 >>= 16u - leading_zeroes;    /* PRQA S 0502 */ /* $Misra: #PERF_ARITHMETIC_SHIFT_RIGHT $*/
+ 310                             		.loc 1 104 21 discriminator 2 view .LVU114
+ 311 00d5 69 01                   		shlr	#16, r1
+ 312 00d7 2E 91                   		bra	.L21
+ 313                             	.L22:
+ 108:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    nx2 >>= 16u - leading_zeroes;    /* PRQA S 0502 */ /* $Misra: #PERF_ARITHMETIC_SHIFT_RIGHT $*/
+ 314                             		.loc 1 108 88 discriminator 2 view .LVU115
+ 315 00d9 FC 07 B1                		neg	r11, r1
+ 108:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    nx2 >>= 16u - leading_zeroes;    /* PRQA S 0502 */ /* $Misra: #PERF_ARITHMETIC_SHIFT_RIGHT $*/
+ 316                             		.loc 1 108 21 discriminator 2 view .LVU116
+ 317 00dc 69 01                   		shlr	#16, r1
+ 318 00de 2E A1                   		bra	.L23
+ 319                             	.LVL46:
+ 320                             	.L24:
+ 321                             	.LCFI3:
+  92:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 322                             		.loc 1 92 14 view .LVU117
+ 323 00e0 66 01                   		mov.L	#0, r1
+ 324                             	.LVL47:
+  92:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 325                             		.loc 1 92 14 view .LVU118
+ 326 00e2 02                      		rts
+ 327                             	.LVL48:
+ 328                             	.L26:
+  92:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 329                             		.loc 1 92 14 view .LVU119
+ 330 00e3 66 01                   		mov.L	#0, r1
+ 331                             	.LVL49:
+  92:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 332                             		.loc 1 92 14 view .LVU120
+ 333 00e5 02                      		rts
+ 334                             	.LVL50:
+ 335                             	.L28:
+ 336                             	.LCFI4:
+ 124:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 337                             		.loc 1 124 14 view .LVU121
+ 338 00e6 66 01                   		mov.L	#0, r1
+ 339 00e8 2E C4                   		bra	.L10
+ 340                             	.LFE7:
+ 342                             		.section	.text.d2_renderwedge_intern,"ax",@progbits
+ 344                             	_d2_renderwedge_intern:
+ 345                             	.LVL51:
+ 346                             	.LFB8:
+ 128:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 129:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** /*--------------------------------------------------------------------------
+ 130:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  *
+ 131:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  * */
+ 132:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** static d2_s32 d2_renderwedge_intern( d2_devicedata *handle, d2_contextdata *ctx, d2_point x, d2_poi
+ 133:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** {
+ 347                             		.loc 1 133 1 is_stmt 1 view -0
+ 348                             		.loc 1 133 1 is_stmt 0 view .LVU123
+ 349 0000 6E 6D                   		pushm	r6-r13
+ 350                             	.LCFI5:
+ 351                             		.loc 1 133 1 view .LVU124
+ 352 0002 71 00 BC                		add	#-68, r0
+ 353                             	.LCFI6:
+ 354 0005 75 47 68                		mov.L	#0x68, r7
+ 355 0008 4B 07                   		add	r0, r7
+ 356 000a EF 1A                   		mov.L	r1, r10
+ 357 000c A2 02                   		mov.L	r2, 32[r0]
+ 358 000e 93 83                   		mov.W	r3, 28[r0]
+ 359 0010 93 8C                   		mov.W	r4, 30[r0]
+ 360 0012 D4 70 12                		mov.W	[r7], 36[r0]
+ 361 0015 D5 70 01 13             		mov.W	2[r7], 38[r0]
+ 362 0019 ED 79 01                		mov.L	4[r7], r9
+ 363 001c A8 F6                   		mov.L	8[r7], r6
+ 364 001e ED 7C 03                		mov.L	12[r7], r12
+ 365 0021 ED 7D 04                		mov.L	16[r7], r13
+ 366 0024 A9 7F                   		mov.L	20[r7], r7
+ 134:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    d2_contextdata *oldctx;
+ 367                             		.loc 1 134 4 is_stmt 1 view .LVU125
+ 135:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    d2_border xminori, yminori, xmaxori, ymaxori;
+ 368                             		.loc 1 135 4 view .LVU126
+ 136:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    d2_border bxmin, bymin, bxmax, bymax;
+ 369                             		.loc 1 136 4 view .LVU127
+ 137:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    d2_u32 flags1 = 0;
+ 370                             		.loc 1 137 4 view .LVU128
+ 371                             	.LVL52:
+ 138:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    d2_u32 flags2 = 0;
+ 372                             		.loc 1 138 4 view .LVU129
+ 139:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 140:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    if(0 == (flags & d2_wf_concave))
+ 373                             		.loc 1 140 4 view .LVU130
+ 374                             		.loc 1 140 19 is_stmt 0 view .LVU131
+ 375 0026 75 48 40                		mov.L	#0x40, r8
+ 376 0029 53 78                   		and	r7, r8
+ 377                             		.loc 1 140 6 view .LVU132
+ 378 002b 21 13                   		bne	.L35
+ 141:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    {
+ 142:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       if(0 != is_same_direction(nx1, ny1, nx2, ny2))
+ 379                             		.loc 1 142 7 is_stmt 1 view .LVU133
+ 380                             		.loc 1 142 15 is_stmt 0 view .LVU134
+ 381 002d EF D4                   		mov.L	r13, r4
+ 382                             	.LVL53:
+ 383                             		.loc 1 142 15 view .LVU135
+ 384 002f EF C3                   		mov.L	r12, r3
+ 385                             	.LVL54:
+ 386                             		.loc 1 142 15 view .LVU136
+ 387 0031 EF 62                   		mov.L	r6, r2
+ 388                             	.LVL55:
+ 389                             		.loc 1 142 15 view .LVU137
+ 390 0033 EF 91                   		mov.L	r9, r1
+ 391                             	.LVL56:
+ 392                             		.loc 1 142 15 view .LVU138
+ 393 0035 05 00 00 00             		bsr	_is_same_direction
+ 394                             	.LVL57:
+ 395                             		.loc 1 142 9 view .LVU139
+ 396 0039 61 01                   		cmp	#0, r1
+ 397 003b 3B F3 00                		bne	.L36
+ 398                             	.L35:
+ 143:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       {
+ 144:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          return 1;
+ 145:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+ 146:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 147:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 148:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    /*DEBUG*/
+ 149:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    /* dummy code */
+ 150:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    oldctx = handle->ctxselected;
+ 399                             		.loc 1 150 4 is_stmt 1 view .LVU140
+ 400                             		.loc 1 150 11 is_stmt 0 view .LVU141
+ 401 003e E5 A0 09 0A             		mov.L	36[r10], 40[r0]
+ 402                             	.LVL58:
+ 151:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    handle->ctxselected = ctx;
+ 403                             		.loc 1 151 4 is_stmt 1 view .LVU142
+ 404                             		.loc 1 151 24 is_stmt 0 view .LVU143
+ 405 0042 E5 0A 08 09             		mov.L	32[r0], 36[r10]
+ 406                             	.LVL59:
+ 152:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    
+ 153:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    (void)d2_getcliprect(handle, &xminori, &yminori, &xmaxori, &ymaxori);
+ 407                             		.loc 1 153 4 is_stmt 1 view .LVU144
+ 408                             		.loc 1 153 10 is_stmt 0 view .LVU145
+ 409 0046 71 05 12                		add	#18, r0, r5
+ 410 0049 E3 05                   		mov.L	r5, [r0]
+ 411 004b 71 04 10                		add	#16, r0, r4
+ 412 004e 71 03 0E                		add	#14, r0, r3
+ 413 0051 66 C2                   		mov.L	#12, r2
+ 414 0053 4B 02                   		add	r0, r2
+ 415 0055 EF A1                   		mov.L	r10, r1
+ 416 0057 05 00 00 00             		bsr	_d2_getcliprect
+ 417                             	.LVL60:
+ 154:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 155:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    if(ny1 >= 0)
+ 418                             		.loc 1 155 4 is_stmt 1 view .LVU146
+ 419                             		.loc 1 155 6 is_stmt 0 view .LVU147
+ 420 005b 61 06                   		cmp	#0, r6
+ 421 005d 28 05 38 D4 00          		blt	.L37
+ 156:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    {
+ 157:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       if(nx1 < 0)
+ 422                             		.loc 1 157 7 is_stmt 1 view .LVU148
+ 423                             		.loc 1 157 9 is_stmt 0 view .LVU149
+ 424 0062 61 09                   		cmp	#0, r9
+ 425 0064 28 05 38 D6 00          		blt	.L57
+ 137:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    d2_u32 flags2 = 0;
+ 426                             		.loc 1 137 11 view .LVU150
+ 427 0069 66 03                   		mov.L	#0, r3
+ 428                             		.balign 8,3,1
+ 429                             	.L38:
+ 430                             	.LVL61:
+ 158:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          flags1 |= d2_grad_rightedge;
+ 159:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 160:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    else
+ 161:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    {
+ 162:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       if(nx1 <= 0)
+ 163:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          flags1 |= d2_grad_rightedge;
+ 164:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 165:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 166:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    if(ny2 >= 0)
+ 431                             		.loc 1 166 4 is_stmt 1 view .LVU151
+ 432                             		.loc 1 166 6 is_stmt 0 view .LVU152
+ 433 006b 61 0D                   		cmp	#0, r13
+ 434 006d 28 05 38 D7 00          		blt	.L39
+ 167:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    {
+ 168:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       if(nx2 < 0)
+ 435                             		.loc 1 168 7 is_stmt 1 view .LVU153
+ 436                             		.loc 1 168 9 is_stmt 0 view .LVU154
+ 437 0072 61 0C                   		cmp	#0, r12
+ 438 0074 28 05 38 D9 00          		blt	.L59
+ 138:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 439                             		.loc 1 138 11 view .LVU155
+ 440 0079 66 0B                   		mov.L	#0, r11
+ 441                             		.balign 8,3,1
+ 442                             	.L40:
+ 443                             	.LVL62:
+ 169:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          flags2 |= d2_grad_rightedge;
+ 170:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 171:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    else
+ 172:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    {
+ 173:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       if(nx2 <= 0)
+ 174:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          flags2 |= d2_grad_rightedge;
+ 175:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 176:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 177:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    if(0 != (flags & d2_wf_concave))
+ 444                             		.loc 1 177 4 is_stmt 1 view .LVU156
+ 445                             		.loc 1 177 6 is_stmt 0 view .LVU157
+ 446 007b 61 08                   		cmp	#0, r8
+ 447 007d 20 2A                   		beq	.L41
+ 448                             	.LBB2:
+ 178:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    {
+ 179:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       /* For the concave case, we need a one pixel offset if the gradients'
+ 180:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****        * gap angle <= 90 degrees. Otherwise, both clipgradients will only
+ 181:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****        * partially cover some of the pixels in the wedge, which will lead to
+ 182:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****        * a ripped wedge.
+ 183:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****        */
+ 184:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 185:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       /* calculate dot product but discard one bit precision for the sake of simplicity */
+ 186:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       d2_s32 dot = (((nx1>>1)*(nx2>>1))>>15) + (((ny1>>1)*(ny2>>1))>>15);
+ 449                             		.loc 1 186 7 is_stmt 1 view .LVU158
+ 450                             		.loc 1 186 26 is_stmt 0 view .LVU159
+ 451 007f FD A1 94                		shar	#1, r9, r4
+ 452                             		.loc 1 186 35 view .LVU160
+ 453 0082 FD A1 C5                		shar	#1, r12, r5
+ 454                             		.loc 1 186 30 view .LVU161
+ 455 0085 4F 54                   		mul	r5, r4
+ 456                             		.loc 1 186 40 view .LVU162
+ 457 0087 6A F4                   		shar	#15, r4
+ 458                             		.loc 1 186 54 view .LVU163
+ 459 0089 FD A1 65                		shar	#1, r6, r5
+ 460                             		.loc 1 186 63 view .LVU164
+ 461 008c FD A1 D2                		shar	#1, r13, r2
+ 462                             		.loc 1 186 58 view .LVU165
+ 463 008f 4F 25                   		mul	r2, r5
+ 464                             		.loc 1 186 68 view .LVU166
+ 465 0091 6A F5                   		shar	#15, r5
+ 466                             		.loc 1 186 14 view .LVU167
+ 467 0093 4B 54                   		add	r5, r4
+ 468                             	.LVL63:
+ 187:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 188:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       if((dot <= 0) && (0 == (flags & d2_edge0_shared)))
+ 469                             		.loc 1 188 7 is_stmt 1 view .LVU168
+ 470                             		.loc 1 188 9 is_stmt 0 view .LVU169
+ 471 0095 61 04                   		cmp	#0, r4
+ 472 0097 2A 05 38 C0 00          		ble	.L62
+ 473                             	.L42:
+ 189:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       {
+ 190:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          flags1 |= d2_grad_offset;
+ 191:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+ 192:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 193:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       if((dot <= 0) && (0 == (flags & d2_edge1_shared)))
+ 474                             		.loc 1 193 7 is_stmt 1 view .LVU170
+ 475                             		.loc 1 193 9 is_stmt 0 view .LVU171
+ 476 009c 61 04                   		cmp	#0, r4
+ 477 009e 2A 05 38 C5 00          		ble	.L63
+ 478                             	.L43:
+ 194:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       {
+ 195:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          flags2 |= d2_grad_offset;
+ 196:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+ 197:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 198:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       flags1 |= d2_grad_concave;
+ 479                             		.loc 1 198 7 is_stmt 1 view .LVU172
+ 480                             		.loc 1 198 14 is_stmt 0 view .LVU173
+ 481 00a3 78 63                   		bset	#6, r3
+ 482                             	.LVL64:
+ 199:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       flags2 |= d2_grad_concave;
+ 483                             		.loc 1 199 7 is_stmt 1 view .LVU174
+ 484                             		.loc 1 199 14 is_stmt 0 view .LVU175
+ 485 00a5 78 6B                   		bset	#6, r11
+ 486                             	.LVL65:
+ 487                             	.L41:
+ 488                             		.loc 1 199 14 view .LVU176
+ 489                             	.LBE2:
+ 200:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 201:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 202:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    (void)d2_setclipgradient( handle, 0, x, y, nx1, ny1, 
+ 490                             		.loc 1 202 4 is_stmt 1 view .LVU177
+ 203:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****                              ((0 != (flags & d2_edge0_shared)) ? d2_grad_threshold : 0) |
+ 491                             		.loc 1 203 84 is_stmt 0 view .LVU178
+ 492 00a7 FD C2 75                		shll	#2, r7, r5
+ 493 00aa 64 45                   		and #4, r5
+ 202:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****                              ((0 != (flags & d2_edge0_shared)) ? d2_grad_threshold : 0) |
+ 494                             		.loc 1 202 10 view .LVU179
+ 495 00ac 57 35                   		or	r3, r5
+ 496 00ae A0 85                   		mov.L	r5, 8[r0]
+ 497 00b0 A0 0E                   		mov.L	r6, 4[r0]
+ 498 00b2 E3 09                   		mov.L	r9, [r0]
+ 499 00b4 9B 8C                   		mov.W	30[r0], r4
+ 500 00b6 9B 83                   		mov.W	28[r0], r3
+ 501                             	.LVL66:
+ 202:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****                              ((0 != (flags & d2_edge0_shared)) ? d2_grad_threshold : 0) |
+ 502                             		.loc 1 202 10 view .LVU180
+ 503 00b8 66 02                   		mov.L	#0, r2
+ 504 00ba EF A1                   		mov.L	r10, r1
+ 505 00bc 05 00 00 00             		bsr	_d2_setclipgradient
+ 506                             	.LVL67:
+ 204:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****                              flags1                                                     );
+ 205:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 206:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    (void)d2_setclipgradient( handle, 1, x, y, nx2, ny2,
+ 507                             		.loc 1 206 4 is_stmt 1 view .LVU181
+ 207:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****                              ((0 != (flags & d2_edge1_shared)) ? d2_grad_threshold : 0) |
+ 508                             		.loc 1 207 84 is_stmt 0 view .LVU182
+ 509 00c0 4B 77                   		add	r7, r7
+ 510 00c2 64 47                   		and #4, r7
+ 206:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****                              ((0 != (flags & d2_edge1_shared)) ? d2_grad_threshold : 0) |
+ 511                             		.loc 1 206 10 view .LVU183
+ 512 00c4 57 B7                   		or	r11, r7
+ 513 00c6 A0 87                   		mov.L	r7, 8[r0]
+ 514 00c8 E7 0D 01                		mov.L	r13, 4[r0]
+ 515 00cb E3 0C                   		mov.L	r12, [r0]
+ 516 00cd 9B 8C                   		mov.W	30[r0], r4
+ 517 00cf 9B 83                   		mov.W	28[r0], r3
+ 518 00d1 66 12                   		mov.L	#1, r2
+ 519 00d3 EF A1                   		mov.L	r10, r1
+ 520 00d5 05 00 00 00             		bsr	_d2_setclipgradient
+ 521                             	.LVL68:
+ 208:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****                              flags2                                                     );
+ 209:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 210:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    /* remove quadrants from clipbox if possible: */
+ 211:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    if(0 == (flags & d2_wf_concave))
+ 522                             		.loc 1 211 4 is_stmt 1 view .LVU184
+ 523                             		.loc 1 211 6 is_stmt 0 view .LVU185
+ 524 00d9 61 08                   		cmp	#0, r8
+ 525 00db 3A 96 00                		beq	.L64
+ 526                             	.L44:
+ 212:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    { 
+ 213:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       (void)d2_getcliprect(handle, &bxmin, &bymin, &bxmax, &bymax);
+ 214:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 215:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       if( ((nx1 + nx2) > 0) && 
+ 216:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           (
+ 217:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****              ((ny2 >= 0) && (ny1 <= 0)) || 
+ 218:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****              ((ny1 >= 0) && (ny2 <= 0))
+ 219:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****            )
+ 220:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           ) /* right half */
+ 221:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       {
+ 222:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          d2_border val = (d2_border)(D2_INT4(x - (D2_FIX4(1) >> 1))); /* PRQA S 0502 */ /* $Misra: 
+ 223:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 224:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          if(bxmin < val)
+ 225:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          {
+ 226:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****             bxmin = val;
+ 227:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          }
+ 228:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+ 229:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 230:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       if( ((nx1 + nx2) < 0 ) &&
+ 231:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           (
+ 232:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****              ((ny2 >= 0) && (ny1 <= 0)) ||
+ 233:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****              ((ny1 >= 0) && (ny2 <= 0)) 
+ 234:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****            )
+ 235:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           ) /* left half */
+ 236:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       {
+ 237:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          d2_border val = (d2_border)(D2_INT4(x + (D2_FIX4(1) >> 1))); /* PRQA S 0502 */ /* $Misra: 
+ 238:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 239:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          if(bxmax > val)
+ 240:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          {
+ 241:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****             bxmax = val;
+ 242:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          }
+ 243:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+ 244:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 245:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       if( ((ny1 + ny2) < 0) &&
+ 246:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           (
+ 247:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****              (
+ 248:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****                 ((nx2 >= 0) && (nx1 <= 0)) ||
+ 249:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****                 ((nx1 >= 0) && (nx2 <= 0))
+ 250:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****               )
+ 251:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****            )
+ 252:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           ) /* upper half */
+ 253:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       {
+ 254:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          d2_border val = (d2_border)(D2_INT4(y + (D2_FIX4(1) >> 1))); /* PRQA S 0502 */ /* $Misra: 
+ 255:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 256:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          if(bymax > val)
+ 257:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          {
+ 258:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****             bymax = val;
+ 259:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          }
+ 260:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+ 261:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 262:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       if( ((ny1 + ny2) > 0) &&
+ 263:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           (
+ 264:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****              ((nx2 >= 0) && (nx1 <= 0)) ||
+ 265:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****              ((nx1 >= 0) && (nx2 <= 0))
+ 266:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****            )
+ 267:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           ) /* lower half */
+ 268:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       {
+ 269:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          d2_border val = (d2_border)(D2_INT4(y - (D2_FIX4(1) >> 1))); /* PRQA S 0502 */ /* $Misra: 
+ 270:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 271:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          if(bymin < val)
+ 272:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          {
+ 273:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****             bymin = val;
+ 274:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          }
+ 275:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+ 276:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           
+ 277:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       (void)d2_cliprect(handle, bxmin, bymin, bxmax, bymax);
+ 278:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 279:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 280:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    (void)d2_rendercircle_intern( handle, ctx, x, y, r, w );
+ 527                             		.loc 1 280 4 is_stmt 1 view .LVU186
+ 528                             		.loc 1 280 10 is_stmt 0 view .LVU187
+ 529 00de D5 00 13 01             		mov.W	38[r0], 2[r0]
+ 530 00e2 D1 00 12                		mov.W	36[r0], [r0]
+ 531 00e5 9B 8C                   		mov.W	30[r0], r4
+ 532 00e7 9B 83                   		mov.W	28[r0], r3
+ 533 00e9 AA 02                   		mov.L	32[r0], r2
+ 534 00eb EF A1                   		mov.L	r10, r1
+ 535 00ed 05 00 00 00             		bsr	_d2_rendercircle_intern
+ 536                             	.LVL69:
+ 281:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 282:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    /* restore */
+ 283:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    (void)d2_setclipgradient( handle, 0, x, y, 0, 0, 0 );
+ 537                             		.loc 1 283 4 is_stmt 1 view .LVU188
+ 538                             		.loc 1 283 10 is_stmt 0 view .LVU189
+ 539 00f1 3E 02 00                		mov.L	#0, 8[r0]
+ 540 00f4 3E 01 00                		mov.L	#0, 4[r0]
+ 541 00f7 F8 06 00                		mov.L	#0, [r0]
+ 542 00fa 9B 8C                   		mov.W	30[r0], r4
+ 543 00fc 9B 83                   		mov.W	28[r0], r3
+ 544 00fe 66 02                   		mov.L	#0, r2
+ 545 0100 EF A1                   		mov.L	r10, r1
+ 546 0102 05 00 00 00             		bsr	_d2_setclipgradient
+ 547                             	.LVL70:
+ 284:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    (void)d2_setclipgradient( handle, 1, x, y, 0, 0, 0 );
+ 548                             		.loc 1 284 4 is_stmt 1 view .LVU190
+ 549                             		.loc 1 284 10 is_stmt 0 view .LVU191
+ 550 0106 3E 02 00                		mov.L	#0, 8[r0]
+ 551 0109 3E 01 00                		mov.L	#0, 4[r0]
+ 552 010c F8 06 00                		mov.L	#0, [r0]
+ 553 010f 9B 8C                   		mov.W	30[r0], r4
+ 554 0111 9B 83                   		mov.W	28[r0], r3
+ 555 0113 66 12                   		mov.L	#1, r2
+ 556 0115 EF A1                   		mov.L	r10, r1
+ 557 0117 05 00 00 00             		bsr	_d2_setclipgradient
+ 558                             	.LVL71:
+ 285:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    (void)d2_cliprect(handle, xminori, yminori, xmaxori, ymaxori);
+ 559                             		.loc 1 285 4 is_stmt 1 view .LVU192
+ 560                             		.loc 1 285 10 is_stmt 0 view .LVU193
+ 561 011b D1 00 09                		mov.W	18[r0], [r0]
+ 562 011e 9A 04                   		mov.W	16[r0], r4
+ 563 0120 99 8B                   		mov.W	14[r0], r3
+ 564 0122 99 82                   		mov.W	12[r0], r2
+ 565 0124 EF A1                   		mov.L	r10, r1
+ 566 0126 05 00 00 00             		bsr	_d2_cliprect
+ 567                             	.LVL72:
+ 286:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    handle->ctxselected = oldctx;
+ 568                             		.loc 1 286 4 is_stmt 1 view .LVU194
+ 569                             		.loc 1 286 24 is_stmt 0 view .LVU195
+ 570 012a E5 0A 0A 09             		mov.L	40[r0], 36[r10]
+ 287:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 288:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    return 1;
+ 571                             		.loc 1 288 4 is_stmt 1 view .LVU196
+ 572                             	.LVL73:
+ 573                             	.L36:
+ 289:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** }
+ 574                             		.loc 1 289 1 is_stmt 0 view .LVU197
+ 575 012e 66 11                   		mov.L	#1, r1
+ 576 0130 3F 6D 19                		rtsd	#100, r6-r13
+ 577                             	.LVL74:
+ 578                             	.L37:
+ 162:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          flags1 |= d2_grad_rightedge;
+ 579                             		.loc 1 162 7 is_stmt 1 view .LVU198
+ 162:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          flags1 |= d2_grad_rightedge;
+ 580                             		.loc 1 162 9 is_stmt 0 view .LVU199
+ 581 0133 61 09                   		cmp	#0, r9
+ 582 0135 2B 0C                   		ble	.L58
+ 137:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    d2_u32 flags2 = 0;
+ 583                             		.loc 1 137 11 view .LVU200
+ 584 0137 66 03                   		mov.L	#0, r3
+ 585 0139 38 32 FF                		bra	.L38
+ 586                             	.L57:
+ 158:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 587                             		.loc 1 158 17 view .LVU201
+ 588 013c 66 83                   		mov.L	#8, r3
+ 589 013e 38 2D FF                		bra	.L38
+ 590                             	.L58:
+ 163:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 591                             		.loc 1 163 17 view .LVU202
+ 592 0141 66 83                   		mov.L	#8, r3
+ 593 0143 38 28 FF                		bra	.L38
+ 594                             	.LVL75:
+ 595                             	.L39:
+ 173:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          flags2 |= d2_grad_rightedge;
+ 596                             		.loc 1 173 7 is_stmt 1 view .LVU203
+ 173:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          flags2 |= d2_grad_rightedge;
+ 597                             		.loc 1 173 9 is_stmt 0 view .LVU204
+ 598 0146 61 0C                   		cmp	#0, r12
+ 599 0148 2B 0C                   		ble	.L60
+ 138:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 600                             		.loc 1 138 11 view .LVU205
+ 601 014a 66 0B                   		mov.L	#0, r11
+ 602 014c 38 2F FF                		bra	.L40
+ 603                             	.L59:
+ 169:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 604                             		.loc 1 169 17 view .LVU206
+ 605 014f 66 8B                   		mov.L	#8, r11
+ 606 0151 38 2A FF                		bra	.L40
+ 607                             	.L60:
+ 174:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 608                             		.loc 1 174 17 view .LVU207
+ 609 0154 66 8B                   		mov.L	#8, r11
+ 610 0156 38 25 FF                		bra	.L40
+ 611                             	.LVL76:
+ 612                             	.L62:
+ 613                             	.LBB3:
+ 188:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       {
+ 614                             		.loc 1 188 21 discriminator 1 view .LVU208
+ 615 0159 FD 74 C7 01             		tst	#1, r7
+ 616 015d 3B 3F FF                		bne	.L42
+ 190:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+ 617                             		.loc 1 190 10 is_stmt 1 view .LVU209
+ 190:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+ 618                             		.loc 1 190 17 is_stmt 0 view .LVU210
+ 619 0160 78 43                   		bset	#4, r3
+ 620                             	.LVL77:
+ 190:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+ 621                             		.loc 1 190 17 view .LVU211
+ 622 0162 38 3A FF                		bra	.L42
+ 623                             	.L63:
+ 193:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       {
+ 624                             		.loc 1 193 21 discriminator 1 view .LVU212
+ 625 0165 FD 74 C7 02             		tst	#2, r7
+ 626 0169 3B 3A FF                		bne	.L43
+ 195:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+ 627                             		.loc 1 195 10 is_stmt 1 view .LVU213
+ 195:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+ 628                             		.loc 1 195 17 is_stmt 0 view .LVU214
+ 629 016c 78 4B                   		bset	#4, r11
+ 630                             	.LVL78:
+ 195:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+ 631                             		.loc 1 195 17 view .LVU215
+ 632 016e 38 35 FF                		bra	.L43
+ 633                             	.LVL79:
+ 634                             	.L64:
+ 195:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****       }
+ 635                             		.loc 1 195 17 view .LVU216
+ 636                             	.LBE3:
+ 213:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 637                             		.loc 1 213 7 is_stmt 1 view .LVU217
+ 213:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 638                             		.loc 1 213 13 is_stmt 0 view .LVU218
+ 639 0171 71 07 1A                		add	#26, r0, r7
+ 640 0174 E3 07                   		mov.L	r7, [r0]
+ 641 0176 71 04 18                		add	#24, r0, r4
+ 642 0179 71 03 16                		add	#22, r0, r3
+ 643 017c 71 02 14                		add	#20, r0, r2
+ 644 017f EF A1                   		mov.L	r10, r1
+ 645 0181 05 00 00 00             		bsr	_d2_getcliprect
+ 646                             	.LVL80:
+ 215:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           (
+ 647                             		.loc 1 215 7 is_stmt 1 view .LVU219
+ 215:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           (
+ 648                             		.loc 1 215 17 is_stmt 0 view .LVU220
+ 649 0185 FF 27 C9                		add	r12, r9, r7
+ 215:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           (
+ 650                             		.loc 1 215 9 view .LVU221
+ 651 0188 61 07                   		cmp	#0, r7
+ 652 018a 2B 12                   		ble	.L45
+ 215:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           (
+ 653                             		.loc 1 215 29 discriminator 1 view .LVU222
+ 654 018c 61 0D                   		cmp	#0, r13
+ 655 018e 29 06                   		blt	.L46
+ 217:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****              ((ny1 >= 0) && (ny2 <= 0))
+ 656                             		.loc 1 217 26 view .LVU223
+ 657 0190 61 06                   		cmp	#0, r6
+ 658 0192 2B 39                   		ble	.L47
+ 659                             	.L46:
+ 217:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****              ((ny1 >= 0) && (ny2 <= 0))
+ 660                             		.loc 1 217 41 discriminator 1 view .LVU224
+ 661 0194 61 06                   		cmp	#0, r6
+ 662 0196 29 06                   		blt	.L45
+ 218:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****            )
+ 663                             		.loc 1 218 26 view .LVU225
+ 664 0198 61 0D                   		cmp	#0, r13
+ 665 019a 2B 31                   		ble	.L47
+ 666                             		.balign 8,3,1
+ 667                             	.L45:
+ 230:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           (
+ 668                             		.loc 1 230 7 is_stmt 1 view .LVU226
+ 230:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           (
+ 669                             		.loc 1 230 9 is_stmt 0 view .LVU227
+ 670 019c 61 07                   		cmp	#0, r7
+ 671 019e 29 3F                   		blt	.L65
+ 672                             		.balign 8,3,2
+ 673                             	.L48:
+ 245:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           (
+ 674                             		.loc 1 245 7 is_stmt 1 view .LVU228
+ 245:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           (
+ 675                             		.loc 1 245 17 is_stmt 0 view .LVU229
+ 676 01a0 FF 27 D6                		add	r13, r6, r7
+ 245:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           (
+ 677                             		.loc 1 245 9 view .LVU230
+ 678 01a3 27 5C                   		bn	.L66
+ 679                             		.balign 8,3,1
+ 680                             	.L51:
+ 262:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           (
+ 681                             		.loc 1 262 7 is_stmt 1 view .LVU231
+ 262:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           (
+ 682                             		.loc 1 262 9 is_stmt 0 view .LVU232
+ 683 01a5 61 07                   		cmp	#0, r7
+ 684 01a7 2B 12                   		ble	.L54
+ 262:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           (
+ 685                             		.loc 1 262 29 discriminator 1 view .LVU233
+ 686 01a9 61 0C                   		cmp	#0, r12
+ 687 01ab 29 06                   		blt	.L55
+ 264:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****              ((nx1 >= 0) && (nx2 <= 0))
+ 688                             		.loc 1 264 26 view .LVU234
+ 689 01ad 61 09                   		cmp	#0, r9
+ 690 01af 2B 72                   		ble	.L56
+ 691                             	.L55:
+ 264:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****              ((nx1 >= 0) && (nx2 <= 0))
+ 692                             		.loc 1 264 41 discriminator 1 view .LVU235
+ 693 01b1 61 09                   		cmp	#0, r9
+ 694 01b3 29 06                   		blt	.L54
+ 265:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****            )
+ 695                             		.loc 1 265 26 view .LVU236
+ 696 01b5 61 0C                   		cmp	#0, r12
+ 697 01b7 2B 6A                   		ble	.L56
+ 698                             		.balign 8,3,1
+ 699                             	.L54:
+ 277:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 700                             		.loc 1 277 7 is_stmt 1 view .LVU237
+ 277:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    }
+ 701                             		.loc 1 277 13 is_stmt 0 view .LVU238
+ 702 01b9 D1 00 0D                		mov.W	26[r0], [r0]
+ 703 01bc 9B 04                   		mov.W	24[r0], r4
+ 704 01be 9A 8B                   		mov.W	22[r0], r3
+ 705 01c0 9A 82                   		mov.W	20[r0], r2
+ 706 01c2 EF A1                   		mov.L	r10, r1
+ 707 01c4 05 00 00 00             		bsr	_d2_cliprect
+ 708                             	.LVL81:
+ 709 01c8 38 16 FF                		bra	.L44
+ 710                             	.L47:
+ 711                             	.LBB4:
+ 222:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 712                             		.loc 1 222 10 is_stmt 1 view .LVU239
+ 222:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 713                             		.loc 1 222 38 is_stmt 0 view .LVU240
+ 714 01cb 9B 85                   		mov.W	28[r0], r5
+ 715 01cd 60 85                   		sub	#8, r5
+ 716 01cf 6A 45                   		shar	#4, r5
+ 717                             	.LVL82:
+ 224:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          {
+ 718                             		.loc 1 224 10 is_stmt 1 view .LVU241
+ 224:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          {
+ 719                             		.loc 1 224 12 is_stmt 0 view .LVU242
+ 720 01d1 9A 83                   		mov.W	20[r0], r3
+ 721 01d3 DF 54                   		mov.W	r5, r4
+ 722 01d5 47 43                   		cmp	r4, r3
+ 723 01d7 28 C5                   		bge	.L45
+ 226:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          }
+ 724                             		.loc 1 226 13 is_stmt 1 view .LVU243
+ 226:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          }
+ 725                             		.loc 1 226 19 is_stmt 0 view .LVU244
+ 726 01d9 92 85                   		mov.W	r5, 20[r0]
+ 727 01db 2E C1                   		bra	.L45
+ 728                             	.LVL83:
+ 729                             	.L65:
+ 226:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          }
+ 730                             		.loc 1 226 19 view .LVU245
+ 731                             	.LBE4:
+ 230:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           (
+ 732                             		.loc 1 230 30 discriminator 1 view .LVU246
+ 733 01dd 61 0D                   		cmp	#0, r13
+ 734 01df 29 06                   		blt	.L49
+ 232:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****              ((ny1 >= 0) && (ny2 <= 0)) 
+ 735                             		.loc 1 232 26 view .LVU247
+ 736 01e1 61 06                   		cmp	#0, r6
+ 737 01e3 2B 0A                   		ble	.L50
+ 738                             	.L49:
+ 232:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****              ((ny1 >= 0) && (ny2 <= 0)) 
+ 739                             		.loc 1 232 41 discriminator 1 view .LVU248
+ 740 01e5 61 06                   		cmp	#0, r6
+ 741 01e7 29 B9                   		blt	.L48
+ 233:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****            )
+ 742                             		.loc 1 233 26 view .LVU249
+ 743 01e9 61 0D                   		cmp	#0, r13
+ 744 01eb 2A B5                   		bgt	.L48
+ 745                             	.L50:
+ 746                             	.LBB5:
+ 237:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 747                             		.loc 1 237 10 is_stmt 1 view .LVU250
+ 237:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 748                             		.loc 1 237 38 is_stmt 0 view .LVU251
+ 749 01ed 9B 87                   		mov.W	28[r0], r7
+ 750 01ef 62 87                   		add	#8, r7
+ 751 01f1 6A 47                   		shar	#4, r7
+ 752                             	.LVL84:
+ 239:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          {
+ 753                             		.loc 1 239 10 is_stmt 1 view .LVU252
+ 239:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          {
+ 754                             		.loc 1 239 12 is_stmt 0 view .LVU253
+ 755 01f3 9B 04                   		mov.W	24[r0], r4
+ 756 01f5 DF 75                   		mov.W	r7, r5
+ 757 01f7 47 54                   		cmp	r5, r4
+ 758 01f9 2B A7                   		ble	.L48
+ 241:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          }
+ 759                             		.loc 1 241 13 is_stmt 1 view .LVU254
+ 241:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          }
+ 760                             		.loc 1 241 19 is_stmt 0 view .LVU255
+ 761 01fb 93 07                   		mov.W	r7, 24[r0]
+ 762 01fd 2E A3                   		bra	.L48
+ 763                             	.LVL85:
+ 764                             	.L66:
+ 241:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          }
+ 765                             		.loc 1 241 19 view .LVU256
+ 766                             	.LBE5:
+ 245:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****           (
+ 767                             		.loc 1 245 29 discriminator 1 view .LVU257
+ 768 01ff 61 0C                   		cmp	#0, r12
+ 769 0201 29 06                   		blt	.L52
+ 248:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****                 ((nx1 >= 0) && (nx2 <= 0))
+ 770                             		.loc 1 248 29 view .LVU258
+ 771 0203 61 09                   		cmp	#0, r9
+ 772 0205 2B 0A                   		ble	.L53
+ 773                             	.L52:
+ 248:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****                 ((nx1 >= 0) && (nx2 <= 0))
+ 774                             		.loc 1 248 44 discriminator 1 view .LVU259
+ 775 0207 61 09                   		cmp	#0, r9
+ 776 0209 29 9C                   		blt	.L51
+ 249:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****               )
+ 777                             		.loc 1 249 29 view .LVU260
+ 778 020b 61 0C                   		cmp	#0, r12
+ 779 020d 2A 98                   		bgt	.L51
+ 780                             	.L53:
+ 781                             	.LBB6:
+ 254:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 782                             		.loc 1 254 10 is_stmt 1 view .LVU261
+ 254:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 783                             		.loc 1 254 38 is_stmt 0 view .LVU262
+ 784 020f 9B 8D                   		mov.W	30[r0], r5
+ 785 0211 62 85                   		add	#8, r5
+ 786 0213 6A 45                   		shar	#4, r5
+ 787                             	.LVL86:
+ 256:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          {
+ 788                             		.loc 1 256 10 is_stmt 1 view .LVU263
+ 256:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          {
+ 789                             		.loc 1 256 12 is_stmt 0 view .LVU264
+ 790 0215 9B 0B                   		mov.W	26[r0], r3
+ 791 0217 DF 54                   		mov.W	r5, r4
+ 792 0219 47 43                   		cmp	r4, r3
+ 793 021b 2B 8A                   		ble	.L51
+ 258:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          }
+ 794                             		.loc 1 258 13 is_stmt 1 view .LVU265
+ 258:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          }
+ 795                             		.loc 1 258 19 is_stmt 0 view .LVU266
+ 796 021d 93 0D                   		mov.W	r5, 26[r0]
+ 797 021f 2E 86                   		bra	.L51
+ 798                             	.LVL87:
+ 799                             	.L56:
+ 258:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          }
+ 800                             		.loc 1 258 19 view .LVU267
+ 801                             	.LBE6:
+ 802                             	.LBB7:
+ 269:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 803                             		.loc 1 269 10 is_stmt 1 view .LVU268
+ 269:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 804                             		.loc 1 269 38 is_stmt 0 view .LVU269
+ 805 0221 9B 8F                   		mov.W	30[r0], r7
+ 806 0223 60 87                   		sub	#8, r7
+ 807 0225 6A 47                   		shar	#4, r7
+ 808                             	.LVL88:
+ 271:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          {
+ 809                             		.loc 1 271 10 is_stmt 1 view .LVU270
+ 271:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          {
+ 810                             		.loc 1 271 12 is_stmt 0 view .LVU271
+ 811 0227 9A 8C                   		mov.W	22[r0], r4
+ 812 0229 DF 75                   		mov.W	r7, r5
+ 813 022b 47 54                   		cmp	r5, r4
+ 814 022d 28 8C                   		bge	.L54
+ 273:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          }
+ 815                             		.loc 1 273 13 is_stmt 1 view .LVU272
+ 273:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****          }
+ 816                             		.loc 1 273 19 is_stmt 0 view .LVU273
+ 817 022f 92 8F                   		mov.W	r7, 22[r0]
+ 818 0231 2E 88                   		bra	.L54
+ 819                             	.LBE7:
+ 820                             	.LFE8:
+ 822 0233 77 10 01 00 00          		.section	.text.d2_renderwedge_solid,"ax",@progbits
+ 823                             		.global	_d2_renderwedge_solid
+ 825                             	_d2_renderwedge_solid:
+ 826                             	.LVL89:
+ 827                             	.LFB9:
+ 290:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 291:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** /*--------------------------------------------------------------------------
+ 292:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  *
+ 293:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  * */
+ 294:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** d2_s32 d2_renderwedge_solid( d2_device *handle, d2_point x, d2_point y, d2_width r, d2_width w, d2_
+ 295:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** {
+ 828                             		.loc 1 295 1 is_stmt 1 view -0
+ 829                             		.loc 1 295 1 is_stmt 0 view .LVU275
+ 830 0000 7E A7                   		push.l	r7
+ 831                             	.LCFI7:
+ 832                             		.loc 1 295 1 view .LVU276
+ 833 0002 71 00 D0                		add	#-48, r0
+ 834                             	.LCFI8:
+ 835 0005 75 47 38                		mov.L	#56, r7
+ 836 0008 4B 07                   		add	r0, r7
+ 296:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    (void)d2_renderwedge_intern( D2_DEV(handle), D2_DEV(handle)->ctxsolid, x, y, r, w, nx1,ny1, nx2,
+ 837                             		.loc 1 296 4 is_stmt 1 view .LVU277
+ 838                             		.loc 1 296 10 is_stmt 0 view .LVU278
+ 839 000a AA 95                   		mov.L	40[r1], r5
+ 840 000c E5 70 05 05             		mov.L	20[r7], 20[r0]
+ 841 0010 E5 70 04 04             		mov.L	16[r7], 16[r0]
+ 842 0014 E5 70 03 03             		mov.L	12[r7], 12[r0]
+ 843 0018 E5 70 02 02             		mov.L	8[r7], 8[r0]
+ 844 001c E5 70 01 01             		mov.L	4[r7], 4[r0]
+ 845 0020 D4 70 01                		mov.W	[r7], 2[r0]
+ 846 0023 D3 04                   		mov.W	r4, [r0]
+ 847 0025 DF 34                   		mov.W	r3, r4
+ 848                             	.LVL90:
+ 849                             		.loc 1 296 10 view .LVU279
+ 850 0027 DF 23                   		mov.W	r2, r3
+ 851                             	.LVL91:
+ 852                             		.loc 1 296 10 view .LVU280
+ 853 0029 EF 52                   		mov.L	r5, r2
+ 854                             	.LVL92:
+ 855                             		.loc 1 296 10 view .LVU281
+ 856 002b 05 00 00 00             		bsr	_d2_renderwedge_intern
+ 857                             	.LVL93:
+ 297:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 298:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    return D2_OK;
+ 858                             		.loc 1 298 4 is_stmt 1 view .LVU282
+ 299:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** }
+ 859                             		.loc 1 299 1 is_stmt 0 view .LVU283
+ 860 002f 66 01                   		mov.L	#0, r1
+ 861 0031 3F 77 0D                		rtsd	#52, r7-r7
+ 862                             	.LFE9:
+ 864                             		.section	.text.d2_renderwedge_outline,"ax",@progbits
+ 865                             		.global	_d2_renderwedge_outline
+ 867                             	_d2_renderwedge_outline:
+ 868                             	.LVL94:
+ 869                             	.LFB10:
+ 300:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 301:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** /*--------------------------------------------------------------------------
+ 302:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  *
+ 303:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  * */
+ 304:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** d2_s32 d2_renderwedge_outline( d2_device *handle, d2_point x, d2_point y, d2_width r, d2_width w, d
+ 305:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** {
+ 870                             		.loc 1 305 1 is_stmt 1 view -0
+ 871                             		.loc 1 305 1 is_stmt 0 view .LVU285
+ 872 0000 7E A7                   		push.l	r7
+ 873                             	.LCFI9:
+ 874                             		.loc 1 305 1 view .LVU286
+ 875 0002 71 00 D0                		add	#-48, r0
+ 876                             	.LCFI10:
+ 877 0005 75 47 38                		mov.L	#56, r7
+ 878 0008 4B 07                   		add	r0, r7
+ 879 000a DC 7F                   		mov.W	[r7], r15
+ 306:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    (void)d2_renderwedge_intern( D2_DEV(handle), D2_DEV(handle)->ctxoutline, x, y, r, (d2_width)(w +
+ 880                             		.loc 1 306 4 is_stmt 1 view .LVU287
+ 881                             		.loc 1 306 116 is_stmt 0 view .LVU288
+ 882 000c DD 15 36                		mov.W	108[r1], r5
+ 883                             		.loc 1 306 131 view .LVU289
+ 884 000f 4B 55                   		add	r5, r5
+ 885                             		.loc 1 306 99 view .LVU290
+ 886 0011 4B F5                   		add	r15, r5
+ 887                             		.loc 1 306 10 view .LVU291
+ 888 0013 E5 70 05 05             		mov.L	20[r7], 20[r0]
+ 889 0017 E5 70 04 04             		mov.L	16[r7], 16[r0]
+ 890 001b E5 70 03 03             		mov.L	12[r7], 12[r0]
+ 891 001f E5 70 02 02             		mov.L	8[r7], 8[r0]
+ 892 0023 E5 70 01 01             		mov.L	4[r7], 4[r0]
+ 893 0027 90 0D                   		mov.W	r5, 2[r0]
+ 894 0029 D3 04                   		mov.W	r4, [r0]
+ 895 002b DF 34                   		mov.W	r3, r4
+ 896                             	.LVL95:
+ 897                             		.loc 1 306 10 view .LVU292
+ 898 002d DF 23                   		mov.W	r2, r3
+ 899                             	.LVL96:
+ 900                             		.loc 1 306 10 view .LVU293
+ 901 002f AA 9A                   		mov.L	44[r1], r2
+ 902                             	.LVL97:
+ 903                             		.loc 1 306 10 view .LVU294
+ 904 0031 05 00 00 00             		bsr	_d2_renderwedge_intern
+ 905                             	.LVL98:
+ 307:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 308:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** /*   d2_renderline_intern_split( D2_DEV(handle), D2_DEV(handle)->ctxoutline, x1,y1, x2,y2, w + D2_D
+ 309:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 310:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    return D2_OK;
+ 906                             		.loc 1 310 4 is_stmt 1 view .LVU295
+ 311:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** }
+ 907                             		.loc 1 311 1 is_stmt 0 view .LVU296
+ 908 0035 66 01                   		mov.L	#0, r1
+ 909 0037 3F 77 0D                		rtsd	#52, r7-r7
+ 910                             	.LFE10:
+ 912                             		.section	.text.d2_renderwedge_shadow,"ax",@progbits
+ 913                             		.global	_d2_renderwedge_shadow
+ 915                             	_d2_renderwedge_shadow:
+ 916                             	.LVL99:
+ 917                             	.LFB11:
+ 312:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 313:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** /*--------------------------------------------------------------------------
+ 314:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  *
+ 315:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  * */
+ 316:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** d2_s32 d2_renderwedge_shadow( d2_device *handle, d2_point x, d2_point y, d2_width r, d2_width w, d2
+ 317:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** {
+ 918                             		.loc 1 317 1 is_stmt 1 view -0
+ 919                             		.loc 1 317 1 is_stmt 0 view .LVU298
+ 920 0000 7E A7                   		push.l	r7
+ 921                             	.LCFI11:
+ 922                             		.loc 1 317 1 view .LVU299
+ 923 0002 71 00 D0                		add	#-48, r0
+ 924                             	.LCFI12:
+ 925 0005 75 47 38                		mov.L	#56, r7
+ 926 0008 4B 07                   		add	r0, r7
+ 318:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    d2_point sx, sy;
+ 927                             		.loc 1 318 4 is_stmt 1 view .LVU300
+ 319:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    sx = D2_DEV(handle)->soffx;
+ 928                             		.loc 1 319 4 view .LVU301
+ 929                             		.loc 1 319 7 is_stmt 0 view .LVU302
+ 930 000a DD 1E 37                		mov.W	110[r1], r14
+ 931                             	.LVL100:
+ 320:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    sy = D2_DEV(handle)->soffy;
+ 932                             		.loc 1 320 4 is_stmt 1 view .LVU303
+ 933                             		.loc 1 320 7 is_stmt 0 view .LVU304
+ 934 000d DD 1F 38                		mov.W	112[r1], r15
+ 935                             	.LVL101:
+ 321:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 322:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    (void)d2_renderwedge_intern( D2_DEV(handle), D2_DEV(handle)->ctxoutline, (d2_point)(x + sx), (d2
+ 936                             		.loc 1 322 4 is_stmt 1 view .LVU305
+ 937                             		.loc 1 322 10 is_stmt 0 view .LVU306
+ 938 0010 E5 70 05 05             		mov.L	20[r7], 20[r0]
+ 939 0014 E5 70 04 04             		mov.L	16[r7], 16[r0]
+ 940 0018 E5 70 03 03             		mov.L	12[r7], 12[r0]
+ 941 001c E5 70 02 02             		mov.L	8[r7], 8[r0]
+ 942 0020 E5 70 01 01             		mov.L	4[r7], 4[r0]
+ 943 0024 D4 70 01                		mov.W	[r7], 2[r0]
+ 944 0027 D3 04                   		mov.W	r4, [r0]
+ 945 0029 FF 24 F3                		add	r15, r3, r4
+ 946                             	.LVL102:
+ 947                             		.loc 1 322 10 view .LVU307
+ 948 002c FF 23 E2                		add	r14, r2, r3
+ 949                             	.LVL103:
+ 950                             		.loc 1 322 10 view .LVU308
+ 951 002f AA 9A                   		mov.L	44[r1], r2
+ 952                             	.LVL104:
+ 953                             		.loc 1 322 10 view .LVU309
+ 954 0031 05 00 00 00             		bsr	_d2_renderwedge_intern
+ 955                             	.LVL105:
+ 323:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 324:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    return D2_OK;
+ 956                             		.loc 1 324 4 is_stmt 1 view .LVU310
+ 325:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** }
+ 957                             		.loc 1 325 1 is_stmt 0 view .LVU311
+ 958 0035 66 01                   		mov.L	#0, r1
+ 959 0037 3F 77 0D                		rtsd	#52, r7-r7
+ 960                             	.LFE11:
+ 962                             		.section	.text.d2_renderwedge_solidoutline,"ax",@progbits
+ 963                             		.global	_d2_renderwedge_solidoutline
+ 965                             	_d2_renderwedge_solidoutline:
+ 966                             	.LVL106:
+ 967                             	.LFB12:
+ 326:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 327:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 328:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** /*--------------------------------------------------------------------------
+ 329:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  *
+ 330:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  * */
+ 331:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** d2_s32 d2_renderwedge_solidoutline( d2_device *handle, d2_point x, d2_point y, d2_width r, d2_width
+ 332:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** {
+ 968                             		.loc 1 332 1 is_stmt 1 view -0
+ 969                             		.loc 1 332 1 is_stmt 0 view .LVU313
+ 970 0000 6E 6D                   		pushm	r6-r13
+ 971                             	.LCFI13:
+ 972                             		.loc 1 332 1 view .LVU314
+ 973 0002 71 00 C8                		add	#-56, r0
+ 974                             	.LCFI14:
+ 975 0005 75 47 5C                		mov.L	#0x5c, r7
+ 976 0008 4B 07                   		add	r0, r7
+ 977 000a EF 1A                   		mov.L	r1, r10
+ 978 000c DF 26                   		mov.W	r2, r6
+ 979 000e DF 3B                   		mov.W	r3, r11
+ 980 0010 DF 4C                   		mov.W	r4, r12
+ 981 0012 DC 79                   		mov.W	[r7], r9
+ 982 0014 E5 70 01 06             		mov.L	4[r7], 24[r0]
+ 983 0018 E5 70 02 07             		mov.L	8[r7], 28[r0]
+ 984 001c ED 78 03                		mov.L	12[r7], r8
+ 985 001f ED 7D 04                		mov.L	16[r7], r13
+ 986 0022 A9 7F                   		mov.L	20[r7], r7
+ 333:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    /* render outline */
+ 334:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    (void)d2_renderwedge_intern( D2_DEV(handle), D2_DEV(handle)->ctxoutline, x, y, r, (d2_width)(w +
+ 987                             		.loc 1 334 4 is_stmt 1 view .LVU315
+ 988                             		.loc 1 334 116 is_stmt 0 view .LVU316
+ 989 0024 DD 15 36                		mov.W	108[r1], r5
+ 990                             		.loc 1 334 131 view .LVU317
+ 991 0027 4B 55                   		add	r5, r5
+ 992                             		.loc 1 334 99 view .LVU318
+ 993 0029 4B 95                   		add	r9, r5
+ 994                             		.loc 1 334 10 view .LVU319
+ 995 002b A1 0F                   		mov.L	r7, 20[r0]
+ 996 002d E7 0D 04                		mov.L	r13, 16[r0]
+ 997 0030 E7 08 03                		mov.L	r8, 12[r0]
+ 998 0033 E5 00 07 02             		mov.L	28[r0], 8[r0]
+ 999 0037 E5 00 06 01             		mov.L	24[r0], 4[r0]
+ 1000 003b 90 0D                   		mov.W	r5, 2[r0]
+ 1001 003d D3 04                   		mov.W	r4, [r0]
+ 1002 003f DF 34                   		mov.W	r3, r4
+ 1003                             	.LVL107:
+ 1004                             		.loc 1 334 10 view .LVU320
+ 1005 0041 DF 23                   		mov.W	r2, r3
+ 1006                             	.LVL108:
+ 1007                             		.loc 1 334 10 view .LVU321
+ 1008 0043 AA 9A                   		mov.L	44[r1], r2
+ 1009                             	.LVL109:
+ 1010                             		.loc 1 334 10 view .LVU322
+ 1011 0045 05 00 00 00             		bsr	_d2_renderwedge_intern
+ 1012                             	.LVL110:
+ 335:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 336:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    /* render solid */
+ 337:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    d2_rendertolayer_intern( handle );
+ 1013                             		.loc 1 337 4 is_stmt 1 view .LVU323
+ 1014 0049 EF A1                   		mov.L	r10, r1
+ 1015 004b 05 00 00 00             		bsr	_d2_rendertolayer_intern
+ 1016                             	.LVL111:
+ 338:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    (void)d2_renderwedge_intern( D2_DEV(handle), D2_DEV(handle)->ctxsolid, x, y, r, w, nx1, ny1, nx2
+ 1017                             		.loc 1 338 4 view .LVU324
+ 1018                             		.loc 1 338 10 is_stmt 0 view .LVU325
+ 1019 004f A1 0F                   		mov.L	r7, 20[r0]
+ 1020 0051 E7 0D 04                		mov.L	r13, 16[r0]
+ 1021 0054 E7 08 03                		mov.L	r8, 12[r0]
+ 1022 0057 E5 00 07 02             		mov.L	28[r0], 8[r0]
+ 1023 005b E5 00 06 01             		mov.L	24[r0], 4[r0]
+ 1024 005f D7 09 01                		mov.W	r9, 2[r0]
+ 1025 0062 D3 0C                   		mov.W	r12, [r0]
+ 1026 0064 DF B4                   		mov.W	r11, r4
+ 1027 0066 DF 63                   		mov.W	r6, r3
+ 1028 0068 ED A2 0A                		mov.L	40[r10], r2
+ 1029 006b EF A1                   		mov.L	r10, r1
+ 1030 006d 05 00 00 00             		bsr	_d2_renderwedge_intern
+ 1031                             	.LVL112:
+ 339:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    d2_rendertobase_intern( handle );
+ 1032                             		.loc 1 339 4 is_stmt 1 view .LVU326
+ 1033 0071 EF A1                   		mov.L	r10, r1
+ 1034 0073 05 00 00 00             		bsr	_d2_rendertobase_intern
+ 1035                             	.LVL113:
+ 340:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 341:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    return D2_OK;
+ 1036                             		.loc 1 341 4 view .LVU327
+ 342:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** }
+ 1037                             		.loc 1 342 1 is_stmt 0 view .LVU328
+ 1038 0077 66 01                   		mov.L	#0, r1
+ 1039 0079 3F 6D 16                		rtsd	#88, r6-r13
+ 1040                             		.loc 1 342 1 view .LVU329
+ 1041                             	.LFE12:
+ 1043                             		.section	.text.d2_renderwedge_solidshadow,"ax",@progbits
+ 1044                             		.global	_d2_renderwedge_solidshadow
+ 1046                             	_d2_renderwedge_solidshadow:
+ 1047                             	.LVL114:
+ 1048                             	.LFB13:
+ 343:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 344:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** /*--------------------------------------------------------------------------
+ 345:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  *
+ 346:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****  * */
+ 347:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** d2_s32 d2_renderwedge_solidshadow( d2_device *handle, d2_point x, d2_point y, d2_width r, d2_width 
+ 348:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** {
+ 1049                             		.loc 1 348 1 is_stmt 1 view -0
+ 1050                             		.loc 1 348 1 is_stmt 0 view .LVU331
+ 1051 0000 6E 6D                   		pushm	r6-r13
+ 1052                             	.LCFI15:
+ 1053                             		.loc 1 348 1 view .LVU332
+ 1054 0002 71 00 C8                		add	#-56, r0
+ 1055                             	.LCFI16:
+ 1056 0005 75 47 5C                		mov.L	#0x5c, r7
+ 1057 0008 4B 07                   		add	r0, r7
+ 1058 000a EF 1A                   		mov.L	r1, r10
+ 1059 000c DF 26                   		mov.W	r2, r6
+ 1060 000e DF 3B                   		mov.W	r3, r11
+ 1061 0010 DF 4C                   		mov.W	r4, r12
+ 1062 0012 D4 70 0C                		mov.W	[r7], 24[r0]
+ 1063 0015 E5 70 01 07             		mov.L	4[r7], 28[r0]
+ 1064 0019 ED 79 02                		mov.L	8[r7], r9
+ 1065 001c ED 78 03                		mov.L	12[r7], r8
+ 1066 001f ED 7D 04                		mov.L	16[r7], r13
+ 1067 0022 A9 7F                   		mov.L	20[r7], r7
+ 349:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    d2_point sx,sy;
+ 1068                             		.loc 1 349 4 is_stmt 1 view .LVU333
+ 350:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    sx = D2_DEV(handle)->soffx;
+ 1069                             		.loc 1 350 4 view .LVU334
+ 1070                             		.loc 1 350 7 is_stmt 0 view .LVU335
+ 1071 0024 DD 13 37                		mov.W	110[r1], r3
+ 1072                             	.LVL115:
+ 351:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    sy = D2_DEV(handle)->soffy;
+ 1073                             		.loc 1 351 4 is_stmt 1 view .LVU336
+ 1074                             		.loc 1 351 7 is_stmt 0 view .LVU337
+ 1075 0027 DD 14 38                		mov.W	112[r1], r4
+ 1076                             	.LVL116:
+ 352:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 353:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    /* render shadow */
+ 354:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    (void)d2_renderwedge_intern( D2_DEV(handle), D2_DEV(handle)->ctxoutline, (d2_point)(x + sx), (d2
+ 1077                             		.loc 1 354 4 is_stmt 1 view .LVU338
+ 1078                             		.loc 1 354 10 is_stmt 0 view .LVU339
+ 1079 002a A1 0F                   		mov.L	r7, 20[r0]
+ 1080 002c E7 0D 04                		mov.L	r13, 16[r0]
+ 1081 002f E7 08 03                		mov.L	r8, 12[r0]
+ 1082 0032 E7 09 02                		mov.L	r9, 8[r0]
+ 1083 0035 E5 00 07 01             		mov.L	28[r0], 4[r0]
+ 1084 0039 D5 00 0C 01             		mov.W	24[r0], 2[r0]
+ 1085 003d D3 0C                   		mov.W	r12, [r0]
+ 1086 003f 4B B4                   		add	r11, r4
+ 1087                             	.LVL117:
+ 1088                             		.loc 1 354 10 view .LVU340
+ 1089 0041 4B 63                   		add	r6, r3
+ 1090                             	.LVL118:
+ 1091                             		.loc 1 354 10 view .LVU341
+ 1092 0043 AA 9A                   		mov.L	44[r1], r2
+ 1093                             	.LVL119:
+ 1094                             		.loc 1 354 10 view .LVU342
+ 1095 0045 05 00 00 00             		bsr	_d2_renderwedge_intern
+ 1096                             	.LVL120:
+ 355:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 356:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    /* render solid */
+ 357:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    d2_rendertolayer_intern( handle );
+ 1097                             		.loc 1 357 4 is_stmt 1 view .LVU343
+ 1098 0049 EF A1                   		mov.L	r10, r1
+ 1099 004b 05 00 00 00             		bsr	_d2_rendertolayer_intern
+ 1100                             	.LVL121:
+ 358:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    (void)d2_renderwedge_intern( D2_DEV(handle), D2_DEV(handle)->ctxsolid, x, y, r, w, nx1, ny1, nx2
+ 1101                             		.loc 1 358 4 view .LVU344
+ 1102                             		.loc 1 358 10 is_stmt 0 view .LVU345
+ 1103 004f A1 0F                   		mov.L	r7, 20[r0]
+ 1104 0051 E7 0D 04                		mov.L	r13, 16[r0]
+ 1105 0054 E7 08 03                		mov.L	r8, 12[r0]
+ 1106 0057 E7 09 02                		mov.L	r9, 8[r0]
+ 1107 005a E5 00 07 01             		mov.L	28[r0], 4[r0]
+ 1108 005e D5 00 0C 01             		mov.W	24[r0], 2[r0]
+ 1109 0062 D3 0C                   		mov.W	r12, [r0]
+ 1110 0064 DF B4                   		mov.W	r11, r4
+ 1111 0066 DF 63                   		mov.W	r6, r3
+ 1112 0068 ED A2 0A                		mov.L	40[r10], r2
+ 1113 006b EF A1                   		mov.L	r10, r1
+ 1114 006d 05 00 00 00             		bsr	_d2_renderwedge_intern
+ 1115                             	.LVL122:
+ 359:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    d2_rendertobase_intern( handle );
+ 1116                             		.loc 1 359 4 is_stmt 1 view .LVU346
+ 1117 0071 EF A1                   		mov.L	r10, r1
+ 1118 0073 05 00 00 00             		bsr	_d2_rendertobase_intern
+ 1119                             	.LVL123:
+ 360:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** 
+ 361:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c ****    return D2_OK;
+ 1120                             		.loc 1 361 4 view .LVU347
+ 362:../src/smc_gen/r_drw2d_rx/src/tes/dave_wedge.c **** }
+ 1121                             		.loc 1 362 1 is_stmt 0 view .LVU348
+ 1122 0077 66 01                   		mov.L	#0, r1
+ 1123 0079 3F 6D 16                		rtsd	#88, r6-r13
+ 1124                             		.loc 1 362 1 view .LVU349
+ 1125                             	.LFE13:
+ 1379                             	.Letext0:
+ 1380                             		.file 2 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_drw2d_rx\\inc\\tes/dav
+ 1381                             		.file 3 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_drw2d_rx\\inc\\tes/dav
+ 1382                             		.file 4 "../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h"
+ 1383                             		.file 5 "../src/smc_gen/r_drw2d_rx/src/tes/dave_dlist.h"
+ 1384                             		.file 6 "../src/smc_gen/r_drw2d_rx/src/tes/dave_rbuffer.h"
+ 1385                             		.file 7 "../src/smc_gen/r_drw2d_rx/src/tes/dave_gradient.h"
+ 1386                             		.file 8 "../src/smc_gen/r_drw2d_rx/src/tes/dave_context.h"
+ 1387                             		.file 9 "../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.h"

@@ -1,0 +1,753 @@
+   1                             		.file	"lowsrc.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.write,"ax",@progbits
+   5                             		.global	_write
+   7                             	_write:
+   8                             	.LVL0:
+   9                             	.LFB3:
+  10                             		.file 1 "../src/smc_gen/r_bsp/mcu/all/lowsrc.c"
+   1:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+   2:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * DISCLAIMER
+   3:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * This software is supplied by Renesas Electronics Corporation and is only intended for use with Re
+   4:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * other uses are authorized. This software is owned by Renesas Electronics Corporation and is prote
+   5:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * applicable laws, including copyright laws.
+   6:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+   7:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF 
+   8:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIM
+   9:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AF
+  10:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY RE
+  11:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+  12:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Renesas reserves the right, without notice, to make changes to this software and to discontinue t
+  13:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * this software. By using this software, you agree to the additional terms and conditions found by 
+  14:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * following link:
+  15:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * http://www.renesas.com/disclaimer
+  16:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *
+  17:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Copyright (C) 2013 Renesas Electronics Corporation. All rights reserved.
+  18:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+  19:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+  20:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * File Name    : lowsrc.c
+  21:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Description  : Functions to support stream I/O
+  22:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+  23:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+  24:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * History : DD.MM.YYYY Version  Description
+  25:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *         : 28.02.2019 3.00     Merged processing of all devices.
+  26:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                               Added support for GNUC and ICCRX.
+  27:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                               Fixed coding style.
+  28:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *         : 29.01.2021 3.01     Added tha __write function and __read function for ICCRX.
+  29:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+  30:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+  31:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+  32:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** Includes   <System Includes> , "Project Includes"
+  33:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+  34:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #if defined(__CCRX__)
+  35:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #include <string.h>
+  36:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #include <stdio.h>
+  37:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #endif /* defined(__CCRX__) */
+  38:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #include "r_bsp_common.h"
+  39:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #include "r_bsp_config.h"
+  40:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #include "lowlvl.h"
+  41:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #include "lowsrc.h"
+  42:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #if defined(__ICCRX__)
+  43:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #if (BSP_CFG_USER_CHARPUT_ENABLED == 1) || (BSP_CFG_USER_CHARGET_ENABLED == 1)
+  44:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #include <stddef.h>
+  45:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #endif
+  46:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #endif
+  47:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+  48:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /* When using the user startup program, disable the following code. */
+  49:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #if BSP_CFG_STARTUP_DISABLE == 0
+  50:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+  51:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /* Do not include this file if stdio is disabled in r_bsp_config. */
+  52:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #if BSP_CFG_IO_LIB_ENABLE == 1
+  53:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+  54:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #if defined(__CCRX__)
+  55:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+  56:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+  57:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** Macro definitions
+  58:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+  59:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /*Number of I/O Stream*/
+  60:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_IOSTREAM (20)
+  61:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+  62:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /* file number */
+  63:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_STDIN    (0)    /* Standard input (console) */
+  64:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_STDOUT   (1)    /* Standard output (console) */
+  65:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_STDERR   (2)    /* Standard error output (console) */
+  66:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+  67:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_FLMIN    (0)    /* Minimum file number */
+  68:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_MOPENR   (0x1)
+  69:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_MOPENW   (0x2)
+  70:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_MOPENA   (0x4)
+  71:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_MTRUNC   (0x8)
+  72:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_MCREAT   (0x10)
+  73:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_MBIN     (0x20)
+  74:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_MEXCL    (0x40)
+  75:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_MALBUF   (0x40)
+  76:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_MALFIL   (0x80)
+  77:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_MEOF     (0x100)
+  78:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_MERR     (0x200)
+  79:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_MLBF     (0x400)
+  80:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_MNBF     (0x800)
+  81:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_MREAD    (0x1000)
+  82:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_MWRITE   (0x2000)
+  83:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_MBYTE    (0x4000)
+  84:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_MWIDE    (0x8000)
+  85:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /* File Flags */
+  86:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_O_RDONLY (0x0001)  /* Read only */
+  87:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_O_WRONLY (0x0002)  /* Write only */
+  88:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_O_RDWR   (0x0004)  /* Both read and Write */
+  89:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_O_CREAT  (0x0008)  /* A file is created if it is not existed */
+  90:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_O_TRUNC  (0x0010)  /* The file size is changed to 0 if it is existed. */
+  91:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_O_APPEND (0x0020)  /* The position is set for next reading/writing
+  92:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****                                       0: Top of the file 1: End of file */
+  93:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+  94:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /* Special character code */
+  95:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_CR (0x0d) /* Carriage return */
+  96:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_LF (0x0a) /* Line feed */
+  97:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+  98:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_FPATH_STDIN     "C:\\stdin"
+  99:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_FPATH_STDOUT    "C:\\stdout"
+ 100:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_FPATH_STDERR    "C:\\stderr"
+ 101:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 102:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #ifdef _REENTRANT
+ 103:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** // For Reentrant Library (generated lbgrx with -reent option)
+ 104:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_MALLOC_SEM   (1)  /* Semaphore No. for malloc */
+ 105:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_STRTOK_SEM   (2)  /* Semaphore No. for strtok */
+ 106:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_FILE_TBL_SEM (3)  /* Semaphore No. for fopen  */
+ 107:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_MBRLEN_SEM   (4)  /* Semaphore No. for mbrlen */
+ 108:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_FPSWREG_SEM  (5)  /* Semaphore No. for FPSW register */
+ 109:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_FILES_SEM    (6)  /* Semaphore No. for _Files */
+ 110:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_SEMSIZE      (26) /* BSP_PRV_FILES_SEM + _nfiles (assumed _nfiles=20) */
+ 111:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 112:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_TRUE  (1)
+ 113:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_FALSE (0)
+ 114:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_OK    (1)
+ 115:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #define BSP_PRV_NG    (0)
+ 116:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #endif /* _REENTRANT */
+ 117:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 118:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 119:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** Typedef definitions
+ 120:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 121:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 122:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 123:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** Exported global variables (to be accessed by other files)
+ 124:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 125:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** extern const long _nfiles;     /* The number of files for input/output files */
+ 126:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** char flmod[BSP_PRV_IOSTREAM];          /* The location for the mode of opened file. */
+ 127:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 128:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** unsigned char sml_buf[BSP_PRV_IOSTREAM];
+ 129:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 130:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** FILE *_Files[BSP_PRV_IOSTREAM]; /* structure for FILE */
+ 131:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** char *env_list[] = {            /* Array for environment variables(**environ) */
+ 132:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     "ENV1=temp01",
+ 133:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     "ENV2=temp02",
+ 134:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     "ENV9=end",
+ 135:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     '\0'                        /* Terminal for environment variables */
+ 136:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** };
+ 137:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 138:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** char **environ = env_list;
+ 139:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 140:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 141:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** Private global variables and functions
+ 142:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 143:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #ifdef _REENTRANT
+ 144:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** static long sem_errno;
+ 145:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** static int force_fail_signal_sem = BSP_PRV_FALSE;
+ 146:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** static int semaphore[BSP_PRV_SEMSIZE];
+ 147:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #endif /* _REENTRANT */
+ 148:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 149:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 150:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Function Name: init_iolib
+ 151:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Description  : Initialize C library Functions, if necessary. Define USES_SIMIO on Assembler Optio
+ 152:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Arguments    : none
+ 153:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Return Value : none
+ 154:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 155:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** void init_iolib(void)
+ 156:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** {
+ 157:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* A file for standard input/output is opened or created. Each FILE
+ 158:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****      * structure members are initialized by the library. Each _Buf member
+ 159:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****      * in it is re-set the end of buffer pointer.
+ 160:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****      */
+ 161:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 162:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* Initializations of File Stream Table */
+ 163:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     _Files[0] = stdin;
+ 164:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     _Files[1] = stdout;
+ 165:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     _Files[2] = stderr;
+ 166:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 167:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* Standard Input File */
+ 168:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     if( freopen( BSP_PRV_FPATH_STDIN, "r", stdin ) == NULL )
+ 169:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     {
+ 170:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         stdin->_Mode = 0xffff;  /* Not allow the access if it fails to open */
+ 171:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     }
+ 172:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     stdin->_Mode  = BSP_PRV_MOPENR;         /* Read only attribute */
+ 173:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     stdin->_Mode |= BSP_PRV_MNBF;           /* Non-buffering for data */
+ 174:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     stdin->_Bend = stdin->_Buf + 1;  /* Re-set pointer to the end of buffer */
+ 175:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 176:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* Standard Output File */
+ 177:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     if( freopen( BSP_PRV_FPATH_STDOUT, "w", stdout ) == NULL ) 
+ 178:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     {
+ 179:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         stdout->_Mode = 0xffff; /* Not allow the access if it fails to open */
+ 180:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     }
+ 181:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     stdout->_Mode |= BSP_PRV_MNBF;            /* Non-buffering for data */
+ 182:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     stdout->_Bend = stdout->_Buf + 1;  /* Re-set pointer to the end of buffer */
+ 183:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     
+ 184:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* Standard Error File */
+ 185:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     if( freopen( BSP_PRV_FPATH_STDERR, "w", stderr ) == NULL )
+ 186:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     {
+ 187:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         stderr->_Mode = 0xffff;  /* Not allow the access if it fails to open */
+ 188:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     }
+ 189:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     stderr->_Mode |= BSP_PRV_MNBF;             /* Non-buffering for data */
+ 190:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     stderr->_Bend = stderr->_Buf + 1;/* Re-set pointer to the end of buffer */
+ 191:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** } /* End of function init_iolib() */
+ 192:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 193:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 194:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Function Name: close_all
+ 195:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Description  : Colses the file
+ 196:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Arguments    : none
+ 197:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Return Value : none
+ 198:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 199:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** void close_all(void)
+ 200:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** {
+ 201:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     long i;
+ 202:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 203:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* WAIT_LOOP */
+ 204:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     for( i=0; i < _nfiles; i++ )
+ 205:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     {
+ 206:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         /* Checks if the file is opened or not */
+ 207:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         if( _Files[i]->_Mode & (BSP_PRV_MOPENR | BSP_PRV_MOPENW | BSP_PRV_MOPENA ) )
+ 208:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         {
+ 209:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****             fclose( _Files[i] );    /* Closes the file */
+ 210:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         }
+ 211:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     }
+ 212:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** } /* End of function close_all() */
+ 213:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 214:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 215:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Function Name: open
+ 216:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Description  : file open
+ 217:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Arguments    : name - File name
+ 218:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                mode - Open mode
+ 219:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                flg - Open flag
+ 220:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Return Value : File number (Pass)
+ 221:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                -1          (Failure)
+ 222:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 223:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** long open(const char *name, long  mode, long  flg)
+ 224:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** {
+ 225:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* This code is only used to remove compiler info messages about these parameters not being use
+ 226:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     INTERNAL_NOT_USED(flg);
+ 227:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 228:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     if( 0 == strcmp( name, BSP_PRV_FPATH_STDIN ) )       /* Standard Input file? */
+ 229:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     {
+ 230:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         if( 0 == ( mode & BSP_PRV_O_RDONLY ) )
+ 231:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         {
+ 232:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****             return -1;
+ 233:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         }
+ 234:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         flmod[BSP_PRV_STDIN] = mode;
+ 235:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         return BSP_PRV_STDIN;
+ 236:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     }
+ 237:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     else if( 0 == strcmp( name, BSP_PRV_FPATH_STDOUT ) ) /* Standard Output file? */
+ 238:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     {
+ 239:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         if( 0 == ( mode & BSP_PRV_O_WRONLY ) )
+ 240:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         {
+ 241:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****             return -1;
+ 242:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         }
+ 243:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         flmod[BSP_PRV_STDOUT] = mode;
+ 244:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         return BSP_PRV_STDOUT;
+ 245:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     }
+ 246:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     else if( 0 == strcmp(name, BSP_PRV_FPATH_STDERR ) )   /* Standard Error file? */
+ 247:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     {
+ 248:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         if( 0 == ( mode & BSP_PRV_O_WRONLY ) )
+ 249:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         {
+ 250:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****             return -1;
+ 251:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         }
+ 252:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         flmod[BSP_PRV_STDERR] = mode;
+ 253:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         return BSP_PRV_STDERR;
+ 254:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     }
+ 255:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     else
+ 256:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     {
+ 257:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         return -1;                              /*Others */
+ 258:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     }
+ 259:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** } /* End of function open() */
+ 260:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 261:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 262:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Function Name: close
+ 263:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Description  : dummy
+ 264:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Arguments    : fileno - File number
+ 265:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Return Value : 1
+ 266:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 267:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** long close(long fileno)
+ 268:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** {
+ 269:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* This code is only used to remove compiler info messages about these parameters not being use
+ 270:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     INTERNAL_NOT_USED(fileno);
+ 271:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 272:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     return 1;
+ 273:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** } /* End of function close() */
+ 274:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 275:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 276:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Function Name: write
+ 277:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Description  : Data write
+ 278:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Arguments    : fileno - File number
+ 279:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                buf - The address of destination buffer
+ 280:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                count - The number of chacter to write
+ 281:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Return Value : Number of write characters (Pass)
+ 282:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                -1                         (Failure)
+ 283:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 284:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** long write(long  fileno, const unsigned char *buf, long  count)
+ 285:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** {
+ 286:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     long    i;                          /* A variable for counter */
+ 287:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     unsigned char    c;                 /* An output character */
+ 288:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 289:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* Checking the mode of file , output each character
+ 290:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****      * Checking the attribute for Write-Only, Read-Only or Read-Write
+ 291:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****      */
+ 292:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     if((flmod[fileno]&BSP_PRV_O_WRONLY) || (flmod[fileno]&BSP_PRV_O_RDWR))
+ 293:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     {
+ 294:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         if( BSP_PRV_STDIN == fileno )
+ 295:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         {
+ 296:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****             return -1;            /* Standard Input */
+ 297:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         }
+ 298:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         else if( (BSP_PRV_STDOUT == fileno) || (BSP_PRV_STDERR == fileno) ) /* Standard Error/outpu
+ 299:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         {
+ 300:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****             /* WAIT_LOOP */
+ 301:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****             for( i = count; i > 0; --i )
+ 302:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****             {
+ 303:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****                 c = *buf++;
+ 304:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****                 charput(c);
+ 305:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****             }
+ 306:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****             return count;        /*Return the number of written characters */
+ 307:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         }
+ 308:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         else
+ 309:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         {
+ 310:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****             return -1;                  /* Incorrect file number */
+ 311:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         }
+ 312:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     }
+ 313:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     else
+ 314:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     {
+ 315:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         return -1;                      /* An error */
+ 316:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     }
+ 317:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** } /* End of function write() */
+ 318:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 319:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 320:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Function Name: read
+ 321:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Description  : Data read
+ 322:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Arguments    : fileno - File number
+ 323:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                buf - The address of destination buffer
+ 324:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                count - The number of chacter to read
+ 325:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Return Value : Number of read characters (Pass)
+ 326:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                -1                        (Failure)
+ 327:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 328:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** long read(long fileno, unsigned char *buf, long count)
+ 329:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** {
+ 330:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****        long i;
+ 331:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 332:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****        /* Checking the file mode with the file number, each character is input and stored the buffe
+ 333:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 334:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****        if((flmod[fileno]&BSP_PRV_MOPENR) || (flmod[fileno]&BSP_PRV_O_RDWR))
+ 335:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****        {
+ 336:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****              /* WAIT_LOOP */
+ 337:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****              for(i = count; i > 0; i--)
+ 338:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****              {
+ 339:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****                    *buf = charget();
+ 340:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****                    if(BSP_PRV_CR == (*buf))
+ 341:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****                    {
+ 342:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****                          *buf = BSP_PRV_LF; /* Replace the new line character */
+ 343:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****                    }
+ 344:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****                    buf++;
+ 345:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****              }
+ 346:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****              return count;
+ 347:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****        }
+ 348:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****        else 
+ 349:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****        {
+ 350:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****              return -1;
+ 351:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****        }
+ 352:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** } /* End of function read() */
+ 353:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 354:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 355:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Function Name: lseek
+ 356:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Description  : dummy
+ 357:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Arguments    : fileno - File number
+ 358:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                offset - Offset indicating reading / writing position
+ 359:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                base - Offset starting point
+ 360:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Return Value : -1L
+ 361:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 362:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** long lseek(long fileno, long offset, long base)
+ 363:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** {
+ 364:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* This code is only used to remove compiler info messages about these parameters not being use
+ 365:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     INTERNAL_NOT_USED(fileno);
+ 366:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 367:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* This code is only used to remove compiler info messages about these parameters not being use
+ 368:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     INTERNAL_NOT_USED(offset);
+ 369:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 370:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* This code is only used to remove compiler info messages about these parameters not being use
+ 371:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     INTERNAL_NOT_USED(base);
+ 372:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 373:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     return -1L;
+ 374:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** } /* End of function lseek() */
+ 375:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 376:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #ifdef _REENTRANT
+ 377:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 378:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Function Name: errno_addr
+ 379:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Description  : Acquisition of errno address
+ 380:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Arguments    : none
+ 381:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Return Value : errno address
+ 382:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 383:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** long *errno_addr(void)
+ 384:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** {
+ 385:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* Return the errno address of the current task */
+ 386:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     return (&sem_errno);
+ 387:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** }
+ 388:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 389:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 390:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Function Name: wait_sem
+ 391:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Description  : Defines the specified numbers of semaphores
+ 392:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Arguments    : semnum - Semaphore ID
+ 393:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Return Value : BSP_PRV_OK(=1) (Normal)
+ 394:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                BSP_PRV_NG(=0) (Error)
+ 395:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 396:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** long wait_sem(long semnum) /* Semaphore ID */
+ 397:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** {
+ 398:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     if((0 < semnum) && (semnum < BSP_PRV_SEMSIZE)) {
+ 399:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         if(semaphore[semnum] == BSP_PRV_FALSE) {
+ 400:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****             semaphore[semnum] = BSP_PRV_TRUE;
+ 401:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****             return(BSP_PRV_OK);
+ 402:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         }
+ 403:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     }
+ 404:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     return(BSP_PRV_NG);
+ 405:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** }
+ 406:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 407:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 408:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Function Name: signal_sem
+ 409:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Description  : Releases the specified numbers of semaphores
+ 410:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Arguments    : semnum - Semaphore ID
+ 411:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Return Value : BSP_PRV_OK(=1) (Normal)
+ 412:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                BSP_PRV_NG(=0) (Error)
+ 413:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 414:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** long signal_sem(long semnum) /* Semaphore ID */
+ 415:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** {
+ 416:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     if(!force_fail_signal_sem) {
+ 417:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         if((0 <= semnum) && (semnum < BSP_PRV_SEMSIZE)) {
+ 418:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****             if( semaphore[semnum] == BSP_PRV_TRUE ) {
+ 419:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****                 semaphore[semnum] = BSP_PRV_FALSE;
+ 420:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****                 return(BSP_PRV_OK);
+ 421:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****             }
+ 422:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****         }
+ 423:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     }
+ 424:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     return(BSP_PRV_NG);
+ 425:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** }
+ 426:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #endif /* _REENTRANT */
+ 427:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 428:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #endif /* defined(__CCRX__) */
+ 429:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 430:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #endif /* BSP_CFG_IO_LIB_ENABLE */
+ 431:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 432:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** #if defined(__GNUC__)
+ 433:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 434:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Function Name: write
+ 435:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Description  : Data write (for GNURX+NEWLIB)
+ 436:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Arguments    : fileno - File number
+ 437:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                buf - The address of destination buffer
+ 438:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                count - The number of chacter to write
+ 439:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Return Value : Number of write characters (Pass)
+ 440:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 441:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** int write(int fileno, char *buf, int count)
+ 442:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** {
+  11                             		.loc 1 442 1 view -0
+  12                             		.loc 1 442 1 is_stmt 0 view .LVU1
+  13 0000 6E 6A                   		pushm	r6-r10
+  14                             	.LCFI0:
+  15 0002 EF 27                   		mov.L	r2, r7
+  16 0004 EF 36                   		mov.L	r3, r6
+ 443:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     int i;
+  17                             		.loc 1 443 5 is_stmt 1 view .LVU2
+ 444:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     char c;
+  18                             		.loc 1 444 5 view .LVU3
+ 445:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 446:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* This code is only used to remove compiler info messages about these parameters not being use
+ 447:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     INTERNAL_NOT_USED(fileno);
+  19                             		.loc 1 447 5 view .LVU4
+ 448:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 449:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* WAIT_LOOP */
+ 450:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     for(i = count; i > 0; --i)
+  20                             		.loc 1 450 5 view .LVU5
+  21                             	.LVL1:
+  22                             		.loc 1 450 11 is_stmt 0 view .LVU6
+  23 0006 EF 3A                   		mov.L	r3, r10
+  24                             	.LVL2:
+  25                             	.L2:
+  26                             		.loc 1 450 5 discriminator 1 view .LVU7
+  27 0008 61 0A                   		cmp	#0, r10
+  28 000a 2B 0D                   		ble	.L5
+ 451:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     {
+ 452:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****        c = *buf++;
+  29                             		.loc 1 452 8 is_stmt 1 discriminator 3 view .LVU8
+  30                             	.LVL3:
+ 453:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****        charput(c);
+  31                             		.loc 1 453 8 discriminator 3 view .LVU9
+  32 000c FD 28 71                		mov.B	[r7+], r1
+  33                             	.LVL4:
+  34                             		.loc 1 453 8 is_stmt 0 discriminator 3 view .LVU10
+  35 000f 05 00 00 00             		bsr	_charput
+  36                             	.LVL5:
+ 450:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     {
+  37                             		.loc 1 450 27 discriminator 3 view .LVU11
+  38 0013 60 1A                   		sub	#1, r10
+  39                             	.LVL6:
+ 450:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     {
+  40                             		.loc 1 450 27 discriminator 3 view .LVU12
+  41 0015 2E F3                   		bra	.L2
+  42                             	.LVL7:
+  43                             	.L5:
+ 454:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     }
+ 455:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 456:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     return count;
+  44                             		.loc 1 456 5 is_stmt 1 view .LVU13
+ 457:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** }
+  45                             		.loc 1 457 1 is_stmt 0 view .LVU14
+  46 0017 EF 61                   		mov.L	r6, r1
+  47 0019 3F 6A 05                		rtsd	#20, r6-r10
+  48                             		.loc 1 457 1 view .LVU15
+  49                             	.LFE3:
+  51                             		.section	.text.read,"ax",@progbits
+  52                             		.global	_read
+  54                             	_read:
+  55                             	.LVL8:
+  56                             	.LFB4:
+ 458:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 459:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 460:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Function Name: read
+ 461:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Description  : Data read (for GNURX+NEWLIB)
+ 462:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Arguments    : fileno - File number
+ 463:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                buf - The address of destination buffer
+ 464:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                count - The number of chacter to read
+ 465:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Return Value : 1 (Pass)
+ 466:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 467:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** int read(int fileno, char *buf, int count)
+ 468:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** {
+  57                             		.loc 1 468 1 is_stmt 1 view -0
+  58                             		.loc 1 468 1 is_stmt 0 view .LVU17
+  59 0000 7E A7                   		push.l	r7
+  60                             	.LCFI1:
+  61 0002 EF 27                   		mov.L	r2, r7
+ 469:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* This code is only used to remove compiler info messages about these parameters not being use
+ 470:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     INTERNAL_NOT_USED(fileno);
+  62                             		.loc 1 470 5 is_stmt 1 view .LVU18
+ 471:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     INTERNAL_NOT_USED(count);
+  63                             		.loc 1 471 5 view .LVU19
+ 472:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 473:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     *buf = charget();
+  64                             		.loc 1 473 5 view .LVU20
+  65                             		.loc 1 473 12 is_stmt 0 view .LVU21
+  66 0004 05 00 00 00             		bsr	_charget
+  67                             	.LVL9:
+  68                             		.loc 1 473 10 view .LVU22
+  69 0008 C3 71                   		mov.B	r1, [r7]
+ 474:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     return 1;
+  70                             		.loc 1 474 5 is_stmt 1 view .LVU23
+ 475:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** }
+  71                             		.loc 1 475 1 is_stmt 0 view .LVU24
+  72 000a 66 11                   		mov.L	#1, r1
+  73 000c 3F 77 01                		rtsd	#4, r7-r7
+  74                             		.loc 1 475 1 view .LVU25
+  75                             	.LFE4:
+  77                             		.section	.text._write,"ax",@progbits
+  78                             		.global	__write
+  80                             	__write:
+  81                             	.LVL10:
+  82                             	.LFB5:
+ 476:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 477:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 478:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Function Name: _write
+ 479:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Description  : Data write (for GNURX+OPTLIB)
+ 480:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Arguments    : fileno - File number
+ 481:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                buf - The address of destination buffer
+ 482:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                count - The number of chacter to write
+ 483:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Return Value : Number of write characters (Pass)
+ 484:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 485:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** int _write(int fileno, char *buf, int count)
+ 486:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** {
+  83                             		.loc 1 486 1 is_stmt 1 view -0
+  84                             		.loc 1 486 1 is_stmt 0 view .LVU27
+  85 0000 6E 6A                   		pushm	r6-r10
+  86                             	.LCFI2:
+  87 0002 EF 27                   		mov.L	r2, r7
+  88 0004 EF 36                   		mov.L	r3, r6
+ 487:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     int i;
+  89                             		.loc 1 487 5 is_stmt 1 view .LVU28
+ 488:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     char c;
+  90                             		.loc 1 488 5 view .LVU29
+ 489:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 490:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* This code is only used to remove compiler info messages about these parameters not being use
+ 491:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     INTERNAL_NOT_USED(fileno);
+  91                             		.loc 1 491 5 view .LVU30
+ 492:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 493:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* WAIT_LOOP */
+ 494:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     for(i = count; i > 0; --i)
+  92                             		.loc 1 494 5 view .LVU31
+  93                             	.LVL11:
+  94                             		.loc 1 494 11 is_stmt 0 view .LVU32
+  95 0006 EF 3A                   		mov.L	r3, r10
+  96                             	.LVL12:
+  97                             	.L9:
+  98                             		.loc 1 494 5 discriminator 1 view .LVU33
+  99 0008 61 0A                   		cmp	#0, r10
+ 100 000a 2B 0D                   		ble	.L12
+ 495:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     {
+ 496:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****        c = *buf++;
+ 101                             		.loc 1 496 8 is_stmt 1 discriminator 3 view .LVU34
+ 102                             	.LVL13:
+ 497:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****        charput(c);
+ 103                             		.loc 1 497 8 discriminator 3 view .LVU35
+ 104 000c FD 28 71                		mov.B	[r7+], r1
+ 105                             	.LVL14:
+ 106                             		.loc 1 497 8 is_stmt 0 discriminator 3 view .LVU36
+ 107 000f 05 00 00 00             		bsr	_charput
+ 108                             	.LVL15:
+ 494:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     {
+ 109                             		.loc 1 494 27 discriminator 3 view .LVU37
+ 110 0013 60 1A                   		sub	#1, r10
+ 111                             	.LVL16:
+ 494:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     {
+ 112                             		.loc 1 494 27 discriminator 3 view .LVU38
+ 113 0015 2E F3                   		bra	.L9
+ 114                             	.LVL17:
+ 115                             	.L12:
+ 498:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     }
+ 499:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 500:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     return count;
+ 116                             		.loc 1 500 5 is_stmt 1 view .LVU39
+ 501:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** }
+ 117                             		.loc 1 501 1 is_stmt 0 view .LVU40
+ 118 0017 EF 61                   		mov.L	r6, r1
+ 119 0019 3F 6A 05                		rtsd	#20, r6-r10
+ 120                             		.loc 1 501 1 view .LVU41
+ 121                             	.LFE5:
+ 123                             		.section	.text._read,"ax",@progbits
+ 124                             		.global	__read
+ 126                             	__read:
+ 127                             	.LVL18:
+ 128                             	.LFB6:
+ 502:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 503:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 504:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Function Name: read
+ 505:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Description  : Data read (for GNURX+OPTLIB)
+ 506:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Arguments    : fileno - File number
+ 507:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                buf - The address of destination buffer
+ 508:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** *                count - The number of chacter to read
+ 509:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Return Value : 1 (Pass)
+ 510:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 511:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** int _read(int fileno, char *buf, int count)
+ 512:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** {
+ 129                             		.loc 1 512 1 is_stmt 1 view -0
+ 130                             		.loc 1 512 1 is_stmt 0 view .LVU43
+ 131 0000 7E A7                   		push.l	r7
+ 132                             	.LCFI3:
+ 133 0002 EF 27                   		mov.L	r2, r7
+ 513:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* This code is only used to remove compiler info messages about these parameters not being use
+ 514:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     INTERNAL_NOT_USED(fileno);
+ 134                             		.loc 1 514 5 is_stmt 1 view .LVU44
+ 515:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     INTERNAL_NOT_USED(count);
+ 135                             		.loc 1 515 5 view .LVU45
+ 516:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 517:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     *buf = charget();
+ 136                             		.loc 1 517 5 view .LVU46
+ 137                             		.loc 1 517 12 is_stmt 0 view .LVU47
+ 138 0004 05 00 00 00             		bsr	_charget
+ 139                             	.LVL19:
+ 140                             		.loc 1 517 10 view .LVU48
+ 141 0008 C3 71                   		mov.B	r1, [r7]
+ 518:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     return 1;
+ 142                             		.loc 1 518 5 is_stmt 1 view .LVU49
+ 519:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** }
+ 143                             		.loc 1 519 1 is_stmt 0 view .LVU50
+ 144 000a 66 11                   		mov.L	#1, r1
+ 145 000c 3F 77 01                		rtsd	#4, r7-r7
+ 146                             		.loc 1 519 1 view .LVU51
+ 147                             	.LFE6:
+ 149                             		.section	.text.close,"ax",@progbits
+ 150                             		.global	_close
+ 152                             	_close:
+ 153                             	.LFB7:
+ 520:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 521:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 522:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Function Name: close
+ 523:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Description  : dummy
+ 524:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Arguments    : none
+ 525:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Return Value : none
+ 526:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 527:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** void close (void)
+ 528:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** {
+ 154                             		.loc 1 528 1 is_stmt 1 view -0
+ 529:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* This is dummy function.
+ 530:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****        This function is used to suppress the warning messages of GNU compiler.
+ 531:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****        Plese edit the function as required. */
+ 532:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** }
+ 155                             		.loc 1 532 1 view .LVU53
+ 156 0000 02                      		rts
+ 157                             	.LFE7:
+ 159                             		.section	.text.fstat,"ax",@progbits
+ 160                             		.global	_fstat
+ 162                             	_fstat:
+ 163                             	.LFB8:
+ 533:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 534:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 535:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Function Name: fstat
+ 536:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Description  : dummy
+ 537:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Arguments    : none
+ 538:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Return Value : none
+ 539:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 540:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** void fstat (void)
+ 541:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** {
+ 164                             		.loc 1 541 1 view -0
+ 542:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* This is dummy function.
+ 543:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****        This function is used to suppress the warning messages of GNU compiler.
+ 544:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****        Plese edit the function as required. */
+ 545:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** }
+ 165                             		.loc 1 545 1 view .LVU55
+ 166 0000 02                      		rts
+ 167                             	.LFE8:
+ 169                             		.section	.text.isatty,"ax",@progbits
+ 170                             		.global	_isatty
+ 172                             	_isatty:
+ 173                             	.LFB9:
+ 546:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 547:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 548:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Function Name: isatty
+ 549:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Description  : dummy
+ 550:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Arguments    : none
+ 551:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Return Value : none
+ 552:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 553:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** void isatty (void)
+ 554:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** {
+ 174                             		.loc 1 554 1 view -0
+ 555:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* This is dummy function.
+ 556:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****        This function is used to suppress the warning messages of GNU compiler.
+ 557:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****        Plese edit the function as required. */
+ 558:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** }
+ 175                             		.loc 1 558 1 view .LVU57
+ 176 0000 02                      		rts
+ 177                             	.LFE9:
+ 179                             		.section	.text.lseek,"ax",@progbits
+ 180                             		.global	_lseek
+ 182                             	_lseek:
+ 183                             	.LFB10:
+ 559:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** 
+ 560:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** /**************************************************************************************************
+ 561:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Function Name: lseek
+ 562:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Description  : dummy
+ 563:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Arguments    : none
+ 564:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** * Return Value : none
+ 565:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** ***************************************************************************************************
+ 566:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** void lseek (void)
+ 567:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** {
+ 184                             		.loc 1 567 1 view -0
+ 568:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****     /* This is dummy function.
+ 569:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****        This function is used to suppress the warning messages of GNU compiler.
+ 570:../src/smc_gen/r_bsp/mcu/all/lowsrc.c ****        Plese edit the function as required. */
+ 571:../src/smc_gen/r_bsp/mcu/all/lowsrc.c **** }
+ 185                             		.loc 1 571 1 view .LVU59
+ 186 0000 02                      		rts
+ 187                             	.LFE10:
+ 311                             	.Letext0:
+ 312                             		.file 2 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\lib\\gcc\\rx-
+ 313                             		.file 3 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 314                             		.file 4 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 315                             		.file 5 "c:\\programdata\\gcc for renesas rx 8.3.0.202311-gnurx-elf\\rx-elf\\rx-elf\\rx-elf\\inclu
+ 316                             		.file 6 "../src/smc_gen/r_bsp/mcu/all/lowlvl.h"

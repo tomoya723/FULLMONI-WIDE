@@ -1,0 +1,1887 @@
+   1                             		.file	"dave_circle.c"
+   2                             		.section P,"ax"
+   3                             	.Ltext0:
+   4                             		.section	.text.d2_rendercircle_intern,"ax",@progbits
+   5                             		.global	_d2_rendercircle_intern
+   7                             	_d2_rendercircle_intern:
+   8                             	.LVL0:
+   9                             	.LFB6:
+  10                             		.file 1 "../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c"
+   1:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** /*--------------------------------------------------------------------------
+   2:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  * Project: D/AVE
+   3:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  * File:    dave_circle.c (%version: 15 %)
+   4:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  *          created Wed Jan 12 15:53:43 2005 by hh04027
+   5:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  *
+   6:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  * Description:
+   7:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  *  %date_modified: Thu Jan 04 16:46:49 2007 %  (%derived_by:  hh04027 %)
+   8:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  *
+   9:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  * Changes:
+  10:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  *  2008-01-14 ASc  changed comments from C++ to C, removed tabs
+  11:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  *  2008-09-25 MRe  added  ctx->circleextendoffset
+  12:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  *  2008-10-02 MRe  fix of blurred circles
+  13:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  *  2012-09-25 BSp  MISRA cleanup
+  14:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  *-------------------------------------------------------------------------- */
+  15:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+  16:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** #include "dave_driver.h"
+  17:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** #include "dave_intern.h"
+  18:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** #include "dave_viewport.h"
+  19:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** #include "dave_render.h"
+  20:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** #include "dave_pattern.h"
+  21:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** #include "dave_circle.h"
+  22:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** #include "dave_curve.h"
+  23:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** #include "dave_texture.h"
+  24:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+  25:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+  26:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** /*--------------------------------------------------------------------------
+  27:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  *
+  28:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  * */
+  29:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** d2_s32 d2_rendercircle_intern( d2_devicedata *handle, d2_contextdata *ctx, d2_point x, d2_point y, 
+  30:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** {
+  11                             		.loc 1 30 1 view -0
+  12                             		.loc 1 30 1 is_stmt 0 view .LVU1
+  13 0000 6E 6D                   		pushm	r6-r13
+  14                             	.LCFI0:
+  15                             		.loc 1 30 1 view .LVU2
+  16 0002 71 00 E4                		add	#-28, r0
+  17                             	.LCFI1:
+  18 0005 75 47 40                		mov.L	#0x40, r7
+  19 0008 4B 07                   		add	r0, r7
+  20 000a EF 1A                   		mov.L	r1, r10
+  21 000c EF 2B                   		mov.L	r2, r11
+  22 000e DF 39                   		mov.W	r3, r9
+  23 0010 DF 4C                   		mov.W	r4, r12
+  24 0012 DC 76                   		mov.W	[r7], r6
+  25 0014 98 7F                   		mov.W	2[r7], r7
+  31:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    d2_bbox bbox;
+  26                             		.loc 1 31 4 is_stmt 1 view .LVU3
+  32:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    d2_u32 delay;
+  27                             		.loc 1 32 4 view .LVU4
+  33:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    d2_u32 control;
+  28                             		.loc 1 33 4 view .LVU5
+  34:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    d2_u32 tmask;
+  29                             		.loc 1 34 4 view .LVU6
+  35:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    d2_s32 bbox_enlarge=0;
+  30                             		.loc 1 35 4 view .LVU7
+  31                             	.LVL1:
+  36:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+  37:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    /* check for circle ring */
+  38:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    if (w > 0)
+  32                             		.loc 1 38 4 view .LVU8
+  33                             		.loc 1 38 7 is_stmt 0 view .LVU9
+  34 0016 DF 75                   		mov.W	r7, r5
+  35 0018 61 05                   		cmp	#0, r5
+  36 001a 2B 40                   		ble	.L2
+  37                             	.LBB28:
+  39:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    {
+  40:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       /* ring bounding box */
+  41:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       d2_width wh = w/2;
+  38                             		.loc 1 41 7 is_stmt 1 view .LVU10
+  39                             		.loc 1 41 16 is_stmt 0 view .LVU11
+  40 001c EF 54                   		mov.L	r5, r4
+  41                             	.LVL2:
+  42                             		.loc 1 41 16 view .LVU12
+  43 001e 69 F5                   		shlr	#31, r5
+  44 0020 4B 45                   		add	r4, r5
+  45 0022 6A 15                   		shar	#1, r5
+  46                             	.LVL3:
+  42:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       d2_width wr = (d2_width)(wh + r);
+  47                             		.loc 1 42 7 is_stmt 1 view .LVU13
+  48                             		.loc 1 42 35 is_stmt 0 view .LVU14
+  49 0024 FF 23 65                		add	r6, r5, r3
+  50                             	.LVL4:
+  43:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       bbox.xmin = (d2_point) D2_FLOOR4( x - wr );
+  51                             		.loc 1 43 7 is_stmt 1 view .LVU15
+  52                             		.loc 1 43 30 is_stmt 0 view .LVU16
+  53 0027 FF 04 39                		sub	r3, r9, r4
+  54                             		.loc 1 43 19 view .LVU17
+  55 002a 75 24 F0                		and #-16, r4
+  56                             		.loc 1 43 17 view .LVU18
+  57 002d 92 04                   		mov.W	r4, 16[r0]
+  44:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       bbox.ymin = (d2_point) D2_FLOOR4( y - wr );
+  58                             		.loc 1 44 7 is_stmt 1 view .LVU19
+  59                             		.loc 1 44 30 is_stmt 0 view .LVU20
+  60 002f FF 04 3C                		sub	r3, r12, r4
+  61                             		.loc 1 44 19 view .LVU21
+  62 0032 75 24 F0                		and #-16, r4
+  63                             		.loc 1 44 17 view .LVU22
+  64 0035 92 0C                   		mov.W	r4, 18[r0]
+  45:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       bbox.xmax = (d2_point) D2_CEIL4( x + wr );
+  65                             		.loc 1 45 7 is_stmt 1 view .LVU23
+  66                             		.loc 1 45 30 is_stmt 0 view .LVU24
+  67 0037 FF 24 93                		add	r9, r3, r4
+  68 003a 62 F4                   		add	#15, r4
+  69                             		.loc 1 45 19 view .LVU25
+  70 003c 75 24 F0                		and #-16, r4
+  71                             		.loc 1 45 17 view .LVU26
+  72 003f 92 84                   		mov.W	r4, 20[r0]
+  46:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       bbox.ymax = (d2_point) D2_CEIL4( y + wr );
+  73                             		.loc 1 46 7 is_stmt 1 view .LVU27
+  74                             		.loc 1 46 30 is_stmt 0 view .LVU28
+  75 0041 FF 24 C3                		add	r12, r3, r4
+  76 0044 62 F4                   		add	#15, r4
+  77                             		.loc 1 46 19 view .LVU29
+  78 0046 75 24 F0                		and #-16, r4
+  79                             		.loc 1 46 17 view .LVU30
+  80 0049 92 8C                   		mov.W	r4, 22[r0]
+  47:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+  48:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       if( (r - wh) <= (D2_FIX4(1)/2) )
+  81                             		.loc 1 48 7 is_stmt 1 view .LVU31
+  82                             		.loc 1 48 14 is_stmt 0 view .LVU32
+  83 004b DF 64                   		mov.W	r6, r4
+  84 004d FF 05 54                		sub	r5, r4, r5
+  85                             	.LVL5:
+  86                             		.loc 1 48 9 view .LVU33
+  87 0050 61 85                   		cmp	#8, r5
+  88 0052 2A 2C                   		bgt	.L3
+  49:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+  50:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          /* invalid ring, use full circle */
+  51:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          r = (d2_width)(r + wh);
+  89                             		.loc 1 51 12 view .LVU34
+  90 0054 DF 36                   		mov.W	r3, r6
+  52:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          w = 0;
+  91                             		.loc 1 52 12 view .LVU35
+  92 0056 66 07                   		mov	#0, r7
+  93                             	.LVL6:
+  94                             		.loc 1 52 12 view .LVU36
+  95 0058 2E 26                   		bra	.L3
+  96                             	.LVL7:
+  97                             	.L2:
+  98                             		.loc 1 52 12 view .LVU37
+  99                             	.LBE28:
+  53:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+  54:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+  55:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    else
+  56:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    {
+  57:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       /* solid circle bounding box */
+  58:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       bbox.xmin = (d2_point) D2_FLOOR4( x - r );
+ 100                             		.loc 1 58 7 is_stmt 1 view .LVU38
+ 101                             		.loc 1 58 30 is_stmt 0 view .LVU39
+ 102 005a FF 05 69                		sub	r6, r9, r5
+ 103                             		.loc 1 58 19 view .LVU40
+ 104 005d 75 25 F0                		and #-16, r5
+ 105                             		.loc 1 58 17 view .LVU41
+ 106 0060 92 05                   		mov.W	r5, 16[r0]
+  59:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       bbox.ymin = (d2_point) D2_FLOOR4( y - r );
+ 107                             		.loc 1 59 7 is_stmt 1 view .LVU42
+ 108                             		.loc 1 59 30 is_stmt 0 view .LVU43
+ 109 0062 FF 05 6C                		sub	r6, r12, r5
+ 110                             		.loc 1 59 19 view .LVU44
+ 111 0065 75 25 F0                		and #-16, r5
+ 112                             		.loc 1 59 17 view .LVU45
+ 113 0068 92 0D                   		mov.W	r5, 18[r0]
+  60:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       bbox.xmax = (d2_point) D2_CEIL4( x + r );
+ 114                             		.loc 1 60 7 is_stmt 1 view .LVU46
+ 115                             		.loc 1 60 30 is_stmt 0 view .LVU47
+ 116 006a FF 25 69                		add	r6, r9, r5
+ 117 006d 62 F5                   		add	#15, r5
+ 118                             		.loc 1 60 19 view .LVU48
+ 119 006f 75 25 F0                		and #-16, r5
+ 120                             		.loc 1 60 17 view .LVU49
+ 121 0072 92 85                   		mov.W	r5, 20[r0]
+  61:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       bbox.ymax = (d2_point) D2_CEIL4( y + r );
+ 122                             		.loc 1 61 7 is_stmt 1 view .LVU50
+ 123                             		.loc 1 61 30 is_stmt 0 view .LVU51
+ 124 0074 FF 25 C6                		add	r12, r6, r5
+ 125 0077 62 F5                   		add	#15, r5
+ 126                             		.loc 1 61 19 view .LVU52
+ 127 0079 75 25 F0                		and #-16, r5
+ 128                             		.loc 1 61 17 view .LVU53
+ 129 007c 92 8D                   		mov.W	r5, 22[r0]
+ 130                             	.LVL8:
+ 131                             	.L3:
+  62:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+  63:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+  64:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    if(ctx->circleextendoffset > 0)
+ 132                             		.loc 1 64 4 is_stmt 1 view .LVU54
+ 133                             		.loc 1 64 10 is_stmt 0 view .LVU55
+ 134 007e DD B5 6D                		mov.W	218[r11], r5
+ 135                             		.loc 1 64 6 view .LVU56
+ 136 0081 DF 54                   		mov.W	r5, r4
+ 137 0083 61 04                   		cmp	#0, r4
+ 138 0085 2B 61                   		ble	.L21
+  65:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    { 
+  66:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       /* enlarge bbox to avoid cropping due to insufficient accuracy for big circles */
+  67:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       bbox_enlarge = ctx->circleextendoffset;
+ 139                             		.loc 1 67 7 is_stmt 1 view .LVU57
+ 140                             		.loc 1 67 20 is_stmt 0 view .LVU58
+ 141 0087 EF 48                   		mov.L	r4, r8
+ 142                             	.LVL9:
+  68:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       /* bbox_enlarge = (bbox_enlarge > ((256 * 128) - 1)) ? ((256 * 128) - 1) : bbox_enlarge; */ /
+  69:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                       
+  70:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       if( ((d2_s32)(bbox.xmin) - bbox_enlarge) < (d2_s32)(handle->clipxmin))
+ 143                             		.loc 1 70 7 is_stmt 1 view .LVU59
+ 144                             		.loc 1 70 25 is_stmt 0 view .LVU60
+ 145 0089 9A 03                   		mov.W	16[r0], r3
+ 146                             		.loc 1 70 12 view .LVU61
+ 147 008b DF 34                   		mov.W	r3, r4
+ 148                             	.LVL10:
+ 149                             		.loc 1 70 32 view .LVU62
+ 150 008d 43 84                   		sub	r8, r4
+ 151                             		.loc 1 70 65 view .LVU63
+ 152 008f DD A2 39                		mov.W	114[r10], r2
+ 153                             	.LVL11:
+ 154                             		.loc 1 70 48 view .LVU64
+ 155 0092 DF 21                   		mov.W	r2, r1
+ 156                             	.LVL12:
+ 157                             		.loc 1 70 9 view .LVU65
+ 158 0094 47 14                   		cmp	r1, r4
+ 159 0096 28 39                   		bge	.L5
+  71:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+  72:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          bbox.xmin = handle->clipxmin;
+ 160                             		.loc 1 72 10 is_stmt 1 view .LVU66
+ 161                             		.loc 1 72 20 is_stmt 0 view .LVU67
+ 162 0098 92 02                   		mov.W	r2, 16[r0]
+ 163                             	.L6:
+  73:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+  74:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       else
+  75:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+  76:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          bbox.xmin = (d2_point)(bbox.xmin - (d2_point)bbox_enlarge);
+  77:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+  78:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       
+  79:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       if( ((d2_s32)(bbox.ymin) - bbox_enlarge) < (d2_s32)(handle->clipymin) )
+ 164                             		.loc 1 79 7 is_stmt 1 view .LVU68
+ 165                             		.loc 1 79 25 is_stmt 0 view .LVU69
+ 166 009a 9A 0B                   		mov.W	18[r0], r3
+ 167                             		.loc 1 79 12 view .LVU70
+ 168 009c DF 34                   		mov.W	r3, r4
+ 169                             		.loc 1 79 32 view .LVU71
+ 170 009e 43 84                   		sub	r8, r4
+ 171                             		.loc 1 79 65 view .LVU72
+ 172 00a0 DD A2 3A                		mov.W	116[r10], r2
+ 173                             		.loc 1 79 48 view .LVU73
+ 174 00a3 DF 21                   		mov.W	r2, r1
+ 175                             		.loc 1 79 9 view .LVU74
+ 176 00a5 47 14                   		cmp	r1, r4
+ 177 00a7 28 2E                   		bge	.L7
+  80:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+  81:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          bbox.ymin = handle->clipymin;
+ 178                             		.loc 1 81 10 is_stmt 1 view .LVU75
+ 179                             		.loc 1 81 20 is_stmt 0 view .LVU76
+ 180 00a9 92 0A                   		mov.W	r2, 18[r0]
+ 181                             	.L8:
+  82:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+  83:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       else
+  84:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+  85:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          bbox.ymin = (d2_point)(bbox.ymin - (d2_point)bbox_enlarge);
+  86:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+  87:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       
+  88:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       if( ((d2_s32)(bbox.xmax)+bbox_enlarge) > (d2_s32)(handle->clipxmax) )
+ 182                             		.loc 1 88 7 is_stmt 1 view .LVU77
+ 183                             		.loc 1 88 25 is_stmt 0 view .LVU78
+ 184 00ab 9A 83                   		mov.W	20[r0], r3
+ 185                             		.loc 1 88 12 view .LVU79
+ 186 00ad DF 34                   		mov.W	r3, r4
+ 187                             		.loc 1 88 31 view .LVU80
+ 188 00af 4B 84                   		add	r8, r4
+ 189                             		.loc 1 88 63 view .LVU81
+ 190 00b1 DD A2 3B                		mov.W	118[r10], r2
+ 191                             		.loc 1 88 46 view .LVU82
+ 192 00b4 DF 21                   		mov.W	r2, r1
+ 193                             		.loc 1 88 9 view .LVU83
+ 194 00b6 47 14                   		cmp	r1, r4
+ 195 00b8 2B 23                   		ble	.L9
+  89:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+  90:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          bbox.xmax = handle->clipxmax; 
+ 196                             		.loc 1 90 10 is_stmt 1 view .LVU84
+ 197                             		.loc 1 90 20 is_stmt 0 view .LVU85
+ 198 00ba 92 82                   		mov.W	r2, 20[r0]
+ 199                             	.L10:
+  91:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+  92:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       else
+  93:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+  94:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          bbox.xmax = (d2_point)(bbox.xmax + (d2_point)bbox_enlarge);
+  95:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+  96:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+  97:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       if( ((d2_s32)(bbox.ymax) + bbox_enlarge) > (d2_s32)(handle->clipymax) )
+ 200                             		.loc 1 97 7 is_stmt 1 view .LVU86
+ 201                             		.loc 1 97 25 is_stmt 0 view .LVU87
+ 202 00bc 9A 8B                   		mov.W	22[r0], r3
+ 203                             		.loc 1 97 12 view .LVU88
+ 204 00be DF 34                   		mov.W	r3, r4
+ 205                             		.loc 1 97 32 view .LVU89
+ 206 00c0 4B 84                   		add	r8, r4
+ 207                             		.loc 1 97 65 view .LVU90
+ 208 00c2 DD A2 3C                		mov.W	120[r10], r2
+ 209                             		.loc 1 97 48 view .LVU91
+ 210 00c5 DF 21                   		mov.W	r2, r1
+ 211                             		.loc 1 97 9 view .LVU92
+ 212 00c7 47 14                   		cmp	r1, r4
+ 213 00c9 2B 18                   		ble	.L11
+  98:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+  99:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          bbox.ymax = handle->clipymax;
+ 214                             		.loc 1 99 10 is_stmt 1 view .LVU93
+ 215                             		.loc 1 99 20 is_stmt 0 view .LVU94
+ 216 00cb 92 8A                   		mov.W	r2, 22[r0]
+ 217 00cd 2E 1B                   		bra	.L4
+ 218                             	.L5:
+  76:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 219                             		.loc 1 76 10 is_stmt 1 view .LVU95
+  76:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 220                             		.loc 1 76 43 is_stmt 0 view .LVU96
+ 221 00cf 43 53                   		sub	r5, r3
+  76:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 222                             		.loc 1 76 20 view .LVU97
+ 223 00d1 92 03                   		mov.W	r3, 16[r0]
+ 224 00d3 2E C7                   		bra	.L6
+ 225                             	.L7:
+  85:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 226                             		.loc 1 85 10 is_stmt 1 view .LVU98
+  85:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 227                             		.loc 1 85 43 is_stmt 0 view .LVU99
+ 228 00d5 43 53                   		sub	r5, r3
+  85:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 229                             		.loc 1 85 20 view .LVU100
+ 230 00d7 92 0B                   		mov.W	r3, 18[r0]
+ 231 00d9 2E D2                   		bra	.L8
+ 232                             	.L9:
+  94:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 233                             		.loc 1 94 10 is_stmt 1 view .LVU101
+  94:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 234                             		.loc 1 94 43 is_stmt 0 view .LVU102
+ 235 00db 4B 53                   		add	r5, r3
+  94:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 236                             		.loc 1 94 20 view .LVU103
+ 237 00dd 92 83                   		mov.W	r3, 20[r0]
+ 238 00df 2E DD                   		bra	.L10
+ 239                             	.L11:
+ 100:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 101:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       else
+ 102:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+ 103:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          bbox.ymax = (d2_point)(bbox.ymax + (d2_point)bbox_enlarge);
+ 240                             		.loc 1 103 10 is_stmt 1 view .LVU104
+ 241                             		.loc 1 103 43 is_stmt 0 view .LVU105
+ 242 00e1 4B 35                   		add	r3, r5
+ 243                             		.loc 1 103 20 view .LVU106
+ 244 00e3 92 8D                   		mov.W	r5, 22[r0]
+ 245 00e5 0B                      		bra	.L4
+ 246                             	.LVL13:
+ 247                             	.L21:
+  35:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 248                             		.loc 1 35 11 view .LVU107
+ 249 00e6 66 08                   		mov.L	#0, r8
+ 250                             	.LVL14:
+ 251                             	.L4:
+ 104:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 105:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 106:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 107:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    /* clipping */
+ 108:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    if(0 == d2_clipbbox_intern( handle, &bbox ))
+ 252                             		.loc 1 108 4 is_stmt 1 view .LVU108
+ 253                             		.loc 1 108 12 is_stmt 0 view .LVU109
+ 254 00e8 75 42 10                		mov.L	#16, r2
+ 255 00eb 4B 02                   		add	r0, r2
+ 256 00ed EF A1                   		mov.L	r10, r1
+ 257 00ef 05 00 00 00             		bsr	_d2_clipbbox_intern
+ 258                             	.LVL15:
+ 259                             		.loc 1 108 6 view .LVU110
+ 260 00f3 61 01                   		cmp	#0, r1
+ 261 00f5 1C                      		bne	.L25
+ 262                             	.LVL16:
+ 263                             	.L1:
+ 109:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    {
+ 110:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       return 0;
+ 111:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 112:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 113:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    /* make relative */ 
+ 114:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    x = (d2_point)(x - bbox.xmin);
+ 115:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    y = (d2_point)(y - bbox.ymin);
+ 116:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 117:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    /* set register values (material parameters) */
+ 118:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    d2_setupmaterial_intern( handle, ctx );
+ 119:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    tmask = ctx->thresholdmask;
+ 120:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 121:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    if(0 == w)
+ 122:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    {
+ 123:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       /* solid circle */
+ 124:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 125:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       /* set register values (geometric parameters) */
+ 126:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       d2_circlesetup_intern(handle, ctx, 0, x, y, r, 0, 0, 1);
+ 127:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 128:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       control = D2C_LIM1ENABLE  | D2C_QUAD1ENABLE | D2C_SPANABORT | D2C_SPANSTORE | (tmask & D2C_LI
+ 129:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 130:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       if(0 != (D2_DEV(handle)->hwrevision & D2FB_HILIMITERPRECISION))
+ 131:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+ 132:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          control |= (0 != (ctx->features & d2_feat_blur)) ? D2C_LIMITERPRECISION : 0;
+ 133:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 134:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 135:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       control = d2_initgradients_intern( handle, ctx, &bbox, 2, control );
+ 136:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 137:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       D2_DLISTWRITES( D2_CONTROL, (d2_s32)control );
+ 138:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 139:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       delay = D2_CEIL4( r+bbox_enlarge ) >> 4;
+ 140:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 141:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    else
+ 142:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    {
+ 143:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       /* circle ring */
+ 144:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 145:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       /* determine whether we can use bandfilter (2lim) ring without distortion
+ 146:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****        * this is the case if r/w is larger than sqrt(r) */
+ 147:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       if( (r > (w * w)) && (0 == (ctx->features & d2_feat_blur)) )
+ 148:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+ 149:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          /* 2lim ring */
+ 150:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          r = (d2_width)(r+D2_EPSILON);
+ 151:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          /* set register values (geometric parameters) */
+ 152:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          d2_circlesetup_intern(handle, ctx, 0, x, y, r, (d2_s32) (((d2_u32)((w + D2_FIX4(1)) / 2)) 
+ 153:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 154:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          control = D2C_LIM1ENABLE | D2C_QUAD1ENABLE | D2C_BAND1ENABLE | (tmask & D2C_LIM1THRESHOLD)
+ 155:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          control = d2_initgradients_intern( handle, ctx, &bbox, 2, control );
+ 156:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 157:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          D2_DLISTWRITES( D2_L1BAND, w * 4096 ); /* w << (16-4) */
+ 158:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          D2_DLISTWRITES( D2_CONTROL, (d2_s32)control );
+ 159:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 160:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          delay = 0;
+ 161:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 162:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       else
+ 163:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+ 164:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          /* 4lim ring (more accurate)
+ 165:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****           * set register values (geometric parameters) */
+ 166:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          d2_circlesetup_intern(handle, ctx, 0, x, y, (d2_width)(r + (w / 2)), 0, 0, 1 );
+ 167:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 168:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          /* inner circle */
+ 169:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          d2_circlesetup_intern(handle, ctx, 2, x, y, (d2_width)(r - (w / 2)), (-D2_FIX16(1)) / 2, 1
+ 170:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 171:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          control = D2C_LIM1ENABLE | D2C_QUAD1ENABLE | D2C_LIM3ENABLE | D2C_QUAD2ENABLE | (tmask & (
+ 172:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 173:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          if(0 != (D2_DEV(handle)->hwrevision & D2FB_HILIMITERPRECISION) )
+ 174:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          {
+ 175:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****             control |= (0 != (ctx->features & d2_feat_blur)) ? D2C_LIMITERPRECISION : 0;
+ 176:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          }
+ 177:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 178:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          control = d2_initgradients_intern( handle, ctx, &bbox, 4, control );
+ 179:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 180:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          D2_DLISTWRITES( D2_CONTROL, (d2_s32)control );
+ 181:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 182:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          delay = 0;
+ 183:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 184:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 185:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 186:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    /* start rendering */
+ 187:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    d2_setuppattern( handle, ctx, &bbox, 0 );
+ 188:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    d2_setuptexture( handle, ctx, &bbox, 0 );
+ 189:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    d2_startrender_intern( handle, &bbox, delay );
+ 190:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 191:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    return 1;
+ 192:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** }
+ 264                             		.loc 1 192 1 view .LVU111
+ 265 00f6 3F 6D 0F                		rtsd	#60, r6-r13
+ 266                             	.LVL17:
+ 267                             	.L25:
+ 114:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    y = (d2_point)(y - bbox.ymin);
+ 268                             		.loc 1 114 4 is_stmt 1 view .LVU112
+ 114:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    y = (d2_point)(y - bbox.ymin);
+ 269                             		.loc 1 114 27 is_stmt 0 view .LVU113
+ 270 00f9 9A 05                   		mov.W	16[r0], r5
+ 114:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    y = (d2_point)(y - bbox.ymin);
+ 271                             		.loc 1 114 21 view .LVU114
+ 272 00fb 43 59                   		sub	r5, r9
+ 273                             	.LVL18:
+ 115:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 274                             		.loc 1 115 4 is_stmt 1 view .LVU115
+ 115:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 275                             		.loc 1 115 27 is_stmt 0 view .LVU116
+ 276 00fd 9A 0D                   		mov.W	18[r0], r5
+ 115:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 277                             		.loc 1 115 21 view .LVU117
+ 278 00ff 43 5C                   		sub	r5, r12
+ 279                             	.LVL19:
+ 118:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    tmask = ctx->thresholdmask;
+ 280                             		.loc 1 118 4 is_stmt 1 view .LVU118
+ 281 0101 EF B2                   		mov.L	r11, r2
+ 282 0103 EF A1                   		mov.L	r10, r1
+ 283 0105 05 00 00 00             		bsr	_d2_setupmaterial_intern
+ 284                             	.LVL20:
+ 119:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 285                             		.loc 1 119 4 view .LVU119
+ 119:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 286                             		.loc 1 119 10 is_stmt 0 view .LVU120
+ 287 0109 ED BD 4A                		mov.L	296[r11], r13
+ 288                             	.LVL21:
+ 121:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    {
+ 289                             		.loc 1 121 4 is_stmt 1 view .LVU121
+ 121:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    {
+ 290                             		.loc 1 121 6 is_stmt 0 view .LVU122
+ 291 010c DF 75                   		mov.W	r7, r5
+ 292 010e 61 05                   		cmp	#0, r5
+ 293 0110 3A AD 00                		beq	.L26
+ 147:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+ 294                             		.loc 1 147 7 is_stmt 1 view .LVU123
+ 147:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+ 295                             		.loc 1 147 14 is_stmt 0 view .LVU124
+ 296 0113 DF 65                   		mov.W	r6, r5
+ 147:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+ 297                             		.loc 1 147 19 view .LVU125
+ 298 0115 DF 78                   		mov.W	r7, r8
+ 299                             	.LVL22:
+ 147:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+ 300                             		.loc 1 147 19 view .LVU126
+ 301 0117 FF 34 88                		mul	r8, r8, r4
+ 147:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+ 302                             		.loc 1 147 9 view .LVU127
+ 303 011a 47 45                   		cmp	r4, r5
+ 304 011c 2B 0C                   		ble	.L17
+ 147:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+ 305                             		.loc 1 147 38 discriminator 1 view .LVU128
+ 306 011e CD B5 D5                		mov.B	213[r11], r5
+ 147:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+ 307                             		.loc 1 147 25 discriminator 1 view .LVU129
+ 308 0121 FD 74 C5 01             		tst	#1, r5
+ 309 0125 3A 40 01                		beq	.L27
+ 310                             	.L17:
+ 166:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 311                             		.loc 1 166 10 is_stmt 1 view .LVU130
+ 166:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 312                             		.loc 1 166 67 is_stmt 0 view .LVU131
+ 313 0128 DF 77                   		mov.W	r7, r7
+ 314                             	.LVL23:
+ 166:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 315                             		.loc 1 166 67 view .LVU132
+ 316 012a FD 9F 75                		shlr	#31, r7, r5
+ 317 012d 4B 57                   		add	r5, r7
+ 318 012f 6A 17                   		shar	#1, r7
+ 319 0131 FF 25 67                		add	r6, r7, r5
+ 166:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 320                             		.loc 1 166 10 view .LVU133
+ 321 0134 3E 03 01                		mov.L	#1, 12[r0]
+ 322 0137 3E 02 00                		mov.L	#0, 8[r0]
+ 323 013a 3E 01 00                		mov.L	#0, 4[r0]
+ 324 013d 90 0D                   		mov.W	r5, 2[r0]
+ 325 013f D3 0C                   		mov.W	r12, [r0]
+ 326 0141 DF 94                   		mov.W	r9, r4
+ 327 0143 66 03                   		mov.L	#0, r3
+ 328 0145 EF B2                   		mov.L	r11, r2
+ 329 0147 EF A1                   		mov.L	r10, r1
+ 330 0149 05 00 00 00             		bsr	_d2_circlesetup_intern
+ 331                             	.LVL24:
+ 169:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 332                             		.loc 1 169 10 is_stmt 1 view .LVU134
+ 169:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 333                             		.loc 1 169 67 is_stmt 0 view .LVU135
+ 334 014d 43 76                   		sub	r7, r6
+ 335                             	.LVL25:
+ 169:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 336                             		.loc 1 169 10 view .LVU136
+ 337 014f 3E 03 01                		mov.L	#1, 12[r0]
+ 338 0152 3E 02 01                		mov.L	#1, 8[r0]
+ 339 0155 F9 0A 01 00 80          		mov.L	#-32768, 4[r0]
+ 340 015a 90 0E                   		mov.W	r6, 2[r0]
+ 341 015c D3 0C                   		mov.W	r12, [r0]
+ 342 015e DF 94                   		mov.W	r9, r4
+ 343 0160 66 23                   		mov.L	#2, r3
+ 344 0162 EF B2                   		mov.L	r11, r2
+ 345 0164 EF A1                   		mov.L	r10, r1
+ 346 0166 05 00 00 00             		bsr	_d2_circlesetup_intern
+ 347                             	.LVL26:
+ 171:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 348                             		.loc 1 171 10 is_stmt 1 view .LVU137
+ 171:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 349                             		.loc 1 171 97 is_stmt 0 view .LVU138
+ 350 016a 76 2D 00 0A             		and #0xa00, r13
+ 351                             	.LVL27:
+ 171:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 352                             		.loc 1 171 18 view .LVU139
+ 353 016e 76 3D C5 00             		or	#0xc5, r13
+ 354                             	.LVL28:
+ 173:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          {
+ 355                             		.loc 1 173 10 is_stmt 1 view .LVU140
+ 173:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          {
+ 356                             		.loc 1 173 33 is_stmt 0 view .LVU141
+ 357 0172 ED A7 20                		mov.L	128[r10], r7
+ 173:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          {
+ 358                             		.loc 1 173 12 view .LVU142
+ 359 0175 FD 70 C7 00 00 00 04    		tst	#0x4000000, r7
+ 360 017c 20 0F                   		beq	.L19
+ 175:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          }
+ 361                             		.loc 1 175 13 is_stmt 1 view .LVU143
+ 175:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          }
+ 362                             		.loc 1 175 85 is_stmt 0 view .LVU144
+ 363 017e 59 B7 D5                		movu.B	213[r11], r7
+ 364 0181 6D 87                   		shll	#24, r7
+ 365 0183 74 27 00 00 00 01       		and #0x1000000, r7
+ 175:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          }
+ 366                             		.loc 1 175 21 view .LVU145
+ 367 0189 57 7D                   		or	r7, r13
+ 368                             	.LVL29:
+ 369                             	.L19:
+ 178:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 370                             		.loc 1 178 10 is_stmt 1 view .LVU146
+ 178:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 371                             		.loc 1 178 20 is_stmt 0 view .LVU147
+ 372 018b E3 0D                   		mov.L	r13, [r0]
+ 373 018d 66 44                   		mov.L	#4, r4
+ 374 018f 75 43 10                		mov.L	#16, r3
+ 375 0192 4B 03                   		add	r0, r3
+ 376 0194 EF B2                   		mov.L	r11, r2
+ 377 0196 EF A1                   		mov.L	r10, r1
+ 378 0198 05 00 00 00             		bsr	_d2_initgradients_intern
+ 379                             	.LVL30:
+ 180:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 380                             		.loc 1 180 10 is_stmt 1 view .LVU148
+ 381                             	.LBB29:
+ 382                             	.LBI29:
+ 383                             		.file 2 "../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h"
+   1:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*--------------------------------------------------------------------------
+   2:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * Project: D/AVE
+   3:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * File:    dave_intern.h (%version: 29 %)
+   4:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *          created Tue Jan 11 12:57:48 2005 by hh04027
+   5:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *
+   6:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * Description:
+   7:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  %date_modified: Thu Jan 25 18:12:54 2007 %  (%derived_by:  hh74026 %)
+   8:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *
+   9:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * Changes:
+  10:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2005-12-22 CSe  removed transfermode field, added flags field in _d2_devicedata
+  11:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2006-02-16 CSe  added performance counter support
+  12:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2006-10-30 CSe  removed waitdlist flag
+  13:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2006-11-07 CSe  removed waitdlist flag
+  14:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2006-11-07 CSe  added dlist_buffer to device struct for 'd2_df_low_localmem' mode
+  15:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2007-01-26 CSe  made 'low localmem' mode configurable
+  16:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2007-05-23 MGe  added delayed_errorcode to context
+  17:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2008-01-14 ASc  changed comments from C++ to C, removed tabs
+  18:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2008-11-24 AJ   Added support for IAR compiler
+  19:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2011-09-05 MRe  added cr2 register to device structure
+  20:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *  2012-09-25 BSp  MISRA cleanup
+  21:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  *-------------------------------------------------------------------------- */
+  22:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  23:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #ifndef __1_dave_intern_h_H
+  24:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define __1_dave_intern_h_H
+  25:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+  26:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * define inline modifier if available */
+  27:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #ifdef _MSC_VER
+  28:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_INLINE __forceinline
+  29:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #else
+  30:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #ifdef __CA850__
+  31:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_INLINE
+  32:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #elif defined(__ICCV850__)
+  33:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_INLINE _Pragma("inline")
+  34:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #else
+  35:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_INLINE inline
+  36:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #endif
+  37:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #endif
+  38:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  39:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+  40:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * define null to become independent of stdlib */
+  41:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #ifndef NULL
+  42:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #ifdef __cplusplus
+  43:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define NULL    0
+  44:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #else
+  45:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define NULL    ((void *)0)
+  46:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #endif
+  47:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #endif
+  48:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  49:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+  50:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * internally used types */
+  51:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  52:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #ifdef _MSC_VER
+  53:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** typedef __int64 d2_int64;
+  54:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #elif (defined(__CA850__) || defined(__ICC850__))
+  55:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define _NO_LL_
+  56:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** typedef struct {
+  57:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32 low32;
+  58:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s32 high32;
+  59:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** } d2_int64;
+  60:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #else
+  61:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** typedef long long d2_int64;
+  62:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #endif
+  63:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  64:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+  65:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * use separate context for blit 
+  66:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  see also d2_df_no_blitctxbackup and d2_bf_no_blitctxbackup*/
+  67:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  68:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*
+  69:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_USEBLITBACKUPCONTEXT 
+  70:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** */
+  71:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  72:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  73:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+  74:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * force register cache usage
+  75:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  see also d2_df_no_registercaching */
+  76:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  77:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_USEREGCACHE 
+  78:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  79:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+  80:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * set initial size of list of dlist start address */
+  81:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  82:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define DLIST_ADRESSES_NUMBER 16
+  83:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  84:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  85:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+  86:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * Register Cache */
+  87:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  88:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #include "dave_registermap.h"
+  89:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  90:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** typedef struct _d2_cacheddata
+  91:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+  92:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s32    data[  D2_QUANTITY ];
+  93:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s8     valid[ D2_QUANTITY ];
+  94:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** } d2_cacheddata;
+  95:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+  96:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #ifdef D2_USEREGCACHE
+  97:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** D2_EXTERN const d2_u8 d2_cacheableregs[D2_QUANTITY];
+  98:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #endif
+  99:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 100:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** typedef void (*d2_fp_scratchfull)( void *handle );
+ 101:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 102:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*--------------------------------------------------------------------------- */
+ 103:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #include "dave_base.h"
+ 104:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #include "dave_dlist.h"
+ 105:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #include "dave_rbuffer.h"
+ 106:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #include "dave_hardware.h"
+ 107:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #include "dave_context.h"
+ 108:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #include "dave_math.h"
+ 109:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 110:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+ 111:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * use higher precision of qlimiters */
+ 112:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 113:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define LIMITER_HIPRECISION 6 
+ 114:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 115:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 116:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+ 117:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * These helper macros are used to stringify a given macro */
+ 118:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_STR(s)           # s
+ 119:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_XSTR(s)          D2_STR(s)  /* PRQA S 3453 */ /* $Misra: #MISRA_BUG_MACRO_HASH $*/
+ 120:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 121:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 122:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+ 123:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * Define the D2_VERSION and D2_VERSION_STRING macros */
+ 124:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 125:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /* Build up the D2_VERSION macro */
+ 126:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_VERSION ((D2_VERSION_BRANCH << 24) | (D2_VERSION_MAJOR << 16) | D2_VERSION_MINOR )
+ 127:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 128:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /* Create the D2_VERSION_STRING macro */
+ 129:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_VERSION_STRING  D2_VERSION_BRANCH_STRING " V" D2_XSTR(D2_VERSION_MAJOR) "." D2_XSTR(D2_V
+ 130:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 131:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+ 132:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * Internal device structure */
+ 133:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 134:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** typedef struct _d2_devicedata
+ 135:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+ 136:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    struct _d2_devicedata *next;        /* to chain devices [must be index 0] */
+ 137:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 138:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_dlist *readlist;                 /* read (executing) dlist */
+ 139:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_dlist *writelist;                /* write (under construction) dlist */
+ 140:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_rbuffer *selectedbuffer;         /* currently selected renderbuffer */
+ 141:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_rbuffer *renderbuffer[2];        /* default renderbuffers */
+ 142:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 143:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d1_device      *hwid;               /* lowlevel access handle */
+ 144:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_contextdata *ctxchain;           /* context chain (list of all contexts for this device) */
+ 145:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_contextdata *ctxdef;             /* default context (cannot be removed by application) */
+ 146:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_contextdata *ctxselected;        /* selected context (used as target of context write/read op
+ 147:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_contextdata *ctxsolid;           /* solid context (used as source for rendering solid geometr
+ 148:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_contextdata *ctxoutline;         /* outline context (used as source for rendering outlines) *
+ 149:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #ifdef D2_USEBLITBACKUPCONTEXT
+ 150:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_contextdata *blitcontext;        /* internal context used only for blits */
+ 151:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #else
+ 152:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_contextdata_backup *blitcontext_b; /* internal context backup used only for blits */
+ 153:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #endif
+ 154:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_contextdata *srccontext;         /* last context that acted as source for display list (for d
+ 155:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_color       *srcclut;            /* last clut that was loaded  */
+ 156:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 157:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    void *   framebuffer;               /* rendering baseaddress */
+ 158:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s32   pitch, bpp;                /* framebuffer pitch and bytes per pixel */
+ 159:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s32   fbformat;                  /* framebuffer format */
+ 160:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32   fbwidth,fbheight;          /* framebuffer size */
+ 161:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32   fbstylemask;               /* dave ctrl1 bitmask for framebuffer format */
+ 162:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32   cr2;                       /* control register 2 */
+ 163:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 164:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32   cachectlmask;              /* dave cache ctrl register bitmask */
+ 165:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32   perftriggermask;           /* dave performance counter trigger source register bitmask 
+ 166:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 167:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32   rendermode;                /* see 'enum d2_rendermodes' */
+ 168:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32   flags;                     /* see 'enum d2_deviceflags' */
+ 169:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_width outlinewidth;
+ 170:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_point soffx, soffy;
+ 171:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_point clipxmin, clipymin;
+ 172:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_point clipxmax, clipymax;
+ 173:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 174:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_lowlocalmem_mode *lowlocalmem_mode;       /* only used in 'low localmem' mode */
+ 175:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 176:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32 hwrevision;
+ 177:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32 hwmemarchitecture;
+ 178:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 179:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_u32 dlistblocksize;              /* specify number of entries to grow when dlist is full */
+ 180:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #ifdef D2_USEREGCACHE
+ 181:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_cacheddata cache;                 /* register cache for this device */
+ 182:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #endif
+ 183:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    /* display list assembly buffer */
+ 184:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_dlist_scratch_entry *dlscratch_base;
+ 185:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_dlist_scratch_entry *dlscratch_pos;
+ 186:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s32                  dlscratch_cnt;
+ 187:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_fp_scratchfull       dlscratch_hook;
+ 188:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 189:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s8   lasttextwasrle;               /* last texture format was RLE */
+ 190:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s8   maxpatlen;                    /* maximum size of pattern bitvector supported by the hard
+ 191:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s8   errorcode;                    /* last actions detaild result code */
+ 192:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s8   delayed_errorcode;            /* errorcondition that exists until the renderbuffer gets 
+ 193:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s8   hilimiterprecision_supported; /* is set to 1 when the hilimiterprecision feature is supp
+ 194:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 195:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s8   dlist_indirect_supported;     /* is set to 1 when lists of dlist addresses are supported
+ 196:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s32* dlist_list_single[2];         /* for d2_executedlist we need an extra dlist list with ju
+ 197:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 198:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** } d2_devicedata;
+ 199:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 200:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*--------------------------------------------------------------------------- */
+ 201:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 202:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** typedef struct _d2_bbox
+ 203:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+ 204:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_point xmin, ymin;
+ 205:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_point xmax, ymax;
+ 206:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** } d2_bbox;
+ 207:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 208:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** typedef struct _d2_limdata
+ 209:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+ 210:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s32 start;
+ 211:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s32 xadd;
+ 212:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_s32 yadd;
+ 213:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** } d2_limdata;
+ 214:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 215:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+ 216:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * Internal flags */
+ 217:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 218:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** typedef d2_u32 d2_lineendflags_intern;
+ 219:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 220:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define d2_lei_base                256u
+ 221:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 222:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define d2_lei_ext_first_edge     (d2_lei_base *  2)
+ 223:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define d2_lei_ext_last_edge      (d2_lei_base *  4)
+ 224:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define d2_lei_buffer_first_edge  (d2_lei_base *  8)
+ 225:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define d2_lei_buffer_last_edge   (d2_lei_base * 16)
+ 226:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define d2_lei_miter_edge         (d2_lei_base * 32)
+ 227:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define d2_lei_miter1_flip        (d2_lei_base * 64)
+ 228:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define d2_lei_miter2_flip        (d2_lei_base *128)
+ 229:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 230:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+ 231:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * Internal macros */
+ 232:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 233:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_DEV(d)           ((d2_devicedata *) (d))           /* PRQA S 3453 */ /* $Misra: #MACRO_T
+ 234:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_CTX(c)           ((d2_contextdata *) (c))          /* PRQA S 3453 */ /* $Misra: #MACRO_T
+ 235:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_FNC(r)           ((d2_renderfunctions *) (r))      /* PRQA S 3453 */ /* $Misra: #MACRO_T
+ 236:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_DRB(r)           ((d2_rbuffer *) (r))              /* PRQA S 3453 */ /* $Misra: #MACRO_T
+ 237:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 238:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** static D2_INLINE d2_s32 d2_seterr(d2_device *handle, d2_s32 err); /* to satisfy MISRA rule 3450 */
+ 239:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** static D2_INLINE d2_s32 d2_seterr(d2_device *handle, d2_s32 err) /* PRQA S 3219, 3480 */ /* $Misra:
+ 240:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+ 241:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    D2_DEV(handle)->errorcode = (d2_s8)(err);
+ 242:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 243:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    return err;
+ 244:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** }
+ 245:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 246:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_SETERR(d,e)      d2_seterr(d, e)                   /* PRQA S 3453 */ /* $Misra: #MACRO_F
+ 247:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_SETOK(d)         D2_SETERR(d, D2_OK)               /* PRQA S 3453 */ /* $Misra: #MACRO_F
+ 248:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_RETERR(d,e)      return D2_SETERR(d,e)             /* PRQA S 3453 */ /* $Misra: #MISRA_B
+ 249:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_RETERRU(d,e)     return (d2_u32) (D2_SETERR(d,e))  /* PRQA S 3412 */ /* $Misra: #MACRO_R
+ 250:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_RETOK(d)         return D2_SETOK(d)                /* PRQA S 3412 */ /* $Misra: #MACRO_R
+ 251:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 252:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #ifdef _DEBUG
+ 253:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_VALIDATE(x,e)    if (0 == (x)) \
+ 254:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    {                                      \
+ 255:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****       return (e);                         \
+ 256:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    }(void)0                                                   /* PRQA S 3412 */ /* $Misra: #COMPILE
+ 257:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_CHECKERR(x,e)    if (! (x))    \
+ 258:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    {                                      \
+ 259:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****       D2_RETERR(handle, (e));             \
+ 260:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    }(void)0                                                   /* PRQA S 3412 */ /* $Misra: #COMPILE
+ 261:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_VALIDATEP(x,e)   if (0 == (x)) \
+ 262:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    {                                      \
+ 263:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****       return 0;                           \
+ 264:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    }(void)0                                                   /* PRQA S 3412 */ /* $Misra: #COMPILE
+ 265:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_CHECKERRP(x,e)   if (! (x)) \
+ 266:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    {                                   \
+ 267:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****       (void)D2_SETERR(handle, (e));    \
+ 268:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****       return 0;                        \
+ 269:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    } (void)0                                                  /* PRQA S 3412 */ /* $Misra: #COMPILE
+ 270:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_CHECKRANGE( v, min, max ) if( ((min) > (v)) || ( (v) > (max)) ) \
+ 271:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    {                                                                       \
+ 272:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****       (void)D2_SETERR( handle, D2_INVALIDINDEX);                           \
+ 273:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****       return D2_INVALIDINDEX;                                              \
+ 274:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    }(void)0                                                   /* PRQA S 3412 */ /* $Misra: #COMPILE
+ 275:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #else
+ 276:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_VALIDATE(x,e)(void)0              /* PRQA S 4130, 3112, 3453 */ /* $Misra: #DEBUG_MACRO 
+ 277:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_CHECKERR(x,e)(void)0              /* PRQA S 4130, 3112, 3453 */ /* $Misra: #DEBUG_MACRO 
+ 278:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_VALIDATEP(x,e)(void)0             /* PRQA S 4130, 3112, 3453 */ /* $Misra: #DEBUG_MACRO 
+ 279:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_CHECKERRP(x,e)(void)0             /* PRQA S 4130, 3112, 3453 */ /* $Misra: #DEBUG_MACRO 
+ 280:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_CHECKRANGE( v, min, max )(void)0  /* PRQA S 4130, 3112, 3453 */ /* $Misra: #DEBUG_MACRO 
+ 281:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #endif
+ 282:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 283:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** D2_EXTERN void d2_cast32to64(d2_s32 par, d2_int64 *res);
+ 284:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** D2_EXTERN d2_s32  d2_cast64to32(const d2_int64 *par);
+ 285:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** D2_EXTERN void d2_add64(const d2_int64 *a, const d2_int64 *b, d2_int64 *res);
+ 286:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** D2_EXTERN void d2_sub64(const d2_int64 *a, const d2_int64 *b, d2_int64 *res);
+ 287:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** D2_EXTERN void d2_mul3232to64(d2_s32 a, d2_s32 b, d2_int64 *res);
+ 288:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** D2_EXTERN void d2_mul3264(d2_s32 a, d2_int64 *b, d2_int64 *res);
+ 289:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** D2_EXTERN void d2_div6432(const d2_int64 *dividend, d2_s32 divisor, d2_int64 *res);
+ 290:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** D2_EXTERN void d2_shiftleft64(const d2_int64 *var, d2_s32 index, d2_int64 *res);
+ 291:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** D2_EXTERN void d2_shiftright64(const d2_int64 *var, d2_s32 index, d2_int64 *res);
+ 292:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 293:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #ifdef _NO_LL_
+ 294:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_CAST32TO64(PAR, RES)    d2_cast32to64(PAR, RES)     /* PRQA S 3453 */ /* $Misra: #MACRO_
+ 295:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_CAST64TO32(PAR)         d2_cast64to32(PAR)          /* PRQA S 3453 */ /* $Misra: #MACRO_
+ 296:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_ADD64(A, B, RES)        d2_add64(A, B, RES)         /* PRQA S 3453 */ /* $Misra: #MACRO_
+ 297:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_SUB64(A, B, RES)        d2_sub64(A, B, RES)         /* PRQA S 3453 */ /* $Misra: #MACRO_
+ 298:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_MUL3232TO64(A, B, RES)  d2_mul3232to64(A, B, RES)   /* PRQA S 3453 */ /* $Misra: #MACRO_
+ 299:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_MUL3264(A, B, RES)      d2_mul3264(A, B, RES)       /* PRQA S 3453 */ /* $Misra: #MACRO_
+ 300:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_DIV6432(DVD, DVS, RES)  d2_div6432(DVD, DVS, RES)   /* PRQA S 3453 */ /* $Misra: #MACRO_
+ 301:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_SHIFTLEFT64(V, I, RES)  d2_shiftleft64(V, I, RES)   /* PRQA S 3453 */ /* $Misra: #MACRO_
+ 302:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_SHIFTRIGHT64(V, I, RES) d2_shiftright64(V, I, RES)  /* PRQA S 3453 */ /* $Misra: #MACRO_
+ 303:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #else
+ 304:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_CAST32TO64(PAR, RES)    *(RES) = (PAR)              /* PRQA S 3453 */ /* $Misra: #MACRO_
+ 305:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_CAST64TO32(PAR)         ((d2_s32)*(PAR))            /* PRQA S 3453 */ /* $Misra: #MACRO_
+ 306:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_ADD64(A, B, RES)        *(RES) = (*(A)) + (*(B))    /* PRQA S 3453 */ /* $Misra: #MACRO_
+ 307:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_SUB64(A, B, RES)        *(RES) = (*(A)) - (*(B))    /* PRQA S 3453 */ /* $Misra: #MACRO_
+ 308:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_MUL3232TO64(A, B, RES)  *(RES) = ((A)) * (*(B))     /* PRQA S 3453 */ /* $Misra: #MACRO_
+ 309:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_MUL3264(A, B, RES)      *(RES) = ((A)) * (*(B))     /* PRQA S 3453 */ /* $Misra: #MACRO_
+ 310:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_DIV6432(DVD, DVS, RES)  *(RES) = (*(DVD)) / ((DVS)) /* PRQA S 3453 */ /* $Misra: #MACRO_
+ 311:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_SHIFTLEFT64(V, I, RES)  *(RES) = ((*(V)) << (I))    /* PRQA S 3453 */ /* $Misra: #MACRO_
+ 312:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #define D2_SHIFTRIGHT64(V, I, RES) *(RES) = ((*(V)) >> (I))    /* PRQA S 3453 */ /* $Misra: #MACRO_
+ 313:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** #endif
+ 314:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 315:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 316:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** /*---------------------------------------------------------------------------
+ 317:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****  * Display List entry macro (moved from dlist.h because of include dependencies) */
+ 318:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 319:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** static D2_INLINE void d2_add2dlist_intern( d2_devicedata *handle, d2_u32 regIdx, d2_s32 value )  /*
+ 384                             		.loc 2 319 23 view .LVU149
+ 385                             	.LBB30:
+ 320:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+ 321:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    d2_dlist_scratch_entry *entry = handle->dlscratch_pos;
+ 386                             		.loc 2 321 4 view .LVU150
+ 387                             		.loc 2 321 28 is_stmt 0 view .LVU151
+ 388 019c ED A7 6E                		mov.L	440[r10], r7
+ 389                             	.LVL31:
+ 322:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    handle->dlscratch_pos++;
+ 390                             		.loc 2 322 4 is_stmt 1 view .LVU152
+ 391                             		.loc 2 322 25 is_stmt 0 view .LVU153
+ 392 019f 71 75 08                		add	#8, r7, r5
+ 393 01a2 E7 A5 6E                		mov.L	r5, 440[r10]
+ 323:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 324:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    entry->reg   = regIdx;
+ 394                             		.loc 2 324 4 is_stmt 1 view .LVU154
+ 395                             		.loc 2 324 17 is_stmt 0 view .LVU155
+ 396 01a5 F8 76 00                		mov.L	#0, [r7]
+ 325:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    entry->value = value;
+ 397                             		.loc 2 325 4 is_stmt 1 view .LVU156
+ 398                             		.loc 2 325 17 is_stmt 0 view .LVU157
+ 399 01a8 A0 79                   		mov.L	r1, 4[r7]
+ 326:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 327:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    --handle->dlscratch_cnt;
+ 400                             		.loc 2 327 4 is_stmt 1 view .LVU158
+ 401                             		.loc 2 327 12 is_stmt 0 view .LVU159
+ 402 01aa ED A7 6F                		mov.L	444[r10], r7
+ 403                             	.LVL32:
+ 404                             		.loc 2 327 4 view .LVU160
+ 405 01ad 60 17                   		sub	#1, r7
+ 406 01af E7 A7 6F                		mov.L	r7, 444[r10]
+ 328:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    if(handle->dlscratch_cnt <= 0)
+ 407                             		.loc 2 328 4 is_stmt 1 view .LVU161
+ 408                             		.loc 2 328 6 is_stmt 0 view .LVU162
+ 409 01b2 61 07                   		cmp	#0, r7
+ 410 01b4 2A 05 38 42 01          		ble	.L28
+ 411                             	.LBE30:
+ 412                             	.LBE29:
+ 182:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 413                             		.loc 1 182 16 view .LVU163
+ 414 01b9 66 08                   		mov.L	#0, r8
+ 415                             	.LVL33:
+ 182:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 416                             		.loc 1 182 16 view .LVU164
+ 417 01bb 2E 71                   		bra	.L16
+ 418                             	.LVL34:
+ 419                             	.L26:
+ 126:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 420                             		.loc 1 126 7 is_stmt 1 view .LVU165
+ 421 01bd 3E 03 01                		mov.L	#1, 12[r0]
+ 422 01c0 3E 02 00                		mov.L	#0, 8[r0]
+ 423 01c3 3E 01 00                		mov.L	#0, 4[r0]
+ 424 01c6 90 0E                   		mov.W	r6, 2[r0]
+ 425 01c8 D3 0C                   		mov.W	r12, [r0]
+ 426 01ca DF 94                   		mov.W	r9, r4
+ 427 01cc 66 03                   		mov.L	#0, r3
+ 428 01ce EF B2                   		mov.L	r11, r2
+ 429 01d0 EF A1                   		mov.L	r10, r1
+ 430 01d2 05 00 00 00             		bsr	_d2_circlesetup_intern
+ 431                             	.LVL35:
+ 128:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 432                             		.loc 1 128 7 view .LVU166
+ 128:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 433                             		.loc 1 128 92 is_stmt 0 view .LVU167
+ 434 01d6 76 2D 00 02             		and #0x200, r13
+ 435                             	.LVL36:
+ 128:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 436                             		.loc 1 128 15 view .LVU168
+ 437 01da 74 3D 41 00 C0 00       		or	#0xc00041, r13
+ 438                             	.LVL37:
+ 130:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+ 439                             		.loc 1 130 7 is_stmt 1 view .LVU169
+ 130:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+ 440                             		.loc 1 130 30 is_stmt 0 view .LVU170
+ 441 01e0 ED A7 20                		mov.L	128[r10], r7
+ 442                             	.LVL38:
+ 130:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       {
+ 443                             		.loc 1 130 9 view .LVU171
+ 444 01e3 FD 70 C7 00 00 00 04    		tst	#0x4000000, r7
+ 445 01ea 20 0F                   		beq	.L14
+ 132:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 446                             		.loc 1 132 10 is_stmt 1 view .LVU172
+ 132:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 447                             		.loc 1 132 82 is_stmt 0 view .LVU173
+ 448 01ec 59 B7 D5                		movu.B	213[r11], r7
+ 449 01ef 6D 87                   		shll	#24, r7
+ 450 01f1 74 27 00 00 00 01       		and #0x1000000, r7
+ 132:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 451                             		.loc 1 132 18 view .LVU174
+ 452 01f7 57 7D                   		or	r7, r13
+ 453                             	.LVL39:
+ 454                             	.L14:
+ 135:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 455                             		.loc 1 135 7 is_stmt 1 view .LVU175
+ 135:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 456                             		.loc 1 135 17 is_stmt 0 view .LVU176
+ 457 01f9 E3 0D                   		mov.L	r13, [r0]
+ 458 01fb 66 24                   		mov.L	#2, r4
+ 459 01fd 75 43 10                		mov.L	#16, r3
+ 460 0200 4B 03                   		add	r0, r3
+ 461 0202 EF B2                   		mov.L	r11, r2
+ 462 0204 EF A1                   		mov.L	r10, r1
+ 463 0206 05 00 00 00             		bsr	_d2_initgradients_intern
+ 464                             	.LVL40:
+ 137:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 465                             		.loc 1 137 7 is_stmt 1 view .LVU177
+ 466                             	.LBB34:
+ 467                             	.LBI34:
+ 319:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+ 468                             		.loc 2 319 23 view .LVU178
+ 469                             	.LBB35:
+ 321:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    handle->dlscratch_pos++;
+ 470                             		.loc 2 321 4 view .LVU179
+ 321:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    handle->dlscratch_pos++;
+ 471                             		.loc 2 321 28 is_stmt 0 view .LVU180
+ 472 020a ED A7 6E                		mov.L	440[r10], r7
+ 473                             	.LVL41:
+ 322:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 474                             		.loc 2 322 4 is_stmt 1 view .LVU181
+ 322:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 475                             		.loc 2 322 25 is_stmt 0 view .LVU182
+ 476 020d 71 75 08                		add	#8, r7, r5
+ 477 0210 E7 A5 6E                		mov.L	r5, 440[r10]
+ 324:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    entry->value = value;
+ 478                             		.loc 2 324 4 is_stmt 1 view .LVU183
+ 324:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    entry->value = value;
+ 479                             		.loc 2 324 17 is_stmt 0 view .LVU184
+ 480 0213 F8 76 00                		mov.L	#0, [r7]
+ 325:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 481                             		.loc 2 325 4 is_stmt 1 view .LVU185
+ 325:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 482                             		.loc 2 325 17 is_stmt 0 view .LVU186
+ 483 0216 A0 79                   		mov.L	r1, 4[r7]
+ 327:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    if(handle->dlscratch_cnt <= 0)
+ 484                             		.loc 2 327 4 is_stmt 1 view .LVU187
+ 327:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    if(handle->dlscratch_cnt <= 0)
+ 485                             		.loc 2 327 12 is_stmt 0 view .LVU188
+ 486 0218 ED A7 6F                		mov.L	444[r10], r7
+ 487                             	.LVL42:
+ 327:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    if(handle->dlscratch_cnt <= 0)
+ 488                             		.loc 2 327 4 view .LVU189
+ 489 021b 60 17                   		sub	#1, r7
+ 490 021d E7 A7 6F                		mov.L	r7, 444[r10]
+ 491                             		.loc 2 328 4 is_stmt 1 view .LVU190
+ 492                             		.loc 2 328 6 is_stmt 0 view .LVU191
+ 493 0220 61 07                   		cmp	#0, r7
+ 494 0222 2B 3A                   		ble	.L29
+ 495                             	.LVL43:
+ 496                             	.L15:
+ 497                             		.loc 2 328 6 view .LVU192
+ 498                             	.LBE35:
+ 499                             	.LBE34:
+ 139:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 500                             		.loc 1 139 7 is_stmt 1 view .LVU193
+ 139:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 501                             		.loc 1 139 15 is_stmt 0 view .LVU194
+ 502 0224 DF 66                   		mov.W	r6, r6
+ 139:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 503                             		.loc 1 139 15 view .LVU195
+ 504 0226 4B 68                   		add	r6, r8
+ 505                             	.LVL44:
+ 139:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 506                             		.loc 1 139 15 view .LVU196
+ 507 0228 62 F8                   		add	#15, r8
+ 139:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 508                             		.loc 1 139 13 view .LVU197
+ 509 022a 68 48                   		shlr	#4, r8
+ 510                             	.LVL45:
+ 511                             		.balign 8,3,1
+ 512                             	.L16:
+ 187:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    d2_setuptexture( handle, ctx, &bbox, 0 );
+ 513                             		.loc 1 187 4 is_stmt 1 view .LVU198
+ 514 022c 66 04                   		mov.L	#0, r4
+ 515 022e 75 43 10                		mov.L	#16, r3
+ 516 0231 4B 03                   		add	r0, r3
+ 517 0233 EF B2                   		mov.L	r11, r2
+ 518 0235 EF A1                   		mov.L	r10, r1
+ 519 0237 05 00 00 00             		bsr	_d2_setuppattern
+ 520                             	.LVL46:
+ 188:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    d2_startrender_intern( handle, &bbox, delay );
+ 521                             		.loc 1 188 4 view .LVU199
+ 522 023b 66 04                   		mov.L	#0, r4
+ 523 023d 75 43 10                		mov.L	#16, r3
+ 524 0240 4B 03                   		add	r0, r3
+ 525 0242 EF B2                   		mov.L	r11, r2
+ 526 0244 EF A1                   		mov.L	r10, r1
+ 527 0246 05 00 00 00             		bsr	_d2_setuptexture
+ 528                             	.LVL47:
+ 189:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 529                             		.loc 1 189 4 view .LVU200
+ 530 024a EF 83                   		mov.L	r8, r3
+ 531 024c 75 42 10                		mov.L	#16, r2
+ 532 024f 4B 02                   		add	r0, r2
+ 533 0251 EF A1                   		mov.L	r10, r1
+ 534 0253 05 00 00 00             		bsr	_d2_startrender_intern
+ 535                             	.LVL48:
+ 191:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** }
+ 536                             		.loc 1 191 4 view .LVU201
+ 191:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** }
+ 537                             		.loc 1 191 11 is_stmt 0 view .LVU202
+ 538 0257 66 11                   		mov.L	#1, r1
+ 539 0259 38 9D FE                		bra	.L1
+ 540                             	.LVL49:
+ 541                             	.L29:
+ 542                             	.LBB39:
+ 543                             	.LBB38:
+ 544                             	.LBB36:
+ 545                             	.LBI36:
+ 319:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+ 546                             		.loc 2 319 23 is_stmt 1 view .LVU203
+ 547                             	.LBB37:
+ 329:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    {
+ 330:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****       handle->dlscratch_hook( (d2_device*) handle );
+ 548                             		.loc 2 330 7 view .LVU204
+ 549                             		.loc 2 330 13 is_stmt 0 view .LVU205
+ 550 025c ED A7 70                		mov.L	448[r10], r7
+ 551                             		.loc 2 330 7 view .LVU206
+ 552 025f EF A1                   		mov.L	r10, r1
+ 553                             	.LVL50:
+ 554                             		.loc 2 330 7 view .LVU207
+ 555 0261 7F 17                   		jsr	r7
+ 556                             	.LVL51:
+ 557                             		.loc 2 330 7 view .LVU208
+ 558 0263 2E C1                   		bra	.L15
+ 559                             	.LVL52:
+ 560                             	.L27:
+ 561                             		.loc 2 330 7 view .LVU209
+ 562                             	.LBE37:
+ 563                             	.LBE36:
+ 564                             	.LBE38:
+ 565                             	.LBE39:
+ 150:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          /* set register values (geometric parameters) */
+ 566                             		.loc 1 150 10 is_stmt 1 view .LVU210
+ 150:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          /* set register values (geometric parameters) */
+ 567                             		.loc 1 150 26 is_stmt 0 view .LVU211
+ 568 0265 62 16                   		add	#1, r6
+ 569                             	.LVL53:
+ 152:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 570                             		.loc 1 152 10 is_stmt 1 view .LVU212
+ 152:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 571                             		.loc 1 152 80 is_stmt 0 view .LVU213
+ 572 0267 71 85 10                		add	#16, r8, r5
+ 152:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 573                             		.loc 1 152 94 view .LVU214
+ 574 026a FD 9F 57                		shlr	#31, r5, r7
+ 575                             	.LVL54:
+ 152:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 576                             		.loc 1 152 94 view .LVU215
+ 577 026d 4B 57                   		add	r5, r7
+ 578 026f 6A 17                   		shar	#1, r7
+ 152:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 579                             		.loc 1 152 100 view .LVU216
+ 580 0271 6C C7                   		shll	#12, r7
+ 152:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 581                             		.loc 1 152 10 view .LVU217
+ 582 0273 3E 03 01                		mov.L	#1, 12[r0]
+ 583 0276 3E 02 00                		mov.L	#0, 8[r0]
+ 584 0279 A0 0F                   		mov.L	r7, 4[r0]
+ 585 027b 90 0E                   		mov.W	r6, 2[r0]
+ 586 027d D3 0C                   		mov.W	r12, [r0]
+ 587 027f DF 94                   		mov.W	r9, r4
+ 588 0281 66 03                   		mov.L	#0, r3
+ 589 0283 EF B2                   		mov.L	r11, r2
+ 590 0285 EF A1                   		mov.L	r10, r1
+ 591 0287 05 00 00 00             		bsr	_d2_circlesetup_intern
+ 592                             	.LVL55:
+ 154:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          control = d2_initgradients_intern( handle, ctx, &bbox, 2, control );
+ 593                             		.loc 1 154 10 is_stmt 1 view .LVU218
+ 154:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          control = d2_initgradients_intern( handle, ctx, &bbox, 2, control );
+ 594                             		.loc 1 154 80 is_stmt 0 view .LVU219
+ 595 028b 76 2D 00 02             		and #0x200, r13
+ 596                             	.LVL56:
+ 154:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          control = d2_initgradients_intern( handle, ctx, &bbox, 2, control );
+ 597                             		.loc 1 154 18 view .LVU220
+ 598 028f 77 3D 41 80 00          		or	#0x8041, r13
+ 599                             	.LVL57:
+ 155:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 600                             		.loc 1 155 10 is_stmt 1 view .LVU221
+ 155:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 601                             		.loc 1 155 20 is_stmt 0 view .LVU222
+ 602 0294 E3 0D                   		mov.L	r13, [r0]
+ 603 0296 66 24                   		mov.L	#2, r4
+ 604 0298 75 43 10                		mov.L	#16, r3
+ 605 029b 4B 03                   		add	r0, r3
+ 606 029d EF B2                   		mov.L	r11, r2
+ 607 029f EF A1                   		mov.L	r10, r1
+ 608 02a1 05 00 00 00             		bsr	_d2_initgradients_intern
+ 609                             	.LVL58:
+ 610 02a5 EF 16                   		mov.L	r1, r6
+ 611                             	.LVL59:
+ 157:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****          D2_DLISTWRITES( D2_CONTROL, (d2_s32)control );
+ 612                             		.loc 1 157 10 is_stmt 1 view .LVU223
+ 613 02a7 6C C8                   		shll	#12, r8
+ 614                             	.LVL60:
+ 615                             	.LBB40:
+ 616                             	.LBI40:
+ 319:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+ 617                             		.loc 2 319 23 view .LVU224
+ 618                             	.LBB41:
+ 321:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    handle->dlscratch_pos++;
+ 619                             		.loc 2 321 4 view .LVU225
+ 321:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    handle->dlscratch_pos++;
+ 620                             		.loc 2 321 28 is_stmt 0 view .LVU226
+ 621 02a9 ED A7 6E                		mov.L	440[r10], r7
+ 622                             	.LVL61:
+ 322:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 623                             		.loc 2 322 4 is_stmt 1 view .LVU227
+ 322:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 624                             		.loc 2 322 25 is_stmt 0 view .LVU228
+ 625 02ac 71 75 08                		add	#8, r7, r5
+ 626 02af E7 A5 6E                		mov.L	r5, 440[r10]
+ 324:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    entry->value = value;
+ 627                             		.loc 2 324 4 is_stmt 1 view .LVU229
+ 324:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    entry->value = value;
+ 628                             		.loc 2 324 17 is_stmt 0 view .LVU230
+ 629 02b2 F8 76 16                		mov.L	#22, [r7]
+ 325:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 630                             		.loc 2 325 4 is_stmt 1 view .LVU231
+ 325:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 631                             		.loc 2 325 17 is_stmt 0 view .LVU232
+ 632 02b5 E7 78 01                		mov.L	r8, 4[r7]
+ 327:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    if(handle->dlscratch_cnt <= 0)
+ 633                             		.loc 2 327 4 is_stmt 1 view .LVU233
+ 327:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    if(handle->dlscratch_cnt <= 0)
+ 634                             		.loc 2 327 12 is_stmt 0 view .LVU234
+ 635 02b8 ED A7 6F                		mov.L	444[r10], r7
+ 636                             	.LVL62:
+ 327:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    if(handle->dlscratch_cnt <= 0)
+ 637                             		.loc 2 327 4 view .LVU235
+ 638 02bb 60 17                   		sub	#1, r7
+ 639 02bd E7 A7 6F                		mov.L	r7, 444[r10]
+ 328:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    {
+ 640                             		.loc 2 328 4 is_stmt 1 view .LVU236
+ 328:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    {
+ 641                             		.loc 2 328 6 is_stmt 0 view .LVU237
+ 642 02c0 61 07                   		cmp	#0, r7
+ 643 02c2 2B 21                   		ble	.L30
+ 644                             	.LVL63:
+ 645                             	.L18:
+ 328:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    {
+ 646                             		.loc 2 328 6 view .LVU238
+ 647                             	.LBE41:
+ 648                             	.LBE40:
+ 158:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 649                             		.loc 1 158 10 is_stmt 1 view .LVU239
+ 650                             	.LBB45:
+ 651                             	.LBI45:
+ 319:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+ 652                             		.loc 2 319 23 view .LVU240
+ 653                             	.LBB46:
+ 321:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    handle->dlscratch_pos++;
+ 654                             		.loc 2 321 4 view .LVU241
+ 321:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    handle->dlscratch_pos++;
+ 655                             		.loc 2 321 28 is_stmt 0 view .LVU242
+ 656 02c4 ED A7 6E                		mov.L	440[r10], r7
+ 657                             	.LVL64:
+ 322:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 658                             		.loc 2 322 4 is_stmt 1 view .LVU243
+ 322:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 659                             		.loc 2 322 25 is_stmt 0 view .LVU244
+ 660 02c7 71 75 08                		add	#8, r7, r5
+ 661 02ca E7 A5 6E                		mov.L	r5, 440[r10]
+ 324:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    entry->value = value;
+ 662                             		.loc 2 324 4 is_stmt 1 view .LVU245
+ 324:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    entry->value = value;
+ 663                             		.loc 2 324 17 is_stmt 0 view .LVU246
+ 664 02cd F8 76 00                		mov.L	#0, [r7]
+ 325:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 665                             		.loc 2 325 4 is_stmt 1 view .LVU247
+ 325:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** 
+ 666                             		.loc 2 325 17 is_stmt 0 view .LVU248
+ 667 02d0 A0 7E                   		mov.L	r6, 4[r7]
+ 327:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    if(handle->dlscratch_cnt <= 0)
+ 668                             		.loc 2 327 4 is_stmt 1 view .LVU249
+ 327:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    if(handle->dlscratch_cnt <= 0)
+ 669                             		.loc 2 327 12 is_stmt 0 view .LVU250
+ 670 02d2 ED A7 6F                		mov.L	444[r10], r7
+ 671                             	.LVL65:
+ 327:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    if(handle->dlscratch_cnt <= 0)
+ 672                             		.loc 2 327 4 view .LVU251
+ 673 02d5 60 17                   		sub	#1, r7
+ 674 02d7 E7 A7 6F                		mov.L	r7, 444[r10]
+ 328:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    {
+ 675                             		.loc 2 328 4 is_stmt 1 view .LVU252
+ 328:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h ****    {
+ 676                             		.loc 2 328 6 is_stmt 0 view .LVU253
+ 677 02da 61 07                   		cmp	#0, r7
+ 678 02dc 2B 10                   		ble	.L31
+ 679                             	.LBE46:
+ 680                             	.LBE45:
+ 160:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 681                             		.loc 1 160 16 view .LVU254
+ 682 02de 66 08                   		mov.L	#0, r8
+ 683 02e0 38 4C FF                		bra	.L16
+ 684                             	.LVL66:
+ 685                             	.L30:
+ 686                             	.LBB50:
+ 687                             	.LBB44:
+ 688                             	.LBB42:
+ 689                             	.LBI42:
+ 319:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+ 690                             		.loc 2 319 23 is_stmt 1 view .LVU255
+ 691                             	.LBB43:
+ 692                             		.loc 2 330 7 view .LVU256
+ 693                             		.loc 2 330 13 is_stmt 0 view .LVU257
+ 694 02e3 ED A7 70                		mov.L	448[r10], r7
+ 695                             		.loc 2 330 7 view .LVU258
+ 696 02e6 EF A1                   		mov.L	r10, r1
+ 697                             	.LVL67:
+ 698                             		.loc 2 330 7 view .LVU259
+ 699 02e8 7F 17                   		jsr	r7
+ 700                             	.LVL68:
+ 701                             		.loc 2 330 7 view .LVU260
+ 702 02ea 2E DA                   		bra	.L18
+ 703                             	.LVL69:
+ 704                             	.L31:
+ 705                             		.loc 2 330 7 view .LVU261
+ 706                             	.LBE43:
+ 707                             	.LBE42:
+ 708                             	.LBE44:
+ 709                             	.LBE50:
+ 710                             	.LBB51:
+ 711                             	.LBB49:
+ 712                             	.LBB47:
+ 713                             	.LBI47:
+ 319:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+ 714                             		.loc 2 319 23 is_stmt 1 view .LVU262
+ 715                             	.LBB48:
+ 716                             		.loc 2 330 7 view .LVU263
+ 717                             		.loc 2 330 13 is_stmt 0 view .LVU264
+ 718 02ec ED A7 70                		mov.L	448[r10], r7
+ 719                             		.loc 2 330 7 view .LVU265
+ 720 02ef EF A1                   		mov.L	r10, r1
+ 721 02f1 7F 17                   		jsr	r7
+ 722                             	.LVL70:
+ 723                             		.loc 2 330 7 view .LVU266
+ 724                             	.LBE48:
+ 725                             	.LBE47:
+ 726                             	.LBE49:
+ 727                             	.LBE51:
+ 160:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 728                             		.loc 1 160 16 view .LVU267
+ 729 02f3 66 08                   		mov.L	#0, r8
+ 730 02f5 38 37 FF                		bra	.L16
+ 731                             	.LVL71:
+ 732                             	.L28:
+ 733                             	.LBB52:
+ 734                             	.LBB33:
+ 735                             	.LBB31:
+ 736                             	.LBI31:
+ 319:../src/smc_gen/r_drw2d_rx/src/tes/dave_intern.h **** {
+ 737                             		.loc 2 319 23 is_stmt 1 view .LVU268
+ 738                             	.LBB32:
+ 739                             		.loc 2 330 7 view .LVU269
+ 740                             		.loc 2 330 13 is_stmt 0 view .LVU270
+ 741 02f8 ED A7 70                		mov.L	448[r10], r7
+ 742                             		.loc 2 330 7 view .LVU271
+ 743 02fb EF A1                   		mov.L	r10, r1
+ 744                             	.LVL72:
+ 745                             		.loc 2 330 7 view .LVU272
+ 746 02fd 7F 17                   		jsr	r7
+ 747                             	.LVL73:
+ 748                             		.loc 2 330 7 view .LVU273
+ 749                             	.LBE32:
+ 750                             	.LBE31:
+ 751                             	.LBE33:
+ 752                             	.LBE52:
+ 182:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 753                             		.loc 1 182 16 view .LVU274
+ 754 02ff 66 08                   		mov.L	#0, r8
+ 755                             	.LVL74:
+ 182:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       }
+ 756                             		.loc 1 182 16 view .LVU275
+ 757 0301 38 2B FF                		bra	.L16
+ 758                             	.LFE6:
+ 760 0304 76 10 01 00             		.section	.text.d2_rendercircle_solid,"ax",@progbits
+ 761                             		.global	_d2_rendercircle_solid
+ 763                             	_d2_rendercircle_solid:
+ 764                             	.LVL75:
+ 765                             	.LFB7:
+ 193:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 194:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** /*--------------------------------------------------------------------------
+ 195:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  *
+ 196:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  * */
+ 197:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** d2_s32 d2_rendercircle_solid( d2_device *handle, d2_point x, d2_point y, d2_width r, d2_width w )
+ 198:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** {
+ 766                             		.loc 1 198 1 is_stmt 1 view -0
+ 767                             		.loc 1 198 1 is_stmt 0 view .LVU277
+ 768 0000 60 80                   		sub	#8, r0
+ 769                             	.LCFI2:
+ 199:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    (void)d2_rendercircle_intern( D2_DEV(handle), D2_DEV(handle)->ctxsolid, x, y, r, w );
+ 770                             		.loc 1 199 4 is_stmt 1 view .LVU278
+ 771                             		.loc 1 199 10 is_stmt 0 view .LVU279
+ 772 0002 AA 95                   		mov.L	40[r1], r5
+ 773 0004 D5 00 06 01             		mov.W	12[r0], 2[r0]
+ 774                             		.loc 1 199 10 view .LVU280
+ 775 0008 D3 04                   		mov.W	r4, [r0]
+ 776 000a DF 34                   		mov.W	r3, r4
+ 777                             	.LVL76:
+ 778                             		.loc 1 199 10 view .LVU281
+ 779 000c DF 23                   		mov.W	r2, r3
+ 780                             	.LVL77:
+ 781                             		.loc 1 199 10 view .LVU282
+ 782 000e EF 52                   		mov.L	r5, r2
+ 783                             	.LVL78:
+ 784                             		.loc 1 199 10 view .LVU283
+ 785 0010 05 00 00 00             		bsr	_d2_rendercircle_intern
+ 786                             	.LVL79:
+ 200:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    return D2_OK;
+ 787                             		.loc 1 200 4 is_stmt 1 view .LVU284
+ 201:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** }
+ 788                             		.loc 1 201 1 is_stmt 0 view .LVU285
+ 789 0014 66 01                   		mov.L	#0, r1
+ 790 0016 67 02                   		rtsd	#8
+ 791                             	.LFE7:
+ 793                             		.section	.text.d2_rendercircle_shadow,"ax",@progbits
+ 794                             		.global	_d2_rendercircle_shadow
+ 796                             	_d2_rendercircle_shadow:
+ 797                             	.LVL80:
+ 798                             	.LFB8:
+ 202:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 203:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** /*--------------------------------------------------------------------------
+ 204:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  *
+ 205:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  * */
+ 206:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** d2_s32 d2_rendercircle_shadow( d2_device *handle, d2_point x, d2_point y, d2_width r, d2_width w )
+ 207:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** {
+ 799                             		.loc 1 207 1 is_stmt 1 view -0
+ 800                             		.loc 1 207 1 is_stmt 0 view .LVU287
+ 801 0000 60 80                   		sub	#8, r0
+ 802                             	.LCFI3:
+ 208:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    (void)d2_rendercircle_intern( D2_DEV(handle), D2_DEV(handle)->ctxoutline,
+ 803                             		.loc 1 208 4 is_stmt 1 view .LVU288
+ 209:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                  (d2_point)(D2_DEV(handle)->soffx + x),
+ 804                             		.loc 1 209 59 is_stmt 0 view .LVU289
+ 805 0002 DD 1E 37                		mov.W	110[r1], r14
+ 210:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                  (d2_point)(D2_DEV(handle)->soffy + y),
+ 806                             		.loc 1 210 59 view .LVU290
+ 807 0005 DD 1F 38                		mov.W	112[r1], r15
+ 208:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    (void)d2_rendercircle_intern( D2_DEV(handle), D2_DEV(handle)->ctxoutline,
+ 808                             		.loc 1 208 10 view .LVU291
+ 809 0008 D5 00 06 01             		mov.W	12[r0], 2[r0]
+ 208:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    (void)d2_rendercircle_intern( D2_DEV(handle), D2_DEV(handle)->ctxoutline,
+ 810                             		.loc 1 208 10 view .LVU292
+ 811 000c D3 04                   		mov.W	r4, [r0]
+ 812 000e FF 24 F3                		add	r15, r3, r4
+ 813                             	.LVL81:
+ 208:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    (void)d2_rendercircle_intern( D2_DEV(handle), D2_DEV(handle)->ctxoutline,
+ 814                             		.loc 1 208 10 view .LVU293
+ 815 0011 FF 23 E2                		add	r14, r2, r3
+ 816                             	.LVL82:
+ 208:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    (void)d2_rendercircle_intern( D2_DEV(handle), D2_DEV(handle)->ctxoutline,
+ 817                             		.loc 1 208 10 view .LVU294
+ 818 0014 AA 9A                   		mov.L	44[r1], r2
+ 819                             	.LVL83:
+ 208:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    (void)d2_rendercircle_intern( D2_DEV(handle), D2_DEV(handle)->ctxoutline,
+ 820                             		.loc 1 208 10 view .LVU295
+ 821 0016 05 00 00 00             		bsr	_d2_rendercircle_intern
+ 822                             	.LVL84:
+ 211:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                  r, w );
+ 212:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 213:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    return D2_OK;
+ 823                             		.loc 1 213 4 is_stmt 1 view .LVU296
+ 214:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** }
+ 824                             		.loc 1 214 1 is_stmt 0 view .LVU297
+ 825 001a 66 01                   		mov.L	#0, r1
+ 826 001c 67 02                   		rtsd	#8
+ 827                             	.LFE8:
+ 829                             		.section	.text.d2_rendercircle_outline,"ax",@progbits
+ 830                             		.global	_d2_rendercircle_outline
+ 832                             	_d2_rendercircle_outline:
+ 833                             	.LVL85:
+ 834                             	.LFB9:
+ 215:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 216:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** /*--------------------------------------------------------------------------
+ 217:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  *
+ 218:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  * */
+ 219:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** d2_s32 d2_rendercircle_outline( d2_device *handle, d2_point x, d2_point y, d2_width r, d2_width w )
+ 220:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** {
+ 835                             		.loc 1 220 1 is_stmt 1 view -0
+ 836                             		.loc 1 220 1 is_stmt 0 view .LVU299
+ 837 0000 6E 6C                   		pushm	r6-r12
+ 838                             	.LCFI4:
+ 839                             		.loc 1 220 1 view .LVU300
+ 840 0002 60 80                   		sub	#8, r0
+ 841                             	.LCFI5:
+ 842 0004 DD 09 14                		mov.W	40[r0], r9
+ 221:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    d2_width wo = D2_DEV(handle)->outlinewidth;
+ 843                             		.loc 1 221 4 is_stmt 1 view .LVU301
+ 844                             		.loc 1 221 13 is_stmt 0 view .LVU302
+ 845 0007 DD 1A 36                		mov.W	108[r1], r10
+ 846                             	.LVL86:
+ 222:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 223:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    /* skip invisible cases */
+ 224:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    if(wo < D2_EPSILON)
+ 847                             		.loc 1 224 4 is_stmt 1 view .LVU303
+ 848                             		.loc 1 224 6 is_stmt 0 view .LVU304
+ 849 000a DF A7                   		mov.W	r10, r7
+ 850 000c 61 07                   		cmp	#0, r7
+ 851 000e 2B 39                   		ble	.L37
+ 852 0010 DF 4C                   		mov.W	r4, r12
+ 853 0012 DF 3B                   		mov.W	r3, r11
+ 854 0014 DF 26                   		mov.W	r2, r6
+ 855 0016 EF 17                   		mov.L	r1, r7
+ 225:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    {
+ 226:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       return D2_OK;
+ 227:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 228:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 229:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    if(w > 0)
+ 856                             		.loc 1 229 4 is_stmt 1 view .LVU305
+ 857                             		.loc 1 229 6 is_stmt 0 view .LVU306
+ 858 0018 DF 95                   		mov.W	r9, r5
+ 859 001a 61 05                   		cmp	#0, r5
+ 860 001c 2A 30                   		bgt	.L40
+ 861                             	.LVL87:
+ 862                             	.L38:
+ 230:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    {
+ 231:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       /* circle ring: we also need an outline at the inside */
+ 232:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       (void)d2_rendercircle_intern( D2_DEV(handle), D2_DEV(handle)->ctxoutline,
+ 233:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                     x, y, (d2_width)((r - (w / 2)) - (wo / 2)), wo
+ 234:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                     );
+ 235:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 236:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 237:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    /* outline on the outside */
+ 238:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    (void)d2_rendercircle_intern( D2_DEV(handle), D2_DEV(handle)->ctxoutline,
+ 863                             		.loc 1 238 4 is_stmt 1 view .LVU307
+ 239:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                  x, y, (d2_width)((r + (w / 2)) + (wo / 2)), wo
+ 864                             		.loc 1 239 54 is_stmt 0 view .LVU308
+ 865 001e DF 95                   		mov.W	r9, r5
+ 866 0020 FD 9F 54                		shlr	#31, r5, r4
+ 867 0023 4B 54                   		add	r5, r4
+ 868 0025 FD A1 45                		shar	#1, r4, r5
+ 869 0028 FF 24 C5                		add	r12, r5, r4
+ 870                             		.loc 1 239 65 view .LVU309
+ 871 002b DF A3                   		mov.W	r10, r3
+ 872 002d FD 9F 35                		shlr	#31, r3, r5
+ 873 0030 4B 35                   		add	r3, r5
+ 874 0032 6A 15                   		shar	#1, r5
+ 875 0034 4B 54                   		add	r5, r4
+ 238:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                  x, y, (d2_width)((r + (w / 2)) + (wo / 2)), wo
+ 876                             		.loc 1 238 10 view .LVU310
+ 877 0036 D7 0A 01                		mov.W	r10, 2[r0]
+ 878 0039 D3 04                   		mov.W	r4, [r0]
+ 879 003b DF B4                   		mov.W	r11, r4
+ 880 003d DF 63                   		mov.W	r6, r3
+ 881 003f AA FA                   		mov.L	44[r7], r2
+ 882 0041 EF 71                   		mov.L	r7, r1
+ 883 0043 05 00 00 00             		bsr	_d2_rendercircle_intern
+ 884                             	.LVL88:
+ 240:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                  );
+ 241:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 242:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    return D2_OK;
+ 885                             		.loc 1 242 4 is_stmt 1 view .LVU311
+ 886                             	.L37:
+ 243:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** }
+ 887                             		.loc 1 243 1 is_stmt 0 view .LVU312
+ 888 0047 66 01                   		mov.L	#0, r1
+ 889 0049 3F 6C 09                		rtsd	#36, r6-r12
+ 890                             	.LVL89:
+ 891                             	.L40:
+ 232:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                     x, y, (d2_width)((r - (w / 2)) - (wo / 2)), wo
+ 892                             		.loc 1 232 7 is_stmt 1 view .LVU313
+ 233:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                     );
+ 893                             		.loc 1 233 57 is_stmt 0 view .LVU314
+ 894 004c EF 54                   		mov.L	r5, r4
+ 895                             	.LVL90:
+ 233:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                     );
+ 896                             		.loc 1 233 57 view .LVU315
+ 897 004e 69 F5                   		shlr	#31, r5
+ 898 0050 4B 45                   		add	r4, r5
+ 899 0052 6A 15                   		shar	#1, r5
+ 900 0054 FF 05 5C                		sub	r5, r12, r5
+ 233:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                     );
+ 901                             		.loc 1 233 68 view .LVU316
+ 902 0057 DF A3                   		mov.W	r10, r3
+ 903                             	.LVL91:
+ 233:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                     );
+ 904                             		.loc 1 233 68 view .LVU317
+ 905 0059 FD 9F 34                		shlr	#31, r3, r4
+ 906 005c 4B 34                   		add	r3, r4
+ 907 005e 6A 14                   		shar	#1, r4
+ 908 0060 43 45                   		sub	r4, r5
+ 232:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                     x, y, (d2_width)((r - (w / 2)) - (wo / 2)), wo
+ 909                             		.loc 1 232 13 view .LVU318
+ 910 0062 D7 0A 01                		mov.W	r10, 2[r0]
+ 911 0065 D3 05                   		mov.W	r5, [r0]
+ 912 0067 DF B4                   		mov.W	r11, r4
+ 913 0069 DF 23                   		mov.W	r2, r3
+ 914 006b AA 9A                   		mov.L	44[r1], r2
+ 915                             	.LVL92:
+ 232:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                     x, y, (d2_width)((r - (w / 2)) - (wo / 2)), wo
+ 916                             		.loc 1 232 13 view .LVU319
+ 917 006d 05 00 00 00             		bsr	_d2_rendercircle_intern
+ 918                             	.LVL93:
+ 232:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                     x, y, (d2_width)((r - (w / 2)) - (wo / 2)), wo
+ 919                             		.loc 1 232 13 view .LVU320
+ 920 0071 2E AD                   		bra	.L38
+ 921                             	.LFE9:
+ 923                             		.section	.text.d2_rendercircle_solidoutline,"ax",@progbits
+ 924                             		.global	_d2_rendercircle_solidoutline
+ 926                             	_d2_rendercircle_solidoutline:
+ 927                             	.LVL94:
+ 928                             	.LFB10:
+ 244:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 245:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** /*--------------------------------------------------------------------------
+ 246:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  *
+ 247:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  * */
+ 248:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** d2_s32 d2_rendercircle_solidoutline( d2_device *handle, d2_point x, d2_point y, d2_width r, d2_widt
+ 249:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** {
+ 929                             		.loc 1 249 1 is_stmt 1 view -0
+ 930                             		.loc 1 249 1 is_stmt 0 view .LVU322
+ 931 0000 6E 6C                   		pushm	r6-r12
+ 932                             	.LCFI6:
+ 933                             		.loc 1 249 1 view .LVU323
+ 934 0002 60 80                   		sub	#8, r0
+ 935                             	.LCFI7:
+ 936 0004 EF 17                   		mov.L	r1, r7
+ 937 0006 DF 2B                   		mov.W	r2, r11
+ 938 0008 DF 3C                   		mov.W	r3, r12
+ 939 000a DF 49                   		mov.W	r4, r9
+ 940 000c DD 0A 14                		mov.W	40[r0], r10
+ 250:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    d2_width wo = D2_DEV(handle)->outlinewidth;
+ 941                             		.loc 1 250 4 is_stmt 1 view .LVU324
+ 942                             		.loc 1 250 13 is_stmt 0 view .LVU325
+ 943 000f DD 16 36                		mov.W	108[r1], r6
+ 944                             	.LVL95:
+ 251:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 252:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    /* render pre outline */
+ 253:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    if( (w > 0) && (wo > 0) )
+ 945                             		.loc 1 253 4 is_stmt 1 view .LVU326
+ 946                             		.loc 1 253 6 is_stmt 0 view .LVU327
+ 947 0012 DF A5                   		mov.W	r10, r5
+ 948 0014 61 05                   		cmp	#0, r5
+ 949 0016 2B 08                   		ble	.L42
+ 950                             		.loc 1 253 16 discriminator 1 view .LVU328
+ 951 0018 DF 65                   		mov.W	r6, r5
+ 952 001a 61 05                   		cmp	#0, r5
+ 953 001c 2A 2F                   		bgt	.L45
+ 954                             	.LVL96:
+ 955                             	.L42:
+ 254:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    {
+ 255:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       /* circle rings only */
+ 256:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       (void)d2_rendercircle_intern( D2_DEV(handle), D2_DEV(handle)->ctxoutline, x, y, r, (d2_width)
+ 257:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 258:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    if( (0 == w) && (wo > 0) )
+ 956                             		.loc 1 258 4 is_stmt 1 view .LVU329
+ 957                             		.loc 1 258 6 is_stmt 0 view .LVU330
+ 958 001e DF A5                   		mov.W	r10, r5
+ 959 0020 61 05                   		cmp	#0, r5
+ 960 0022 1F                      		bne	.L43
+ 961                             		.loc 1 258 17 discriminator 1 view .LVU331
+ 962 0023 DF 65                   		mov.W	r6, r5
+ 963 0025 61 05                   		cmp	#0, r5
+ 964 0027 2A 39                   		bgt	.L46
+ 965                             	.LVL97:
+ 966                             	.L43:
+ 259:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    {
+ 260:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       /* solid circles only */
+ 261:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****       (void)d2_rendercircle_intern( D2_DEV(handle), D2_DEV(handle)->ctxoutline, x, y, (d2_width)(r 
+ 262:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 263:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    /* render solid [base part] */
+ 264:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    d2_rendertolayer_intern( handle );
+ 967                             		.loc 1 264 4 is_stmt 1 view .LVU332
+ 968 0029 EF 71                   		mov.L	r7, r1
+ 969 002b 05 00 00 00             		bsr	_d2_rendertolayer_intern
+ 970                             	.LVL98:
+ 265:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    (void)d2_rendercircle_intern( D2_DEV(handle), D2_DEV(handle)->ctxsolid, x, y, r, w );
+ 971                             		.loc 1 265 4 view .LVU333
+ 972                             		.loc 1 265 10 is_stmt 0 view .LVU334
+ 973 002f D7 0A 01                		mov.W	r10, 2[r0]
+ 974 0032 D3 09                   		mov.W	r9, [r0]
+ 975 0034 DF C4                   		mov.W	r12, r4
+ 976 0036 DF B3                   		mov.W	r11, r3
+ 977 0038 AA F2                   		mov.L	40[r7], r2
+ 978 003a EF 71                   		mov.L	r7, r1
+ 979 003c 05 00 00 00             		bsr	_d2_rendercircle_intern
+ 980                             	.LVL99:
+ 266:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    d2_rendertobase_intern( handle );
+ 981                             		.loc 1 266 4 is_stmt 1 view .LVU335
+ 982 0040 EF 71                   		mov.L	r7, r1
+ 983 0042 05 00 00 00             		bsr	_d2_rendertobase_intern
+ 984                             	.LVL100:
+ 267:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 268:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    /* render post outline */
+ 269:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 270:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    return D2_OK;
+ 985                             		.loc 1 270 4 view .LVU336
+ 271:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** }
+ 986                             		.loc 1 271 1 is_stmt 0 view .LVU337
+ 987 0046 66 01                   		mov.L	#0, r1
+ 988 0048 3F 6C 09                		rtsd	#36, r6-r12
+ 989                             	.LVL101:
+ 990                             	.L45:
+ 256:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 991                             		.loc 1 256 7 is_stmt 1 view .LVU338
+ 256:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 992                             		.loc 1 256 105 is_stmt 0 view .LVU339
+ 993 004b FF 25 66                		add	r6, r6, r5
+ 256:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 994                             		.loc 1 256 110 view .LVU340
+ 995 004e 4B A5                   		add	r10, r5
+ 256:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 996                             		.loc 1 256 13 view .LVU341
+ 997 0050 90 0D                   		mov.W	r5, 2[r0]
+ 998 0052 D3 09                   		mov.W	r9, [r0]
+ 999 0054 DF 34                   		mov.W	r3, r4
+ 1000                             	.LVL102:
+ 256:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 1001                             		.loc 1 256 13 view .LVU342
+ 1002 0056 DF 23                   		mov.W	r2, r3
+ 1003                             	.LVL103:
+ 256:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 1004                             		.loc 1 256 13 view .LVU343
+ 1005 0058 AA 9A                   		mov.L	44[r1], r2
+ 1006                             	.LVL104:
+ 256:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 1007                             		.loc 1 256 13 view .LVU344
+ 1008 005a 05 00 00 00             		bsr	_d2_rendercircle_intern
+ 1009                             	.LVL105:
+ 256:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 1010                             		.loc 1 256 13 view .LVU345
+ 1011 005e 2E C0                   		bra	.L42
+ 1012                             	.L46:
+ 261:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 1013                             		.loc 1 261 7 is_stmt 1 view .LVU346
+ 261:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 1014                             		.loc 1 261 107 is_stmt 0 view .LVU347
+ 1015 0060 71 54 F0                		add	#-16, r5, r4
+ 261:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 1016                             		.loc 1 261 113 view .LVU348
+ 1017 0063 FD 9F 45                		shlr	#31, r4, r5
+ 1018 0066 4B 45                   		add	r4, r5
+ 1019 0068 6A 15                   		shar	#1, r5
+ 261:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 1020                             		.loc 1 261 100 view .LVU349
+ 1021 006a 4B 95                   		add	r9, r5
+ 261:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 1022                             		.loc 1 261 134 view .LVU350
+ 1023 006c 62 86                   		add	#8, r6
+ 1024                             	.LVL106:
+ 261:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 1025                             		.loc 1 261 13 view .LVU351
+ 1026 006e 90 0E                   		mov.W	r6, 2[r0]
+ 1027 0070 D3 05                   		mov.W	r5, [r0]
+ 1028 0072 DF C4                   		mov.W	r12, r4
+ 1029                             	.LVL107:
+ 261:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    }
+ 1030                             		.loc 1 261 13 view .LVU352
+ 1031 0074 DF B3                   		mov.W	r11, r3
+ 1032 0076 AA FA                   		mov.L	44[r7], r2
+ 1033 0078 EF 71                   		mov.L	r7, r1
+ 1034 007a 05 00 00 00             		bsr	_d2_rendercircle_intern
+ 1035                             	.LVL108:
+ 1036 007e 2E AB                   		bra	.L43
+ 1037                             	.LFE10:
+ 1039                             		.section	.text.d2_rendercircle_solidshadow,"ax",@progbits
+ 1040                             		.global	_d2_rendercircle_solidshadow
+ 1042                             	_d2_rendercircle_solidshadow:
+ 1043                             	.LVL109:
+ 1044                             	.LFB11:
+ 272:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 273:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** /*--------------------------------------------------------------------------
+ 274:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  *
+ 275:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****  * */
+ 276:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** d2_s32 d2_rendercircle_solidshadow( d2_device *handle, d2_point x, d2_point y, d2_width r, d2_width
+ 277:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** {
+ 1045                             		.loc 1 277 1 is_stmt 1 view -0
+ 1046                             		.loc 1 277 1 is_stmt 0 view .LVU354
+ 1047 0000 6E 6C                   		pushm	r6-r12
+ 1048                             	.LCFI8:
+ 1049                             		.loc 1 277 1 view .LVU355
+ 1050 0002 60 80                   		sub	#8, r0
+ 1051                             	.LCFI9:
+ 1052 0004 EF 17                   		mov.L	r1, r7
+ 1053 0006 DF 2A                   		mov.W	r2, r10
+ 1054 0008 DF 36                   		mov.W	r3, r6
+ 1055 000a DF 4B                   		mov.W	r4, r11
+ 1056 000c DD 0C 14                		mov.W	40[r0], r12
+ 278:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    /* render shadow */
+ 279:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    (void)d2_rendercircle_intern( D2_DEV(handle), D2_DEV(handle)->ctxoutline,
+ 1057                             		.loc 1 279 4 is_stmt 1 view .LVU356
+ 280:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                  (d2_point)(D2_DEV(handle)->soffx + x),
+ 1058                             		.loc 1 280 59 is_stmt 0 view .LVU357
+ 1059 000f DD 13 37                		mov.W	110[r1], r3
+ 1060                             	.LVL110:
+ 281:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                  (d2_point)(D2_DEV(handle)->soffy + y),
+ 1061                             		.loc 1 281 59 view .LVU358
+ 1062 0012 DD 14 38                		mov.W	112[r1], r4
+ 1063                             	.LVL111:
+ 279:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                  (d2_point)(D2_DEV(handle)->soffx + x),
+ 1064                             		.loc 1 279 10 view .LVU359
+ 1065 0015 D7 0C 01                		mov.W	r12, 2[r0]
+ 1066 0018 D3 0B                   		mov.W	r11, [r0]
+ 1067 001a 4B 64                   		add	r6, r4
+ 1068 001c EF A5                   		mov.L	r10, r5
+ 1069 001e 4B 53                   		add	r5, r3
+ 1070 0020 AA 9A                   		mov.L	44[r1], r2
+ 1071                             	.LVL112:
+ 279:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                  (d2_point)(D2_DEV(handle)->soffx + x),
+ 1072                             		.loc 1 279 10 view .LVU360
+ 1073 0022 05 00 00 00             		bsr	_d2_rendercircle_intern
+ 1074                             	.LVL113:
+ 282:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                  r, w
+ 283:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****                                  );
+ 284:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 285:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    /* render solid [base part] */
+ 286:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    d2_rendertolayer_intern( handle );
+ 1075                             		.loc 1 286 4 is_stmt 1 view .LVU361
+ 1076 0026 EF 71                   		mov.L	r7, r1
+ 1077 0028 05 00 00 00             		bsr	_d2_rendertolayer_intern
+ 1078                             	.LVL114:
+ 287:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    (void)d2_rendercircle_intern( D2_DEV(handle), D2_DEV(handle)->ctxsolid, x, y, r, w );
+ 1079                             		.loc 1 287 4 view .LVU362
+ 1080                             		.loc 1 287 10 is_stmt 0 view .LVU363
+ 1081 002c D7 0C 01                		mov.W	r12, 2[r0]
+ 1082 002f D3 0B                   		mov.W	r11, [r0]
+ 1083 0031 DF 64                   		mov.W	r6, r4
+ 1084 0033 DF A3                   		mov.W	r10, r3
+ 1085 0035 AA F2                   		mov.L	40[r7], r2
+ 1086 0037 EF 71                   		mov.L	r7, r1
+ 1087 0039 05 00 00 00             		bsr	_d2_rendercircle_intern
+ 1088                             	.LVL115:
+ 288:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    d2_rendertobase_intern( handle );
+ 1089                             		.loc 1 288 4 is_stmt 1 view .LVU364
+ 1090 003d EF 71                   		mov.L	r7, r1
+ 1091 003f 05 00 00 00             		bsr	_d2_rendertobase_intern
+ 1092                             	.LVL116:
+ 289:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** 
+ 290:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c ****    return D2_OK;
+ 1093                             		.loc 1 290 4 view .LVU365
+ 291:../src/smc_gen/r_drw2d_rx/src/tes/dave_circle.c **** }
+ 1094                             		.loc 1 291 1 is_stmt 0 view .LVU366
+ 1095 0043 66 01                   		mov.L	#0, r1
+ 1096 0045 3F 6C 09                		rtsd	#36, r6-r12
+ 1097                             		.loc 1 291 1 view .LVU367
+ 1098                             	.LFE11:
+ 1264                             	.Letext0:
+ 1265                             		.file 3 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_drw2d_rx\\inc\\tes/dav
+ 1266                             		.file 4 "D:\\e2_studio\\workspace\\FULLMONI_WIDE\\Firmware\\src\\smc_gen\\r_drw2d_rx\\inc\\tes/dav
+ 1267                             		.file 5 "../src/smc_gen/r_drw2d_rx/src/tes/dave_dlist.h"
+ 1268                             		.file 6 "../src/smc_gen/r_drw2d_rx/src/tes/dave_rbuffer.h"
+ 1269                             		.file 7 "../src/smc_gen/r_drw2d_rx/src/tes/dave_gradient.h"
+ 1270                             		.file 8 "../src/smc_gen/r_drw2d_rx/src/tes/dave_context.h"
+ 1271                             		.file 9 "../src/smc_gen/r_drw2d_rx/src/tes/dave_viewport.h"
+ 1272                             		.file 10 "../src/smc_gen/r_drw2d_rx/src/tes/dave_render.h"
+ 1273                             		.file 11 "../src/smc_gen/r_drw2d_rx/src/tes/dave_curve.h"
+ 1274                             		.file 12 "../src/smc_gen/r_drw2d_rx/src/tes/dave_pattern.h"
+ 1275                             		.file 13 "../src/smc_gen/r_drw2d_rx/src/tes/dave_texture.h"
