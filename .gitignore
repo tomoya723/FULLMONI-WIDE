@@ -16,10 +16,17 @@ build/
 *.project.bak
 
 # その他更新対象外
-hardware/
+Hardware/
 IMG/
+.git/
 .setteings/
 LICENSE
+Firmware/.cache/
+Firmware/.metadata
+Firmware/.settings
+Firmware/build
+Firmware/HardwareDebug
+Firmware/src/smc_gen/r_emwin_rx/tool
 
 # OS依存の不要ファイル
 Thumbs.db
