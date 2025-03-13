@@ -26,6 +26,7 @@ Firmware/.metadata
 Firmware/.settings
 Firmware/build
 Firmware/HardwareDebug
+Firmware/trash
 Firmware/src/smc_gen/r_emwin_rx/tool
 
 # OS依存の不要ファイル
