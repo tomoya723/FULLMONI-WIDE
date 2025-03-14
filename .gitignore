@@ -8,7 +8,7 @@
 Debug/
 Release/
 build/
-.metadata/
+#.metadata/
 *.bak
 *.tmp
 *.d
