@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?><settings>
     <emWin>
         <item key="Board">CUSTOM</item>
-        <item key="XsizePhys">1</item>
-        <item key="YsizePhys">1</item>
+        <item key="XsizePhys">800</item>
+        <item key="YsizePhys">256</item>
         <item key="LcdInterface">LCD_IF_GLCDC</item>
         <item key="LcdDriverIc">LCD_DRV_IC_OTHER</item>
         <item key="LcdInterfaceChannelNumber">0</item>
         <item key="LcdInterfaceBitrate">1000000</item>
         <item key="DisplayOrientation">ORIENTATION_0</item>
         <item key="ColorDepth">COLORDEPTH_16BITS</item>
-        <item key="UseLcdResetPin">true</item>
+        <item key="UseLcdResetPin">false</item>
         <item key="LcdResetPin_Port">0</item>
         <item key="LcdResetPin_Bit">0</item>
         <item key="UseLcdBacklightPin">true</item>
@@ -21,17 +21,17 @@
         <item key="UseLcdCsPin">false</item>
         <item key="LcdCsPin_Port">0</item>
         <item key="LcdCsPin_Bit">0</item>
-        <item key="UseLcdTouchIcResetPin">true</item>
+        <item key="UseLcdTouchIcResetPin">false</item>
         <item key="LcdTouchIcResetPin_Port">6</item>
         <item key="LcdTouchIcResetPin_Bit">6</item>
         <item key="UseLcdTouchIcCsPin">false</item>
         <item key="LcdTouchIcCsPin_Port">0</item>
         <item key="LcdTouchIcCsPin_Bit">0</item>
-        <item key="GuiFrameBufferAddr1">64</item>
+        <item key="GuiFrameBufferAddr1">134217728</item>
         <item key="GuiFrameBufferAddr2">8388608</item>
         <item key="UseCacheMemory">false</item>
         <item key="GuiMemorySize">81920</item>
-        <item key="UseTouch">true</item>
+        <item key="UseTouch">false</item>
         <item key="TouchInterface">TOUCH_IF_SCI_IIC</item>
         <item key="I2CChannelNumber">6</item>
         <item key="TouchInterfaceBitrate">1000000</item>

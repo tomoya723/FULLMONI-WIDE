@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?><maker key="maker0">
-    <name>s</name>
+    <name>JDI KOE</name>
     <products>
         <product key="lcd0">
-            <name>s</name>
+            <name>TX26D25VM2BAA</name>
             <lcdDriverIc>LCD_DRV_IC_ST7715</lcdDriverIc>
-            <timingControlType>DESIGNAL</timingControlType>
+            <timingControlType>DESignal</timingControlType>
             <params>
                 <param key="PanelClockFrequencyMHz">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
+                    <minimum>14.6</minimum>
+                    <typical>20.0</typical>
+                    <maximum>27.2</maximum>
                 </param>
                 <param key="PanelClockPeriodNs">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
+                    <minimum>36.76470588235294</minimum>
+                    <typical>50.0</typical>
+                    <maximum>68.4931506849315</maximum>
                 </param>
                 <param key="HorizontalFrequencyKHz">
                     <minimum/>
@@ -27,9 +27,9 @@
                     <maximum/>
                 </param>
                 <param key="HorizontalTotalPeriodClk">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
+                    <minimum>944</minimum>
+                    <typical>1056</typical>
+                    <maximum>1088</maximum>
                 </param>
                 <param key="HorizontalPulseWidthClk">
                     <minimum/>
@@ -37,13 +37,13 @@
                     <maximum/>
                 </param>
                 <param key="HorizontalDisplayPeriodClk">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
+                    <minimum>800</minimum>
+                    <typical>800</typical>
+                    <maximum>800</maximum>
                 </param>
                 <param key="HorizontalTotalBlankingClk">
                     <minimum/>
-                    <typical/>
+                    <typical>256</typical>
                     <maximum/>
                 </param>
                 <param key="HorizontalFrontPorchClk">
@@ -67,9 +67,9 @@
                     <maximum/>
                 </param>
                 <param key="VertialTotalPeriodLine">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
+                    <minimum>258</minimum>
+                    <typical>316</typical>
+                    <maximum>416</maximum>
                 </param>
                 <param key="VertialPulseWidthLine">
                     <minimum/>
@@ -77,13 +77,13 @@
                     <maximum/>
                 </param>
                 <param key="VertialDisplayPeriodLine">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
+                    <minimum>256</minimum>
+                    <typical>256</typical>
+                    <maximum>256</maximum>
                 </param>
                 <param key="VertialTotalBlankingLine">
                     <minimum/>
-                    <typical/>
+                    <typical>60</typical>
                     <maximum/>
                 </param>
                 <param key="VertialFrontPorchLine">
@@ -92,131 +92,6 @@
                     <maximum/>
                 </param>
                 <param key="VertialBackPorchLine">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="NumberOfDataLanes">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="ContinuousModeOfClockLane">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="ULPSTwakeupPeriodUs">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="EnableDataScramble">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="EnableEotp">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="EnableEccCheck">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="MaximumReturnPacketSize">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="ExternalTearingEffectDetectionSense">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="HsTxTimeoutCountUs">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="LpRxHostProcessorTimeoutUs">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="TurnaroundAcknowledgeTimeoutUs">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="PeripheralResponseTimeoutUs">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="LpWriteResponseTimeoutUs">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="LpReadResponseTimeoutUs">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="HsWriteResponseTimeoutUs">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="HsReadResponseTimeoutUs">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="EnableCrcCheckCh0">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="EnableCrcCheckCh1">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="EnableCrcCheckCh2">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="EnableCrcCheckCh3">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="SyncPulse">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="SyncPulseVirtualCh">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="NoLpduringHSA">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="NoLpduringHBP">
-                    <minimum/>
-                    <typical/>
-                    <maximum/>
-                </param>
-                <param key="NoLpduringHFP">
                     <minimum/>
                     <typical/>
                     <maximum/>
