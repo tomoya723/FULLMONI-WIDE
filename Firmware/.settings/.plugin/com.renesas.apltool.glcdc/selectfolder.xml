@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?><settings>
+    <SelectFolder>
+        <item key="LCD">false</item>
+        <item key="IsOutputLCDTimingHeader">true</item>
+        <item key="IsOutputLCDImageHeader">true</item>
+        <item key="GuiTool">false</item>
+    </SelectFolder>
+</settings>

@@ -1,0 +1,1488 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<QE>
+    <Segment id="Project">
+        <Setting id="SrcGeneratedPath" value="src/smc_gen"/>
+    </Segment>
+    <Segment id="Pin">
+        <Setting id="PB2" value="LCD_TCON2"/>
+        <Setting id="PB5" value="LCD_CLK"/>
+        <Setting id="P21" value="SCL1"/>
+        <Setting id="P20" value="SDA1"/>
+        <Setting id="P25" value="MTCLKB"/>
+        <Setting id="P24" value="MTCLKA"/>
+        <Setting id="XCOUT" value="XCOUT"/>
+        <Setting id="PC0" value="PC0"/>
+        <Setting id="PC2" value="PC2"/>
+        <Setting id="PC1" value="PC1"/>
+        <Setting id="PC4" value="PC4"/>
+        <Setting id="PC3" value="PC3"/>
+        <Setting id="PC5" value="PC5"/>
+        <Setting id="P32" value="CTX0"/>
+        <Setting id="P33" value="CRX0"/>
+        <Setting id="P36" value="EXTAL"/>
+        <Setting id="P37" value="XTAL"/>
+        <Setting id="PD1" value="PD1"/>
+        <Setting id="PD0" value="PD0"/>
+        <Setting id="PD3" value="PD3"/>
+        <Setting id="PD2" value="PD2"/>
+        <Setting id="PD5" value="PD5"/>
+        <Setting id="PD4" value="PD4"/>
+        <Setting id="PD7" value="PD7"/>
+        <Setting id="PD6" value="MTIOC8A"/>
+        <Setting id="P41" value="AN001"/>
+        <Setting id="P40" value="AN000"/>
+        <Setting id="P43" value="AN003"/>
+        <Setting id="P42" value="AN002"/>
+        <Setting id="P45" value="AN005"/>
+        <Setting id="P44" value="AN004"/>
+        <Setting id="P47" value="AN007"/>
+        <Setting id="P46" value="AN006"/>
+        <Setting id="PE2" value="LCD_DATA14"/>
+        <Setting id="PE1" value="LCD_DATA15"/>
+        <Setting id="PA0" value="LCD_DATA8"/>
+        <Setting id="PE4" value="LCD_DATA12"/>
+        <Setting id="PE3" value="LCD_DATA13"/>
+        <Setting id="PA2" value="LCD_DATA6"/>
+        <Setting id="PE6" value="LCD_DATA10"/>
+        <Setting id="PA1" value="LCD_DATA7"/>
+        <Setting id="PE5" value="LCD_DATA11"/>
+        <Setting id="PA4" value="LCD_DATA4"/>
+        <Setting id="PA3" value="LCD_DATA5"/>
+        <Setting id="PE7" value="LCD_DATA9"/>
+        <Setting id="PA6" value="LCD_DATA2"/>
+        <Setting id="PA5" value="LCD_DATA3"/>
+        <Setting id="PA7" value="LCD_DATA1"/>
+        <Setting id="P50" value="P50"/>
+        <Setting id="P52" value="P52"/>
+        <Setting id="P51" value="P51"/>
+        <Setting id="P54" value="P54"/>
+        <Setting id="P53" value="P53"/>
+        <Setting id="P12" value="SCL0"/>
+        <Setting id="P55" value="P55"/>
+        <Setting id="P13" value="SDA0"/>
+        <Setting id="P17" value="P17"/>
+        <Setting id="PJ3" value="MTIOC3C"/>
+        <Setting id="XCIN" value="XCIN"/>
+        <Setting id="PB0" value="LCD_DATA0"/>
+    </Segment>
+    <Segment id="Device">
+        <Setting id="Series" value="RX700"/>
+        <Setting id="Group" value="RX72N"/>
+        <Setting id="Board" value="カスタムユーザボード"/>
+        <Setting id="PartNo" value="R5F572NNDxFP"/>
+        <Setting id="PinCount" value="100"/>
+    </Segment>
+    <Segment id="Clock">
+        <Setting id="SubCLK" value="32.768"/>
+        <Setting id="CacSubCLK" value="32.768"/>
+        <Setting id="CacMCLK" value="24000.0"/>
+        <Setting id="PLLCLK" value="240000.0"/>
+        <Setting id="BusCLK" value="80000.0"/>
+        <Setting id="PCLKA" value="120000.0"/>
+        <Setting id="ExtCLK" value="24000.0"/>
+        <Setting id="UsbCLK" value="48000.0"/>
+        <Setting id="PCLKD" value="60000.0"/>
+        <Setting id="PCLKB" value="60000.0"/>
+        <Setting id="VCC" value="3.3"/>
+        <Setting id="PCLKC" value="60000.0"/>
+        <Setting id="ICLK" value="240000.0"/>
+        <Setting id="FCLK" value="60000.0"/>
+        <Setting id="SysCLKSrc" value="4.0"/>
+        <Setting id="RtcCLK" value="32.768"/>
+    </Segment>
+    <Segment id="Component">
+        <Setting id="Config_MTU3" value="CG"/>
+        <Setting id="r_bsp" value="FIT"/>
+        <Setting id="r_dmaca_rx" value="FIT"/>
+        <Setting id="Config_MTU1" value="CG"/>
+        <Setting id="Config_RTC" value="CG"/>
+        <Setting id="r_drw2d_rx" value="FIT"/>
+        <Setting id="Config_MTU8" value="CG"/>
+        <Setting id="r_glcdc_rx" value="FIT"/>
+        <Setting id="r_gpio_rx" value="FIT"/>
+        <Setting id="Config_LVD0" value="CG"/>
+        <Setting id="r_can_rx" value="FIT"/>
+        <Setting id="r_cmt_rx" value="FIT"/>
+        <Setting id="Config_S12AD0" value="CG"/>
+        <Setting id="Config_RIIC0" value="CG"/>
+        <Setting id="Config_RIIC1" value="CG"/>
+        <Setting id="Config_PORT" value="CG"/>
+        <Setting id="r_emwin_rx" value="FIT"/>
+        <Setting id="Config_MTU0" value="CG"/>
+        <Segment component="com.renesas.smc.tools.swcomponent.codegenerator.pwmmode" id="Config_MTU3" source="com.renesas.smc.tools.swcomponent.codegenerator.source">
+            <Setting id="CntClk" value="Div4"/>
+            <Setting id="TGRCValue" value="2999"/>
+            <Setting id="Tgid" value="Disable"/>
+            <Setting id="Tgic" value="Disable"/>
+            <Setting id="Tgib" value="Disable"/>
+            <Setting id="Unit" value="ms"/>
+            <Setting id="Tgia" value="Disable"/>
+            <Setting id="MultiIntTgidEnable" value="UnCheck"/>
+            <Setting id="BufB" value="Cmp"/>
+            <Setting id="BufA" value="Cmp"/>
+            <Setting id="PrioV" value="Level15"/>
+            <Setting id="MultiIntTgiaEnable" value="UnCheck"/>
+            <Setting id="TGRAValue" value="100"/>
+            <Setting id="TGRDValue" value="0x0000"/>
+            <Setting id="IOA" value="OutDis"/>
+            <Setting id="Tciv" value="Disable"/>
+            <Setting id="Sync" value="Disable"/>
+            <Setting id="IOC" value="Out01"/>
+            <Setting id="ClrSrc" value="TGRC"/>
+            <Setting id="PrioD" value="Level15"/>
+            <Setting id="Tgrd" value="Out"/>
+            <Setting id="Tgrc" value="Out"/>
+            <Setting id="PrioA" value="Level15"/>
+            <Setting id="MultiIntTgicEnable" value="UnCheck"/>
+            <Setting id="PrioB" value="Level15"/>
+            <Setting id="PrioC" value="Level15"/>
+            <Setting id="IODtgrd" value="Out0"/>
+            <Setting id="ExtNoiseB" value="Disable"/>
+            <Setting id="TRGAN" value="Disable"/>
+            <Setting id="ExtNoiseA" value="Disable"/>
+            <Setting id="IOBtgrb" value="Out0"/>
+            <Setting id="PeriodValue" value="0.1"/>
+            <Setting id="MultiIntTgibEnable" value="UnCheck"/>
+            <Setting id="ExtNoiseClk" value="PCLK"/>
+            <Setting id="MultiIntTcivEnable" value="UnCheck"/>
+            <Setting id="ClkEdg" value="Rise"/>
+            <Setting id="TGRBValue" value="100"/>
+        </Segment>
+        <Segment component="r_bsp7.42" id="r_bsp" source="com.renesas.smc.tools.swcomponent.fit.source">
+            <Setting id="BSP_CFG_SWINT_UNIT1_ENABLE" value="0"/>
+            <Setting id="BSP_CFG_SWINT_UNIT2_ENABLE" value="0"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA0_ENABLE" value="0"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA1_IF_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_USER_WARM_START_POST_C_FUNCTION" value="my_sw_warmstart_postc_function"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA1_ENABLE" value="0"/>
+            <Setting id="BSP_CFG_INTERNAL_PERIPHERAL_BUS2_3_PRIORITY" value="0"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA0_DM_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_USER_WARM_START_PRE_C_FUNCTION" value="my_sw_warmstart_prec_function"/>
+            <Setting id="BSP_CFG_PARAM_CHECKING_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_SERIAL_PROGRAMMER_CONECT_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_SCI_UART_TERMINAL_INTERRUPT_PRIORITY" value="15"/>
+            <Setting id="BSP_CFG_INTERNAL_PERIPHERAL_BUS1_PRIORITY" value="0"/>
+            <Setting id="BSP_CFG_USER_WARM_START_CALLBACK_PRE_INITC_ENABLED" value="0"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA0_OA_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_USTACK_BYTES" value="0x1000"/>
+            <Setting id="BSP_CFG_MEMORY_BUS2_PRIORITY" value="0"/>
+            <Setting id="BSP_CFG_INTERNAL_PERIPHERAL_BUS4_5_PRIORITY" value="0"/>
+            <Setting id="BSP_CFG_EXTERNAL_BUS_PRIORITY" value="0"/>
+            <Setting id="BSP_CFG_IO_LIB_ENABLE" value="0"/>
+            <Setting id="BSP_CFG_MEMORY_BUS1_3_PRIORITY" value="0"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA1_ADDR" value="0xFFE00000"/>
+            <Setting id="BSP_CFG_BUS_PRIORITY_INITIALIZE_ENABLE" value="0"/>
+            <Setting id="BSP_CFG_ID_CODE_LONG_4" value="0xFFFFFFFF"/>
+            <Setting id="BSP_CFG_ID_CODE_LONG_2" value="0xFFFFFFFF"/>
+            <Setting id="BSP_CFG_EBMAPCR_2ND_PRIORITY" value="3"/>
+            <Setting id="BSP_CFG_ID_CODE_LONG_3" value="0xFFFFFFFF"/>
+            <Setting id="BSP_CFG_USER_CHARPUT_FUNCTION" value="my_sw_charput_function"/>
+            <Setting id="BSP_CFG_TRUSTED_MODE_FUNCTION" value="0xFFFFFFFF"/>
+            <Setting id="BSP_CFG_SCI_UART_TERMINAL_BITRATE" value="115200"/>
+            <Setting id="BSP_CFG_SWINT_TASK_BUFFER_NUMBER" value="8"/>
+            <Setting id="BSP_CFG_USER_LOCKING_HW_UNLOCK_FUNCTION" value="my_hw_unlocking_function"/>
+            <Setting id="BSP_CFG_ID_CODE_LONG_1" value="0xFFFFFFFF"/>
+            <Setting id="BSP_CFG_USER_STACK_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_SCI_UART_TERMINAL_ENABLE" value="0"/>
+            <Setting id="BSP_CFG_INTERNAL_PERIPHERAL_BUS6_PRIORITY" value="0"/>
+            <Setting id="BSP_CFG_USER_LOCKING_SW_UNLOCK_FUNCTION" value="my_sw_unlocking_function"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA1_SIZE" value="0x0"/>
+            <Setting id="BSP_CFG_USER_CHARPUT_ENABLED" value="0"/>
+            <Setting id="BSP_CFG_SWINT_IPR_INITIAL_VALUE" value="0x1"/>
+            <Setting id="BSP_CFG_RUN_IN_USER_MODE" value="0"/>
+            <Setting id="BSP_CFG_USER_LOCKING_HW_LOCK_FUNCTION" value="my_hw_locking_function"/>
+            <Setting id="BSP_CFG_EBMAPCR_3RD_PRIORITY" value="1"/>
+            <Setting id="BSP_CFG_ROMCODE_REG_VALUE" value="0xFFFFFFFF"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA0_SIZE" value="0x0"/>
+            <Setting id="BSP_CFG_ROM_CACHE_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_USER_LOCKING_TYPE" value="bsp_lock_t"/>
+            <Setting id="BSP_CFG_HEAP_BYTES" value="0x4000"/>
+            <Setting id="BSP_CFG_FIT_IPL_MAX" value="0xF"/>
+            <Setting id="BSP_CFG_BOOTLOADER_PROJECT" value="0"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA0_ADDR" value="0xFFE00000"/>
+            <Setting id="BSP_CFG_EBMAPCR_4TH_PRIORITY" value="2"/>
+            <Setting id="BSP_CFG_USER_LOCKING_SW_LOCK_FUNCTION" value="my_sw_locking_function"/>
+            <Setting id="BSP_CFG_ISTACK_BYTES" value="0x400"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA1_DM_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_SCI_UART_TERMINAL_CHANNEL" value="9"/>
+            <Setting id="BSP_CFG_USER_LOCKING_ENABLED" value="0"/>
+            <Setting id="BSP_CFG_USER_CHARGET_ENABLED" value="0"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA0_IF_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_USER_CHARGET_FUNCTION" value="my_sw_charget_function"/>
+            <Setting id="BSP_CFG_CODE_FLASH_START_BANK" value="0"/>
+            <Setting id="BSP_CFG_FAW_REG_VALUE" value="0xFFFFFFFF"/>
+            <Setting id="BSP_CFG_EBMAPCR_5TH_PRIORITY" value="4"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA1_OA_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_USER_WARM_START_CALLBACK_POST_INITC_ENABLED" value="0"/>
+            <Setting id="BSP_CFG_EBMAPCR_1ST_PRIORITY" value="0"/>
+        </Segment>
+        <Segment component="r_dmaca_rx3.20" id="r_dmaca_rx" source="com.renesas.smc.tools.swcomponent.fit.source">
+            <Setting id="DMACA_CFG_USE_DTC_FIT_MODULE" value="0"/>
+            <Setting id="DMACA_CFG_PARAM_CHECKING_ENABLE" value="BSP_CFG_PARAM_CHECKING_ENABLE"/>
+        </Segment>
+        <Segment component="com.renesas.smc.tools.swcomponent.codegenerator.phasecountingmode" id="Config_MTU1" source="com.renesas.smc.tools.swcomponent.codegenerator.source">
+            <Setting id="NoiseAEnable" value="Disable"/>
+            <Setting id="EnableTGIB" value="Disable"/>
+            <Setting id="EnableTGIA" value="Disable"/>
+            <Setting id="ClearSource" value="Disabled"/>
+            <Setting id="UpCnt" value="PhaseCount1"/>
+            <Setting id="TGRAFunction" value="Output"/>
+            <Setting id="MultiIntTgiaEnable" value="UnCheck"/>
+            <Setting id="TGRAValue" value="100"/>
+            <Setting id="DownCnt" value="PhaseCount1"/>
+            <Setting id="EnableTCIV" value="Disable"/>
+            <Setting id="MultiIntTciuEnable" value="UnCheck"/>
+            <Setting id="TGRBFunction" value="Output"/>
+            <Setting id="EnableTCIU" value="Disable"/>
+            <Setting id="Externalclock" value="ExtAB"/>
+            <Setting id="TIOCApin" value="OutputDisabled"/>
+            <Setting id="IntAPriority" value="Level15"/>
+            <Setting id="NoiseClock" value="PCLK"/>
+            <Setting id="IntUPriority" value="Level15"/>
+            <Setting id="IntBPriority" value="Level15"/>
+            <Setting id="ExtNoiseB" value="Enable"/>
+            <Setting id="TRGAN" value="Disable"/>
+            <Setting id="ExtNoiseA" value="Enable"/>
+            <Setting id="EnableSync" value="Disable"/>
+            <Setting id="TIOCBpin" value="OutputDisabled"/>
+            <Setting id="NoiseBEnable" value="Disable"/>
+            <Setting id="MultiIntTgibEnable" value="UnCheck"/>
+            <Setting id="ExtNoiseClk" value="PCLK_32"/>
+            <Setting id="MultiIntTcivEnable" value="UnCheck"/>
+            <Setting id="TGRBValue" value="100"/>
+            <Setting id="IntVPriority" value="Level15"/>
+        </Segment>
+        <Segment component="com.renesas.smc.tools.swcomponent.codegenerator.rtc" id="Config_RTC" source="com.renesas.smc.tools.swcomponent.codegenerator.source">
+            <Setting id="enableDate" value="uncheck"/>
+            <Setting id="dateValue" value="1"/>
+            <Setting id="adjustmentnum" value="1"/>
+            <Setting id="enablecapturepin0" value="uncheck"/>
+            <Setting id="enableSecond" value="uncheck"/>
+            <Setting id="enablecapturepin1" value="uncheck"/>
+            <Setting id="enableALM" value="uncheck"/>
+            <Setting id="enablePRD" value="uncheck"/>
+            <Setting id="prdPriority" value="Level15"/>
+            <Setting id="clockfrequency" value="1hz"/>
+            <Setting id="enablerealtimeinitvalue" value="uncheck"/>
+            <Setting id="almPriority" value="Level15"/>
+            <Setting id="clockSource" value="subclock"/>
+            <Setting id="enableHour" value="uncheck"/>
+            <Setting id="adjustmentfrequency" value="1minite"/>
+            <Setting id="enableAutoadjustment" value="uncheck"/>
+            <Setting id="adjustmentdirection" value="plus"/>
+            <Setting id="secondValue" value="0"/>
+            <Setting id="cupPriority" value="Level15"/>
+            <Setting id="noisefitlersource1" value="countsource"/>
+            <Setting id="edgeselection0" value="raisingedge"/>
+            <Setting id="noisefitlersource2" value="countsource"/>
+            <Setting id="edgeselection1" value="raisingedge"/>
+            <Setting id="edgeselection2" value="raisingedge"/>
+            <Setting id="minuteValue" value="0"/>
+            <Setting id="enablertcout" value="uncheck"/>
+            <Setting id="noisefitlersource0" value="countsource"/>
+            <Setting id="prdInterval" value="1Second256"/>
+            <Setting id="enableMinute" value="uncheck"/>
+            <Setting id="enableCUP" value="uncheck"/>
+            <Setting id="hourmode" value="24hourmode"/>
+            <Setting id="yearValue" value="2000"/>
+            <Setting id="enableMonth" value="uncheck"/>
+            <Setting id="enableDayofweek" value="uncheck"/>
+            <Setting id="dayofweekValue" value="saturday"/>
+            <Setting id="countmode" value="calendar"/>
+            <Setting id="realtimeinitdatevalue" value="2000,1,1"/>
+            <Setting id="enablenoisefilter0" value="uncheck"/>
+            <Setting id="realtimeinittimevalue" value="0,0,0"/>
+            <Setting id="enablenoisefilter2" value="uncheck"/>
+            <Setting id="monthValue" value="1"/>
+            <Setting id="enablenoisefilter1" value="uncheck"/>
+            <Setting id="hourValue" value="0"/>
+            <Setting id="ampmValue" value="am"/>
+            <Setting id="enableYear" value="uncheck"/>
+            <Setting id="enablecapturepin2" value="uncheck"/>
+        </Segment>
+        <Segment component="r_drw2d_rx1.12" id="r_drw2d_rx" source="com.renesas.smc.tools.swcomponent.fit.source"/>
+        <Segment component="com.renesas.smc.tools.swcomponent.codegenerator.normalmode" id="Config_MTU8" source="com.renesas.smc.tools.swcomponent.codegenerator.source">
+            <Setting id="CntClk" value="Div1024"/>
+            <Setting id="TGRCValue" value="100"/>
+            <Setting id="TgrbScale" value="us"/>
+            <Setting id="Tgid" value="Disable"/>
+            <Setting id="Tgic" value="Disable"/>
+            <Setting id="Tgib" value="Disable"/>
+            <Setting id="Tgia" value="Enable"/>
+            <Setting id="MultiIntTgidEnable" value="UnCheck"/>
+            <Setting id="PrioV" value="Level15"/>
+            <Setting id="MultiIntTgiaEnable" value="UnCheck"/>
+            <Setting id="TGRAValue" value="100"/>
+            <Setting id="TGRDValue" value="100"/>
+            <Setting id="IOA" value="InR"/>
+            <Setting id="Tciv" value="Disable"/>
+            <Setting id="IOC" value="OutDis"/>
+            <Setting id="IOB" value="OutDis"/>
+            <Setting id="IOD" value="OutDis"/>
+            <Setting id="ClrSrc" value="TGRA"/>
+            <Setting id="NoiseA" value="Enable"/>
+            <Setting id="PrioD" value="Level15"/>
+            <Setting id="ADSM1" value="Disable"/>
+            <Setting id="Tgrd" value="Out"/>
+            <Setting id="Tgrc" value="Out"/>
+            <Setting id="AdSrc1" value="NoSrc"/>
+            <Setting id="Tgrb" value="Out"/>
+            <Setting id="Tgra" value="Input"/>
+            <Setting id="TgrcScale" value="us"/>
+            <Setting id="NoiseClock" value="PCLK_32"/>
+            <Setting id="PrioA" value="Level15"/>
+            <Setting id="MultiIntTgicEnable" value="UnCheck"/>
+            <Setting id="PrioB" value="Level15"/>
+            <Setting id="PrioC" value="Level15"/>
+            <Setting id="ADSM0" value="Disable"/>
+            <Setting id="NoiseD" value="Disable"/>
+            <Setting id="NoiseC" value="Disable"/>
+            <Setting id="NoiseB" value="Disable"/>
+            <Setting id="ExtNoiseB" value="Disable"/>
+            <Setting id="ExtNoiseA" value="Disable"/>
+            <Setting id="TgraScale" value="us"/>
+            <Setting id="MultiIntTgibEnable" value="UnCheck"/>
+            <Setting id="ExtNoiseClk" value="PCLK"/>
+            <Setting id="AdSrc0" value="NoSrc"/>
+            <Setting id="TgrdScale" value="us"/>
+            <Setting id="MultiIntTcivEnable" value="UnCheck"/>
+            <Setting id="ClkEdg" value="Rise"/>
+            <Setting id="TGRBValue" value="100"/>
+        </Segment>
+        <Segment component="r_glcdc_rx1.50" id="r_glcdc_rx" source="com.renesas.smc.tools.swcomponent.fit.source">
+            <Setting id="LCD_CH0_CLUT_GR1_PBASE" value="FIT_NO_PTR"/>
+            <Setting id="IMGC_GAMMA_B_GAIN_10" value="967"/>
+            <Setting id="IMGC_GAMMA_B_GAIN_12" value="952"/>
+            <Setting id="LCD_CH0_BLEND_GR1_BLEND_CONTROL" value="GLCDC_BLEND_CONTROL_NONE"/>
+            <Setting id="IMGC_GAMMA_B_GAIN_11" value="959"/>
+            <Setting id="IMGC_GAMMA_B_GAIN_14" value="939"/>
+            <Setting id="IMGC_GAMMA_B_GAIN_13" value="945"/>
+            <Setting id="IMGC_GAMMA_R_TH_01" value="64"/>
+            <Setting id="IMGC_GAMMA_R_TH_02" value="128"/>
+            <Setting id="IMGC_GAMMA_R_TH_03" value="192"/>
+            <Setting id="LCD_CH0_OUT_EDGE" value="GLCDC_SIGNAL_SYNC_EDGE_RISING"/>
+            <Setting id="LCD_CH0_DETECT_GR2UF" value="false"/>
+            <Setting id="IMGC_GAMMA_R_TH_04" value="256"/>
+            <Setting id="IMGC_GAMMA_R_TH_05" value="320"/>
+            <Setting id="IMGC_GAMMA_R_TH_06" value="384"/>
+            <Setting id="IMGC_GAMMA_R_TH_07" value="448"/>
+            <Setting id="IMGC_GAMMA_R_TH_08" value="512"/>
+            <Setting id="LCD_CH0_IN_GR1_COORD_X" value="0"/>
+            <Setting id="IMGC_GAMMA_R_TH_09" value="576"/>
+            <Setting id="LCD_CH0_OUT_ENDIAN" value="GLCDC_ENDIAN_LITTLE"/>
+            <Setting id="LCD_CH0_IN_GR1_COORD_Y" value="0"/>
+            <Setting id="LCD_CH0_CLUT_GR1_SIZE" value="256"/>
+            <Setting id="LCD_CH0_INTERRUPT_GR1UF_ENABLE" value="false"/>
+            <Setting id="IMGC_GAMMA_B_GAIN_15" value="919"/>
+            <Setting id="LCD_CH0_IN_GR2_FORMAT" value="GLCDC_IN_FORMAT_16BITS_RGB565"/>
+            <Setting id="LCD_CH0_IN_GR1_FORMAT" value="GLCDC_IN_FORMAT_16BITS_RGB565"/>
+            <Setting id="GLCDC_CFG_INTERRUPT_PRIORITY_LEVEL" value="5"/>
+            <Setting id="IMGC_GAMMA_G_TH_03" value="192"/>
+            <Setting id="IMGC_GAMMA_B_GAIN_01" value="1157"/>
+            <Setting id="IMGC_GAMMA_G_TH_02" value="128"/>
+            <Setting id="IMGC_GAMMA_B_GAIN_00" value="1317"/>
+            <Setting id="IMGC_GAMMA_G_TH_01" value="64"/>
+            <Setting id="IMGC_GAMMA_B_GAIN_03" value="1069"/>
+            <Setting id="IMGC_GAMMA_R_TH_10" value="640"/>
+            <Setting id="LCD_CH0_DISP_HW" value="480"/>
+            <Setting id="IMGC_GAMMA_B_GAIN_02" value="1103"/>
+            <Setting id="IMGC_GAMMA_R_TH_11" value="704"/>
+            <Setting id="LCD_CH0_W_HBP" value="62"/>
+            <Setting id="IMGC_GAMMA_R_TH_12" value="768"/>
+            <Setting id="IMGC_GAMMA_R_TH_13" value="832"/>
+            <Setting id="LCD_CH0_BLEND_GR1_START_COORD_Y" value="0"/>
+            <Setting id="IMGC_GAMMA_R_TH_14" value="896"/>
+            <Setting id="LCD_CH0_BLEND_GR1_START_COORD_X" value="0"/>
+            <Setting id="IMGC_GAMMA_R_TH_15" value="960"/>
+            <Setting id="LCD_CH0_IN_GR1_BG_COLOR" value="0x00000000"/>
+            <Setting id="LCD_CH0_BLEND_GR2_END_COORD_Y" value="0"/>
+            <Setting id="LCD_CH0_CHROMAKEY_GR2_AFTER_ARGB" value="0x00000000"/>
+            <Setting id="LCD_CH0_DETECT_VPOS" value="false"/>
+            <Setting id="LCD_CH0_BLEND_GR2_END_COORD_X" value="0"/>
+            <Setting id="LCD_CH0_CALLBACK_ENABLE" value="false"/>
+            <Setting id="LCD_CH0_BLEND_GR1_END_COORD_Y" value="0"/>
+            <Setting id="LCD_CH0_CLUT_GR1_START" value="0"/>
+            <Setting id="IMGC_GAMMA_R_GAIN_15" value="919"/>
+            <Setting id="LCD_CH0_IN_GR2_BG_COLOR" value="0x00000000"/>
+            <Setting id="LCD_CH0_W_VFP" value="8"/>
+            <Setting id="LCD_CH0_INTERRUPT_GR2UF_ENABLE" value="false"/>
+            <Setting id="LCD_CH0_BLEND_GR1_END_COORD_X" value="0"/>
+            <Setting id="LCD_CH0_TCON_PIN_HSYNC" value="GLCDC_TCON_PIN_2"/>
+            <Setting id="LCD_CH0_BLEND_GR1_VISIBLE" value="true"/>
+            <Setting id="IMGC_GAMMA_B_GAIN_05" value="1026"/>
+            <Setting id="IMGC_GAMMA_B_GAIN_04" value="1045"/>
+            <Setting id="IMGC_GAMMA_B_GAIN_07" value="997"/>
+            <Setting id="LCD_CH0_CLUT_GR2_SIZE" value="256"/>
+            <Setting id="IMGC_GAMMA_B_GAIN_06" value="1010"/>
+            <Setting id="IMGC_GAMMA_B_GAIN_09" value="976"/>
+            <Setting id="IMGC_GAMMA_B_GAIN_08" value="986"/>
+            <Setting id="LCD_CH0_IN_GR1_FRAME_EDGE" value="false"/>
+            <Setting id="LCD_CH0_CLUT_GR1_ENABLE" value="false"/>
+            <Setting id="IMGC_CONTRAST_OUTCTL_GAIN_G" value="128"/>
+            <Setting id="LCD_CH0_CLUT_GR2_ENABLE" value="false"/>
+            <Setting id="IMGC_BRIGHT_OUTCTL_OFFSET_B" value="512"/>
+            <Setting id="LCD_CH0_IN_GR2_PBASE" value="0x00800000"/>
+            <Setting id="IMGC_BRIGHT_OUTCTL_OFFSET_G" value="512"/>
+            <Setting id="LCD_CH0_BLEND_GR2_FRAME_EDGE" value="false"/>
+            <Setting id="LCD_CH0_DETECT_GR1UF" value="false"/>
+            <Setting id="IMGC_OUTCTL_CALIB_ROUTE" value="GLCDC_BRIGHTNESS_CONTRAST_TO_GAMMA"/>
+            <Setting id="IMGC_CONTRAST_OUTCTL_GAIN_B" value="128"/>
+            <Setting id="IMGC_BRIGHT_OUTCTL_OFFSET_R" value="512"/>
+            <Setting id="LCD_CH0_DISP_VW" value="272"/>
+            <Setting id="LCD_CH0_CHROMAKEY_GR2_ENABLE" value="false"/>
+            <Setting id="LCD_CH0_TCON_PIN_VSYNC" value="GLCDC_TCON_PIN_0"/>
+            <Setting id="LCD_CH0_CLUT_GR2_PBASE" value="FIT_NO_PTR"/>
+            <Setting id="LCD_CH0_BLEND_GR2_FADE_SPEED" value="255"/>
+            <Setting id="LCD_CH0_IN_GR2_FRAME_EDGE" value="false"/>
+            <Setting id="IMGC_DITHER_MODE" value="GLCDC_DITHERING_MODE_TRUNCATE"/>
+            <Setting id="LCD_CH0_BLEND_GR1_FADE_SPEED" value="255"/>
+            <Setting id="IMGC_CONTRAST_OUTCTL_GAIN_R" value="128"/>
+            <Setting id="LCD_CH0_OUT_CLK_DIV_RATIO" value="GLCDC_PANEL_CLK_DIVISOR_24"/>
+            <Setting id="LCD_CH0_TCON_POL_DE" value="GLCDC_SIGNAL_POLARITY_HIACTIVE"/>
+            <Setting id="LCD_CH0_BLEND_GR1_FIXED_BLEND_VALUE" value="255"/>
+            <Setting id="IMGC_GAMMA_B_TH_12" value="768"/>
+            <Setting id="IMGC_GAMMA_B_TH_13" value="832"/>
+            <Setting id="GLCDC_CFG_PARAM_CHECKING_ENABLE" value="1"/>
+            <Setting id="IMGC_GAMMA_B_TH_14" value="896"/>
+            <Setting id="IMGC_GAMMA_B_TH_15" value="960"/>
+            <Setting id="IMGC_GAMMA_B_TH_10" value="640"/>
+            <Setting id="IMGC_GAMMA_B_TH_11" value="704"/>
+            <Setting id="LCD_CH0_BLEND_GR2_START_COORD_Y" value="0"/>
+            <Setting id="IMGC_DITHER_2X2_PD" value="GLCDC_DITHERING_PATTERN_01"/>
+            <Setting id="IMGC_DITHER_ACTIVE" value="false"/>
+            <Setting id="IMGC_DITHER_2X2_PC" value="GLCDC_DITHERING_PATTERN_10"/>
+            <Setting id="LCD_CH0_BLEND_GR2_START_COORD_X" value="0"/>
+            <Setting id="IMGC_BRIGHT_OUTCTL_ACTIVE" value="true"/>
+            <Setting id="LCD_CH0_BLEND_GR1_FRAME_EDGE" value="false"/>
+            <Setting id="LCD_CH0_CHROMAKEY_GR1_AFTER_ARGB" value="0x00000000"/>
+            <Setting id="LCD_CH0_INTERRUPT_VPOS_ENABLE" value="false"/>
+            <Setting id="IMGC_GAMMA_B_TH_09" value="576"/>
+            <Setting id="LCD_CH0_TCON_PIN_DE" value="GLCDC_TCON_PIN_3"/>
+            <Setting id="USE_QE_DISPLAY_CONFIGURATION" value="0"/>
+            <Setting id="LCD_CH0_W_HFP" value="17"/>
+            <Setting id="IMGC_CONTRAST_OUTCTL_ACTIVE" value="true"/>
+            <Setting id="IMGC_GAMMA_ACTIVE" value="true"/>
+            <Setting id="LCD_CH0_TCON_POL_VSYNC" value="GLCDC_SIGNAL_POLARITY_LOACTIVE"/>
+            <Setting id="LCD_CH0_W_VSYNC" value="1"/>
+            <Setting id="LCD_CH0_IN_GR1_LINEOFFSET" value="960"/>
+            <Setting id="LCD_CH0_W_VBP" value="7"/>
+            <Setting id="LCD_CH0_IN_GR1_PBASE" value="NULL"/>
+            <Setting id="IMGC_GAMMA_G_TH_10" value="640"/>
+            <Setting id="LCD_CH0_IN_GR1_VSIZE" value="272"/>
+            <Setting id="LCD_CH0_CHROMAKEY_GR1_BEFORE_ARGB" value="0x00000000"/>
+            <Setting id="IMGC_GAMMA_G_TH_14" value="896"/>
+            <Setting id="IMGC_GAMMA_G_TH_13" value="832"/>
+            <Setting id="IMGC_GAMMA_G_TH_12" value="768"/>
+            <Setting id="IMGC_GAMMA_G_TH_11" value="704"/>
+            <Setting id="IMGC_GAMMA_G_GAIN_15" value="919"/>
+            <Setting id="IMGC_GAMMA_G_GAIN_14" value="939"/>
+            <Setting id="IMGC_GAMMA_R_GAIN_10" value="967"/>
+            <Setting id="IMGC_GAMMA_G_GAIN_13" value="945"/>
+            <Setting id="IMGC_GAMMA_R_GAIN_11" value="959"/>
+            <Setting id="IMGC_GAMMA_G_GAIN_12" value="952"/>
+            <Setting id="IMGC_GAMMA_R_GAIN_12" value="952"/>
+            <Setting id="LCD_CH0_CHROMAKEY_GR2_BEFORE_ARGB" value="0x00000000"/>
+            <Setting id="IMGC_GAMMA_G_GAIN_11" value="959"/>
+            <Setting id="IMGC_GAMMA_R_GAIN_13" value="945"/>
+            <Setting id="LCD_CH0_OUT_COLOR_ORDER" value="GLCDC_COLOR_ORDER_RGB"/>
+            <Setting id="IMGC_GAMMA_G_GAIN_10" value="967"/>
+            <Setting id="IMGC_GAMMA_R_GAIN_14" value="939"/>
+            <Setting id="IMGC_GAMMA_R_GAIN_04" value="1045"/>
+            <Setting id="IMGC_GAMMA_R_GAIN_05" value="1026"/>
+            <Setting id="IMGC_GAMMA_R_GAIN_06" value="1010"/>
+            <Setting id="IMGC_GAMMA_R_GAIN_07" value="997"/>
+            <Setting id="LCD_CH0_IN_GR2_HSIZE" value="480"/>
+            <Setting id="IMGC_GAMMA_R_GAIN_08" value="986"/>
+            <Setting id="IMGC_GAMMA_R_GAIN_09" value="976"/>
+            <Setting id="LCD_CH0_IN_GR2_COORD_Y" value="0"/>
+            <Setting id="LCD_CH0_IN_GR2_COORD_X" value="0"/>
+            <Setting id="LCD_CH0_CLUT_GR2_START" value="0"/>
+            <Setting id="IMGC_GAMMA_G_TH_07" value="448"/>
+            <Setting id="IMGC_GAMMA_G_TH_06" value="384"/>
+            <Setting id="IMGC_GAMMA_G_TH_05" value="320"/>
+            <Setting id="IMGC_GAMMA_G_TH_04" value="256"/>
+            <Setting id="LCD_CH0_W_HSYNC" value="25"/>
+            <Setting id="LCD_CH0_IN_GR2_LINEOFFSET" value="960"/>
+            <Setting id="IMGC_GAMMA_G_TH_09" value="576"/>
+            <Setting id="LCD_CH0_CHROMAKEY_GR1_ENABLE" value="false"/>
+            <Setting id="IMGC_GAMMA_G_TH_08" value="512"/>
+            <Setting id="LCD_CH0_BLEND_GR2_BLEND_CONTROL" value="GLCDC_BLEND_CONTROL_NONE"/>
+            <Setting id="IMGC_GAMMA_B_TH_05" value="320"/>
+            <Setting id="IMGC_GAMMA_B_TH_06" value="384"/>
+            <Setting id="IMGC_GAMMA_B_TH_07" value="448"/>
+            <Setting id="IMGC_GAMMA_B_TH_08" value="512"/>
+            <Setting id="LCD_CH0_OUT_FORMAT" value="GLCDC_OUT_FORMAT_16BITS_RGB565"/>
+            <Setting id="IMGC_GAMMA_B_TH_01" value="64"/>
+            <Setting id="LCD_CH0_IN_GR2_VSIZE" value="272"/>
+            <Setting id="IMGC_GAMMA_G_GAIN_09" value="976"/>
+            <Setting id="IMGC_GAMMA_B_TH_02" value="128"/>
+            <Setting id="IMGC_GAMMA_G_GAIN_08" value="986"/>
+            <Setting id="IMGC_GAMMA_B_TH_03" value="192"/>
+            <Setting id="IMGC_GAMMA_G_GAIN_07" value="997"/>
+            <Setting id="IMGC_GAMMA_B_TH_04" value="256"/>
+            <Setting id="IMGC_GAMMA_G_GAIN_06" value="1010"/>
+            <Setting id="IMGC_GAMMA_G_GAIN_05" value="1026"/>
+            <Setting id="IMGC_GAMMA_G_GAIN_04" value="1045"/>
+            <Setting id="IMGC_GAMMA_G_GAIN_03" value="1069"/>
+            <Setting id="IMGC_GAMMA_G_GAIN_02" value="1103"/>
+            <Setting id="IMGC_GAMMA_R_GAIN_00" value="1317"/>
+            <Setting id="IMGC_GAMMA_G_GAIN_01" value="1157"/>
+            <Setting id="IMGC_GAMMA_R_GAIN_01" value="1157"/>
+            <Setting id="IMGC_GAMMA_G_GAIN_00" value="1317"/>
+            <Setting id="IMGC_GAMMA_R_GAIN_02" value="1103"/>
+            <Setting id="IMGC_GAMMA_R_GAIN_03" value="1069"/>
+            <Setting id="LCD_CH0_BLEND_GR2_VISIBLE" value="true"/>
+            <Setting id="IMGC_DITHER_2X2_PB" value="GLCDC_DITHERING_PATTERN_00"/>
+            <Setting id="IMGC_DITHER_2X2_PA" value="GLCDC_DITHERING_PATTERN_11"/>
+            <Setting id="LCD_CH0_TCON_POL_HSYNC" value="GLCDC_SIGNAL_POLARITY_LOACTIVE"/>
+            <Setting id="LCD_CH0_PCALLBACK" value="glcdc_callback"/>
+            <Setting id="GLCDC_CFG_CONFIGURATION_MODE" value="0"/>
+            <Setting id="LCD_CH0_BLEND_GR2_FIXED_BLEND_VALUE" value="255"/>
+            <Setting id="IMGC_GAMMA_G_TH_15" value="960"/>
+            <Setting id="LCD_CH0_OUT_BG_COLOR" value="0x00000000"/>
+            <Setting id="LCD_CH0_IN_GR1_HSIZE" value="480"/>
+        </Segment>
+        <Segment component="r_gpio_rx5.00" id="r_gpio_rx" source="com.renesas.smc.tools.swcomponent.fit.source">
+            <Setting id="GPIO_CFG_PARAM_CHECKING_ENABLE" value="BSP_CFG_PARAM_CHECKING_ENABLE"/>
+        </Segment>
+        <Segment component="com.renesas.smc.tools.swcomponent.codegenerator.lvd" id="Config_LVD0" source="com.renesas.smc.tools.swcomponent.codegenerator.source">
+            <Setting id="LVD0Start" value="ResetDisable"/>
+            <Setting id="LVD_VoltLvl" value="lvd_280"/>
+        </Segment>
+        <Segment component="r_can_rx5.50" id="r_can_rx" source="com.renesas.smc.tools.swcomponent.fit.source">
+            <Setting id="CAN1_TRX_ENABLE_PIN" value="0"/>
+            <Setting id="CAN_CFG_RXFIFO_INT_GEN_TIMING" value="0"/>
+            <Setting id="CAN0_TRX_STB_LVL" value="0"/>
+            <Setting id="CAN0_TRX_ENABLE_LVL" value="0"/>
+            <Setting id="CAN1_TRX_STB_LVL" value="0"/>
+            <Setting id="CAN2_TRX_STB_LVL" value="0"/>
+            <Setting id="CAN2_TRX_ENABLE_PIN" value="0"/>
+            <Setting id="CAN_USE_CAN0" value="1"/>
+            <Setting id="CAN2_TRX_ENABLE_PORT" value="0"/>
+            <Setting id="CAN_USE_CAN1_STANDBY_ENABLE_PINS" value="0"/>
+            <Setting id="CAN_USE_CAN1" value="0"/>
+            <Setting id="CAN_USE_CAN2" value="0"/>
+            <Setting id="FRAME_ID_MODE" value="STD_ID_MODE"/>
+            <Setting id="CAN_USE_CAN0_STANDBY_ENABLE_PINS" value="0"/>
+            <Setting id="CAN2_TRX_STB_PORT" value="0"/>
+            <Setting id="MAX_CANREG_POLLCYCLES" value="5"/>
+            <Setting id="CAN0_TRX_STB_PORT" value="0"/>
+            <Setting id="CAN1_TRX_STB_PORT" value="0"/>
+            <Setting id="CAN0_TRX_ENABLE_PORT" value="0"/>
+            <Setting id="CAN0_TRX_ENABLE_PIN" value="0"/>
+            <Setting id="CAN1_INT_LVL" value="2"/>
+            <Setting id="CAN0_INT_LVL" value="2"/>
+            <Setting id="CAN_CFG_TXFIFO_INT_GEN_TIMING" value="0"/>
+            <Setting id="USE_CAN_POLL" value="0"/>
+            <Setting id="CAN0_TRX_STB_PIN" value="0"/>
+            <Setting id="CAN_USE_CAN2_STANDBY_ENABLE_PINS" value="0"/>
+            <Setting id="CAN1_TRX_ENABLE_LVL" value="0"/>
+            <Setting id="CAN2_TRX_ENABLE_LVL" value="0"/>
+            <Setting id="CAN1_TRX_ENABLE_PORT" value="0"/>
+            <Setting id="CAN1_TRX_STB_PIN" value="0"/>
+            <Setting id="CAN2_TRX_STB_PIN" value="0"/>
+            <Setting id="CAN2_INT_LVL" value="2"/>
+        </Segment>
+        <Segment component="r_cmt_rx5.60" id="r_cmt_rx" source="com.renesas.smc.tools.swcomponent.fit.source">
+            <Setting id="CMT_CFG_CH2_EN_NESTED_INT" value="0"/>
+            <Setting id="CMT_CFG_CH1_EN_NESTED_INT" value="0"/>
+            <Setting id="CMT_CFG_CH3_EN_NESTED_INT" value="0"/>
+            <Setting id="CMT_CFG_CH0_EN_NESTED_INT" value="0"/>
+            <Setting id="CMT_RX_CFG_IPR" value="5"/>
+        </Segment>
+        <Segment component="com.renesas.smc.tools.swcomponent.codegenerator.singlescanmode" id="Config_S12AD0" source="com.renesas.smc.tools.swcomponent.codegenerator.source">
+            <Setting id="SDFmode" value="Unused"/>
+            <Setting id="ANx06_Add" value="Unuse"/>
+            <Setting id="SDFVolt" value="0V"/>
+            <Setting id="CMPBChk" value="Unuse"/>
+            <Setting id="ANx06" value="Use"/>
+            <Setting id="ANx05_CMPA" value="Unuse"/>
+            <Setting id="ANx05" value="Use"/>
+            <Setting id="ANx06_CMPALEVEL" value="Ref0Larger"/>
+            <Setting id="ANx07" value="Use"/>
+            <Setting id="Valuecount" value="1time"/>
+            <Setting id="StartTrigger" value="Software"/>
+            <Setting id="ANx00" value="Use"/>
+            <Setting id="DSH_Sampling" value="0.4"/>
+            <Setting id="ANx02" value="Use"/>
+            <Setting id="ANx01DSHchk" value="Unuse"/>
+            <Setting id="ANx01" value="Use"/>
+            <Setting id="ANx05_Add" value="Unuse"/>
+            <Setting id="ANx00_CMPA" value="Unuse"/>
+            <Setting id="ANx04" value="Use"/>
+            <Setting id="ANx03" value="Use"/>
+            <Setting id="ANx02_CMPALEVEL" value="Ref0Larger"/>
+            <Setting id="S12ADIchk" value="Use"/>
+            <Setting id="DDperiod" value="2ADCLK"/>
+            <Setting id="CMPBLevel" value="Ref0Larger"/>
+            <Setting id="Countmode" value="Addition"/>
+            <Setting id="ANx06_CMPA" value="Unuse"/>
+            <Setting id="ANx01_CMPA" value="Unuse"/>
+            <Setting id="ANx00_CMPALEVEL" value="Ref0Larger"/>
+            <Setting id="ANx07_CMPA" value="Unuse"/>
+            <Setting id="ANx04_CMPA" value="Unuse"/>
+            <Setting id="ANx04_Add" value="Unuse"/>
+            <Setting id="ANx02DSHchk" value="Unuse"/>
+            <Setting id="ANx07_CMPALEVEL" value="Ref0Larger"/>
+            <Setting id="S12ADIPrity" value="Level15"/>
+            <Setting id="ANx05_Sampling" value="0.183"/>
+            <Setting id="ANx00_Sampling" value="0.183"/>
+            <Setting id="Cmp1B" value="0"/>
+            <Setting id="ANx06_Sampling" value="0.183"/>
+            <Setting id="Cmp1A" value="0"/>
+            <Setting id="S12CMPAIchk" value="Use"/>
+            <Setting id="CMPBChan" value="Unused"/>
+            <Setting id="ANx03_Add" value="Unuse"/>
+            <Setting id="ANx03_CMPALEVEL" value="Ref0Larger"/>
+            <Setting id="Resolution" value="12bit"/>
+            <Setting id="ANx01_Add" value="Unuse"/>
+            <Setting id="WindowABcomplex" value="AORB"/>
+            <Setting id="S12CMPBIchk" value="Use"/>
+            <Setting id="ANx01_Sampling" value="0.183"/>
+            <Setting id="ANx02_CMPA" value="Unuse"/>
+            <Setting id="DataAligh" value="Right"/>
+            <Setting id="ANx00_Add" value="Unuse"/>
+            <Setting id="ANx01_CMPALEVEL" value="Ref0Larger"/>
+            <Setting id="ANx04_CMPALEVEL" value="Ref0Larger"/>
+            <Setting id="GBL1Prity" value="Level15"/>
+            <Setting id="ANx02_Add" value="Unuse"/>
+            <Setting id="Cmp0A" value="0"/>
+            <Setting id="ANx03_CMPA" value="Unuse"/>
+            <Setting id="ANx04_Sampling" value="0.183"/>
+            <Setting id="Cmp0B" value="0"/>
+            <Setting id="ANx07_Sampling" value="0.183"/>
+            <Setting id="DoubleTriggermode" value="Unuse"/>
+            <Setting id="ANx02_Sampling" value="0.183"/>
+            <Setting id="CMPAChk" value="Unuse"/>
+            <Setting id="ANx05_CMPALEVEL" value="Ref0Larger"/>
+            <Setting id="Autoclean" value="DisAutoclean"/>
+            <Setting id="ANx07_Add" value="Unuse"/>
+            <Setting id="WDFuntion" value="WDFUnuse"/>
+            <Setting id="DDcharge" value="Unused"/>
+            <Setting id="ANx03_Sampling" value="0.183"/>
+            <Setting id="ANx00DSHchk" value="Unuse"/>
+        </Segment>
+        <Segment component="com.renesas.smc.tools.swcomponent.codegenerator.i2cmastermode" id="Config_RIIC0" source="com.renesas.smc.tools.swcomponent.codegenerator.source">
+            <Setting id="SPIEnable" value="Enable"/>
+            <Setting id="TransEnd" value="Enable"/>
+            <Setting id="SDACNTClock" value="Internal"/>
+            <Setting id="NFStage" value="1Stage"/>
+            <Setting id="IntTEIPriority" value="Level15"/>
+            <Setting id="MultiIntTEIEnable" value="UnCheck"/>
+            <Setting id="NFEnable" value="Enable"/>
+            <Setting id="MultiIntTXIEnable" value="UnCheck"/>
+            <Setting id="STIEnable" value="Enable"/>
+            <Setting id="TSusEnable" value="Enable"/>
+            <Setting id="SDAOutDelay" value="Delay1"/>
+            <Setting id="SDAEnable" value="Disable"/>
+            <Setting id="IntEEIPriority" value="Level15"/>
+            <Setting id="NACKALDEnable" value="Disable"/>
+            <Setting id="IntTXIPriority" value="Level6"/>
+            <Setting id="DetCondition" value="SCLBoth"/>
+            <Setting id="Timeout" value="Disable"/>
+            <Setting id="Mode" value="I2C"/>
+            <Setting id="IntRXIPriority" value="Level6"/>
+            <Setting id="MultiIntRXIEnable" value="UnCheck"/>
+            <Setting id="DetTime" value="LongMode"/>
+            <Setting id="Bitrate" value="400"/>
+            <Setting id="NAKIEnable" value="Enable"/>
+            <Setting id="MasterALDEnable" value="Enable"/>
+            <Setting id="RecvEnd" value="Enable"/>
+            <Setting id="TMOIEnable" value="Disable"/>
+            <Setting id="ALIEnable" value="Enable"/>
+            <Setting id="RecvErr" value="Enable"/>
+            <Setting id="MultiIntEEIEnable" value="UnCheck"/>
+        </Segment>
+        <Segment component="com.renesas.smc.tools.swcomponent.codegenerator.i2cmastermode" id="Config_RIIC1" source="com.renesas.smc.tools.swcomponent.codegenerator.source">
+            <Setting id="SPIEnable" value="Enable"/>
+            <Setting id="TransEnd" value="Enable"/>
+            <Setting id="SDACNTClock" value="Internal"/>
+            <Setting id="NFStage" value="1Stage"/>
+            <Setting id="IntTEIPriority" value="Level15"/>
+            <Setting id="MultiIntTEIEnable" value="Check"/>
+            <Setting id="NFEnable" value="Enable"/>
+            <Setting id="MultiIntTXIEnable" value="Check"/>
+            <Setting id="STIEnable" value="Enable"/>
+            <Setting id="TSusEnable" value="Enable"/>
+            <Setting id="SDAOutDelay" value="Delay1"/>
+            <Setting id="SDAEnable" value="Disable"/>
+            <Setting id="IntEEIPriority" value="Level15"/>
+            <Setting id="NACKALDEnable" value="Disable"/>
+            <Setting id="IntTXIPriority" value="Level14"/>
+            <Setting id="DetCondition" value="SCLBoth"/>
+            <Setting id="Timeout" value="Disable"/>
+            <Setting id="Mode" value="I2C"/>
+            <Setting id="IntRXIPriority" value="Level14"/>
+            <Setting id="MultiIntRXIEnable" value="Check"/>
+            <Setting id="DetTime" value="LongMode"/>
+            <Setting id="Bitrate" value="400"/>
+            <Setting id="NAKIEnable" value="Enable"/>
+            <Setting id="MasterALDEnable" value="Enable"/>
+            <Setting id="RecvEnd" value="Enable"/>
+            <Setting id="TMOIEnable" value="Disable"/>
+            <Setting id="ALIEnable" value="Enable"/>
+            <Setting id="RecvErr" value="Enable"/>
+            <Setting id="MultiIntEEIEnable" value="Check"/>
+        </Segment>
+        <Segment component="com.renesas.smc.tools.swcomponent.codegenerator.port" id="Config_PORT" source="com.renesas.smc.tools.swcomponent.codegenerator.source">
+            <Setting id="UnuseOutput" value="NoChange"/>
+            <Segment id="PORT0_Check">
+                <Setting id="PortnEnable" value="Disable"/>
+            </Segment>
+            <Segment id="PORT3_Chan">
+                <Setting id="UseStatusAll" value="UnuseAll"/>
+                <Setting id="ApplyAll" value="ApplyallUnuse"/>
+                <Segment id="PORTx4_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx3_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx7_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx0_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveOut"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx2_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx6_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx1_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveOut"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx5_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                </Segment>
+            </Segment>
+            <Segment id="PORT0_Chan">
+                <Setting id="Output1All" value="Output1UnuseAll"/>
+                <Setting id="UseStatusAll" value="UnuseAll"/>
+                <Setting id="ApplyAll" value="ApplyallUnuse"/>
+                <Setting id="PullupAll" value="PullupUnuseAll"/>
+                <Setting id="OpendrainAll" value="CMOSAll"/>
+                <Segment id="PORTx7_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx5_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+            </Segment>
+            <Segment id="PORTB_Check">
+                <Setting id="PortnEnable" value="Disable"/>
+            </Segment>
+            <Segment id="PORTC_Chan">
+                <Setting id="HighdriveSelectAll" value="HighdriveNormalAll"/>
+                <Setting id="Output1All" value="Output1UnuseAll"/>
+                <Setting id="UseStatusAll" value="UnuseAll"/>
+                <Setting id="ApplyAll" value="ApplyallUnuse"/>
+                <Setting id="PullupAll" value="PullupUnuseAll"/>
+                <Setting id="OpendrainAll" value="CMOSAll"/>
+                <Segment id="PORTx4_Item">
+                    <Setting id="UseStatus" value="Out"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx3_Item">
+                    <Setting id="UseStatus" value="Out"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx7_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx0_Item">
+                    <Setting id="UseStatus" value="Out"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx2_Item">
+                    <Setting id="UseStatus" value="Out"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx6_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx1_Item">
+                    <Setting id="UseStatus" value="Out"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx5_Item">
+                    <Setting id="UseStatus" value="Out"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+            </Segment>
+            <Segment id="PORTC_Check">
+                <Setting id="PortnEnable" value="Enable"/>
+            </Segment>
+            <Segment id="PORT1_Check">
+                <Setting id="PortnEnable" value="Enable"/>
+            </Segment>
+            <Segment id="PORTB_Chan">
+                <Setting id="HighdriveSelectAll" value="HighdriveNormalAll"/>
+                <Setting id="Output1All" value="Output1UnuseAll"/>
+                <Setting id="UseStatusAll" value="UnuseAll"/>
+                <Setting id="ApplyAll" value="ApplyallUnuse"/>
+                <Setting id="PullupAll" value="PullupUnuseAll"/>
+                <Setting id="OpendrainAll" value="CMOSAll"/>
+                <Segment id="PORTx4_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx3_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx7_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx0_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx2_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx6_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx1_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx5_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+            </Segment>
+            <Segment id="PORTJ_Check">
+                <Setting id="PortnEnable" value="Disable"/>
+            </Segment>
+            <Segment id="PORT2_Chan">
+                <Setting id="Output1All" value="Output1UnuseAll"/>
+                <Setting id="UseStatusAll" value="UnuseAll"/>
+                <Setting id="ApplyAll" value="ApplyallUnuse"/>
+                <Setting id="PullupAll" value="PullupUnuseAll"/>
+                <Setting id="OpendrainAll" value="CMOSAll"/>
+                <Segment id="PORTx4_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx3_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveOut"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx7_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx0_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveOut"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx2_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveOut"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx6_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx1_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveOut"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx5_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+            </Segment>
+            <Segment id="PORT4_Chan">
+                <Setting id="Output1All" value="Output1UnuseAll"/>
+                <Setting id="UseStatusAll" value="UnuseAll"/>
+                <Setting id="ApplyAll" value="ApplyallUnuse"/>
+                <Setting id="PullupAll" value="PullupUnuseAll"/>
+                <Setting id="OpendrainAll" value="CMOSAll"/>
+                <Segment id="PORTx4_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx3_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx7_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx0_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx2_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx6_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx1_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx5_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+            </Segment>
+            <Segment id="PORT5_Check">
+                <Setting id="PortnEnable" value="Enable"/>
+            </Segment>
+            <Segment id="PORTA_Check">
+                <Setting id="PortnEnable" value="Disable"/>
+            </Segment>
+            <Segment id="PORT4_Check">
+                <Setting id="PortnEnable" value="Disable"/>
+            </Segment>
+            <Segment id="PORTD_Chan">
+                <Setting id="HighdriveSelectAll" value="HighdriveNormalAll"/>
+                <Setting id="Output1All" value="Output1UnuseAll"/>
+                <Setting id="UseStatusAll" value="UnuseAll"/>
+                <Setting id="ApplyAll" value="ApplyallUnuse"/>
+                <Setting id="PullupAll" value="PullupUnuseAll"/>
+                <Setting id="OpendrainAll" value="CMOSAll"/>
+                <Segment id="PORTx4_Item">
+                    <Setting id="UseStatus" value="In"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx3_Item">
+                    <Setting id="UseStatus" value="In"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx7_Item">
+                    <Setting id="UseStatus" value="In"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx0_Item">
+                    <Setting id="UseStatus" value="In"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx2_Item">
+                    <Setting id="UseStatus" value="In"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx6_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx1_Item">
+                    <Setting id="UseStatus" value="In"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx5_Item">
+                    <Setting id="UseStatus" value="In"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+            </Segment>
+            <Segment id="PORT3_Check">
+                <Setting id="PortnEnable" value="Disable"/>
+            </Segment>
+            <Segment id="PORTA_Chan">
+                <Setting id="HighdriveSelectAll" value="HighdriveNormalAll"/>
+                <Setting id="Output1All" value="Output1UnuseAll"/>
+                <Setting id="UseStatusAll" value="UnuseAll"/>
+                <Setting id="ApplyAll" value="ApplyallUnuse"/>
+                <Setting id="PullupAll" value="PullupUnuseAll"/>
+                <Setting id="OpendrainAll" value="CMOSAll"/>
+                <Segment id="PORTx4_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx3_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx7_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx0_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx2_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx6_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx1_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx5_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+            </Segment>
+            <Segment id="PORT1_Chan">
+                <Setting id="Output1All" value="Output1UnuseAll"/>
+                <Setting id="UseStatusAll" value="UnuseAll"/>
+                <Setting id="ApplyAll" value="ApplyallUnuse"/>
+                <Setting id="PullupAll" value="PullupUnuseAll"/>
+                <Setting id="OpendrainAll" value="CMOSAll"/>
+                <Segment id="PORTx4_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx3_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx7_Item">
+                    <Setting id="UseStatus" value="Out"/>
+                    <Setting id="HighdriveSelect" value="HighdriveOut"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx2_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx6_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx5_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+            </Segment>
+            <Segment id="PORT5_Chan">
+                <Setting id="HighdriveSelectAll" value="HighdriveOutAll"/>
+                <Setting id="Output1All" value="Output1UnuseAll"/>
+                <Setting id="UseStatusAll" value="UnuseAll"/>
+                <Setting id="ApplyAll" value="ApplyallUnuse"/>
+                <Setting id="PullupAll" value="PullupUnuseAll"/>
+                <Setting id="OpendrainAll" value="CMOSAll"/>
+                <Segment id="PORTx4_Item">
+                    <Setting id="UseStatus" value="Out"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx3_Item">
+                    <Setting id="UseStatus" value="Out"/>
+                    <Setting id="HighdriveSelect" value="HighdriveOut"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx0_Item">
+                    <Setting id="UseStatus" value="Out"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx2_Item">
+                    <Setting id="UseStatus" value="Out"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx1_Item">
+                    <Setting id="UseStatus" value="Out"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx5_Item">
+                    <Setting id="UseStatus" value="Out"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+            </Segment>
+            <Segment id="PORTE_Check">
+                <Setting id="PortnEnable" value="Disable"/>
+            </Segment>
+            <Segment id="PORTJ_Chan">
+                <Setting id="Output1All" value="Output1UnuseAll"/>
+                <Setting id="UseStatusAll" value="UnuseAll"/>
+                <Setting id="ApplyAll" value="ApplyallUnuse"/>
+                <Setting id="PullupAll" value="PullupUnuseAll"/>
+                <Setting id="OpendrainAll" value="CMOSAll"/>
+                <Segment id="PORTx3_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+            </Segment>
+            <Segment id="PORTD_Check">
+                <Setting id="PortnEnable" value="Enable"/>
+            </Segment>
+            <Segment id="PORTE_Chan">
+                <Setting id="HighdriveSelectAll" value="HighdriveNormalAll"/>
+                <Setting id="Output1All" value="Output1UnuseAll"/>
+                <Setting id="UseStatusAll" value="UnuseAll"/>
+                <Setting id="ApplyAll" value="ApplyallUnuse"/>
+                <Setting id="PullupAll" value="PullupUnuseAll"/>
+                <Setting id="OpendrainAll" value="CMOSAll"/>
+                <Segment id="PORTx4_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx3_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx7_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx0_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx2_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx6_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx1_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+                <Segment id="PORTx5_Item">
+                    <Setting id="UseStatus" value="Unuse"/>
+                    <Setting id="HighdriveSelect" value="HighdriveNormal"/>
+                    <Setting id="Pullup" value="PullupUnuse"/>
+                    <Setting id="Output1" value="Output1Unuse"/>
+                    <Setting id="Opendrain" value="CMOS"/>
+                </Segment>
+            </Segment>
+            <Segment id="PORT2_Check">
+                <Setting id="PortnEnable" value="Disable"/>
+            </Segment>
+        </Segment>
+        <Segment component="r_emwin_rx6.32.a.1.00" id="r_emwin_rx" source="com.renesas.smc.tools.swcomponent.fit.source">
+            <Setting id="EMWIN_LCD_DRIVER_IC" value="LCD_DRV_IC_ST7715"/>
+            <Setting id="EMWIN_BITS_PER_PIXEL" value="16"/>
+            <Setting id="EMWIN_SLAVE_ADDRESS" value="0x00000038"/>
+            <Setting id="EMWIN_GUI_FRAME_BUFFER3" value="0x00000000"/>
+            <Setting id="EMWIN_GUI_FRAME_BUFFER2" value="0x00840000"/>
+            <Setting id="EMWIN_GUI_FRAME_BUFFER1" value="0x00800000"/>
+            <Setting id="EMWIN_LCD_IF" value="LCD_IF_OTHER"/>
+            <Setting id="EMWIN_USE_TOUCH_IC_RESET_PIN" value="1"/>
+            <Setting id="EMWIN_TOUCH_IC_RESET_PIN" value="GPIO_PORT_6_PIN_6"/>
+            <Setting id="EMWIN_TOUCH_IF" value="TOUCH_IF_OTHER"/>
+            <Setting id="EMWIN_TOUCH_CS_PIN" value="GPIO_PORT_9_PIN_3"/>
+            <Setting id="EMWIN_DISP_SIGNAL_PIN" value="GPIO_PORT_B_PIN_3"/>
+            <Setting id="EMWIN_TOUCH_BAUDRATE" value="1000000"/>
+            <Setting id="EMWIN_USE_BACKLIGHT_PIN" value="1"/>
+            <Setting id="EMWIN_LCD_CS_PIN" value="GPIO_PORT_B_PIN_1"/>
+            <Setting id="EMWIN_USE_DRW2D" value="1"/>
+            <Setting id="EMWIN_USE_DISP_SIGNAL_PIN" value="1"/>
+            <Setting id="EMWIN_DATA_CMD_PIN" value="GPIO_PORT_B_PIN_7"/>
+            <Setting id="EMWIN_TOUCH_IF_NUMBER" value="0"/>
+            <Setting id="EMWIN_MAX_NUM_TOUCHPOINTS" value="10"/>
+            <Setting id="EMWIN_DMAC_NUMBER" value="0"/>
+            <Setting id="EMWIN_USE_MULTITOUCH" value="0"/>
+            <Setting id="EMWIN_NUM_BUFFERS" value="2"/>
+            <Setting id="EMWIN_DMAC_NUMBER2" value="1"/>
+            <Setting id="EMWIN_USE_RUNTIME_ORIENTATION" value="0"/>
+            <Setting id="EMWIN_YSIZE_PHYS" value="256"/>
+            <Setting id="EMWIN_USE_DATA_CMD_PIN" value="1"/>
+            <Setting id="EMWIN_BACKLIGHT_PIN" value="GPIO_PORT_6_PIN_7"/>
+            <Setting id="EMWIN_LCD_IF_NUMBER" value="0"/>
+            <Setting id="EMWIN_USE_TOUCH_CS_PIN" value="1"/>
+            <Setting id="EMWIN_DISPLAY_ORIENTATION" value="ORIENTATION_0"/>
+            <Setting id="EMWIN_USE_LCD_CS_PIN" value="1"/>
+            <Setting id="EMWIN_LCD_BAUDRATE" value="1000000"/>
+            <Setting id="EMWIN_SELECT_DMAC_DTC" value="2"/>
+            <Setting id="EMWIN_GUI_NUM_BYTES" value="102400"/>
+            <Setting id="EMWIN_XSIZE_PHYS" value="800"/>
+            <Setting id="EMWIN_GUI_USE_CACHE" value="0"/>
+            <Setting id="EMWIN_USE_TOUCH" value="1"/>
+            <Setting id="EMWIN_INIT_DMAC" value="1"/>
+        </Segment>
+        <Segment component="com.renesas.smc.tools.swcomponent.codegenerator.normalmode" id="Config_MTU0" source="com.renesas.smc.tools.swcomponent.codegenerator.source">
+            <Setting id="CntClk" value="Div64"/>
+            <Setting id="TGRCValue" value="100"/>
+            <Setting id="TgrbScale" value="us"/>
+            <Setting id="MultiIntTgidEnable" value="UnCheck"/>
+            <Setting id="PrioV" value="Level15"/>
+            <Setting id="MultiIntTgiaEnable" value="UnCheck"/>
+            <Setting id="TGRDValue" value="100"/>
+            <Setting id="Sync" value="Disable"/>
+            <Setting id="Tgrf" value="Out"/>
+            <Setting id="ADSM1" value="Disable"/>
+            <Setting id="Tgre" value="Out"/>
+            <Setting id="TRG0N" value="Disable"/>
+            <Setting id="Tgrd" value="Out"/>
+            <Setting id="Tgrc" value="Out"/>
+            <Setting id="AdSrc1" value="NoSrc"/>
+            <Setting id="Tgrb" value="Out"/>
+            <Setting id="Tgra" value="Out"/>
+            <Setting id="NoiseClock" value="PCLK"/>
+            <Setting id="MultiIntTgicEnable" value="UnCheck"/>
+            <Setting id="ADSM0" value="Disable"/>
+            <Setting id="TRGAN" value="Disable"/>
+            <Setting id="TgraScale" value="ms"/>
+            <Setting id="AdSrc0" value="NoSrc"/>
+            <Setting id="TgrdScale" value="us"/>
+            <Setting id="ClkEdg" value="Rise"/>
+            <Setting id="Tgie" value="Disable"/>
+            <Setting id="TgreScale" value="us"/>
+            <Setting id="TGRFValue" value="100"/>
+            <Setting id="Tgid" value="Disable"/>
+            <Setting id="Tgic" value="Disable"/>
+            <Setting id="Tgib" value="Disable"/>
+            <Setting id="Tgia" value="Enable"/>
+            <Setting id="TGRAValue" value="10"/>
+            <Setting id="Tgif" value="Disable"/>
+            <Setting id="IOA" value="OutDis"/>
+            <Setting id="Tciv" value="Disable"/>
+            <Setting id="IOC" value="OutDis"/>
+            <Setting id="IOB" value="OutDis"/>
+            <Setting id="IOD" value="OutDis"/>
+            <Setting id="MultiIntTgifEnable" value="UnCheck"/>
+            <Setting id="ClrSrc" value="TGRA"/>
+            <Setting id="NoiseA" value="Disable"/>
+            <Setting id="PrioD" value="Level15"/>
+            <Setting id="TgrfScale" value="us"/>
+            <Setting id="PrioE" value="Level15"/>
+            <Setting id="PrioF" value="Level15"/>
+            <Setting id="TgrcScale" value="us"/>
+            <Setting id="TGREValue" value="100"/>
+            <Setting id="PrioA" value="Level15"/>
+            <Setting id="PrioB" value="Level15"/>
+            <Setting id="PrioC" value="Level15"/>
+            <Setting id="NoiseD" value="Disable"/>
+            <Setting id="NoiseC" value="Disable"/>
+            <Setting id="NoiseB" value="Disable"/>
+            <Setting id="ExtNoiseB" value="Disable"/>
+            <Setting id="ExtNoiseA" value="Disable"/>
+            <Setting id="ExtNoiseD" value="Disable"/>
+            <Setting id="ExtNoiseC" value="Disable"/>
+            <Setting id="MultiIntTgibEnable" value="UnCheck"/>
+            <Setting id="MultiIntTgieEnable" value="UnCheck"/>
+            <Setting id="ExtNoiseClk" value="PCLK"/>
+            <Setting id="MultiIntTcivEnable" value="UnCheck"/>
+            <Setting id="TGRBValue" value="100"/>
+        </Segment>
+    </Segment>
+</QE>

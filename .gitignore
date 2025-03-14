@@ -19,7 +19,7 @@ build/
 Hardware/
 IMG/
 .git/
-.setteings/
+#.setteings/
 LICENSE
 #Firmware/.cache/
 #Firmware/.metadata
@@ -36,4 +36,3 @@ Desktop.ini
 ._*
 *.swp
 *~
-/Firmware/
