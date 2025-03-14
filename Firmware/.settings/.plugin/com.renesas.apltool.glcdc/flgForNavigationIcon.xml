@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?><settings>
+    <FlgNavigationIcon>
+        <item key="LcdGenerateCode">false</item>
+        <item key="GuiGenerateCode">false</item>
+        <item key="OpenSampleCode">false</item>
+        <item key="OpenSampleCodeCamera">false</item>
+    </FlgNavigationIcon>
+</settings>
