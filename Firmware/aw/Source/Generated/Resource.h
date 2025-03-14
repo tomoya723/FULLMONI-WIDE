@@ -132,7 +132,7 @@ extern APPW_ROOT_INFO ID_SCREEN_02_RootInfo;
 *
 *       Project path
 */
-#define APPW_PROJECT_PATH "D:/e2_studio/workspace/FULLMONI_WIDE/Firmware/aw"
+#define APPW_PROJECT_PATH "C:/Users/tomoyasato/git/FULLMONI-WIDE/Firmware/aw"
 
 #endif  // RESOURCE_H
 

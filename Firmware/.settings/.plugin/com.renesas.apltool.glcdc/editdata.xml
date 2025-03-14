@@ -151,36 +151,11 @@
         <item key="IntegerMapItem_HorizontalFrontPorchClk">3</item>
         <item key="IntegerMapItem_HorizontalTotalBlankingClk">144</item>
         <item key="IntegerMapItem_HorizontalTotalPeriodClk">944</item>
-        <item key="IntegerMapItem_MaximumReturnPacketSize">1</item>
         <item key="IntegerMapItem_PanelClockFrequencyMHz">20000000</item>
         <item key="IntegerMapItem_VertialDisplayPeriodLine">256</item>
         <item key="IntegerMapItem_VertialFrontPorchLine">2</item>
         <item key="IntegerMapItem_VertialTotalBlankingLine">98</item>
         <item key="IntegerMapItem_VertialTotalPeriodLine">354</item>
-        <item key="LongMapItem_HsReadResponseTimeoutUs">0</item>
-        <item key="LongMapItem_HsTxTimeoutCountUs">0</item>
-        <item key="LongMapItem_HsWriteResponseTimeoutUs">0</item>
-        <item key="LongMapItem_LpReadResponseTimeoutUs">0</item>
-        <item key="LongMapItem_LpRxHostProcessorTimeoutUs">0</item>
-        <item key="LongMapItem_LpWriteResponseTimeoutUs">0</item>
-        <item key="LongMapItem_PeripheralResponseTimeoutUs">0</item>
-        <item key="LongMapItem_TurnaroundAcknowledgeTimeoutUs">0</item>
-        <item key="LongMapItem_ULPSTwakeupPeriodUs">1000</item>
-        <item key="ObjectMapItem_ContinuousModeOfClockLane">DISABLE</item>
-        <item key="ObjectMapItem_EnableCrcCheckCh0">false</item>
-        <item key="ObjectMapItem_EnableCrcCheckCh1">false</item>
-        <item key="ObjectMapItem_EnableCrcCheckCh2">false</item>
-        <item key="ObjectMapItem_EnableCrcCheckCh3">false</item>
-        <item key="ObjectMapItem_EnableDataScramble">DISABLE</item>
-        <item key="ObjectMapItem_EnableEccCheck">ENABLE</item>
-        <item key="ObjectMapItem_EnableEotp">ENABLE</item>
-        <item key="ObjectMapItem_ExternalTearingEffectDetectionSense">RISING</item>
-        <item key="ObjectMapItem_NoLpduringHBP">false</item>
-        <item key="ObjectMapItem_NoLpduringHFP">false</item>
-        <item key="ObjectMapItem_NoLpduringHSA">false</item>
-        <item key="ObjectMapItem_NumberOfDataLanes">LANE2</item>
-        <item key="ObjectMapItem_SyncPulse">NOT_TRANSMITTED</item>
-        <item key="ObjectMapItem_SyncPulseVirtualCh">CH0</item>
         <item key="SelectedChannelNummber">0</item>
     </lcdMapData>
 </settings>
