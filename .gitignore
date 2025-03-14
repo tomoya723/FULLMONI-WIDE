@@ -21,9 +21,9 @@ IMG/
 .git/
 .setteings/
 LICENSE
-Firmware/.cache/
-Firmware/.metadata
-Firmware/.settings
+#Firmware/.cache/
+#Firmware/.metadata
+#Firmware/.settings
 Firmware/build
 Firmware/HardwareDebug
 Firmware/trash
