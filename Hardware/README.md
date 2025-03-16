@@ -1,7 +1,8 @@
 # FULLMONI-WIDE：Hardware
 ## Assembly View
 Access shared files created with Fusion360.<br>
-Type B : https://a360.co/3WhtYCx
+[Type A](https://violet1.autodesk360.com/data/permalink/dXJuOmFkc2sud2lwcHJvZDpkbS5saW5lYWdlOlZ3RDFHTDh2U2VxVVFYUzljWTV2alE)<br>
+[Type B](https://violet1.autodesk360.com/data/permalink/dXJuOmFkc2sud2lwcHJvZDpkbS5saW5lYWdlOmRCeXQyb1pxUnF1bW5rN0gyaXlyZ0E)<br>
 
 # Schematic & PCB Files
 ## MAIN-Board
