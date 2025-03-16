@@ -19,3 +19,6 @@ Type B : https://a360.co/3WhtYCx
 &emsp;&emsp; https://a360.co/4heQZyd<br>
  PCB : https://a360.co/4jgQo0P<br>
  3D : https://a360.co/4gSbPna<br>
+## State Machine Flow
+ フルモニファームウェアはmainループで以下ステートマシンのフローでコントロールしています。<br>
+![image](https://github.com/user-attachments/assets/25a1ea5b-9cfa-40e0-8f1c-1a7269c03bce)
