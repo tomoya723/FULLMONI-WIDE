@@ -753,9 +753,12 @@
       <SetFont>
         Font=51_30_Normal_EXT.xbf
       </SetFont>
-      <SetTextId>
-        Id=18
-      </SetTextId>
+      <SetDecMode>
+        Len=4
+        Shift=0
+        Signed=0
+        Space=1
+      </SetDecMode>
     </Text>
     <Text>
       ParentId=2048
@@ -1904,10 +1907,6 @@
       </Para>
     </SETVALUE>
   </Interactions>
-  <Selection>
-    Root=ID_SCREEN_01
-    Object=2048
-  </Selection>
   <Terms>
   </Terms>
   <AnimItems>
