@@ -1,8 +1,9 @@
 # FULLMONI-WIDE：Hardware
 ## Assembly View
 Access shared files created with Fusion360.<br>
-[Type A](https://a360.co/4iwMT53)<br>
-[Type B](https://a360.co/4kALsVd)<br>
+[type A](https://a360.co/4iwMT53)：NAロードスター搭載仕様　車速センサなしモデル<br>
+[type B](https://a360.co/4kALsVd)：NAロードスター搭載仕様　車速センサありモデル<br>
+[type N]：汎用エンクロージャーモデル
 
 # Schematic & PCB Files
 ## MAIN-Board
