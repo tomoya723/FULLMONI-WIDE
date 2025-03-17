@@ -15,10 +15,14 @@
 
 #define PI 3.1415923
 
-const float table_fuel_resistance[9]	= {   0.0,   7.0,  15.0,  33.0,  50.0,  70.0,  95.0, 1000.0};
-const float table_fuel_calclevel[9]		= { 100.0, 100.0,  82.8,  50.0,  26.6,   8.5,   0.0,    0.0};
+//float table_fuel_resistance[9]	= {   0.0,   7.0,  15.0,  33.0,  50.0,  70.0,  95.0, 1000.0};
+//float table_fuel_calclevel[9]		= { 100.0, 100.0,  82.8,  50.0,  26.6,   8.5,   0.0,    0.0};
 
-const table2D fuel_sender_to_LEVEL_fl_fl = {9, table_fuel_calclevel, table_fuel_resistance};
+float table_fuel_resistance[9]		= { 1000.0,  95.0,  70.0,  50.0,  33.0,  15.0,   7.0,   0.0};
+float table_fuel_calclevel[9]		= {    0.0,   0.0,   8.5,  26.6,  50.0,  82.8, 100.0, 100.0};
+
+//const table2D fuel_sender_to_LEVEL_fl_fl = {9, table_fuel_calclevel, table_fuel_resistance};
+const table2D fuel_sender_to_LEVEL_fl_fl = {8, table_fuel_resistance, table_fuel_calclevel};
 
 const float table_tyre_spec[3]			= { 195.0,  50.0,  15.0};
 const float table_gear_ratio[6]			= { 3.760, 2.269, 1.645, 1.257, 1.000, 0.843};
@@ -80,9 +84,9 @@ void data_store(void)
 	if(g_CALC_data.num2 > 32767) g_CALC_data.num2 = g_CALC_data.num2 -65534;
 	g_CALC_data.num3 = (float)((((unsigned int)rx_dataframe3.data[6]) << 8) + rx_dataframe3.data[7]) / 10.0  ; // OIL Temp
 	if(g_CALC_data.num3 > 32767) g_CALC_data.num3 = g_CALC_data.num3 -65534;
-	g_CALC_data.num4 = (float)((((unsigned int)rx_dataframe1.data[4]) << 8) + rx_dataframe1.data[5]) * 0.1   ; // MAP
+	g_CALC_data.num4 = (float)((((unsigned int)rx_dataframe1.data[4]) << 8) + rx_dataframe1.data[5]) * 1.0   ; // MAP
 	if(g_CALC_data.num4 > 32767) g_CALC_data.num4 = g_CALC_data.num4 -65534;
-	g_CALC_data.num5 = (float)((((unsigned int)rx_dataframe4.data[0]) << 8) + rx_dataframe4.data[1]) * 0.1   ; // OIL Pressure
+	g_CALC_data.num5 = (float)((((unsigned int)rx_dataframe4.data[0]) << 8) + rx_dataframe4.data[1]) * 0.01  ; // OIL Pressure
 	if(g_CALC_data.num5 > 32767) g_CALC_data.num5 = g_CALC_data.num5 -65534;
 	g_CALC_data.num6 = (float)((((unsigned int)rx_dataframe4.data[6]) << 8) + rx_dataframe4.data[7]) * 0.1   ; // Battery Voltage
 	if(g_CALC_data.num6 > 32767) g_CALC_data.num6 = g_CALC_data.num6 -65534;
