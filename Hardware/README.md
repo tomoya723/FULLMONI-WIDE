@@ -1,13 +1,11 @@
 # FULLMONI-WIDE：Hardware
 ## Assembly View
 Access shared files created with Fusion360.<br>
-| Part name     | Preview       | Link       |
+| model         | Note          | Preview       |
 | ------------- | ------------- | ------------- |
-| [type A](https://a360.co/4iwMT53) | NAロードスター搭載仕様　車速センサなしモデル |
-| --------------------------------- | ---------------------------------------- |
-| [type B](https://a360.co/4kALsVd) | NAロードスター搭載仕様　車速センサありモデル |
------------------------------------ | ---------------------------------------- |
-| type N | 汎用エンクロージャーモデル
+| [type A](https://a360.co/4iwMT53) | NAロードスター搭載仕様　車速センサなしモデル | ![image](https://github.com/user-attachments/assets/8232431c-e633-477c-b88c-38fa48a43e2b) |
+| [type B](https://a360.co/4kALsVd) | NAロードスター搭載仕様　車速センサありモデル | ![image](https://github.com/user-attachments/assets/d97cb603-2d4a-47da-a86b-308152c9f7fb) |
+| type N | 汎用エンクロージャーモデル | coming soon |
 
 # Schematic & PCB Files
 ## MAIN-Board
