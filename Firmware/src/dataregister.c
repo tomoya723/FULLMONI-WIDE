@@ -84,9 +84,9 @@ void data_store(void)
 	if(g_CALC_data.num2 > 32767) g_CALC_data.num2 = g_CALC_data.num2 -65534;
 	g_CALC_data.num3 = (float)((((unsigned int)rx_dataframe3.data[6]) << 8) + rx_dataframe3.data[7]) / 10.0  ; // OIL Temp
 	if(g_CALC_data.num3 > 32767) g_CALC_data.num3 = g_CALC_data.num3 -65534;
-	g_CALC_data.num4 = (float)((((unsigned int)rx_dataframe1.data[4]) << 8) + rx_dataframe1.data[5]) * 1.0   ; // MAP
+	g_CALC_data.num4 = (float)((((unsigned int)rx_dataframe1.data[4]) << 8) + rx_dataframe1.data[5]) * 0.1   ; // MAP
 	if(g_CALC_data.num4 > 32767) g_CALC_data.num4 = g_CALC_data.num4 -65534;
-	g_CALC_data.num5 = (float)((((unsigned int)rx_dataframe4.data[0]) << 8) + rx_dataframe4.data[1]) * 0.01  ; // OIL Pressure
+	g_CALC_data.num5 = (float)((((unsigned int)rx_dataframe4.data[0]) << 8) + rx_dataframe4.data[1]) * 0.1   ; // OIL Pressure
 	if(g_CALC_data.num5 > 32767) g_CALC_data.num5 = g_CALC_data.num5 -65534;
 	g_CALC_data.num6 = (float)((((unsigned int)rx_dataframe4.data[6]) << 8) + rx_dataframe4.data[7]) * 0.1   ; // Battery Voltage
 	if(g_CALC_data.num6 > 32767) g_CALC_data.num6 = g_CALC_data.num6 -65534;
