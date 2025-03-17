@@ -11,11 +11,15 @@
 #include "../aw/Source/Generated/ID_SCREEN_02.h"
 
 #include "dataregister.h"
+#include "lib_table.h"
 
 #define PI 3.1415923
 
 const float table_fuel_resistance[9]	= {   0.0,   7.0,  15.0,  33.0,  50.0,  70.0,  95.0, 1000.0};
 const float table_fuel_calclevel[9]		= { 100.0, 100.0,  82.8,  50.0,  26.6,   8.5,   0.0,    0.0};
+
+const table2D fuel_sender_to_LEVEL_fl_fl = {9, table_fuel_calclevel, table_fuel_resistance};
+
 const float table_tyre_spec[3]			= { 195.0,  50.0,  15.0};
 const float table_gear_ratio[6]			= { 3.760, 2.269, 1.645, 1.257, 1.000, 0.843};
 unsigned int table_gear_ratio_range[7]	= {   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0};
@@ -106,23 +110,26 @@ void data_store(void)
 	fuel3 = fuel1 / fuel2;	// �Z���_�[��R�l�Z�o
 //	for(i = 1; i <= 7; i ++)
 //	{
-	i = 1;
-	while(i <= 7)
-	{
-		if(fuel3 <= table_fuel_resistance[i])
-		{
-			a = (table_fuel_resistance[i] - table_fuel_resistance[i-1]);
-			b = (fuel3 - table_fuel_resistance[i-1]);
-			c = b / a;
-			fuel4 = table_fuel_calclevel[i-1] - ((table_fuel_calclevel[i-1] - table_fuel_calclevel[i]) * c);
+// refactor to look up function
+//	i = 1;
+//	while(i <= 7)
+//	{
+//		if(fuel3 <= table_fuel_resistance[i])
+//		{
+//			a = (table_fuel_resistance[i] - table_fuel_resistance[i-1]);
+//			b = (fuel3 - table_fuel_resistance[i-1]);
+//			c = b / a;
+//			fuel4 = table_fuel_calclevel[i-1] - ((table_fuel_calclevel[i-1] - table_fuel_calclevel[i]) * c);
 //			fuel4 = (fuel4 );
-			break;
-		}
-		else
-		{
-			i++;
-		}
-	}
+//			break;
+//		}
+//		else
+//		{
+//			i++;
+//		}
+//	}
+
+	fuel4 = table2D_getValue(&fuel_sender_to_LEVEL_fl_fl, fuel3);
 	if(fuel4 <   0) fuel4 =   0;
 	if(fuel4 > 100) fuel4 = 100;
 
