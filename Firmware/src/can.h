@@ -39,7 +39,7 @@ Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
 #include "r_can_rx_config.h"
 #include "r_can_rx_if.h"
-#include "aprx72n0a.h"	/* AP change */
+//#include "aprx72n0a.h"	/* AP change */
 //#include "rskrx72n.h"
 //#include <machine.h> gcc not asign
 
@@ -82,11 +82,30 @@ independent - not affecting neighboring mailboxes. */
 //#define 	CANBOX_REMOTE_RX	(0x08)
 //#define 	CANBOX_REMOTE_TX	(0x0C)	    /* Mailbox #12 */
 
+/* Local defines */
+#define LED_ON              (1)
+#define LED_OFF             (0)
+
+/* LEDs */
+#define LED0                PORT9.PODR.BIT.B5
+#define LED1                PORT9.PODR.BIT.B6
+#define LED0_PDR            PORT9.PDR.BIT.B5
+#define LED1_PDR            PORT9.PDR.BIT.B6
+
 /**********************************************************************************************************************
 Global variables and functions exported
 ***********************************************************************************************************************/
 /* Data */
 extern can_frame_t		tx_dataframe, rx_dataframe, remote_frame;
+extern can_frame_t	tx_dataframe,
+//							rx_dataframe,
+							rx_dataframe1,
+							rx_dataframe2,
+							rx_dataframe3,
+							rx_dataframe4,
+							rx_dataframe5,
+							rx_dataframe6,
+							remote_frame;
 
 #if !USE_CAN_POLL
 extern uint32_t         CAN1_tx_sentdata_flag;
