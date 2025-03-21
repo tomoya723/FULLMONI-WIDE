@@ -68,7 +68,7 @@ Includes   <System Includes> , "Project Includes"
 #include "r_can_rx_if.h"
 #include "r_can_rx_config.h"
 #include <stdio.h>
-#include "cmt_dev.h"	/* AP add */
+//#include "cmt_dev.h"	/* AP add */
 
 
 /***********************************************************************************************************************
