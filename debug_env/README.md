@@ -1,1 +1,2 @@
-## FULLMONI-WIDE : CANDATA for Debug.
+# FULLMONI-WIDE : CANDATA log for Debug.
+## Import to BUSMASTER.
