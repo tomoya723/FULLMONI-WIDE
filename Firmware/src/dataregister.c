@@ -198,7 +198,7 @@ void data_store(void)
 	aPara1[0].v = 0;																			APPW_DoJob(ID_SCREEN_02, ID_ICON_01 , APPW_JOB_SETVIS, aPara1);	// Oil Warning
 	if(g_CALC_data.num1 >  60)	{	aPara2[0].v = 0;	} else {		aPara2[0].v = 1;	}	APPW_DoJob(ID_SCREEN_02, ID_ICON_02L, APPW_JOB_SETVIS, aPara2);	// Water Temp Warning Low
 	if(g_CALC_data.num1 < 100)	{	aPara3[0].v = 0;	} else {		aPara3[0].v = 1;	}	APPW_DoJob(ID_SCREEN_02, ID_ICON_02H, APPW_JOB_SETVIS, aPara3);	// Water Temp Warning High
-	if(g_CALC_data.AD3 >  100)	{	aPara4[0].v = 0;	} else {		aPara4[0].v = 1;	}	APPW_DoJob(ID_SCREEN_02, ID_ICON_03 , APPW_JOB_SETVIS, aPara4);	// Battery Warning
+	if(g_CALC_data.AD3 >  100)	{	aPara4[0].v = 0;	} else {		aPara4[0].v = 1;	}	APPW_DoJob(ID_SCREEN_02, ID_ICON_03 , APPW_JOB_SETVIS, aPara4);	// EXtemp Warning
 	if(g_CALC_data.AD1 > 1000)	{	aPara5[0].v = 0;	} else {		aPara5[0].v = 1;	}	APPW_DoJob(ID_SCREEN_02, ID_ICON_04 , APPW_JOB_SETVIS, aPara5);	// Battery Warning
 	if(g_CALC_data.AD2 >  100)	{	aPara6[0].v = 0;	} else {		aPara6[0].v = 1;	}	APPW_DoJob(ID_SCREEN_02, ID_ICON_05 , APPW_JOB_SETVIS, aPara6);	// Break Warning
 	if(g_CALC_data.AD4 >  100)	{	aPara7[0].v = 0;	} else {		aPara7[0].v = 1;	}	APPW_DoJob(ID_SCREEN_02, ID_ICON_06 , APPW_JOB_SETVIS, aPara7);	// Belts Warning
