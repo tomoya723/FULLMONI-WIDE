@@ -383,7 +383,7 @@ static GUI_CONST_STORAGE APPW_SETUP_ITEM _aSetup[] = {
                                                  ARG_V(0),
                                                  ARG_V(0) } },
   { ID_NUM_04,     APPW_SET_PROP_FONT,         { ARG_VP(0, ac51_30_Normal_EXT) } },
-  { ID_NUM_04,     APPW_SET_PROP_DECMODE,      { ARG_V(3),
+  { ID_NUM_04,     APPW_SET_PROP_DECMODE,      { ARG_V(4),
                                                  ARG_V(0),
                                                  ARG_V(0),
                                                  ARG_V(1) } },
