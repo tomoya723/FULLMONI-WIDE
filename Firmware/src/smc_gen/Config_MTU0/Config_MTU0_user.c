@@ -101,13 +101,8 @@ void r_Config_MTU0_tgia0_interrupt(void)
 	g_CALC_data.AD4 = 0.5    * g_CALC_data.AD4 + 0.5    * (float)S12AD.ADDR4;
 	g_CALC_data.AD5 = 0.99   * g_CALC_data.AD5 + 0.01   * (float)S12AD.ADDR5;
 	g_CALC_data.AD6 = 0.5    * g_CALC_data.AD6 + 0.5    * (float)S12AD.ADDR6;
-//	g_CALC_data.AD7 = 0.9999 * g_CALC_data.AD7 + 0.0001 * (float)S12AD.ADDR7; // 時間差で数値ズレあり　#issue 4
-	g_CALC_data.AD7 = 0.999  * g_CALC_data.AD7 + 0.001  * (float)S12AD.ADDR7; // 問題なし 暫定対応
-//	g_CALC_data.AD7 = 0.99   * g_CALC_data.AD7 + 0.01   * (float)S12AD.ADDR7; // 問題なし
-//	g_CALC_data.AD7 =                                     (float)S12AD.ADDR7; // 問題なし
-//	g_CALC_data.sp  = 0.99   * g_CALC_data.sp  + 0.01   * (float)(165570/sp_TGRA); //MTU4.TGRA);
-//	g_CALC_data.sp  = 0.99   * g_CALC_data.sp  + 0.01   * (float)(664502/sp_TGRA); //MTU4.TGRA); //0323update
-	g_CALC_data.sp  = 0.99   * g_CALC_data.sp  + 0.01   * (float)(704372/sp_TGRA); //MTU4.TGRA); //0324update
+	g_CALC_data.AD7 = 0.9999 * g_CALC_data.AD7 + 0.0001 * (float)S12AD.ADDR7;
+	g_CALC_data.sp  = 0.99   * g_CALC_data.sp  + 0.01   * (float)(704372/sp_TGRA);
 
 	g_sp_int_flg ++;
 	if(g_sp_int_flg > 100)

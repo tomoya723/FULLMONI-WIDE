@@ -15,14 +15,10 @@
 
 #define PI 3.1415923
 
-//float table_fuel_resistance[9]	= {   0.0,   7.0,  15.0,  33.0,  50.0,  70.0,  95.0, 1000.0};
-//float table_fuel_calclevel[9]		= { 100.0, 100.0,  82.8,  50.0,  26.6,   8.5,   0.0,    0.0};
+float table_fuel_resistance[9]	= {   0.0,   7.0,  15.0,  33.0,  50.0,  70.0,  95.0, 1000.0};
+float table_fuel_calclevel[9]	= { 100.0, 100.0,  82.8,  50.0,  26.6,   8.5,   0.0,    0.0};
 
-float table_fuel_resistance[9]		= { 1000.0,  95.0,  70.0,  50.0,  33.0,  15.0,   7.0,   0.0};
-float table_fuel_calclevel[9]		= {    0.0,   0.0,   8.5,  26.6,  50.0,  82.8, 100.0, 100.0};
-
-//const table2D fuel_sender_to_LEVEL_fl_fl = {9, table_fuel_calclevel, table_fuel_resistance};
-const table2D fuel_sender_to_LEVEL_fl_fl = {8, table_fuel_resistance, table_fuel_calclevel};
+const table2D fuel_sender_to_LEVEL_fl_fl = {8, table_fuel_calclevel, table_fuel_resistance};
 
 const float table_tyre_spec[3]			= { 195.0,  50.0,  15.0};
 const float table_gear_ratio[6]			= { 3.760, 2.269, 1.645, 1.257, 1.000, 0.843};
@@ -201,7 +197,8 @@ void data_store(void)
 	if(g_CALC_data.AD3 >  100)	{	aPara4[0].v = 0;	} else {		aPara4[0].v = 1;	}	APPW_DoJob(ID_SCREEN_02, ID_ICON_03 , APPW_JOB_SETVIS, aPara4);	// EXtemp Warning
 	if(g_CALC_data.AD1 > 1000)	{	aPara5[0].v = 0;	} else {		aPara5[0].v = 1;	}	APPW_DoJob(ID_SCREEN_02, ID_ICON_04 , APPW_JOB_SETVIS, aPara5);	// Battery Warning
 	if(g_CALC_data.AD2 >  100)	{	aPara6[0].v = 0;	} else {		aPara6[0].v = 1;	}	APPW_DoJob(ID_SCREEN_02, ID_ICON_05 , APPW_JOB_SETVIS, aPara6);	// Break Warning
-	if(g_CALC_data.AD4 >  100)	{	aPara7[0].v = 0;	} else {		aPara7[0].v = 1;	}	APPW_DoJob(ID_SCREEN_02, ID_ICON_06 , APPW_JOB_SETVIS, aPara7);	// Belts Warning
+//	if(g_CALC_data.AD4 >  100)	{	aPara7[0].v = 0;	} else {		aPara7[0].v = 1;	}	APPW_DoJob(ID_SCREEN_02, ID_ICON_06 , APPW_JOB_SETVIS, aPara7);	// Belts Warning
+	if(g_CALC_data.AD4 >  150)	{	aPara7[0].v = 0;	} else {		aPara7[0].v = 1;	}	APPW_DoJob(ID_SCREEN_02, ID_ICON_06 , APPW_JOB_SETVIS, aPara7);	// Belts Warning #issue8暫定
 	if(fuel4 > 10)	{	aPara8[0].v = 0;	} else if (fuel4 < 5)	{ aPara8[0].v = 1;	}		APPW_DoJob(ID_SCREEN_02, ID_ICON_07 , APPW_JOB_SETVIS, aPara8);	// Fuel Empty
 
 
