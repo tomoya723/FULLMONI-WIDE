@@ -154,6 +154,7 @@ void main(void)
 	printf("FULLMONI Init Done.\n");
 
 	Neopixel_InitRGB();
+	g_CALC_data.AD7 = S12AD.ADDR7; // issue#4暫定対策：LPF値リセット
 
 	while (1)
 	{
