@@ -20,7 +20,7 @@
 /***********************************************************************************************************************
 * File Name        : Config_PORT.c
 * Component Version: 2.4.1
-* Device(s)        : R5F572NNHxBD
+* Device(s)        : R5F572NNDxFP
 * Description      : This file implements device driver for Config_PORT.
 ***********************************************************************************************************************/
 
@@ -54,17 +54,6 @@ Global variables and functions
 
 void R_Config_PORT_Create(void)
 {
-    /* Set PORTH registers */
-    PORTH.PODR.BYTE = _00_Pm0_OUTPUT_0;
-    PORTH.ODR0.BYTE = _00_Pm0_CMOS_OUTPUT | _00_Pm1_CMOS_OUTPUT | _00_Pm2_CMOS_OUTPUT | _00_Pm3_CMOS_OUTPUT;
-    PORTH.ODR1.BYTE = _00_Pm4_CMOS_OUTPUT | _00_Pm5_CMOS_OUTPUT | _00_Pm6_CMOS_OUTPUT | _00_Pm7_CMOS_OUTPUT;
-    PORTH.DSCR.BYTE = _00_Pm0_HIDRV_OFF | _00_Pm1_HIDRV_OFF | _00_Pm2_HIDRV_OFF | _00_Pm3_HIDRV_OFF | 
-                      _00_Pm4_HIDRV_OFF | _00_Pm5_HIDRV_OFF | _00_Pm6_HIDRV_OFF | _00_Pm7_HIDRV_OFF;
-    PORTH.DSCR2.BYTE = _00_Pm0_HISPEED_OFF | _00_Pm1_HISPEED_OFF | _00_Pm2_HISPEED_OFF | _00_Pm3_HISPEED_OFF | 
-                       _00_Pm4_HISPEED_OFF | _00_Pm5_HISPEED_OFF | _00_Pm6_HISPEED_OFF | _00_Pm7_HISPEED_OFF;
-    PORTH.PMR.BYTE = _00_Pm0_PIN_GPIO;
-    PORTH.PDR.BYTE = _01_Pm0_MODE_OUTPUT;
-
     R_Config_PORT_Create_UserInit();
 }
 

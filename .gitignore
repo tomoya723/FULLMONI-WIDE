@@ -28,6 +28,10 @@ Firmware/build
 Firmware/HardwareDebug
 Firmware/trash
 Firmware/src/smc_gen/r_emwin_rx/tool
+Bootloader/build
+Bootloader/HardwareDebug
+Bootloader/output
+Bootloader/trash
 
 # OS依存の不要ファイル
 Thumbs.db

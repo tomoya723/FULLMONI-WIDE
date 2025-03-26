@@ -20,7 +20,7 @@
 /***********************************************************************************************************************
 * File Name        : r_cg_port.h
 * Version          : 1.0.140
-* Device(s)        : R5F572NNHxBD
+* Device(s)        : R5F572NNDxFP
 * Description      : General header file for PORT peripheral.
 ***********************************************************************************************************************/
 
@@ -63,10 +63,22 @@ Port Mode Register (PMR)
 #define _40_Pm6_MODE_OUTPUT     (0x40U) /* Pm6 as output */
 #define _00_Pm7_MODE_INPUT      (0x00U) /* Pm7 as input */
 #define _80_Pm7_MODE_OUTPUT     (0x80U) /* Pm7 as output */
-#define _50_PDR0_DEFAULT        (0x50U) /* PDR0 default value */
-#define _C0_PDRF_DEFAULT        (0xC0U) /* PDRF default value */
-#define _D0_PDRJ_DEFAULT        (0xD0U) /* PDRJ default value */
-#define _C0_PDRN_DEFAULT        (0xC0U) /* PDRN default value */
+#define _5F_PDR0_DEFAULT        (0x5FU) /* PDR0 default value */
+#define _03_PDR1_DEFAULT        (0x03U) /* PDR1 default value */
+#define _C0_PDR5_DEFAULT        (0xC0U) /* PDR5 default value */
+#define _FF_PDR6_DEFAULT        (0xFFU) /* PDR6 default value */
+#define _FF_PDR7_DEFAULT        (0xFFU) /* PDR7 default value */
+#define _FF_PDR8_DEFAULT        (0xFFU) /* PDR8 default value */
+#define _FF_PDR9_DEFAULT        (0xFFU) /* PDR9 default value */
+#define _FF_PDRF_DEFAULT        (0xFFU) /* PDRF default value */
+#define _FF_PDRG_DEFAULT        (0xFFU) /* PDRG default value */
+#define _FF_PDRH_DEFAULT        (0xFFU) /* PDRH default value */
+#define _F7_PDRJ_DEFAULT        (0xF7U) /* PDRJ default value */
+#define _FF_PDRK_DEFAULT        (0xFFU) /* PDRK default value */
+#define _FF_PDRL_DEFAULT        (0xFFU) /* PDRL default value */
+#define _FF_PDRM_DEFAULT        (0xFFU) /* PDRM default value */
+#define _FF_PDRN_DEFAULT        (0xFFU) /* PDRN default value */
+#define _FF_PDRQ_DEFAULT        (0xFFU) /* PDRQ default value */
 
 /*
     Port Output Data Register (PODR)

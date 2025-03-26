@@ -20,7 +20,7 @@
 /***********************************************************************************************************************
 * File Name        : r_smc_interrupt.h
 * Version          : 1.2.40
-* Device(s)        : R5F572NNHxBD
+* Device(s)        : R5F572NNDxFP
 * Description      : This file implements interrupt setting.
 ***********************************************************************************************************************/
 
@@ -129,8 +129,8 @@ Macro definitions
 #define ICU_SCI7_TXI7_PRIORITY                     (_03_ICU_PRIORITY_LEVEL3)
 #define ICU_SCI8_RXI8_PRIORITY                     (_0F_ICU_PRIORITY_LEVEL15)
 #define ICU_SCI8_TXI8_PRIORITY                     (_0F_ICU_PRIORITY_LEVEL15)
-#define ICU_SCI9_RXI9_PRIORITY                     (_0F_ICU_PRIORITY_LEVEL15)
-#define ICU_SCI9_TXI9_PRIORITY                     (_0F_ICU_PRIORITY_LEVEL15)
+#define ICU_SCI9_RXI9_PRIORITY                     (_03_ICU_PRIORITY_LEVEL3)
+#define ICU_SCI9_TXI9_PRIORITY                     (_03_ICU_PRIORITY_LEVEL3)
 #define ICU_SCI10_RXI10_PRIORITY                   (_0F_ICU_PRIORITY_LEVEL15)
 #define ICU_SCI10_TXI10_PRIORITY                   (_0F_ICU_PRIORITY_LEVEL15)
 #define ICU_ICU_GROUPBE0_PRIORITY                  (_0F_ICU_PRIORITY_LEVEL15)

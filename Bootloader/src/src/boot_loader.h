@@ -48,7 +48,7 @@ Macro definitions
 #define BL_SCI_RATE                 (115200)
 #define BL_SCI_INT_PRIORITY         (15)
 #define BL_SCI_CH                   (SCI_CH7)
-#define BL_SCI_PIN_FUNC             (R_SCI_PinSet_SCI7)
+#define BL_SCI_PIN_FUNC             (R_SCI_PinSet_SCI9)
 #define BL_SCI_TX_BUFSIZ            (SCI_CFG_CH7_TX_BUFSIZ)
 
 /* Initial image program mode? */

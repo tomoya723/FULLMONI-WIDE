@@ -20,7 +20,7 @@
 /***********************************************************************************************************************
 * File Name        : r_smc_cgc.c
 * Version          : 2.1.0
-* Device(s)        : R5F572NNHxBD
+* Device(s)        : R5F572NNDxFP
 * Description      : This file implements CGC setting.
 ***********************************************************************************************************************/
 
@@ -54,13 +54,6 @@ Global variables and functions
 
 void R_CGC_Create(void)
 {
-    /* Set SDCLK pin */
-    SYSTEM.SCKCR.BIT.PSTOP0 = 1U;
-    MPC.PFBCR1.BIT.SDCLKE = 1U;
-    MPC.PFBCR3.BIT.SDCLKDRV = 1U;
-    SYSTEM.SCKCR.BIT.PSTOP0 = 0U;
-    PORT7.PMR.BYTE |= 0x01U;
-
     R_CGC_Create_UserInit();
 }
 
