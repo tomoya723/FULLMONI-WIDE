@@ -12,6 +12,7 @@
 
 #include "dataregister.h"
 #include "lib_table.h"
+#include "lib_general.h"
 
 #define PI 3.1415923
 
@@ -80,10 +81,15 @@ void data_store(void)
 	if(g_CALC_data.num2 > 32767) g_CALC_data.num2 = g_CALC_data.num2 -65534;
 	g_CALC_data.num3 = (float)((((unsigned int)rx_dataframe3.data[6]) << 8) + rx_dataframe3.data[7]) / 10.0  ; // OIL Temp
 	if(g_CALC_data.num3 > 32767) g_CALC_data.num3 = g_CALC_data.num3 -65534;
+
 	g_CALC_data.num4 = (float)((((unsigned int)rx_dataframe1.data[4]) << 8) + rx_dataframe1.data[5]) * 0.1   ; // MAP
 	if(g_CALC_data.num4 > 32767) g_CALC_data.num4 = g_CALC_data.num4 -65534;
+	smooth(g_CALC_data_sm.num4,0.3, g_CALC_data.num4);
+
 	g_CALC_data.num5 = (float)((((unsigned int)rx_dataframe4.data[0]) << 8) + rx_dataframe4.data[1]) * 0.1   ; // OIL Pressure
 	if(g_CALC_data.num5 > 32767) g_CALC_data.num5 = g_CALC_data.num5 -65534;
+	smooth(g_CALC_data_sm.num5,0.1, g_CALC_data.num5);
+
 	g_CALC_data.num6 = (float)((((unsigned int)rx_dataframe4.data[6]) << 8) + rx_dataframe4.data[7]) * 0.1   ; // Battery Voltage
 	if(g_CALC_data.num6 > 32767) g_CALC_data.num6 = g_CALC_data.num6 -65534;
 
@@ -130,8 +136,9 @@ void data_store(void)
 //	}
 
 	fuel4 = table2D_getValue(&fuel_sender_to_LEVEL_fl_fl, fuel3);
-	if(fuel4 <   0) fuel4 =   0;
-	if(fuel4 > 100) fuel4 = 100;
+	guard(fuel4,100,0);
+//	if(fuel4 <   0) fuel4 =   0;
+//	if(fuel4 > 100) fuel4 = 100;
 
 	// vehicle speed
 	g_CALC_data.odo = sp_int / 2548;
@@ -173,8 +180,8 @@ void data_store(void)
 	APPW_SetVarData(ID_VAR_01, g_CALC_data.num1);
 	APPW_SetVarData(ID_VAR_02, g_CALC_data.num2);
 	APPW_SetVarData(ID_VAR_03, g_CALC_data.num3);
-	APPW_SetVarData(ID_VAR_04, g_CALC_data.num4);
-	APPW_SetVarData(ID_VAR_05, g_CALC_data.num5);
+	APPW_SetVarData(ID_VAR_04, g_CALC_data_sm.num4);
+	APPW_SetVarData(ID_VAR_05, g_CALC_data_sm.num5);
 	APPW_SetVarData(ID_VAR_06, g_CALC_data.num6);
 	APPW_SetVarData(ID_VAR_AF, g_CALC_data.af);
 	APPW_SetVarData(ID_VAR_REV, g_CALC_data.rev);
