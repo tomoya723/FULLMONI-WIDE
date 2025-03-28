@@ -14,6 +14,8 @@
 // --------------------------------------------------------------------
 void init_data_store(void);
 void data_store(void);
+void data_setLCD10ms(void);
+void data_setLCD100ms(void);
 
 #pragma pack()
 // --------------------------------------------------------------------
