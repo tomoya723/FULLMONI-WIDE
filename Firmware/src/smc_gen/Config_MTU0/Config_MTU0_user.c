@@ -39,6 +39,7 @@ Includes
 #include "../aw/Source/Generated/Resource.h"
 #include "../aw/Source/Generated/ID_SCREEN_00.h"
 #include "dataregister.h"
+#include "main.h"
 /* End user code. Do not edit comment generated here */
 #include "r_cg_userdefine.h"
 
@@ -85,6 +86,7 @@ void r_Config_MTU0_tgia0_interrupt(void)
 	// --------------------------------------------------------------------
 	g_int10mscnt ++;
 	g_fps_time ++;
+	sch_10ms();
 	if(g_fps_time >= 100)
 	{
 			g_fps_max = g_fps_cnt;

@@ -25,6 +25,8 @@ const float table_tyre_spec[3]			= { 195.0,  50.0,  15.0};
 const float table_gear_ratio[6]			= { 3.760, 2.269, 1.645, 1.257, 1.000, 0.843};
 unsigned int table_gear_ratio_range[7]	= {   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0};
 const float table_final_gear_ratio		= 4.300;
+float fuel_per;
+unsigned int gear, gear_pos;
 
 static APPW_PARA_ITEM aPara0[6] = {0};
 static APPW_PARA_ITEM aPara1[6] = {0};
@@ -63,8 +65,8 @@ void init_data_store(void)
 
 void data_store(void)
 {
-	unsigned int i, gear, gear_pos, error;
-	float fuel1, fuel2, fuel3, fuel4, a, b, c;
+	unsigned int i, error;
+	float fuel1, fuel2, fuel3, a, b, c;
 //	APPW_PARA_ITEM aPara0[6] = {0};
 //	APPW_PARA_ITEM aPara1[6] = {0};
 //	APPW_PARA_ITEM aPara2[6] = {0};
@@ -135,8 +137,8 @@ void data_store(void)
 //		}
 //	}
 
-	fuel4 = table2D_getValue(&fuel_sender_to_LEVEL_fl_fl, fuel3);
-	guard(fuel4,100,0);
+	fuel_per = table2D_getValue(&fuel_sender_to_LEVEL_fl_fl, fuel3);
+	guard(fuel_per,100,0);
 //	if(fuel4 <   0) fuel4 =   0;
 //	if(fuel4 > 100) fuel4 = 100;
 
@@ -177,22 +179,7 @@ void data_store(void)
 
 	// Set value to appWizard variables.
 	APPW_SetVarData(ID_VAR_REV_A, g_CALC_data.rev_angle);
-	APPW_SetVarData(ID_VAR_01, g_CALC_data.num1);
-	APPW_SetVarData(ID_VAR_02, g_CALC_data.num2);
-	APPW_SetVarData(ID_VAR_03, g_CALC_data.num3);
-	APPW_SetVarData(ID_VAR_04, g_CALC_data_sm.num4);
-	APPW_SetVarData(ID_VAR_05, g_CALC_data_sm.num5);
-	APPW_SetVarData(ID_VAR_06, g_CALC_data.num6);
-	APPW_SetVarData(ID_VAR_AF, g_CALC_data.af);
-	APPW_SetVarData(ID_VAR_REV, g_CALC_data.rev);
-	APPW_SetVarData(ID_VAR_GEAR, gear_pos);
-	APPW_SetVarData(ID_VAR_BATT, g_CALC_data.bt * 10);
-	APPW_SetVarData(ID_VAR_FL1, gear * 10);
-	APPW_SetVarData(ID_VAR_BL1, g_CALC_data.AD5 * 10);
-	APPW_SetVarData(ID_VAR_SPEED, g_CALC_data.sp * 1.06);
-	APPW_SetVarData(ID_VAR_ODO, g_CALC_data.odo);
-	APPW_SetVarData(ID_VAR_TRIP, g_CALC_data.trip * 10);
-	APPW_SetVarData(ID_VAR_FUEL, fuel4);
+
 	APPW_SetVarData(ID_VAR_AD1, g_CALC_data.AD1 * 10);
 	APPW_SetVarData(ID_VAR_AD2, g_CALC_data.AD2 * 10);
 	APPW_SetVarData(ID_VAR_AD3, g_CALC_data.AD3 * 10);
@@ -206,7 +193,7 @@ void data_store(void)
 	if(g_CALC_data.AD2 >  100)	{	aPara6[0].v = 0;	} else {		aPara6[0].v = 1;	}	APPW_DoJob(ID_SCREEN_02, ID_ICON_05 , APPW_JOB_SETVIS, aPara6);	// Break Warning
 //	if(g_CALC_data.AD4 >  100)	{	aPara7[0].v = 0;	} else {		aPara7[0].v = 1;	}	APPW_DoJob(ID_SCREEN_02, ID_ICON_06 , APPW_JOB_SETVIS, aPara7);	// Belts Warning
 	if(g_CALC_data.AD4 >  150)	{	aPara7[0].v = 0;	} else {		aPara7[0].v = 1;	}	APPW_DoJob(ID_SCREEN_02, ID_ICON_06 , APPW_JOB_SETVIS, aPara7);	// Belts Warning #issue8暫定
-	if(fuel4 > 10)	{	aPara8[0].v = 0;	} else if (fuel4 < 5)	{ aPara8[0].v = 1;	}		APPW_DoJob(ID_SCREEN_02, ID_ICON_07 , APPW_JOB_SETVIS, aPara8);	// Fuel Empty
+	if(fuel_per > 10)	{	aPara8[0].v = 0;	} else if (fuel_per < 5)	{ aPara8[0].v = 1;	}		APPW_DoJob(ID_SCREEN_02, ID_ICON_07 , APPW_JOB_SETVIS, aPara8);	// Fuel Empty
 
 
 //	sprintf((void *) g_CALC_data.str_time,"%2x:%02x:%02x", (RTC.RHRCNT.BYTE & 0x3F), RTC.RMINCNT.BYTE, RTC.RSECCNT.BYTE);
@@ -237,3 +224,37 @@ void data_store(void)
 	}
 
 }
+
+void data_setLCD10ms(void)
+{
+	// Set value to appWizard variables.
+
+	APPW_SetVarData(ID_VAR_AF, g_CALC_data.af);
+	APPW_SetVarData(ID_VAR_REV, g_CALC_data.rev);
+}
+
+void data_setLCD50ms(void)
+{
+	APPW_SetVarData(ID_VAR_04, g_CALC_data_sm.num4); // MAP
+}
+
+void data_setLCD100ms(void)
+{
+
+	APPW_SetVarData(ID_VAR_01, g_CALC_data.num1); //WaterTemp
+	APPW_SetVarData(ID_VAR_02, g_CALC_data.num2); //IAT
+	APPW_SetVarData(ID_VAR_03, g_CALC_data.num3); //OIL temp
+	APPW_SetVarData(ID_VAR_05, g_CALC_data_sm.num5); //Oilpressure
+	APPW_SetVarData(ID_VAR_06, g_CALC_data.num6); //Battv// Set value to appWizard variables.
+
+	APPW_SetVarData(ID_VAR_GEAR, gear_pos);
+	APPW_SetVarData(ID_VAR_BATT, g_CALC_data.bt * 10);
+	APPW_SetVarData(ID_VAR_FL1, gear * 10);
+	APPW_SetVarData(ID_VAR_BL1, g_CALC_data.AD5 * 10);
+	APPW_SetVarData(ID_VAR_SPEED, g_CALC_data.sp * 1.06);
+	APPW_SetVarData(ID_VAR_ODO, g_CALC_data.odo);
+	APPW_SetVarData(ID_VAR_TRIP, g_CALC_data.trip * 10);
+	APPW_SetVarData(ID_VAR_FUEL, fuel_per);
+
+}
+
