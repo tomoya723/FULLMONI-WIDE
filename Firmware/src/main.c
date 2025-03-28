@@ -42,6 +42,7 @@ volatile MD_STATUS I2C1_md_status;
 // --------------------------------------------------------------------
 volatile CAN_data_t			g_CAN_data;
 volatile CALC_data_t		g_CALC_data;
+volatile CALC_data_t		g_CALC_data_sm;
 
 void main(void);
 void User_CallBack_transmitend0(void);
