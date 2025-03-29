@@ -1,23 +1,25 @@
 MEMORY
 {
+	DRAM1 : ORIGIN = 0x00000040, LENGTH = 0x64000
 	RAM : ORIGIN = 0x00064040, LENGTH = 0x1BFC0
+	DRAM2 : ORIGIN = 0x00800000, LENGTH = 0x64000
 	ECCRAM : ORIGIN = 0x00FF8000, LENGTH = 0x8000
-	ROM : ORIGIN = 0xFFC00000, LENGTH = 4194304
+	ROM : ORIGIN = 0xFFE00300, LENGTH = 2096384
 	OFS : ORIGIN = 0xFE7F5D00, LENGTH = 128
 }
 SECTIONS
 {
-	.exvectors 0xFFFFFF80: AT(0xFFFFFF80)
+	.exvectors 0xFFFEFF80: AT(0xFFFEFF80)
 	{
 		"_exvectors_start" = .;
 		KEEP(*(.exvectors))
 	"_exvectors_end" = .;
 	} >ROM
-	.fvectors 0xFFFFFFFC: AT(0xFFFFFFFC)
+	.fvectors 0xFFFEFFFC: AT(0xFFFEFFFC)
 	{
 		KEEP(*(.fvectors))
 	} > ROM
-	.text 0xFFC00000: AT(0xFFC00000)
+	.text 0xFFE00300: AT(0xFFE00300)
 	{
 		*(.text)
 		*(.text.*)
@@ -104,6 +106,7 @@ SECTIONS
 		*(D)
 		*(D_1)
 		*(D_2)
+		*(.sdata.*)
 		_edata = .;
 	} > ECCRAM
 	.bss :

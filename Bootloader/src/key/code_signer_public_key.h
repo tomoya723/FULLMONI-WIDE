@@ -40,8 +40,8 @@
  */
 #define CODE_SIGNER_PUBLIC_KEY_PEM \
 "-----BEGIN PUBLIC KEY-----"\
-""\
-""\
+"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEazzxJah0Lobi7ryY1IHl3XOBSG0"\
+"F9qpp2S3+FQm5U0AnJBA1J5eX2kf1bdOCv0KvT5uZvRib136VqzrutGyFA=="\
 "-----END PUBLIC KEY-----"
 
 #endif /* CODE_SIGNER_PUBLIC_KEY_H_ */
