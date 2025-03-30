@@ -27,7 +27,7 @@ volatile uint8_t I2C_WriteData[] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 volatile uint8_t I2C_BUF[] = {0x00,0x00};
 volatile uint8_t I2C_BUF2[] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 volatile unsigned long sp_int, sp_int_old, tr_int, wr_cnt;
-volatile unsigned int sp_TGRA;
+volatile unsigned int sp_TGRA, sch50ms_cnt, sch100ms_cnt;
 volatile uint8_t I2C0_TX_END_FLG = 0;
 volatile uint8_t I2C0_RX_END_FLG = 0;
 volatile uint8_t I2C0_RCV_ERR_FLG = 0;
@@ -54,6 +54,11 @@ void User_CallBack_receiveerror1(MD_STATUS status);
 void Neopixel_SetRGB(unsigned int LED_No, int g, int r, int b);
 void Neopixel_InitRGB(void);
 void Neopixel_TX(void);
+void sch_10ms(void);
+void ap_10ms(void);
+void ap_50ms(void);
+void ap_100ms(void);
+
 
 extern void LCD_FadeIN(void);
 
@@ -298,6 +303,43 @@ void main(void)
 		}
 
 //		while(g_int10mscnt < 0);
+	}
+}
+
+// 10ms scheduled application call
+void ap_10ms(void)
+{
+	data_setLCD10ms();
+}
+
+// 50ms scheduled application call
+void ap_50ms(void)
+{
+	data_setLCD50ms();
+}
+
+// 100ms scheduled application call
+void ap_100ms(void)
+{
+	data_setLCD100ms();
+}
+
+
+void sch_10ms(void)
+{
+	//10ms , 50ms , 100ms scheduler here
+	ap_10ms();
+	sch50ms_cnt += 1;
+	sch100ms_cnt += 1;
+	if(sch50ms_cnt >= 5)
+	{
+		ap_50ms();
+		sch50ms_cnt =0;
+	}
+	if(sch100ms_cnt >= 10)
+	{
+		ap_100ms();
+		sch100ms_cnt =0;
 	}
 }
 
