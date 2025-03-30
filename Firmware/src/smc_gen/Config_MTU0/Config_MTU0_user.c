@@ -36,8 +36,6 @@ Includes
 #include "r_cg_macrodriver.h"
 #include "Config_MTU0.h"
 /* Start user code for include. Do not edit comment generated here */
-#include "../aw/Source/Generated/Resource.h"
-#include "../aw/Source/Generated/ID_SCREEN_00.h"
 #include "dataregister.h"
 /* End user code. Do not edit comment generated here */
 #include "r_cg_userdefine.h"
