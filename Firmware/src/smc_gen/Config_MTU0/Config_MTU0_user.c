@@ -39,7 +39,6 @@ Includes
 #include "../aw/Source/Generated/Resource.h"
 #include "../aw/Source/Generated/ID_SCREEN_00.h"
 #include "dataregister.h"
-#include "main.h"
 /* End user code. Do not edit comment generated here */
 #include "r_cg_userdefine.h"
 
