@@ -460,7 +460,7 @@ NOTE: The RAM areas are not contiguous.It is separated by 512 KB each.
    NOTE: The waiting time is not required when an external clock signal is input for the main clock oscillator.
          Set the BSP_CFG_MOSC_WAIT_TIME to 00h.
 */
-#define BSP_CFG_MOSC_WAIT_TIME          (0x53) /* Generated value. Do not edit this manually */
+#define BSP_CFG_MOSC_WAIT_TIME          (0x02) /* Generated value. Do not edit this manually */
 
 /* Sub-Clock Oscillator Wait Time (SOSCWTCR).
    The value of SOSCWTCR register required for correspondence with the expected time to secure settling of oscillation
