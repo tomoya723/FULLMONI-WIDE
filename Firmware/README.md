@@ -1,7 +1,7 @@
 ## FULLMONI-WIDE：Firmware
 Renesas e2Studio + GNU GCC-RX + SEGGER emWIN<br>
 順次更新予定
-
+***
 ## CAN data frame setting
 frame No1 address : 1000(dec) , 0x3E8(hex)
 |CAN Address|frame no| byte |assign|unit|multiplier(LSB)|
@@ -75,6 +75,13 @@ frame No6 address : 1005(dec) , 0x3ED(hex)
 |0x3ED|6|5|Gear L|[-]|1|
 |0x3ED|6|6|NoData||
 |0x3ED|6|7|NoData||
-
-
-
+***
+## emWin AppWizard resource swith setting
+The project provides multiple screen resources, so select the one you want to use.
+Switch display resources by changing Eclipse source path settings and resource includes.
+![alt text](image.png)
+In the build path source folder settings, set resource paths such as "aw001", "aw002", etc. Set both resources and sources.
+<br>
+Change the contents of "src/settings.h"
+![alt text](image-1.png)
+Set the "DISP" number appropriately.
