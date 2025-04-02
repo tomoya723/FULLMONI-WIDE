@@ -81,8 +81,9 @@ The project provides multiple screen resources, so select the one you want to us
 Switch display resources by changing Eclipse source path settings and resource includes.<br>
 <br>
 The Project Explorer configuration provides multiple image resources.<br>
-Double-clicking an AppWixard file in "awxxx" will launch the editor for that image resource.<br>
+Double-clicking an AppWizard file in "awxxx" will launch the editor for that image resource.<br>
 ![image](https://github.com/user-attachments/assets/50a501ed-c50e-4862-8025-8d1785cb3be7)<br>
+<br>
 In the build path source folder settings, set resource paths such as "aw001", "aw002", etc. Set both resources and sources.<br>
 ![image](https://github.com/user-attachments/assets/c7a7df58-1156-43a7-99f1-0c031d55beeb)<br>
 <br>
