@@ -6,10 +6,7 @@
  */
 
 #include <can.h>
-#include "../aw/Source/Generated/Resource.h"
-#include "../aw/Source/Generated/ID_SCREEN_01.h"
-#include "../aw/Source/Generated/ID_SCREEN_02.h"
-
+#include "settings.h"			// FULLMONI-WIDE setting parameter
 #include "dataregister.h"
 #include "lib_table.h"
 #include "lib_general.h"

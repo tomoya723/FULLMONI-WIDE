@@ -29,7 +29,7 @@
             <item enabled="true" id="textinputitem" input="24" value="24.000000"/>
         </option>
         <option enabled="true" id="mainwaittime" selection="textinputitem">
-            <item enabled="true" id="textinputitem" input="9980" value="9980.000000"/>
+            <item enabled="true" id="textinputitem" input="61" value="61.000000"/>
         </option>
         <option enabled="true" id="subclockenable" selection="check">
             <item enabled="true" id="check"/>
