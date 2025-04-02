@@ -77,11 +77,11 @@ frame No6 address : 1005(dec) , 0x3ED(hex)
 |0x3ED|6|7|NoData||
 ***
 ## emWin AppWizard resource swith setting
-The project provides multiple screen resources, so select the one you want to use.
-Switch display resources by changing Eclipse source path settings and resource includes.
-![image](https://github.com/user-attachments/assets/c7a7df58-1156-43a7-99f1-0c031d55beeb)
-In the build path source folder settings, set resource paths such as "aw001", "aw002", etc. Set both resources and sources.
+The project provides multiple screen resources, so select the one you want to use.<br>
+Switch display resources by changing Eclipse source path settings and resource includes.<br>
+![image](https://github.com/user-attachments/assets/c7a7df58-1156-43a7-99f1-0c031d55beeb)<br>
+In the build path source folder settings, set resource paths such as "aw001", "aw002", etc. Set both resources and sources.<br>
 <br>
-Change the contents of "src/settings.h"
-![image](https://github.com/user-attachments/assets/4bc4fe29-edbc-4c54-9ac6-5f0a8b6d810b)
-Set the "DISP" number appropriately.
+Change the contents of "src/settings.h"<br>
+![image](https://github.com/user-attachments/assets/4bc4fe29-edbc-4c54-9ac6-5f0a8b6d810b)<br>
+Set the "DISP" number appropriately.<br>
