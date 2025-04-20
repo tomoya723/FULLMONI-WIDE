@@ -150,7 +150,7 @@ extern APPW_ROOT_INFO ID_SCREEN_03_RootInfo;
 *
 *       Project path
 */
-#define APPW_PROJECT_PATH "I:/fullmoni_wide_dev/fullmoni_dev_tgit/FULLMONI-WIDE_chaketek/Firmware/aw"
+#define APPW_PROJECT_PATH "D:/git/FULLMONI-WIDE/FULLMONI-WIDE/Firmware/aw002"
 
 #endif  // RESOURCE_H
 
