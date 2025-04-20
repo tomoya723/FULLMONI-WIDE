@@ -9,13 +9,13 @@
 *                                                                    *
 **********************************************************************
 ----------------------------------------------------------------------
-File        : ID_SCREEN_03.h
+File        : ID_SCREEN_Telltale.h
 Purpose     : Generated file do NOT edit!
 ---------------------------END-OF-HEADER------------------------------
 */
 
-#ifndef ID_SCREEN_03_H
-#define ID_SCREEN_03_H
+#ifndef ID_SCREEN_TELLTALE_H
+#define ID_SCREEN_TELLTALE_H
 
 #include "AppWizard.h"
 
@@ -43,8 +43,8 @@ Purpose     : Generated file do NOT edit!
 *
 *       Callback
 */
-void cbID_SCREEN_03(WM_MESSAGE * pMsg);
+void cbID_SCREEN_Telltale(WM_MESSAGE * pMsg);
 
-#endif  // ID_SCREEN_03_H
+#endif  // ID_SCREEN_TELLTALE_H
 
 /*************************** End of file ****************************/
