@@ -64,10 +64,6 @@ extern GUI_CONST_STORAGE unsigned char ac51_20_Normal_EXT_AA2[];
 *       Images
 */
 extern GUI_CONST_STORAGE unsigned char acmotec[];
-extern GUI_CONST_STORAGE unsigned char acBack2[];
-extern GUI_CONST_STORAGE unsigned char acMarker_red_bar_80x7s[];
-extern GUI_CONST_STORAGE unsigned char acfuel1[];
-extern GUI_CONST_STORAGE unsigned char acfuel2[];
 extern GUI_CONST_STORAGE unsigned char acw_back[];
 extern GUI_CONST_STORAGE unsigned char acws_masterwarning[];
 extern GUI_CONST_STORAGE unsigned char acws_oilpresswarning[];
@@ -78,6 +74,10 @@ extern GUI_CONST_STORAGE unsigned char acws_batterywarning[];
 extern GUI_CONST_STORAGE unsigned char acws_breakwarning[];
 extern GUI_CONST_STORAGE unsigned char acws_beltwarning[];
 extern GUI_CONST_STORAGE unsigned char acws_fuelcheck[];
+extern GUI_CONST_STORAGE unsigned char acBack2[];
+extern GUI_CONST_STORAGE unsigned char acMarker_red_bar_80x7s[];
+extern GUI_CONST_STORAGE unsigned char acfuel1[];
+extern GUI_CONST_STORAGE unsigned char acfuel2[];
 
 /*********************************************************************
 *
