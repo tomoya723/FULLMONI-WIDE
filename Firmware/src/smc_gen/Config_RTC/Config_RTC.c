@@ -64,13 +64,6 @@ void R_Config_RTC_Create(void)
 
     if (RTC.RCR1.BIT.AIE == 1U)
     {
-        /* Disable RTC ALARM interrupt */
-        RTC.RCR1.BIT.AIE = 0U;
-        while (RTC.RCR1.BIT.AIE != 0U)
-        {
-            /* Wait for the register modification to complete */
-        }
-
         /* Clear IR flag of ICU ALARM interrupt */
         IR(RTC, ALM) = 0U;
     }
@@ -82,12 +75,14 @@ void R_Config_RTC_Create(void)
         RTC.RCR4.BYTE = _00_RTC_SOURCE_SELECT_SUB;
 
         /* Set sub-clock oscillator */
+        /* WAIT_LOOP */
         while (1U != RTC.RCR3.BIT.RTCEN)
         {
             RTC.RCR3.BIT.RTCEN = 1U;
         }
 
         /* Wait for 6 sub-clock cycles */
+        /* WAIT_LOOP */
         for (w_count = 0U; w_count < _2256_RTC_SUB_6_CYCLE_WAIT; w_count++)
         {
             nop();
@@ -100,6 +95,7 @@ void R_Config_RTC_Create(void)
 
         /* Stop all counters */
         RTC.RCR2.BYTE = 0x00U;
+        /* WAIT_LOOP */
         while (RTC.RCR2.BIT.START != 0U)
         {
             /* Wait for the register modification to complete */
@@ -107,6 +103,7 @@ void R_Config_RTC_Create(void)
 
         /* Select count mode */
         RTC.RCR2.BIT.CNTMD = 0U;
+        /* WAIT_LOOP */
         while (RTC.RCR2.BIT.CNTMD != 0U)
         {
             /* Wait for the register modification to complete */
@@ -114,6 +111,7 @@ void R_Config_RTC_Create(void)
 
         /* Execute RTC software reset */
         RTC.RCR2.BIT.RESET = 1U;
+        /* WAIT_LOOP */
         while (RTC.RCR2.BIT.RESET != 0U)
         {
             /* Wait for the register modification to complete */
@@ -121,6 +119,7 @@ void R_Config_RTC_Create(void)
 
          /* Stop RTC counter */
         RTC.RCR2.BIT.START = 0U;
+        /* WAIT_LOOP */
         while (RTC.RCR2.BIT.START != 0U)
         {
             /* Wait for the register modification to complete */
@@ -132,10 +131,12 @@ void R_Config_RTC_Create(void)
         RTC.RCR2.BYTE |= (_00_RTC_AUTO_ADJUSTMENT_DISABLE | _40_RTC_HOUR_MODE_24);
 
         /* Perform 4 read operations after writing */
+        /* WAIT_LOOP */
         for (rw_count = 0U; rw_count < _04_FOUR_READ_COUNT; rw_count++)
         {
             dummy = RTC.RCR2.BYTE;
         }
+        /* WAIT_LOOP */
         while (RTC.RCR2.BIT.HR24 != 1U)
         {
             /* Wait for the register modification to complete */
@@ -144,6 +145,7 @@ void R_Config_RTC_Create(void)
         /* Set control registers */
         dummy = _00_RTC_ALARM_INT_DISABLE | _00_RTC_PERIOD_INT_DISABLE | _00_RTC_PERIODIC_INT_PERIOD_DISABLE;
         RTC.RCR1.BYTE = dummy;
+        /* WAIT_LOOP */
         while (dummy != RTC.RCR1.BYTE)
         {
             /* Wait for this write to complete. */
@@ -154,12 +156,14 @@ void R_Config_RTC_Create(void)
     /* Set control registers */
     dummy = RTC.RCR1.BYTE | _00_RTC_CARRY_INT_DISABLE;
     RTC.RCR1.BYTE = dummy;
+    /* WAIT_LOOP */
     while (dummy != RTC.RCR1.BYTE)
     {
         /* Wait for this write to complete. */
     }
     dummy = RTC.RCR2.BYTE | _00_RTC_RTCOUT_OUTPUT_DISABLE;
     RTC.RCR2.BYTE = dummy;
+    /* WAIT_LOOP */
     while (dummy != RTC.RCR2.BYTE)
     {
         /* Wait for this write to complete. */
@@ -188,6 +192,7 @@ void R_Config_RTC_Start(void)
 
     /* Set the START bit to 1 */
     RTC.RCR2.BIT.START = 1U;
+    /* WAIT_LOOP */
     while (RTC.RCR2.BIT.START != 1U)
     {
         /* Wait for the register modification to complete */
@@ -207,6 +212,7 @@ void R_Config_RTC_Stop(void)
 
     /* Stop all counters */
     RTC.RCR2.BIT.START = 0U;
+    /* WAIT_LOOP */
     while (RTC.RCR2.BIT.START != 0U)
     {
         /* Wait for the register modification to complete */
@@ -235,6 +241,7 @@ void R_Config_RTC_Restart(rtc_calendarcounter_value_t counter_write_val)
     {
         /* Disable RTC ALARM interrupt */
         RTC.RCR1.BIT.AIE = 0U;
+        /* WAIT_LOOP */
         while (RTC.RCR1.BIT.AIE != 0U)
         {
             /* Wait for the register modification to complete */
@@ -246,6 +253,7 @@ void R_Config_RTC_Restart(rtc_calendarcounter_value_t counter_write_val)
 
     /* Stop all counters */
     RTC.RCR2.BIT.START = 0U;
+    /* WAIT_LOOP */
     while (RTC.RCR2.BIT.START != 0U)
     {
         /* Wait for the register modification to complete */
@@ -253,6 +261,7 @@ void R_Config_RTC_Restart(rtc_calendarcounter_value_t counter_write_val)
 
     /* Execute RTC software reset */
     RTC.RCR2.BIT.RESET = 1U;
+    /* WAIT_LOOP */
     while (RTC.RCR2.BIT.RESET != 0U)
     {
         /* Wait for the register modification to complete */
@@ -262,11 +271,13 @@ void R_Config_RTC_Restart(rtc_calendarcounter_value_t counter_write_val)
     RTC.RCR2.BYTE |= (_00_RTC_RTCOUT_OUTPUT_DISABLE | _00_RTC_AUTO_ADJUSTMENT_DISABLE | _40_RTC_HOUR_MODE_24);
 
     /* Perform 4 read operations after writing */
+    /* WAIT_LOOP */
     for (rw_count = 0U; rw_count < _04_FOUR_READ_COUNT; rw_count++)
     {
         dummy = RTC.RCR2.BYTE;
     }
 
+    /* WAIT_LOOP */
     while (RTC.RCR2.BIT.HR24 != 1U)
     {
         /* Wait for the register modification to complete */
@@ -283,6 +294,7 @@ void R_Config_RTC_Restart(rtc_calendarcounter_value_t counter_write_val)
 
     /* Set the START bit to 1 */
     RTC.RCR2.BIT.START = 1U;
+    /* WAIT_LOOP */
     while (RTC.RCR2.BIT.START != 1U)
     {
         /* Wait for the register modification to complete */
@@ -303,6 +315,7 @@ void R_Config_RTC_Get_CalendarCounterValue(rtc_calendarcounter_value_t * const c
 
     /* Enable RTC CUP interrupt */
     RTC.RCR1.BYTE |= _02_RTC_CARRY_INT_ENABLE;
+    /* WAIT_LOOP */
     do
     {
         ICU.PIBR6.BYTE = 0x02U;
@@ -336,6 +349,7 @@ void R_Config_RTC_Set_CalendarCounterValue(rtc_calendarcounter_value_t counter_w
 
     /* Stop all counters */
     RTC.RCR2.BIT.START = 0U;
+    /* WAIT_LOOP */
     while (RTC.RCR2.BIT.START != 0U)
     {
         /* Wait for the register modification to complete */
@@ -343,6 +357,7 @@ void R_Config_RTC_Set_CalendarCounterValue(rtc_calendarcounter_value_t counter_w
 
     /* Execute RTC software reset */
     RTC.RCR2.BIT.RESET = 1U;
+    /* WAIT_LOOP */
     while (RTC.RCR2.BIT.RESET != 0U)
     {
         /* Wait for the register modification to complete */
@@ -352,11 +367,13 @@ void R_Config_RTC_Set_CalendarCounterValue(rtc_calendarcounter_value_t counter_w
     RTC.RCR2.BYTE |= (_00_RTC_RTCOUT_OUTPUT_DISABLE | _00_RTC_AUTO_ADJUSTMENT_DISABLE | _40_RTC_HOUR_MODE_24);
 
     /* Perform 4 read operations after writing */
+    /* WAIT_LOOP */
     for (rw_count = 0U; rw_count < _04_FOUR_READ_COUNT; rw_count++)
     {
         dummy = RTC.RCR2.BYTE;
     }
 
+    /* WAIT_LOOP */
     while (RTC.RCR2.BIT.HR24 != 1U)
     {
         /* Wait for the register modification to complete */

@@ -436,6 +436,7 @@ static void r_Config_RIIC1_callback_error(MD_STATUS status)
                 uint8_t count = 0U;
 
                 /* Try outputting additional clock pulses to release SDA */
+                /* WAIT_LOOP */
                 while ((0U == RIIC1.ICCR1.BIT.SDAI) && (count < 0x0AU))
                 {
                     RIIC1.ICCR1.BIT.CLO = 1U;

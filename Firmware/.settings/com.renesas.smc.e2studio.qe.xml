@@ -107,8 +107,8 @@
         <Setting id="Config_RIIC0" value="CG"/>
         <Setting id="Config_RIIC1" value="CG"/>
         <Setting id="Config_PORT" value="CG"/>
-        <Setting id="r_emwin_rx" value="FIT"/>
         <Setting id="Config_MTU0" value="CG"/>
+        <Setting id="r_emwin_rx" value="FIT"/>
         <Segment component="com.renesas.smc.tools.swcomponent.codegenerator.pwmmode" id="Config_MTU3" source="com.renesas.smc.tools.swcomponent.codegenerator.source">
             <Setting id="CntClk" value="Div4"/>
             <Setting id="TGRCValue" value="2999"/>
@@ -256,6 +256,7 @@
             <Setting id="enableDate" value="uncheck"/>
             <Setting id="dateValue" value="1"/>
             <Setting id="adjustmentnum" value="1"/>
+            <Setting id="clockSourceSelection" value="メインクロック発振器"/>
             <Setting id="enablecapturepin0" value="uncheck"/>
             <Setting id="enableSecond" value="uncheck"/>
             <Setting id="enablecapturepin1" value="uncheck"/>
@@ -1378,47 +1379,6 @@
                 <Setting id="PortnEnable" value="Disable"/>
             </Segment>
         </Segment>
-        <Segment component="r_emwin_rx6.32.a.1.00" id="r_emwin_rx" source="com.renesas.smc.tools.swcomponent.fit.source">
-            <Setting id="EMWIN_LCD_DRIVER_IC" value="LCD_DRV_IC_ST7715"/>
-            <Setting id="EMWIN_BITS_PER_PIXEL" value="16"/>
-            <Setting id="EMWIN_SLAVE_ADDRESS" value="0x00000038"/>
-            <Setting id="EMWIN_GUI_FRAME_BUFFER3" value="0x00000000"/>
-            <Setting id="EMWIN_GUI_FRAME_BUFFER2" value="0x00840000"/>
-            <Setting id="EMWIN_GUI_FRAME_BUFFER1" value="0x00800000"/>
-            <Setting id="EMWIN_LCD_IF" value="LCD_IF_OTHER"/>
-            <Setting id="EMWIN_USE_TOUCH_IC_RESET_PIN" value="1"/>
-            <Setting id="EMWIN_TOUCH_IC_RESET_PIN" value="GPIO_PORT_6_PIN_6"/>
-            <Setting id="EMWIN_TOUCH_IF" value="TOUCH_IF_OTHER"/>
-            <Setting id="EMWIN_TOUCH_CS_PIN" value="GPIO_PORT_9_PIN_3"/>
-            <Setting id="EMWIN_DISP_SIGNAL_PIN" value="GPIO_PORT_B_PIN_3"/>
-            <Setting id="EMWIN_TOUCH_BAUDRATE" value="1000000"/>
-            <Setting id="EMWIN_USE_BACKLIGHT_PIN" value="1"/>
-            <Setting id="EMWIN_LCD_CS_PIN" value="GPIO_PORT_B_PIN_1"/>
-            <Setting id="EMWIN_USE_DRW2D" value="1"/>
-            <Setting id="EMWIN_USE_DISP_SIGNAL_PIN" value="1"/>
-            <Setting id="EMWIN_DATA_CMD_PIN" value="GPIO_PORT_B_PIN_7"/>
-            <Setting id="EMWIN_TOUCH_IF_NUMBER" value="0"/>
-            <Setting id="EMWIN_MAX_NUM_TOUCHPOINTS" value="10"/>
-            <Setting id="EMWIN_DMAC_NUMBER" value="0"/>
-            <Setting id="EMWIN_USE_MULTITOUCH" value="0"/>
-            <Setting id="EMWIN_NUM_BUFFERS" value="2"/>
-            <Setting id="EMWIN_DMAC_NUMBER2" value="1"/>
-            <Setting id="EMWIN_USE_RUNTIME_ORIENTATION" value="0"/>
-            <Setting id="EMWIN_YSIZE_PHYS" value="256"/>
-            <Setting id="EMWIN_USE_DATA_CMD_PIN" value="1"/>
-            <Setting id="EMWIN_BACKLIGHT_PIN" value="GPIO_PORT_6_PIN_7"/>
-            <Setting id="EMWIN_LCD_IF_NUMBER" value="0"/>
-            <Setting id="EMWIN_USE_TOUCH_CS_PIN" value="1"/>
-            <Setting id="EMWIN_DISPLAY_ORIENTATION" value="ORIENTATION_0"/>
-            <Setting id="EMWIN_USE_LCD_CS_PIN" value="1"/>
-            <Setting id="EMWIN_LCD_BAUDRATE" value="1000000"/>
-            <Setting id="EMWIN_SELECT_DMAC_DTC" value="2"/>
-            <Setting id="EMWIN_GUI_NUM_BYTES" value="102400"/>
-            <Setting id="EMWIN_XSIZE_PHYS" value="800"/>
-            <Setting id="EMWIN_GUI_USE_CACHE" value="0"/>
-            <Setting id="EMWIN_USE_TOUCH" value="1"/>
-            <Setting id="EMWIN_INIT_DMAC" value="1"/>
-        </Segment>
         <Segment component="com.renesas.smc.tools.swcomponent.codegenerator.normalmode" id="Config_MTU0" source="com.renesas.smc.tools.swcomponent.codegenerator.source">
             <Setting id="CntClk" value="Div64"/>
             <Setting id="TGRCValue" value="100"/>
@@ -1483,6 +1443,47 @@
             <Setting id="ExtNoiseClk" value="PCLK"/>
             <Setting id="MultiIntTcivEnable" value="UnCheck"/>
             <Setting id="TGRBValue" value="100"/>
+        </Segment>
+        <Segment component="r_emwin_rx6.32.a.1.00" id="r_emwin_rx" source="com.renesas.smc.tools.swcomponent.fit.source">
+            <Setting id="EMWIN_LCD_DRIVER_IC" value="LCD_DRV_IC_ST7715"/>
+            <Setting id="EMWIN_BITS_PER_PIXEL" value="16"/>
+            <Setting id="EMWIN_SLAVE_ADDRESS" value="0x00000038"/>
+            <Setting id="EMWIN_GUI_FRAME_BUFFER3" value="0x00000000"/>
+            <Setting id="EMWIN_GUI_FRAME_BUFFER2" value="0x00840000"/>
+            <Setting id="EMWIN_GUI_FRAME_BUFFER1" value="0x00800000"/>
+            <Setting id="EMWIN_LCD_IF" value="LCD_IF_OTHER"/>
+            <Setting id="EMWIN_USE_TOUCH_IC_RESET_PIN" value="1"/>
+            <Setting id="EMWIN_TOUCH_IC_RESET_PIN" value="GPIO_PORT_6_PIN_6"/>
+            <Setting id="EMWIN_TOUCH_IF" value="TOUCH_IF_OTHER"/>
+            <Setting id="EMWIN_TOUCH_CS_PIN" value="GPIO_PORT_9_PIN_3"/>
+            <Setting id="EMWIN_DISP_SIGNAL_PIN" value="GPIO_PORT_B_PIN_3"/>
+            <Setting id="EMWIN_TOUCH_BAUDRATE" value="1000000"/>
+            <Setting id="EMWIN_USE_BACKLIGHT_PIN" value="1"/>
+            <Setting id="EMWIN_LCD_CS_PIN" value="GPIO_PORT_B_PIN_1"/>
+            <Setting id="EMWIN_USE_DRW2D" value="1"/>
+            <Setting id="EMWIN_USE_DISP_SIGNAL_PIN" value="1"/>
+            <Setting id="EMWIN_DATA_CMD_PIN" value="GPIO_PORT_B_PIN_7"/>
+            <Setting id="EMWIN_TOUCH_IF_NUMBER" value="0"/>
+            <Setting id="EMWIN_MAX_NUM_TOUCHPOINTS" value="10"/>
+            <Setting id="EMWIN_DMAC_NUMBER" value="0"/>
+            <Setting id="EMWIN_USE_MULTITOUCH" value="0"/>
+            <Setting id="EMWIN_NUM_BUFFERS" value="2"/>
+            <Setting id="EMWIN_DMAC_NUMBER2" value="1"/>
+            <Setting id="EMWIN_USE_RUNTIME_ORIENTATION" value="0"/>
+            <Setting id="EMWIN_YSIZE_PHYS" value="256"/>
+            <Setting id="EMWIN_USE_DATA_CMD_PIN" value="1"/>
+            <Setting id="EMWIN_BACKLIGHT_PIN" value="GPIO_PORT_6_PIN_7"/>
+            <Setting id="EMWIN_LCD_IF_NUMBER" value="0"/>
+            <Setting id="EMWIN_USE_TOUCH_CS_PIN" value="1"/>
+            <Setting id="EMWIN_DISPLAY_ORIENTATION" value="ORIENTATION_0"/>
+            <Setting id="EMWIN_USE_LCD_CS_PIN" value="1"/>
+            <Setting id="EMWIN_LCD_BAUDRATE" value="1000000"/>
+            <Setting id="EMWIN_SELECT_DMAC_DTC" value="2"/>
+            <Setting id="EMWIN_GUI_NUM_BYTES" value="102400"/>
+            <Setting id="EMWIN_XSIZE_PHYS" value="800"/>
+            <Setting id="EMWIN_GUI_USE_CACHE" value="0"/>
+            <Setting id="EMWIN_USE_TOUCH" value="1"/>
+            <Setting id="EMWIN_INIT_DMAC" value="1"/>
         </Segment>
     </Segment>
 </QE>
