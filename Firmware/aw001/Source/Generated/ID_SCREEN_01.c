@@ -46,7 +46,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
         { DISPOSE_MODE_NULL, 0, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
       },
-      800, 256, 0, 0, 0, 0
+      765, 256, 0, 0, 0, 0
     },
     { 0, 0 }
   },

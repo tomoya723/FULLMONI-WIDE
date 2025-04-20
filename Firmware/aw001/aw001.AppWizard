@@ -552,7 +552,7 @@
       IdPrev=0
       IdPost=0
       <Dispose>
-        xSize=800
+        xSize=765
         ySize=256
         <X0>
           Mode=2
@@ -2016,7 +2016,7 @@
   </Interactions>
   <Selection>
     Root=ID_SCREEN_01
-    Object=2048
+    Object=2049
   </Selection>
   <Terms>
   </Terms>
