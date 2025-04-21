@@ -327,6 +327,7 @@ MD_STATUS R_Config_RIIC0_Master_Receive(uint16_t adr, uint8_t * const rx_buf, ui
             if ((1U == RIIC0.ICCR2.BIT.SP) || (1U == RIIC0.ICSR2.BIT.STOP))
             {
                 /* Wait for the bus to become idle */
+                /* WAIT_LOOP */
                 do
                 {
                     /* Arbitration lost or timeout? */
