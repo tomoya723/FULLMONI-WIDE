@@ -9,13 +9,13 @@
 *                                                                    *
 **********************************************************************
 ----------------------------------------------------------------------
-File        : ID_SCREEN_02b.h
+File        : ID_SCREEN_01b.h
 Purpose     : Generated file do NOT edit!
 ---------------------------END-OF-HEADER------------------------------
 */
 
-#ifndef ID_SCREEN_02B_H
-#define ID_SCREEN_02B_H
+#ifndef ID_SCREEN_01B_H
+#define ID_SCREEN_01B_H
 
 #include "AppWizard.h"
 
@@ -64,8 +64,8 @@ void ID_SCREEN_02_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_06__APPW_JOB_SETVA
 *
 *       Callback
 */
-void cbID_SCREEN_02b(WM_MESSAGE * pMsg);
+void cbID_SCREEN_01b(WM_MESSAGE * pMsg);
 
-#endif  // ID_SCREEN_02B_H
+#endif  // ID_SCREEN_01B_H
 
 /*************************** End of file ****************************/

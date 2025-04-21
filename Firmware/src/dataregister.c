@@ -195,8 +195,11 @@ void data_store(void)
 
 //	sprintf((void *) g_CALC_data.str_time,"%2x:%02x:%02x", (RTC.RHRCNT.BYTE & 0x3F), RTC.RMINCNT.BYTE, RTC.RSECCNT.BYTE);
 	sprintf((void *) g_CALC_data.str_time,"%2x:%02x", (RTC.RHRCNT.BYTE & 0x3F), RTC.RMINCNT.BYTE);
+#if (DISP == 1)
 	APPW_SetText(ID_SCREEN_01,ID_NUM_TIME,	(void *) g_CALC_data.str_time	);
-
+#elif (DISP == 2)
+	APPW_SetText(ID_SCREEN_01a,ID_NUM_TIME,	(void *) g_CALC_data.str_time	);
+#endif
 	// SW Input
 	if(g_sw_int_flg == 1)
 	{

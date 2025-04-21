@@ -9,13 +9,13 @@
 *                                                                    *
 **********************************************************************
 ----------------------------------------------------------------------
-File        : ID_SCREEN_02a.c
+File        : ID_SCREEN_01a.c
 Purpose     : Generated file do NOT edit!
 ---------------------------END-OF-HEADER------------------------------
 */
 
 #include "Resource.h"
-#include "ID_SCREEN_02a.h"
+#include "ID_SCREEN_01a.h"
 
 /*********************************************************************
 *
@@ -29,7 +29,7 @@ Purpose     : Generated file do NOT edit!
 */
 static APPW_CREATE_ITEM _aCreate[] = {
   { WM_OBJECT_WINDOW_Create,
-    ID_SCREEN_02a, 0,
+    ID_SCREEN_01a, 0,
     { { { DISPOSE_MODE_REL_PARENT, 275, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 0, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -40,7 +40,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_IMAGE_Create,
-    ID_IMAGE_00, ID_SCREEN_02a,
+    ID_IMAGE_00, ID_SCREEN_01a,
     { { { DISPOSE_MODE_REL_PARENT, 0, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 0, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -51,7 +51,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_GAUGE_Create,
-    ID_GAUGE_00, ID_SCREEN_02a,
+    ID_GAUGE_00, ID_SCREEN_01a,
     { { { DISPOSE_MODE_REL_PARENT, -3, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 0, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -62,7 +62,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_ROTARY_Create,
-    ID_ROTARY_00, ID_SCREEN_02a,
+    ID_ROTARY_00, ID_SCREEN_01a,
     { { { DISPOSE_MODE_REL_PARENT, -3, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 0, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -73,7 +73,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_TEXT_Create,
-    ID_NUM_AF, ID_SCREEN_02a,
+    ID_NUM_AF, ID_SCREEN_01a,
     { { { DISPOSE_MODE_REL_PARENT, 193, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 193, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -84,7 +84,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_TEXT_Create,
-    ID_NUM_GEAR, ID_SCREEN_02a,
+    ID_NUM_GEAR, ID_SCREEN_01a,
     { { { DISPOSE_MODE_REL_PARENT, 256, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 72, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -95,7 +95,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_TEXT_Create,
-    ID_NUM_RV, ID_SCREEN_02a,
+    ID_NUM_RV, ID_SCREEN_01a,
     { { { DISPOSE_MODE_REL_PARENT, 125, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 145, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -106,7 +106,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_TEXT_Create,
-    ID_NUM_TIME, ID_SCREEN_02a,
+    ID_NUM_TIME, ID_SCREEN_01a,
     { { { DISPOSE_MODE_REL_PARENT, 270, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 0, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -117,7 +117,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_PROGBAR_Create,
-    ID_PROGBAR_AFR_WARN, ID_SCREEN_02a,
+    ID_PROGBAR_AFR_WARN, ID_SCREEN_01a,
     { { { DISPOSE_MODE_REL_PARENT, 187, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 237, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -128,7 +128,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_PROGBAR_Create,
-    ID_PROGBAR_AFR, ID_SCREEN_02a,
+    ID_PROGBAR_AFR, ID_SCREEN_01a,
     { { { DISPOSE_MODE_REL_PARENT, 187, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 230, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -258,12 +258,12 @@ static GUI_CONST_STORAGE APPW_COND _Condition_0c = { "A", _aComparison_0c, GUI_C
 *       _aAction
 */
 static GUI_CONST_STORAGE APPW_ACTION_ITEM _aAction[] = {
-  { ID_SCREEN_02a,       APPW_NOTIFICATION_INITDIALOG,     0,                   APPW_JOB_MODALMESSAGE,   ID_SCREEN_02__APPW_NOTIFICATION_INITDIALOG,
-    { ARG_V(ID_SCREEN_02b),
+  { ID_SCREEN_01a,       APPW_NOTIFICATION_INITDIALOG,     0,                   APPW_JOB_MODALMESSAGE,   ID_SCREEN_02__APPW_NOTIFICATION_INITDIALOG,
+    { ARG_V(ID_SCREEN_01b),
     }, 0, NULL
   },
-  { ID_SCREEN_02a,       APPW_NOTIFICATION_INITDIALOG,     0,                   APPW_JOB_MODALMESSAGE,   ID_SCREEN_01_Copy__APPW_NOTIFICATION_INITDIALOG__ID_NUM_AD_04__APPW_JOB_SETVIS,
-    { ARG_V(ID_SCREEN_02c),
+  { ID_SCREEN_01a,       APPW_NOTIFICATION_INITDIALOG,     0,                   APPW_JOB_MODALMESSAGE,   ID_SCREEN_01_Copy__APPW_NOTIFICATION_INITDIALOG__ID_NUM_AD_04__APPW_JOB_SETVIS,
+    { ARG_V(ID_SCREEN_01c),
     }, 0, NULL
   },
   { ID_VAR_REV_A,        WM_NOTIFICATION_VALUE_CHANGED,    ID_ROTARY_00,        APPW_JOB_SETVALUE,       ID_SCREEN_01_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_ROTARY_00__APPW_JOB_SETVALUE,
@@ -310,7 +310,7 @@ static GUI_CONST_STORAGE APPW_ACTION_ITEM _aAction[] = {
     { ARG_V(ID_RTEXT_G6),
     }, 65536, &_Condition_0c
   },
-  { ID_SCREEN_02a,       APPW_NOTIFICATION_INITDIALOG,     ID_VAR_SW,           APPW_JOB_SETVALUE,       ID_SCREEN_01_Copy__APPW_NOTIFICATION_INITDIALOG,
+  { ID_SCREEN_01a,       APPW_NOTIFICATION_INITDIALOG,     ID_VAR_SW,           APPW_JOB_SETVALUE,       ID_SCREEN_01_Copy__APPW_NOTIFICATION_INITDIALOG,
     { ARG_V(0),
     }, 0, NULL
   },
@@ -328,14 +328,14 @@ static GUI_CONST_STORAGE APPW_ACTION_ITEM _aAction[] = {
 */
 /*********************************************************************
 *
-*       ID_SCREEN_02a_RootInfo
+*       ID_SCREEN_01a_RootInfo
 */
-APPW_ROOT_INFO ID_SCREEN_02a_RootInfo = {
-  ID_SCREEN_02a,
+APPW_ROOT_INFO ID_SCREEN_01a_RootInfo = {
+  ID_SCREEN_01a,
   _aCreate, GUI_COUNTOF(_aCreate),
   _aSetup,  GUI_COUNTOF(_aSetup),
   _aAction, GUI_COUNTOF(_aAction),
-  cbID_SCREEN_02a,
+  cbID_SCREEN_01a,
   0
 };
 

@@ -52,7 +52,6 @@
     Format=ws_batterywarning.png,5
     Format=w_back.png,1
     Format=ws_exhaustwarning.png,5
-    Format=Back4.bmp,5
   </Bitmaps>
   <Movies>
   </Movies>
@@ -79,7 +78,6 @@
       Id=ID_RTEXT_3
       Id=ID_RTEXT_4
       Id=ID_RTEXT_5
-      Id=ID_RTEXT_6
     </Id>
     <Lang>
       Name=JP
@@ -102,7 +100,6 @@
       Text=I=
       Text=00:00
       Text=1100
-      Text=CANSPEED
     </Lang>
   </Text>
   <Content>
@@ -128,18 +125,10 @@
     Item=4114,ID_VAR_REV_A,0
     Item=4113,ID_VAR_SW,0
     Item=4115,ID_VAR_FUEL,0
-    Item=4122,ID_VAR_WT_BAR,0
-    Item=4123,ID_VAR_IAT_BAR,0
-    Item=4125,ID_VAR_OT_BAR,0
-    Item=4120,ID_VAR_MAP_BAR,0
-    Item=4121,ID_VAR_OILP_BAR,0
-    Item=4124,ID_VAR_BATT_BAR,0
-    Item=4126,ID_VAR_AFR_BAR,0
     Item=4116,ID_VAR_AD1,0
     Item=4117,ID_VAR_AD2,0
     Item=4118,ID_VAR_AD3,0
     Item=4119,ID_VAR_AD4,0
-    Item=4127,ID_VAR_SPEED_CAN,0
   </Variables>
   <FocusInfo>
     Color=ff2777b3
@@ -552,7 +541,7 @@
       IdPrev=0
       IdPost=0
       <Dispose>
-        xSize=765
+        xSize=800
         ySize=256
         <X0>
           Mode=2
@@ -718,7 +707,7 @@
         yOff=0
       </SetTextAlign>
       <SetFont>
-        Font=51_30_Normal_EXT_AA2.xbf
+        Font=51_30_Normal_EXT.xbf
       </SetFont>
       <SetDecMode>
         Len=3
@@ -756,7 +745,7 @@
         yOff=0
       </SetTextAlign>
       <SetFont>
-        Font=51_30_Normal_EXT_AA2.xbf
+        Font=51_30_Normal_EXT.xbf
       </SetFont>
       <SetDecMode>
         Len=3
@@ -794,7 +783,7 @@
         yOff=0
       </SetTextAlign>
       <SetFont>
-        Font=51_30_Normal_EXT_AA2.xbf
+        Font=51_30_Normal_EXT.xbf
       </SetFont>
       <SetDecMode>
         Len=3
@@ -832,10 +821,10 @@
         yOff=0
       </SetTextAlign>
       <SetFont>
-        Font=51_30_Normal_EXT_AA2.xbf
+        Font=51_30_Normal_EXT.xbf
       </SetFont>
       <SetDecMode>
-        Len=4
+        Len=3
         Shift=0
         Signed=0
         Space=1
@@ -870,7 +859,7 @@
         yOff=0
       </SetTextAlign>
       <SetFont>
-        Font=51_30_Normal_EXT_AA2.xbf
+        Font=51_30_Normal_EXT.xbf
       </SetFont>
       <SetDecMode>
         Len=3
@@ -890,7 +879,7 @@
         ySize=28
         <Y0>
           Mode=2
-          Off=210
+          Off=209
           Id=0
         </Y0>
         <X1>
@@ -908,7 +897,7 @@
         yOff=0
       </SetTextAlign>
       <SetFont>
-        Font=51_30_Normal_EXT_AA2.xbf
+        Font=51_30_Normal_EXT.xbf
       </SetFont>
       <SetDecMode>
         Len=5
@@ -946,7 +935,7 @@
         yOff=0
       </SetTextAlign>
       <SetFont>
-        Font=51_40_Normal_EXT_AA2.xbf
+        Font=51_40_Normal_EXT.xbf
       </SetFont>
       <SetDecMode>
         Len=5
@@ -984,7 +973,7 @@
         yOff=0
       </SetTextAlign>
       <SetFont>
-        Font=51_40_Normal_EXT_AA2.xbf
+        Font=51_40_Normal_EXT.xbf
       </SetFont>
       <SetDecMode>
         Len=3
@@ -1014,7 +1003,7 @@
         </Y0>
       </Dispose>
       <SetColor>
-        Color=ffffffff
+        Color=ffff5500
       </SetColor>
       <SetTextAlign>
         Alignment=14
@@ -1025,7 +1014,7 @@
         Id=1
       </SetTextId>
       <SetFont>
-        Font=SuiGenerisRg_120_Bold_EXT_AA2.xbf
+        Font=SuiGenerisRg_120_Bold_EXT.xbf
       </SetFont>
     </Text>
     <Text>
@@ -1057,14 +1046,11 @@
         yOff=0
       </SetTextAlign>
       <SetFont>
-        Font=51_30_Normal_EXT_AA4.xbf
+        Font=51_30_Normal_EXT.xbf
       </SetFont>
-      <SetDecMode>
-        Len=4
-        Shift=0
-        Signed=0
-        Space=1
-      </SetDecMode>
+      <SetTextId>
+        Id=18
+      </SetTextId>
     </Text>
     <Text>
       ParentId=2048
@@ -1387,36 +1373,6 @@
         Space=1
       </SetDecMode>
     </Text>
-    <Text>
-      ParentId=2048
-      IdString=ID_NUM_TIME
-      Id=2050
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=72
-        ySize=17
-        <X0>
-          Mode=2
-          Off=510
-          Id=0
-        </X0>
-        <Y0>
-          Mode=2
-          Off=0
-          Id=0
-        </Y0>
-      </Dispose>
-      <SetColor>
-        Color=ffc0c0c0
-      </SetColor>
-      <SetFont>
-        Font=51_20_Normal_EXT_AA2.xbf
-      </SetFont>
-      <SetTextId>
-        Id=17
-      </SetTextId>
-    </Text>
     <Progbar>
       ParentId=2048
       IdString=ID_PROGBAR_00
@@ -1446,81 +1402,37 @@
       </SetSbitmaps>
       <SetTile>
       </SetTile>
-      <SetColors>
-      </SetColors>
     </Progbar>
-    <Progbar>
+    <Text>
       ParentId=2048
-      IdString=ID_PROGBAR_MAP
-      Id=2074
+      IdString=ID_NUM_TIME
+      Id=2050
       IdPrev=0
       IdPost=0
       <Dispose>
-        xSize=74
-        ySize=4
+        xSize=72
+        ySize=17
         <X0>
           Mode=2
-          Off=90
+          Off=510
           Id=0
         </X0>
         <Y0>
           Mode=2
-          Off=162
+          Off=0
           Id=0
         </Y0>
       </Dispose>
-      <SetRadius>
-        Radius=0
-      </SetRadius>
-      <SetFrame>
-        Frame=1
-      </SetFrame>
       <SetColor>
-        Color=ffffffff
+        Color=ffc0c0c0
       </SetColor>
-      <SetValue>
-        Value=40
-      </SetValue>
-      <SetColors>
-        Color0=ffffffff
-      </SetColors>
-    </Progbar>
-    <Progbar>
-      ParentId=2048
-      IdString=ID_PROGBAR_OILP
-      Id=2075
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=74
-        ySize=4
-        <X0>
-          Mode=2
-          Off=90
-          Id=0
-        </X0>
-        <Y0>
-          Mode=2
-          Off=200
-          Id=0
-        </Y0>
-      </Dispose>
-      <SetRadius>
-        Radius=0
-      </SetRadius>
-      <SetFrame>
-        Frame=1
-      </SetFrame>
-      <SetColor>
-        Color=ffffffff
-      </SetColor>
-      <SetValue>
-        Value=40
-      </SetValue>
-      <SetColors>
-        Color0=ffffffff
-      </SetColors>
-    </Progbar>
+      <SetFont>
+        Font=51_20_Normal_EXT.xbf
+      </SetFont>
+      <SetTextId>
+        Id=17
+      </SetTextId>
+    </Text>
   </Objects>
   <Interactions>
     <START>
@@ -1837,8 +1749,8 @@
       IdDst=ID_NUM_GEAR
       Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_GEAR__APPW_JOB_SETTEXT
       Comment=gear_pos=N
-      Flags=65536
-      Condition=A,1,IS_VAR,ID_VAR_GEAR,==,IS_VAL,0
+      Flags=0
+      Condition=A,1,IS_VAR,ID_VAR_01,==,IS_VAL,0
       <Para>
         Text=ID_RTEXT_GN
       </Para>
@@ -1937,7 +1849,7 @@
       IdSrc=ID_VAR_FUEL
       NCode=WM_NOTIFICATION_VALUE_CHANGED
       IdDst=ID_PROGBAR_00
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_PROGBAR_00__APPW_JOB_SETVALUE_0
+      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_PROGBAR_00__APPW_JOB_SETVALUE
       Flags=65537
       <Para>
         Value=4115
@@ -1991,32 +1903,10 @@
         Value=0
       </Para>
     </SETVALUE>
-    <SETVALUE>
-      RootId=6146
-      IdSrc=ID_VAR_MAP_BAR
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_PROGBAR_MAP
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_PROGBAR_MAP__APPW_JOB_SETVALUE
-      Flags=0
-      <Para>
-        Value=0
-      </Para>
-    </SETVALUE>
-    <SETVALUE>
-      RootId=6146
-      IdSrc=ID_VAR_OILP_BAR
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_VAR_OILP_BAR
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED_0
-      Flags=0
-      <Para>
-        Value=0
-      </Para>
-    </SETVALUE>
   </Interactions>
   <Selection>
     Root=ID_SCREEN_01
-    Object=2049
+    Object=2048
   </Selection>
   <Terms>
   </Terms>

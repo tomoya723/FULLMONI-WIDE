@@ -42,7 +42,6 @@ Purpose     : Generated file do NOT edit!
 #define ID_RTEXT_3 16
 #define ID_RTEXT_4 17
 #define ID_RTEXT_5 18
-#define ID_RTEXT_6 19
 
 #define APPW_MANAGE_TEXT APPW_MANAGE_TEXT_EXT
 extern GUI_CONST_STORAGE unsigned char acAPPW_Language_0[];
@@ -52,18 +51,21 @@ extern GUI_CONST_STORAGE unsigned char acAPPW_Language_0[];
 *       Fonts
 */
 extern GUI_CONST_STORAGE unsigned char acArial_19_Normal_EXT[];
-extern GUI_CONST_STORAGE unsigned char ac51_30_Normal_EXT_AA2[];
-extern GUI_CONST_STORAGE unsigned char ac51_40_Normal_EXT_AA2[];
-extern GUI_CONST_STORAGE unsigned char acSuiGenerisRg_120_Bold_EXT_AA2[];
-extern GUI_CONST_STORAGE unsigned char ac51_30_Normal_EXT_AA4[];
+extern GUI_CONST_STORAGE unsigned char ac51_30_Normal_EXT[];
+extern GUI_CONST_STORAGE unsigned char ac51_40_Normal_EXT[];
+extern GUI_CONST_STORAGE unsigned char acSuiGenerisRg_120_Bold_EXT[];
 extern GUI_CONST_STORAGE unsigned char acArial_16_Bold_EXT[];
-extern GUI_CONST_STORAGE unsigned char ac51_20_Normal_EXT_AA2[];
+extern GUI_CONST_STORAGE unsigned char ac51_20_Normal_EXT[];
 
 /*********************************************************************
 *
 *       Images
 */
 extern GUI_CONST_STORAGE unsigned char acmotec[];
+extern GUI_CONST_STORAGE unsigned char acBack2[];
+extern GUI_CONST_STORAGE unsigned char acMarker_red_bar_80x7s[];
+extern GUI_CONST_STORAGE unsigned char acfuel1[];
+extern GUI_CONST_STORAGE unsigned char acfuel2[];
 extern GUI_CONST_STORAGE unsigned char acw_back[];
 extern GUI_CONST_STORAGE unsigned char acws_masterwarning[];
 extern GUI_CONST_STORAGE unsigned char acws_oilpresswarning[];
@@ -74,10 +76,6 @@ extern GUI_CONST_STORAGE unsigned char acws_batterywarning[];
 extern GUI_CONST_STORAGE unsigned char acws_breakwarning[];
 extern GUI_CONST_STORAGE unsigned char acws_beltwarning[];
 extern GUI_CONST_STORAGE unsigned char acws_fuelcheck[];
-extern GUI_CONST_STORAGE unsigned char acBack2[];
-extern GUI_CONST_STORAGE unsigned char acMarker_red_bar_80x7s[];
-extern GUI_CONST_STORAGE unsigned char acfuel1[];
-extern GUI_CONST_STORAGE unsigned char acfuel2[];
 
 /*********************************************************************
 *
@@ -103,18 +101,10 @@ extern GUI_CONST_STORAGE unsigned char acfuel2[];
 #define ID_VAR_REV_A (GUI_ID_USER + 2066)
 #define ID_VAR_SW (GUI_ID_USER + 2065)
 #define ID_VAR_FUEL (GUI_ID_USER + 2067)
-#define ID_VAR_WT_BAR (GUI_ID_USER + 2074)
-#define ID_VAR_IAT_BAR (GUI_ID_USER + 2075)
-#define ID_VAR_OT_BAR (GUI_ID_USER + 2077)
-#define ID_VAR_MAP_BAR (GUI_ID_USER + 2072)
-#define ID_VAR_OILP_BAR (GUI_ID_USER + 2073)
-#define ID_VAR_BATT_BAR (GUI_ID_USER + 2076)
-#define ID_VAR_AFR_BAR (GUI_ID_USER + 2078)
 #define ID_VAR_AD1 (GUI_ID_USER + 2068)
 #define ID_VAR_AD2 (GUI_ID_USER + 2069)
 #define ID_VAR_AD3 (GUI_ID_USER + 2070)
 #define ID_VAR_AD4 (GUI_ID_USER + 2071)
-#define ID_VAR_SPEED_CAN (GUI_ID_USER + 2079)
 
 /*********************************************************************
 *

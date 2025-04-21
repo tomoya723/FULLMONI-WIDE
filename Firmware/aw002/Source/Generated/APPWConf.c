@@ -50,10 +50,9 @@ Purpose     : Generated file do NOT edit!
 static APPW_ROOT_INFO * _apRootList[] = {
   &ID_SCREEN_00_RootInfo,
   &ID_SCREEN_Telltale_RootInfo,
-  &ID_SCREEN_01_RootInfo,
-  &ID_SCREEN_02a_RootInfo,
-  &ID_SCREEN_02b_RootInfo,
-  &ID_SCREEN_02c_RootInfo,
+  &ID_SCREEN_01a_RootInfo,
+  &ID_SCREEN_01b_RootInfo,
+  &ID_SCREEN_01c_RootInfo,
 };
 
 /*********************************************************************
