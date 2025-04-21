@@ -9,13 +9,13 @@
 *                                                                    *
 **********************************************************************
 ----------------------------------------------------------------------
-File        : ID_SCREEN_02b.c
+File        : ID_SCREEN_01b.c
 Purpose     : Generated file do NOT edit!
 ---------------------------END-OF-HEADER------------------------------
 */
 
 #include "Resource.h"
-#include "ID_SCREEN_02b.h"
+#include "ID_SCREEN_01b.h"
 
 /*********************************************************************
 *
@@ -29,7 +29,7 @@ Purpose     : Generated file do NOT edit!
 */
 static APPW_CREATE_ITEM _aCreate[] = {
   { WM_OBJECT_WINDOW_Create,
-    ID_SCREEN_02b, 0,
+    ID_SCREEN_01b, 0,
     { { { DISPOSE_MODE_REL_PARENT, 35, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 0, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -40,7 +40,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_IMAGE_Create,
-    ID_IMAGE_00, ID_SCREEN_02b,
+    ID_IMAGE_00, ID_SCREEN_01b,
     { { { DISPOSE_MODE_REL_PARENT, 0, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 0, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -51,7 +51,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_PROGBAR_Create,
-    ID_PROGBAR_WT, ID_SCREEN_02b,
+    ID_PROGBAR_WT, ID_SCREEN_01b,
     { { { DISPOSE_MODE_REL_PARENT, 43, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 21, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -62,7 +62,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_PROGBAR_Create,
-    ID_PROGBAR_WT_WARN, ID_SCREEN_02b,
+    ID_PROGBAR_WT_WARN, ID_SCREEN_01b,
     { { { DISPOSE_MODE_REL_PARENT, 43, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 33, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -73,7 +73,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_PROGBAR_Create,
-    ID_PROGBAR_IAT, ID_SCREEN_02b,
+    ID_PROGBAR_IAT, ID_SCREEN_01b,
     { { { DISPOSE_MODE_REL_PARENT, 43, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 64, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -84,7 +84,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_PROGBAR_Create,
-    ID_PROGBAR_IAT_WARN, ID_SCREEN_02b,
+    ID_PROGBAR_IAT_WARN, ID_SCREEN_01b,
     { { { DISPOSE_MODE_REL_PARENT, 43, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 76, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -95,7 +95,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_PROGBAR_Create,
-    ID_PROGBAR_MAP, ID_SCREEN_02b,
+    ID_PROGBAR_MAP, ID_SCREEN_01b,
     { { { DISPOSE_MODE_REL_PARENT, 43, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 146, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -106,7 +106,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_PROGBAR_Create,
-    ID_PROGBAR_OT, ID_SCREEN_02b,
+    ID_PROGBAR_OT, ID_SCREEN_01b,
     { { { DISPOSE_MODE_REL_PARENT, 43, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 107, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -117,7 +117,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_PROGBAR_Create,
-    ID_PROGBAR_OT_WARN, ID_SCREEN_02b,
+    ID_PROGBAR_OT_WARN, ID_SCREEN_01b,
     { { { DISPOSE_MODE_REL_PARENT, 43, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 119, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -128,7 +128,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_PROGBAR_Create,
-    ID_PROGBAR_OILP, ID_SCREEN_02b,
+    ID_PROGBAR_OILP, ID_SCREEN_01b,
     { { { DISPOSE_MODE_REL_PARENT, 43, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 185, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -139,7 +139,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_PROGBAR_Create,
-    ID_PROGBAR_OP_WARN, ID_SCREEN_02b,
+    ID_PROGBAR_OP_WARN, ID_SCREEN_01b,
     { { { DISPOSE_MODE_REL_PARENT, 43, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 197, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -150,7 +150,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_PROGBAR_Create,
-    ID_PROGBAR_BATV, ID_SCREEN_02b,
+    ID_PROGBAR_BATV, ID_SCREEN_01b,
     { { { DISPOSE_MODE_REL_PARENT, 43, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 224, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -161,7 +161,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_PROGBAR_Create,
-    ID_PROGBAR_BATTV_WARN, ID_SCREEN_02b,
+    ID_PROGBAR_BATTV_WARN, ID_SCREEN_01b,
     { { { DISPOSE_MODE_REL_PARENT, 43, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 236, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -172,7 +172,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_TEXT_Create,
-    ID_NUM_01, ID_SCREEN_02b,
+    ID_NUM_01, ID_SCREEN_01b,
     { { { DISPOSE_MODE_REL_PARENT, 135, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 17, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -183,7 +183,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_TEXT_Create,
-    ID_NUM_02, ID_SCREEN_02b,
+    ID_NUM_02, ID_SCREEN_01b,
     { { { DISPOSE_MODE_REL_PARENT, 135, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 61, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -194,7 +194,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_TEXT_Create,
-    ID_NUM_03, ID_SCREEN_02b,
+    ID_NUM_03, ID_SCREEN_01b,
     { { { DISPOSE_MODE_REL_PARENT, 135, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 103, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -205,7 +205,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_TEXT_Create,
-    ID_NUM_04, ID_SCREEN_02b,
+    ID_NUM_04, ID_SCREEN_01b,
     { { { DISPOSE_MODE_REL_PARENT, 135, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 143, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -216,7 +216,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_TEXT_Create,
-    ID_NUM_05, ID_SCREEN_02b,
+    ID_NUM_05, ID_SCREEN_01b,
     { { { DISPOSE_MODE_REL_PARENT, 128, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 180, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -227,7 +227,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
     { 0, 0 }
   },
   { WM_OBJECT_TEXT_Create,
-    ID_NUM_06, ID_SCREEN_02b,
+    ID_NUM_06, ID_SCREEN_01b,
     { { { DISPOSE_MODE_REL_PARENT, 127, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 215, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
@@ -386,7 +386,7 @@ static GUI_CONST_STORAGE APPW_SETUP_ITEM _aSetup[] = {
 *       _aAction
 */
 static GUI_CONST_STORAGE APPW_ACTION_ITEM _aAction[] = {
-  { ID_SCREEN_02b,         APPW_NOTIFICATION_INITDIALOG,     ID_VAR_SW,             APPW_JOB_SETVALUE,       ID_SCREEN_02_Copy__APPW_NOTIFICATION_INITDIALOG,
+  { ID_SCREEN_01b,         APPW_NOTIFICATION_INITDIALOG,     ID_VAR_SW,             APPW_JOB_SETVALUE,       ID_SCREEN_02_Copy__APPW_NOTIFICATION_INITDIALOG,
     { ARG_V(0),
     }, 0, NULL
   },
@@ -448,14 +448,14 @@ static GUI_CONST_STORAGE APPW_ACTION_ITEM _aAction[] = {
 */
 /*********************************************************************
 *
-*       ID_SCREEN_02b_RootInfo
+*       ID_SCREEN_01b_RootInfo
 */
-APPW_ROOT_INFO ID_SCREEN_02b_RootInfo = {
-  ID_SCREEN_02b,
+APPW_ROOT_INFO ID_SCREEN_01b_RootInfo = {
+  ID_SCREEN_01b,
   _aCreate, GUI_COUNTOF(_aCreate),
   _aSetup,  GUI_COUNTOF(_aSetup),
   _aAction, GUI_COUNTOF(_aAction),
-  cbID_SCREEN_02b,
+  cbID_SCREEN_01b,
   0
 };
 

@@ -51,18 +51,13 @@ extern GUI_CONST_STORAGE unsigned char acAPPW_Language_0[];
 *
 *       Fonts
 */
-extern GUI_CONST_STORAGE unsigned char acArial_19_Normal_EXT[];
-extern GUI_CONST_STORAGE unsigned char ac51_30_Normal_EXT_AA2[];
-extern GUI_CONST_STORAGE unsigned char ac51_40_Normal_EXT_AA2[];
-extern GUI_CONST_STORAGE unsigned char acSuiGenerisRg_120_Bold_EXT_AA2[];
-extern GUI_CONST_STORAGE unsigned char ac51_30_Normal_EXT_AA4[];
-extern GUI_CONST_STORAGE unsigned char acArial_16_Bold_EXT[];
-extern GUI_CONST_STORAGE unsigned char ac51_20_Normal_EXT_AA2[];
 extern GUI_CONST_STORAGE unsigned char acx14y24pxHeadUpDaisy_36_Bold_EXT[];
 extern GUI_CONST_STORAGE unsigned char acx14y24pxHeadUpDaisy_72_Bold_EXT[];
 extern GUI_CONST_STORAGE unsigned char acx14y24pxHeadUpDaisy_30_Bold_EXT_AA2[];
 extern GUI_CONST_STORAGE unsigned char acx14y24pxHeadUpDaisy_18_Normal_EXT[];
 extern GUI_CONST_STORAGE unsigned char acx14y24pxHeadUpDaisy_27_Bold_EXT[];
+extern GUI_CONST_STORAGE unsigned char acArial_19_Normal_EXT[];
+extern GUI_CONST_STORAGE unsigned char acArial_16_Bold_EXT[];
 
 /*********************************************************************
 *
@@ -79,13 +74,12 @@ extern GUI_CONST_STORAGE unsigned char acws_batterywarning[];
 extern GUI_CONST_STORAGE unsigned char acws_breakwarning[];
 extern GUI_CONST_STORAGE unsigned char acws_beltwarning[];
 extern GUI_CONST_STORAGE unsigned char acws_fuelcheck[];
-extern GUI_CONST_STORAGE unsigned char acBack2[];
-extern GUI_CONST_STORAGE unsigned char acMarker_red_bar_80x7s[];
-extern GUI_CONST_STORAGE unsigned char acfuel1[];
-extern GUI_CONST_STORAGE unsigned char acfuel2[];
 extern GUI_CONST_STORAGE unsigned char acBack5[];
+extern GUI_CONST_STORAGE unsigned char acMarker_red_bar_80x7s[];
 extern GUI_CONST_STORAGE unsigned char acBack6[];
 extern GUI_CONST_STORAGE unsigned char acBack7[];
+extern GUI_CONST_STORAGE unsigned char acfuel1[];
+extern GUI_CONST_STORAGE unsigned char acfuel2[];
 
 /*********************************************************************
 *
@@ -138,17 +132,15 @@ extern GUI_CONST_STORAGE APPW_ANIM_DATA ID_ANIM_000_Data;
 */
 #define ID_SCREEN_00 (GUI_ID_USER + 4096)
 #define ID_SCREEN_Telltale (GUI_ID_USER + 4099)
-#define ID_SCREEN_01 (GUI_ID_USER + 4098)
-#define ID_SCREEN_02a (GUI_ID_USER + 4097)
-#define ID_SCREEN_02b (GUI_ID_USER + 4100)
-#define ID_SCREEN_02c (GUI_ID_USER + 4101)
+#define ID_SCREEN_01a (GUI_ID_USER + 4097)
+#define ID_SCREEN_01b (GUI_ID_USER + 4100)
+#define ID_SCREEN_01c (GUI_ID_USER + 4101)
 
 extern APPW_ROOT_INFO ID_SCREEN_00_RootInfo;
 extern APPW_ROOT_INFO ID_SCREEN_Telltale_RootInfo;
-extern APPW_ROOT_INFO ID_SCREEN_01_RootInfo;
-extern APPW_ROOT_INFO ID_SCREEN_02a_RootInfo;
-extern APPW_ROOT_INFO ID_SCREEN_02b_RootInfo;
-extern APPW_ROOT_INFO ID_SCREEN_02c_RootInfo;
+extern APPW_ROOT_INFO ID_SCREEN_01a_RootInfo;
+extern APPW_ROOT_INFO ID_SCREEN_01b_RootInfo;
+extern APPW_ROOT_INFO ID_SCREEN_01c_RootInfo;
 
 #define APPW_INITIAL_SCREEN &ID_SCREEN_00_RootInfo
 

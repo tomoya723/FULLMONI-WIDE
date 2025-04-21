@@ -9,13 +9,13 @@
 *                                                                    *
 **********************************************************************
 ----------------------------------------------------------------------
-File        : ID_SCREEN_02c.h
+File        : ID_SCREEN_01c.h
 Purpose     : Generated file do NOT edit!
 ---------------------------END-OF-HEADER------------------------------
 */
 
-#ifndef ID_SCREEN_02C_H
-#define ID_SCREEN_02C_H
+#ifndef ID_SCREEN_01C_H
+#define ID_SCREEN_01C_H
 
 #include "AppWizard.h"
 
@@ -69,8 +69,8 @@ void ID_SCREEN_02_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_SPEED_CAN__APPW_JO
 *
 *       Callback
 */
-void cbID_SCREEN_02c(WM_MESSAGE * pMsg);
+void cbID_SCREEN_01c(WM_MESSAGE * pMsg);
 
-#endif  // ID_SCREEN_02C_H
+#endif  // ID_SCREEN_01C_H
 
 /*************************** End of file ****************************/

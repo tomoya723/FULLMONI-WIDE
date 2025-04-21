@@ -9,14 +9,14 @@
 *                                                                    *
 **********************************************************************
 ----------------------------------------------------------------------
-File        : ID_SCREEN_02c_Slots.c
+File        : ID_SCREEN_01c_Slots.c
 Purpose     : AppWizard managed file, function content could be changed
 ---------------------------END-OF-HEADER------------------------------
 */
 
 #include "Application.h"
 #include "../Generated/Resource.h"
-#include "../Generated/ID_SCREEN_02c.h"
+#include "../Generated/ID_SCREEN_01c.h"
 
 /*** Begin of user code area ***/
 /*** End of user code area ***/
@@ -29,9 +29,9 @@ Purpose     : AppWizard managed file, function content could be changed
 */
 /*********************************************************************
 *
-*       cbID_SCREEN_02c
+*       cbID_SCREEN_01c
 */
-void cbID_SCREEN_02c(WM_MESSAGE * pMsg) {
+void cbID_SCREEN_01c(WM_MESSAGE * pMsg) {
   GUI_USE_PARA(pMsg);
 }
 
