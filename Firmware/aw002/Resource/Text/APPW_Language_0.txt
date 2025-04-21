@@ -1,0 +1,20 @@
+Error : Massarge
+N
+1
+2
+3
+4
+5
+6
+WT
+IT
+OT
+MAP
+OP
+BT
+W=
+O=
+I=
+00:00
+1100
+CANSPEED
