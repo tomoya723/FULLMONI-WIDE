@@ -213,7 +213,6 @@ void main(void)
 			Neopixel_SetRGB(6, 0, 0, 0);
 			Neopixel_SetRGB(7, 0, 0, 255);
 		}
-
 		else if((g_CALC_data.rev >= 6000) && (g_CALC_data.rev < 6500))
 		{
 			Neopixel_SetRGB(0, 0, 0, 255);
