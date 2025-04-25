@@ -86,7 +86,7 @@ static GUI_CONST_STORAGE APPW_ACTION_ITEM _aAction[] = {
     }, 0, NULL
   },
   { ID_TIMER_00,  APPW_NOTIFICATION_TIMER,          0,            APPW_JOB_SWAPSCREEN,     ID_SCREEN_00__ID_TIMER_00__APPW_NOTIFICATION_TIMER,
-    { ARG_V(ID_SCREEN_01),
+    { ARG_V(ID_SCREEN_01a),
     }, 0, NULL
   },
 };

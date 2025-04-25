@@ -105,13 +105,6 @@ extern GUI_CONST_STORAGE unsigned char acfuel2[];
 #define ID_VAR_REV_A (GUI_ID_USER + 2066)
 #define ID_VAR_SW (GUI_ID_USER + 2065)
 #define ID_VAR_FUEL (GUI_ID_USER + 2067)
-#define ID_VAR_WT_BAR (GUI_ID_USER + 2074)
-#define ID_VAR_IAT_BAR (GUI_ID_USER + 2075)
-#define ID_VAR_OT_BAR (GUI_ID_USER + 2077)
-#define ID_VAR_MAP_BAR (GUI_ID_USER + 2072)
-#define ID_VAR_OILP_BAR (GUI_ID_USER + 2073)
-#define ID_VAR_BATT_BAR (GUI_ID_USER + 2076)
-#define ID_VAR_AFR_BAR (GUI_ID_USER + 2078)
 #define ID_VAR_AD1 (GUI_ID_USER + 2068)
 #define ID_VAR_AD2 (GUI_ID_USER + 2069)
 #define ID_VAR_AD3 (GUI_ID_USER + 2070)
@@ -148,7 +141,7 @@ extern APPW_ROOT_INFO ID_SCREEN_01c_RootInfo;
 *
 *       Project path
 */
-#define APPW_PROJECT_PATH "D:/git/FULLMONI-WIDE/FULLMONI-WIDE/Firmware/aw002"
+#define APPW_PROJECT_PATH "C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw002"
 
 #endif  // RESOURCE_H
 

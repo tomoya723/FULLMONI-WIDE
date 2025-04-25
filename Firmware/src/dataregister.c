@@ -188,18 +188,14 @@ void data_store(void)
 	if(g_CALC_data.AD3 >  100)	{	aPara4[0].v = 0;	} else {		aPara4[0].v = 1;	}	APPW_DoJob(ID_SCREEN_Telltale, ID_ICON_03 , APPW_JOB_SETVIS, aPara4);	// EXtemp Warning
 	if(g_CALC_data.AD1 > 1000)	{	aPara5[0].v = 0;	} else {		aPara5[0].v = 1;	}	APPW_DoJob(ID_SCREEN_Telltale, ID_ICON_04 , APPW_JOB_SETVIS, aPara5);	// Battery Warning
 	if(g_CALC_data.AD2 >  100)	{	aPara6[0].v = 0;	} else {		aPara6[0].v = 1;	}	APPW_DoJob(ID_SCREEN_Telltale, ID_ICON_05 , APPW_JOB_SETVIS, aPara6);	// Break Warning
-//	if(g_CALC_data.AD4 >  100)	{	aPara7[0].v = 0;	} else {		aPara7[0].v = 1;	}	APPW_DoJob(ID_SCREEN_02, ID_ICON_06 , APPW_JOB_SETVIS, aPara7);	// Belts Warning
+//	if(g_CALC_data.AD4 >  100)	{	aPara7[0].v = 0;	} else {		aPara7[0].v = 1;	}	APPW_DoJob(ID_SCREEN_Telltale, ID_ICON_06 , APPW_JOB_SETVIS, aPara7);	// Belts Warning
 	if(g_CALC_data.AD4 >  150)	{	aPara7[0].v = 0;	} else {		aPara7[0].v = 1;	}	APPW_DoJob(ID_SCREEN_Telltale, ID_ICON_06 , APPW_JOB_SETVIS, aPara7);	// Belts Warning #issue8暫定
 	if(fuel_per > 10)	{	aPara8[0].v = 0;	} else if (fuel_per < 5)	{ aPara8[0].v = 1;	}		APPW_DoJob(ID_SCREEN_Telltale, ID_ICON_07 , APPW_JOB_SETVIS, aPara8);	// Fuel Empty
 
 
 //	sprintf((void *) g_CALC_data.str_time,"%2x:%02x:%02x", (RTC.RHRCNT.BYTE & 0x3F), RTC.RMINCNT.BYTE, RTC.RSECCNT.BYTE);
 	sprintf((void *) g_CALC_data.str_time,"%2x:%02x", (RTC.RHRCNT.BYTE & 0x3F), RTC.RMINCNT.BYTE);
-#if (DISP == 1)
-	APPW_SetText(ID_SCREEN_01,ID_NUM_TIME,	(void *) g_CALC_data.str_time	);
-#elif (DISP == 2)
 	APPW_SetText(ID_SCREEN_01a,ID_NUM_TIME,	(void *) g_CALC_data.str_time	);
-#endif
 	// SW Input
 	if(g_sw_int_flg == 1)
 	{

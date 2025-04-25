@@ -52,6 +52,11 @@
     Format=ws_batterywarning.png,5
     Format=w_back.png,1
     Format=ws_exhaustwarning.png,5
+    Format=Back2a.bmp,5
+    Format=Back2b.bmp,5
+    Format=Back2c.bmp,5
+    Format=Marker_red_bar_80x21s.png,16
+    Format=Marker_red_bar_80x21sw.png,16
   </Bitmaps>
   <Movies>
   </Movies>
@@ -215,8 +220,8 @@
       IdPost=0
       RootId=6147
       <Dispose>
-        xSize=0
-        ySize=0
+        xSize=35
+        ySize=256
         <X0>
           Mode=2
           Off=0
@@ -227,20 +232,7 @@
           Off=0
           Id=0
         </Y0>
-        <X1>
-          Mode=2
-          Off=765
-          Id=0
-        </X1>
-        <Y1>
-          Mode=2
-          Off=0
-          Id=0
-        </Y1>
       </Dispose>
-      <SetStayOnTop>
-        SetStayOnTop=true
-      </SetStayOnTop>
     </Screen>
     <Image>
       ParentId=2048
@@ -504,17 +496,17 @@
     </Image>
     <Screen>
       ParentId=0
-      IdString=ID_SCREEN_01
+      IdString=ID_SCREEN_01a
       Id=2048
       IdPrev=0
       IdPost=0
       RootId=6146
       <Dispose>
-        xSize=0
-        ySize=0
+        xSize=358
+        ySize=256
         <X0>
           Mode=2
-          Off=35
+          Off=272
           Id=0
         </X0>
         <Y0>
@@ -522,16 +514,6 @@
           Off=0
           Id=0
         </Y0>
-        <X1>
-          Mode=2
-          Off=0
-          Id=0
-        </X1>
-        <Y1>
-          Mode=2
-          Off=0
-          Id=0
-        </Y1>
       </Dispose>
     </Screen>
     <Image>
@@ -541,7 +523,7 @@
       IdPrev=0
       IdPost=0
       <Dispose>
-        xSize=800
+        xSize=358
         ySize=256
         <X0>
           Mode=2
@@ -555,7 +537,7 @@
         </Y0>
       </Dispose>
       <SetSbitmap>
-        Image=Back2.bmp
+        Image=Back2a.bmp
       </SetSbitmap>
       <SetLQ>
       </SetLQ>
@@ -571,7 +553,7 @@
         ySize=256
         <X0>
           Mode=2
-          Off=237
+          Off=0
           Id=0
         </X0>
         <Y0>
@@ -613,7 +595,7 @@
         ySize=256
         <X0>
           Mode=2
-          Off=237
+          Off=0
           Id=0
         </X0>
         <Y0>
@@ -623,23 +605,488 @@
         </Y0>
       </Dispose>
       <SetSbitmaps>
-        Index1=Marker_red_bar_80x7s.bmp
+        Index1=Marker_red_bar_80x7s.png
       </SetSbitmaps>
       <SetPos>
         Pos=76
       </SetPos>
-      <SetRotate>
-        Rotate=true
-      </SetRotate>
       <SetOffset>
         Offset=2700
       </SetOffset>
-      <SetLQ>
-      </SetLQ>
       <SetValue>
         Value=3450
       </SetValue>
+      <SetLQ>
+      </SetLQ>
+      <SetRotate>
+        Rotate=true
+      </SetRotate>
     </Rotary>
+    <Text>
+      ParentId=2048
+      IdString=ID_NUM_AF
+      Id=2061
+      IdPrev=0
+      IdPost=0
+      <Dispose>
+        xSize=130
+        ySize=50
+        <X0>
+          Mode=2
+          Off=182
+          Id=0
+        </X0>
+        <Y0>
+          Mode=2
+          Off=193
+          Id=0
+        </Y0>
+      </Dispose>
+      <SetColor>
+        Color=ffffffff
+      </SetColor>
+      <SetTextAlign>
+        Alignment=13
+        xOff=0
+        yOff=0
+      </SetTextAlign>
+      <SetFont>
+        Font=51_40_Normal_EXT.xbf
+      </SetFont>
+      <SetDecMode>
+        Len=5
+        Shift=1
+        Signed=0
+        Space=1
+      </SetDecMode>
+    </Text>
+    <Text>
+      ParentId=2048
+      IdString=ID_NUM_GEAR
+      Id=2063
+      IdPrev=0
+      IdPost=0
+      <Dispose>
+        xSize=100
+        ySize=100
+        <X0>
+          Mode=2
+          Off=259
+          Id=0
+        </X0>
+        <Y0>
+          Mode=2
+          Off=72
+          Id=0
+        </Y0>
+      </Dispose>
+      <SetColor>
+        Color=ffff5500
+      </SetColor>
+      <SetTextAlign>
+        Alignment=14
+        xOff=0
+        yOff=0
+      </SetTextAlign>
+      <SetTextId>
+        Id=1
+      </SetTextId>
+      <SetFont>
+        Font=SuiGenerisRg_120_Bold_EXT.xbf
+      </SetFont>
+    </Text>
+    <Text>
+      ParentId=2048
+      IdString=ID_NUM_RV
+      Id=2064
+      IdPrev=0
+      IdPost=0
+      <Dispose>
+        xSize=100
+        ySize=28
+        <X0>
+          Mode=2
+          Off=128
+          Id=0
+        </X0>
+        <Y0>
+          Mode=2
+          Off=143
+          Id=0
+        </Y0>
+      </Dispose>
+      <SetColor>
+        Color=ffffffff
+      </SetColor>
+      <SetTextAlign>
+        Alignment=13
+        xOff=0
+        yOff=0
+      </SetTextAlign>
+      <SetFont>
+        Font=51_30_Normal_EXT.xbf
+      </SetFont>
+      <SetDecMode>
+        Len=4
+        Shift=0
+        Signed=0
+        Space=1
+      </SetDecMode>
+    </Text>
+    <Text>
+      ParentId=2048
+      IdString=ID_NUM_TIME
+      Id=2050
+      IdPrev=0
+      IdPost=0
+      <Dispose>
+        xSize=72
+        ySize=17
+        <X0>
+          Mode=2
+          Off=273
+          Id=0
+        </X0>
+        <Y0>
+          Mode=2
+          Off=0
+          Id=0
+        </Y0>
+      </Dispose>
+      <SetColor>
+        Color=ffc0c0c0
+      </SetColor>
+      <SetFont>
+        Font=51_20_Normal_EXT.xbf
+      </SetFont>
+      <SetTextId>
+        Id=17
+      </SetTextId>
+    </Text>
+    <Screen>
+      ParentId=0
+      IdString=ID_SCREEN_01b
+      Id=2048
+      IdPrev=0
+      IdPost=0
+      RootId=6145
+      <Dispose>
+        xSize=237
+        ySize=256
+        <X0>
+          Mode=2
+          Off=35
+          Id=0
+        </X0>
+        <Y0>
+          Mode=2
+          Off=0
+          Id=0
+        </Y0>
+      </Dispose>
+    </Screen>
+    <Image>
+      ParentId=2048
+      IdString=ID_IMAGE_00
+      Id=2049
+      IdPrev=0
+      IdPost=0
+      <Dispose>
+        xSize=237
+        ySize=256
+        <X0>
+          Mode=2
+          Off=0
+          Id=0
+        </X0>
+        <Y0>
+          Mode=2
+          Off=0
+          Id=0
+        </Y0>
+      </Dispose>
+      <SetTile>
+      </SetTile>
+      <SetSbitmap>
+        Image=Back2b.bmp
+      </SetSbitmap>
+    </Image>
+    <Text>
+      ParentId=2048
+      IdString=ID_NUM_01
+      Id=2055
+      IdPrev=0
+      IdPost=0
+      <Dispose>
+        xSize=75
+        ySize=28
+        <X0>
+          Mode=2
+          Off=90
+          Id=0
+        </X0>
+        <Y0>
+          Mode=2
+          Off=20
+          Id=0
+        </Y0>
+      </Dispose>
+      <SetColor>
+        Color=ffffffff
+      </SetColor>
+      <SetTextAlign>
+        Alignment=13
+        xOff=0
+        yOff=0
+      </SetTextAlign>
+      <SetFont>
+        Font=51_30_Normal_EXT.xbf
+      </SetFont>
+      <SetDecMode>
+        Len=3
+        Shift=0
+        Signed=0
+        Space=1
+      </SetDecMode>
+    </Text>
+    <Text>
+      ParentId=2048
+      IdString=ID_NUM_02
+      Id=2056
+      IdPrev=0
+      IdPost=0
+      <Dispose>
+        xSize=75
+        ySize=28
+        <X0>
+          Mode=2
+          Off=90
+          Id=0
+        </X0>
+        <Y0>
+          Mode=2
+          Off=58
+          Id=0
+        </Y0>
+      </Dispose>
+      <SetColor>
+        Color=ffffffff
+      </SetColor>
+      <SetTextAlign>
+        Alignment=13
+        xOff=0
+        yOff=0
+      </SetTextAlign>
+      <SetFont>
+        Font=51_30_Normal_EXT.xbf
+      </SetFont>
+      <SetDecMode>
+        Len=3
+        Shift=0
+        Signed=0
+        Space=1
+      </SetDecMode>
+    </Text>
+    <Text>
+      ParentId=2048
+      IdString=ID_NUM_03
+      Id=2057
+      IdPrev=0
+      IdPost=0
+      <Dispose>
+        xSize=75
+        ySize=28
+        <X0>
+          Mode=2
+          Off=90
+          Id=0
+        </X0>
+        <Y0>
+          Mode=2
+          Off=96
+          Id=0
+        </Y0>
+      </Dispose>
+      <SetColor>
+        Color=ffffffff
+      </SetColor>
+      <SetTextAlign>
+        Alignment=13
+        xOff=0
+        yOff=0
+      </SetTextAlign>
+      <SetFont>
+        Font=51_30_Normal_EXT.xbf
+      </SetFont>
+      <SetDecMode>
+        Len=3
+        Shift=0
+        Signed=0
+        Space=1
+      </SetDecMode>
+    </Text>
+    <Text>
+      ParentId=2048
+      IdString=ID_NUM_04
+      Id=2058
+      IdPrev=0
+      IdPost=0
+      <Dispose>
+        xSize=75
+        ySize=28
+        <X0>
+          Mode=2
+          Off=90
+          Id=0
+        </X0>
+        <Y0>
+          Mode=2
+          Off=134
+          Id=0
+        </Y0>
+      </Dispose>
+      <SetColor>
+        Color=ffffffff
+      </SetColor>
+      <SetTextAlign>
+        Alignment=13
+        xOff=0
+        yOff=0
+      </SetTextAlign>
+      <SetFont>
+        Font=51_30_Normal_EXT.xbf
+      </SetFont>
+      <SetDecMode>
+        Len=3
+        Shift=0
+        Signed=0
+        Space=1
+      </SetDecMode>
+    </Text>
+    <Text>
+      ParentId=2048
+      IdString=ID_NUM_05
+      Id=2059
+      IdPrev=0
+      IdPost=0
+      <Dispose>
+        xSize=75
+        ySize=28
+        <X0>
+          Mode=2
+          Off=90
+          Id=0
+        </X0>
+        <Y0>
+          Mode=2
+          Off=172
+          Id=0
+        </Y0>
+      </Dispose>
+      <SetColor>
+        Color=ffffffff
+      </SetColor>
+      <SetTextAlign>
+        Alignment=13
+        xOff=0
+        yOff=0
+      </SetTextAlign>
+      <SetFont>
+        Font=51_30_Normal_EXT.xbf
+      </SetFont>
+      <SetDecMode>
+        Len=3
+        Shift=0
+        Signed=0
+        Space=1
+      </SetDecMode>
+    </Text>
+    <Text>
+      ParentId=2048
+      IdString=ID_NUM_06
+      Id=2060
+      IdPrev=0
+      IdPost=0
+      <Dispose>
+        xSize=75
+        ySize=28
+        <X0>
+          Mode=2
+          Off=90
+          Id=0
+        </X0>
+        <Y0>
+          Mode=2
+          Off=209
+          Id=0
+        </Y0>
+      </Dispose>
+      <SetColor>
+        Color=ffffffff
+      </SetColor>
+      <SetTextAlign>
+        Alignment=13
+        xOff=0
+        yOff=0
+      </SetTextAlign>
+      <SetFont>
+        Font=51_30_Normal_EXT.xbf
+      </SetFont>
+      <SetDecMode>
+        Len=5
+        Shift=1
+        Signed=0
+        Space=1
+      </SetDecMode>
+    </Text>
+    <Screen>
+      ParentId=0
+      IdString=ID_SCREEN_01c
+      Id=2048
+      IdPrev=0
+      IdPost=0
+      RootId=6148
+      <Dispose>
+        xSize=170
+        ySize=256
+        <X0>
+          Mode=2
+          Off=630
+          Id=0
+        </X0>
+        <Y0>
+          Mode=2
+          Off=0
+          Id=0
+        </Y0>
+      </Dispose>
+    </Screen>
+    <Image>
+      ParentId=2048
+      IdString=ID_IMAGE_00
+      Id=2049
+      IdPrev=0
+      IdPost=0
+      <Dispose>
+        xSize=170
+        ySize=256
+        <X0>
+          Mode=2
+          Off=0
+          Id=0
+        </X0>
+        <Y0>
+          Mode=2
+          Off=0
+          Id=0
+        </Y0>
+      </Dispose>
+      <SetTile>
+      </SetTile>
+      <SetSbitmap>
+        Image=Back2c.bmp
+      </SetSbitmap>
+    </Image>
     <Text>
       ParentId=2048
       IdString=ID_NUM_FPS
@@ -680,272 +1127,6 @@
     </Text>
     <Text>
       ParentId=2048
-      IdString=ID_NUM_01
-      Id=2055
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=75
-        ySize=28
-        <Y0>
-          Mode=2
-          Off=20
-          Id=0
-        </Y0>
-        <X1>
-          Mode=2
-          Off=600
-          Id=0
-        </X1>
-      </Dispose>
-      <SetColor>
-        Color=ffffffff
-      </SetColor>
-      <SetTextAlign>
-        Alignment=13
-        xOff=0
-        yOff=0
-      </SetTextAlign>
-      <SetFont>
-        Font=51_30_Normal_EXT.xbf
-      </SetFont>
-      <SetDecMode>
-        Len=3
-        Shift=0
-        Signed=0
-        Space=1
-      </SetDecMode>
-    </Text>
-    <Text>
-      ParentId=2048
-      IdString=ID_NUM_02
-      Id=2056
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=75
-        ySize=28
-        <Y0>
-          Mode=2
-          Off=58
-          Id=0
-        </Y0>
-        <X1>
-          Mode=2
-          Off=600
-          Id=0
-        </X1>
-      </Dispose>
-      <SetColor>
-        Color=ffffffff
-      </SetColor>
-      <SetTextAlign>
-        Alignment=13
-        xOff=0
-        yOff=0
-      </SetTextAlign>
-      <SetFont>
-        Font=51_30_Normal_EXT.xbf
-      </SetFont>
-      <SetDecMode>
-        Len=3
-        Shift=0
-        Signed=0
-        Space=1
-      </SetDecMode>
-    </Text>
-    <Text>
-      ParentId=2048
-      IdString=ID_NUM_03
-      Id=2057
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=75
-        ySize=28
-        <Y0>
-          Mode=2
-          Off=96
-          Id=0
-        </Y0>
-        <X1>
-          Mode=2
-          Off=600
-          Id=0
-        </X1>
-      </Dispose>
-      <SetColor>
-        Color=ffffffff
-      </SetColor>
-      <SetTextAlign>
-        Alignment=13
-        xOff=0
-        yOff=0
-      </SetTextAlign>
-      <SetFont>
-        Font=51_30_Normal_EXT.xbf
-      </SetFont>
-      <SetDecMode>
-        Len=3
-        Shift=0
-        Signed=0
-        Space=1
-      </SetDecMode>
-    </Text>
-    <Text>
-      ParentId=2048
-      IdString=ID_NUM_04
-      Id=2058
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=75
-        ySize=28
-        <Y0>
-          Mode=2
-          Off=134
-          Id=0
-        </Y0>
-        <X1>
-          Mode=2
-          Off=600
-          Id=0
-        </X1>
-      </Dispose>
-      <SetColor>
-        Color=ffffffff
-      </SetColor>
-      <SetTextAlign>
-        Alignment=13
-        xOff=0
-        yOff=0
-      </SetTextAlign>
-      <SetFont>
-        Font=51_30_Normal_EXT.xbf
-      </SetFont>
-      <SetDecMode>
-        Len=3
-        Shift=0
-        Signed=0
-        Space=1
-      </SetDecMode>
-    </Text>
-    <Text>
-      ParentId=2048
-      IdString=ID_NUM_05
-      Id=2059
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=75
-        ySize=28
-        <Y0>
-          Mode=2
-          Off=172
-          Id=0
-        </Y0>
-        <X1>
-          Mode=2
-          Off=600
-          Id=0
-        </X1>
-      </Dispose>
-      <SetColor>
-        Color=ffffffff
-      </SetColor>
-      <SetTextAlign>
-        Alignment=13
-        xOff=0
-        yOff=0
-      </SetTextAlign>
-      <SetFont>
-        Font=51_30_Normal_EXT.xbf
-      </SetFont>
-      <SetDecMode>
-        Len=3
-        Shift=0
-        Signed=0
-        Space=1
-      </SetDecMode>
-    </Text>
-    <Text>
-      ParentId=2048
-      IdString=ID_NUM_06
-      Id=2060
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=75
-        ySize=28
-        <Y0>
-          Mode=2
-          Off=209
-          Id=0
-        </Y0>
-        <X1>
-          Mode=2
-          Off=600
-          Id=0
-        </X1>
-      </Dispose>
-      <SetColor>
-        Color=ffffffff
-      </SetColor>
-      <SetTextAlign>
-        Alignment=13
-        xOff=0
-        yOff=0
-      </SetTextAlign>
-      <SetFont>
-        Font=51_30_Normal_EXT.xbf
-      </SetFont>
-      <SetDecMode>
-        Len=5
-        Shift=1
-        Signed=0
-        Space=1
-      </SetDecMode>
-    </Text>
-    <Text>
-      ParentId=2048
-      IdString=ID_NUM_AF
-      Id=2061
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=130
-        ySize=50
-        <X0>
-          Mode=2
-          Off=419
-          Id=0
-        </X0>
-        <Y0>
-          Mode=2
-          Off=193
-          Id=0
-        </Y0>
-      </Dispose>
-      <SetColor>
-        Color=ffffffff
-      </SetColor>
-      <SetTextAlign>
-        Alignment=14
-        xOff=0
-        yOff=0
-      </SetTextAlign>
-      <SetFont>
-        Font=51_40_Normal_EXT.xbf
-      </SetFont>
-      <SetDecMode>
-        Len=5
-        Shift=1
-        Signed=0
-        Space=1
-      </SetDecMode>
-    </Text>
-    <Text>
-      ParentId=2048
       IdString=ID_NUM_SPEED
       Id=2062
       IdPrev=0
@@ -955,7 +1136,7 @@
         ySize=28
         <X0>
           Mode=2
-          Off=604
+          Off=9
           Id=0
         </X0>
         <Y0>
@@ -978,321 +1159,6 @@
       <SetDecMode>
         Len=3
         Shift=0
-        Signed=0
-        Space=1
-      </SetDecMode>
-    </Text>
-    <Text>
-      ParentId=2048
-      IdString=ID_NUM_GEAR
-      Id=2063
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=100
-        ySize=100
-        <X0>
-          Mode=2
-          Off=496
-          Id=0
-        </X0>
-        <Y0>
-          Mode=2
-          Off=72
-          Id=0
-        </Y0>
-      </Dispose>
-      <SetColor>
-        Color=ffff5500
-      </SetColor>
-      <SetTextAlign>
-        Alignment=14
-        xOff=0
-        yOff=0
-      </SetTextAlign>
-      <SetTextId>
-        Id=1
-      </SetTextId>
-      <SetFont>
-        Font=SuiGenerisRg_120_Bold_EXT.xbf
-      </SetFont>
-    </Text>
-    <Text>
-      ParentId=2048
-      IdString=ID_NUM_RV
-      Id=2064
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=100
-        ySize=28
-        <X0>
-          Mode=2
-          Off=365
-          Id=0
-        </X0>
-        <Y0>
-          Mode=2
-          Off=143
-          Id=0
-        </Y0>
-      </Dispose>
-      <SetColor>
-        Color=ffffffff
-      </SetColor>
-      <SetTextAlign>
-        Alignment=13
-        xOff=0
-        yOff=0
-      </SetTextAlign>
-      <SetFont>
-        Font=51_30_Normal_EXT.xbf
-      </SetFont>
-      <SetTextId>
-        Id=18
-      </SetTextId>
-    </Text>
-    <Text>
-      ParentId=2048
-      IdString=ID_NUM_BT_01
-      Id=2065
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=40
-        ySize=28
-        <Y0>
-          Mode=2
-          Off=17
-          Id=0
-        </Y0>
-        <X1>
-          Mode=2
-          Off=19
-          Id=0
-        </X1>
-      </Dispose>
-      <SetColor>
-        Color=ffffffff
-      </SetColor>
-      <SetTextAlign>
-        Alignment=13
-        xOff=0
-        yOff=0
-      </SetTextAlign>
-      <SetDecMode>
-        Len=6
-        Shift=1
-        Signed=0
-        Space=1
-      </SetDecMode>
-    </Text>
-    <Text>
-      ParentId=2048
-      IdString=ID_NUM_BL_01
-      Id=2066
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=40
-        ySize=28
-        <Y0>
-          Mode=2
-          Off=31
-          Id=0
-        </Y0>
-        <X1>
-          Mode=2
-          Off=19
-          Id=0
-        </X1>
-      </Dispose>
-      <SetColor>
-        Color=ffffffff
-      </SetColor>
-      <SetTextAlign>
-        Alignment=13
-        xOff=0
-        yOff=0
-      </SetTextAlign>
-      <SetDecMode>
-        Len=6
-        Shift=1
-        Signed=0
-        Space=1
-      </SetDecMode>
-    </Text>
-    <Text>
-      ParentId=2048
-      IdString=ID_NUM_FL_01
-      Id=2067
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=40
-        ySize=28
-        <Y0>
-          Mode=2
-          Off=45
-          Id=0
-        </Y0>
-        <X1>
-          Mode=2
-          Off=19
-          Id=0
-        </X1>
-      </Dispose>
-      <SetColor>
-        Color=ffffffff
-      </SetColor>
-      <SetTextAlign>
-        Alignment=13
-        xOff=0
-        yOff=0
-      </SetTextAlign>
-      <SetDecMode>
-        Len=6
-        Shift=1
-        Signed=0
-        Space=1
-      </SetDecMode>
-    </Text>
-    <Text>
-      ParentId=2048
-      IdString=ID_NUM_AD_01
-      Id=2052
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=40
-        ySize=28
-        <Y0>
-          Mode=2
-          Off=58
-          Id=0
-        </Y0>
-        <X1>
-          Mode=2
-          Off=19
-          Id=0
-        </X1>
-      </Dispose>
-      <SetColor>
-        Color=ffffffff
-      </SetColor>
-      <SetTextAlign>
-        Alignment=13
-        xOff=0
-        yOff=0
-      </SetTextAlign>
-      <SetDecMode>
-        Len=6
-        Shift=1
-        Signed=0
-        Space=1
-      </SetDecMode>
-    </Text>
-    <Text>
-      ParentId=2048
-      IdString=ID_NUM_AD_02
-      Id=2071
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=40
-        ySize=28
-        <Y0>
-          Mode=2
-          Off=72
-          Id=0
-        </Y0>
-        <X1>
-          Mode=2
-          Off=19
-          Id=0
-        </X1>
-      </Dispose>
-      <SetColor>
-        Color=ffffffff
-      </SetColor>
-      <SetTextAlign>
-        Alignment=13
-        xOff=0
-        yOff=0
-      </SetTextAlign>
-      <SetDecMode>
-        Len=6
-        Shift=1
-        Signed=0
-        Space=1
-      </SetDecMode>
-    </Text>
-    <Text>
-      ParentId=2048
-      IdString=ID_NUM_AD_03
-      Id=2072
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=40
-        ySize=28
-        <Y0>
-          Mode=2
-          Off=86
-          Id=0
-        </Y0>
-        <X1>
-          Mode=2
-          Off=19
-          Id=0
-        </X1>
-      </Dispose>
-      <SetColor>
-        Color=ffffffff
-      </SetColor>
-      <SetTextAlign>
-        Alignment=13
-        xOff=0
-        yOff=0
-      </SetTextAlign>
-      <SetDecMode>
-        Len=6
-        Shift=1
-        Signed=0
-        Space=1
-      </SetDecMode>
-    </Text>
-    <Text>
-      ParentId=2048
-      IdString=ID_NUM_AD_04
-      Id=2073
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=40
-        ySize=28
-        <Y0>
-          Mode=2
-          Off=99
-          Id=0
-        </Y0>
-        <X1>
-          Mode=2
-          Off=19
-          Id=0
-        </X1>
-      </Dispose>
-      <SetColor>
-        Color=ffffffff
-      </SetColor>
-      <SetTextAlign>
-        Alignment=13
-        xOff=0
-        yOff=0
-      </SetTextAlign>
-      <SetDecMode>
-        Len=6
-        Shift=1
         Signed=0
         Space=1
       </SetDecMode>
@@ -1384,7 +1250,7 @@
         ySize=15
         <X0>
           Mode=2
-          Off=612
+          Off=16
           Id=0
         </X0>
         <Y0>
@@ -1403,36 +1269,6 @@
       <SetTile>
       </SetTile>
     </Progbar>
-    <Text>
-      ParentId=2048
-      IdString=ID_NUM_TIME
-      Id=2050
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=72
-        ySize=17
-        <X0>
-          Mode=2
-          Off=510
-          Id=0
-        </X0>
-        <Y0>
-          Mode=2
-          Off=0
-          Id=0
-        </Y0>
-      </Dispose>
-      <SetColor>
-        Color=ffc0c0c0
-      </SetColor>
-      <SetFont>
-        Font=51_20_Normal_EXT.xbf
-      </SetFont>
-      <SetTextId>
-        Id=17
-      </SetTextId>
-    </Text>
   </Objects>
   <Interactions>
     <START>
@@ -1463,95 +1299,26 @@
         RootId=6146
       </Para>
     </SWAPSCREEN>
-    <SETVIS>
+    <MODALMESSAGE>
       RootId=6146
-      IdSrc=ID_SCREEN_01
+      IdSrc=ID_SCREEN_01a
       NCode=APPW_NOTIFICATION_INITDIALOG
-      IdDst=ID_NUM_BT_01
-      Slot=ID_SCREEN_01__APPW_NOTIFICATION_INITDIALOG__ID_NUM_BT_01__APPW_JOB_SETVIS
+      Slot=ID_SCREEN_01a__APPW_NOTIFICATION_INITDIALOG
       Flags=0
       <Para>
-        OnOff=0
+        RootId=6145
       </Para>
-    </SETVIS>
-    <SETVIS>
+    </MODALMESSAGE>
+    <MODALMESSAGE>
       RootId=6146
-      IdSrc=ID_SCREEN_01
+      IdSrc=ID_SCREEN_01a
       NCode=APPW_NOTIFICATION_INITDIALOG
-      IdDst=ID_NUM_FL_01
-      Slot=ID_SCREEN_01__APPW_NOTIFICATION_INITDIALOG__ID_NUM_FL_01__APPW_JOB_SETVIS
+      Slot=ID_SCREEN_01a__APPW_NOTIFICATION_INITDIALOG_0
       Flags=0
       <Para>
-        OnOff=0
+        RootId=6148
       </Para>
-    </SETVIS>
-    <SETVIS>
-      RootId=6146
-      IdSrc=ID_SCREEN_01
-      NCode=APPW_NOTIFICATION_INITDIALOG
-      IdDst=ID_NUM_BL_01
-      Slot=ID_SCREEN_01__APPW_NOTIFICATION_INITDIALOG__ID_NUM_BL_01__APPW_JOB_SETVIS
-      Flags=0
-      <Para>
-        OnOff=0
-      </Para>
-    </SETVIS>
-    <SETVIS>
-      RootId=6146
-      IdSrc=ID_SCREEN_01
-      NCode=APPW_NOTIFICATION_INITDIALOG
-      IdDst=ID_NUM_AD_01
-      Slot=ID_SCREEN_01__APPW_NOTIFICATION_INITDIALOG__ID_NUM_AD_01__APPW_JOB_SETVIS
-      Flags=0
-      <Para>
-        OnOff=0
-      </Para>
-    </SETVIS>
-    <SETVIS>
-      RootId=6146
-      IdSrc=ID_SCREEN_01
-      NCode=APPW_NOTIFICATION_INITDIALOG
-      IdDst=ID_NUM_AD_02
-      Slot=ID_SCREEN_01__APPW_NOTIFICATION_INITDIALOG__ID_NUM_AD_02__APPW_JOB_SETVIS
-      Flags=0
-      <Para>
-        OnOff=0
-      </Para>
-    </SETVIS>
-    <SETVIS>
-      RootId=6146
-      IdSrc=ID_SCREEN_01
-      NCode=APPW_NOTIFICATION_INITDIALOG
-      IdDst=ID_NUM_AD_03
-      Slot=ID_SCREEN_01__APPW_NOTIFICATION_INITDIALOG__ID_NUM_AD_03__APPW_JOB_SETVIS
-      Flags=0
-      <Para>
-        OnOff=0
-      </Para>
-    </SETVIS>
-    <SETVIS>
-      RootId=6146
-      IdSrc=ID_SCREEN_01
-      NCode=APPW_NOTIFICATION_INITDIALOG
-      IdDst=ID_NUM_AD_04
-      Slot=ID_SCREEN_01__APPW_NOTIFICATION_INITDIALOG__ID_NUM_AD_04__APPW_JOB_SETVIS
-      Flags=0
-      <Para>
-        OnOff=0
-      </Para>
-    </SETVIS>
-    <SETVALUE>
-      RootId=6146
-      IdSrc=ID_VAR_FPS
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_NUM_FPS
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_FPS__APPW_JOB_SETVALUE
-      Comment=FPS反映
-      Flags=65537
-      <Para>
-        Value=4110
-      </Para>
-    </SETVALUE>
+    </MODALMESSAGE>
     <SETVALUE>
       RootId=6146
       IdSrc=ID_VAR_REV_A
@@ -1568,82 +1335,10 @@
       IdSrc=ID_VAR_REV
       NCode=WM_NOTIFICATION_VALUE_CHANGED
       IdDst=ID_GAUGE_00
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_GAUGE_00__APPW_JOB_SETVALUE
+      Slot=ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_GAUGE_00__APPW_JOB_SETVALUE
       Flags=65537
       <Para>
         Value=4104
-      </Para>
-    </SETVALUE>
-    <SETVALUE>
-      RootId=6146
-      IdSrc=ID_VAR_01
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_NUM_01
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_01__APPW_JOB_SETVALUE
-      Comment=NUM1反映
-      Flags=65537
-      <Para>
-        Value=4097
-      </Para>
-    </SETVALUE>
-    <SETVALUE>
-      RootId=6146
-      IdSrc=ID_VAR_02
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_NUM_02
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_02__APPW_JOB_SETVALUE
-      Comment=NUM2反映
-      Flags=65537
-      <Para>
-        Value=4098
-      </Para>
-    </SETVALUE>
-    <SETVALUE>
-      RootId=6146
-      IdSrc=ID_VAR_03
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_NUM_03
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_03__APPW_JOB_SETVALUE
-      Comment=NUM3反映
-      Flags=65537
-      <Para>
-        Value=4099
-      </Para>
-    </SETVALUE>
-    <SETVALUE>
-      RootId=6146
-      IdSrc=ID_VAR_04
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_NUM_04
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_04__APPW_JOB_SETVALUE
-      Comment=NUM4反映
-      Flags=65537
-      <Para>
-        Value=4100
-      </Para>
-    </SETVALUE>
-    <SETVALUE>
-      RootId=6146
-      IdSrc=ID_VAR_05
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_NUM_05
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_05__APPW_JOB_SETVALUE
-      Comment=NUM5反映
-      Flags=65537
-      <Para>
-        Value=4101
-      </Para>
-    </SETVALUE>
-    <SETVALUE>
-      RootId=6146
-      IdSrc=ID_VAR_06
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_NUM_06
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_06__APPW_JOB_SETVALUE
-      Comment=NUM6反映
-      Flags=65537
-      <Para>
-        Value=4102
       </Para>
     </SETVALUE>
     <SETVALUE>
@@ -1668,78 +1363,6 @@
       Flags=65537
       <Para>
         Value=4104
-      </Para>
-    </SETVALUE>
-    <SETVALUE>
-      RootId=6146
-      IdSrc=ID_VAR_BATT
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_NUM_BT_01
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_BT_01__APPW_JOB_SETVALUE
-      Comment=BATT反映
-      Flags=65537
-      <Para>
-        Value=4108
-      </Para>
-    </SETVALUE>
-    <SETVALUE>
-      RootId=6146
-      IdSrc=ID_VAR_BL1
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_NUM_BL_01
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_BL_01__APPW_JOB_SETVALUE
-      Comment=BL1反映
-      Flags=65537
-      <Para>
-        Value=4107
-      </Para>
-    </SETVALUE>
-    <SETVALUE>
-      RootId=6146
-      IdSrc=ID_VAR_FL1
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_NUM_FL_01
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_FL_01__APPW_JOB_SETVALUE
-      Comment=FL1反映
-      Flags=65537
-      <Para>
-        Value=4106
-      </Para>
-    </SETVALUE>
-    <SETVALUE>
-      RootId=6146
-      IdSrc=ID_VAR_SPEED
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_NUM_SPEED
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_SPEED__APPW_JOB_SETVALUE
-      Comment=SPEED反映
-      Flags=65537
-      <Para>
-        Value=4109
-      </Para>
-    </SETVALUE>
-    <SETVALUE>
-      RootId=6146
-      IdSrc=ID_VAR_ODO
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_NUM_ODO
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_ODO__APPW_JOB_SETVALUE
-      Comment=ODO反映
-      Flags=65537
-      <Para>
-        Value=4111
-      </Para>
-    </SETVALUE>
-    <SETVALUE>
-      RootId=6146
-      IdSrc=ID_VAR_TRIP
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_NUM_TRIP
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_TRIP__APPW_JOB_SETVALUE
-      Comment=TRIP反映
-      Flags=65537
-      <Para>
-        Value=4112
       </Para>
     </SETVALUE>
     <SETTEXT>
@@ -1834,70 +1457,116 @@
       </Para>
     </SETTEXT>
     <SETVALUE>
-      RootId=6146
-      IdSrc=ID_SCREEN_01
-      NCode=APPW_NOTIFICATION_INITDIALOG
-      IdDst=ID_VAR_SW
-      Slot=ID_SCREEN_01__APPW_NOTIFICATION_INITDIALOG
+      RootId=6145
+      IdSrc=ID_VAR_01
+      NCode=WM_NOTIFICATION_VALUE_CHANGED
+      IdDst=ID_NUM_01
+      Slot=ID_SCREEN_01_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_01__APPW_JOB_SETVALUE
+      Comment=NUM1反映
+      Flags=65537
+      <Para>
+        Value=4097
+      </Para>
+    </SETVALUE>
+    <SETVALUE>
+      RootId=6145
+      IdSrc=ID_VAR_02
+      NCode=WM_NOTIFICATION_VALUE_CHANGED
+      IdDst=ID_NUM_02
+      Slot=ID_SCREEN_01_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_02__APPW_JOB_SETVALUE
+      Comment=NUM2反映
+      Flags=65537
+      <Para>
+        Value=4098
+      </Para>
+    </SETVALUE>
+    <SETVALUE>
+      RootId=6145
+      IdSrc=ID_VAR_03
+      NCode=WM_NOTIFICATION_VALUE_CHANGED
+      IdDst=ID_NUM_03
+      Slot=ID_SCREEN_01_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_03__APPW_JOB_SETVALUE
+      Comment=NUM3反映
+      Flags=65537
+      <Para>
+        Value=4099
+      </Para>
+    </SETVALUE>
+    <SETVALUE>
+      RootId=6145
+      IdSrc=ID_VAR_04
+      NCode=WM_NOTIFICATION_VALUE_CHANGED
+      IdDst=ID_NUM_04
+      Slot=ID_SCREEN_01_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_04__APPW_JOB_SETVALUE
+      Comment=NUM4反映
+      Flags=65537
+      <Para>
+        Value=4100
+      </Para>
+    </SETVALUE>
+    <SETVALUE>
+      RootId=6145
+      IdSrc=ID_VAR_05
+      NCode=WM_NOTIFICATION_VALUE_CHANGED
+      IdDst=ID_NUM_05
+      Slot=ID_SCREEN_01_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_05__APPW_JOB_SETVALUE
+      Comment=NUM5反映
+      Flags=65537
+      <Para>
+        Value=4101
+      </Para>
+    </SETVALUE>
+    <SETVALUE>
+      RootId=6145
+      IdSrc=ID_VAR_06
+      NCode=WM_NOTIFICATION_VALUE_CHANGED
+      IdDst=ID_NUM_06
+      Slot=ID_SCREEN_01_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_06__APPW_JOB_SETVALUE
+      Comment=NUM6反映
+      Flags=65537
+      <Para>
+        Value=4102
+      </Para>
+    </SETVALUE>
+    <SETVALUE>
+      RootId=6148
+      IdSrc=ID_VAR_FPS
+      NCode=WM_NOTIFICATION_VALUE_CHANGED
+      IdDst=ID_NUM_FPS
+      Slot=ID_SCREEN_01c__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_FPS__APPW_JOB_SETVALUE
       Flags=0
       <Para>
         Value=0
       </Para>
     </SETVALUE>
     <SETVALUE>
-      RootId=6146
+      RootId=6148
+      IdSrc=ID_VAR_TRIP
+      NCode=WM_NOTIFICATION_VALUE_CHANGED
+      IdDst=ID_NUM_TRIP
+      Slot=ID_SCREEN_01c__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_TRIP__APPW_JOB_SETVALUE
+      Flags=0
+      <Para>
+        Value=0
+      </Para>
+    </SETVALUE>
+    <SETVALUE>
+      RootId=6148
+      IdSrc=ID_VAR_ODO
+      NCode=WM_NOTIFICATION_VALUE_CHANGED
+      IdDst=ID_NUM_ODO
+      Slot=ID_SCREEN_01c__WM_NOTIFICATION_VALUE_CHANGED
+      Flags=0
+      <Para>
+        Value=0
+      </Para>
+    </SETVALUE>
+    <SETVALUE>
+      RootId=6148
       IdSrc=ID_VAR_FUEL
       NCode=WM_NOTIFICATION_VALUE_CHANGED
       IdDst=ID_PROGBAR_00
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_PROGBAR_00__APPW_JOB_SETVALUE
-      Flags=65537
-      <Para>
-        Value=4115
-      </Para>
-    </SETVALUE>
-    <SETVALUE>
-      RootId=6146
-      IdSrc=ID_VAR_AD1
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_NUM_AD_01
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED
-      Comment=AD1反映
-      Flags=0
-      <Para>
-        Value=0
-      </Para>
-    </SETVALUE>
-    <SETVALUE>
-      RootId=6146
-      IdSrc=ID_VAR_AD2
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_NUM_AD_02
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_AD_02__APPW_JOB_SETVALUE
-      Comment=AD2反映
-      Flags=0
-      <Para>
-        Value=0
-      </Para>
-    </SETVALUE>
-    <SETVALUE>
-      RootId=6146
-      IdSrc=ID_VAR_AD3
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_NUM_AD_03
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_AD_03__APPW_JOB_SETVALUE
-      Comment=AD3反映
-      Flags=0
-      <Para>
-        Value=0
-      </Para>
-    </SETVALUE>
-    <SETVALUE>
-      RootId=6146
-      IdSrc=ID_VAR_AD4
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_NUM_AD_04
-      Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_AD_04__APPW_JOB_SETVALUE
-      Comment=AD4反映
+      Slot=ID_SCREEN_01c__WM_NOTIFICATION_VALUE_CHANGED__ID_PROGBAR_00__APPW_JOB_SETVALUE
       Flags=0
       <Para>
         Value=0
@@ -1905,8 +1574,8 @@
     </SETVALUE>
   </Interactions>
   <Selection>
-    Root=ID_SCREEN_01
-    Object=2048
+    Root=ID_SCREEN_01a
+    Object=2053
   </Selection>
   <Terms>
   </Terms>
