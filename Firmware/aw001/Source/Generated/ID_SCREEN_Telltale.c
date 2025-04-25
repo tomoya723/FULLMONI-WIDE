@@ -32,10 +32,10 @@ static APPW_CREATE_ITEM _aCreate[] = {
     ID_SCREEN_Telltale, 0,
     { { { DISPOSE_MODE_REL_PARENT, 0, 0, 0 },
         { DISPOSE_MODE_REL_PARENT, 0, 0, 0 },
-        { DISPOSE_MODE_REL_PARENT, 765, 0, 0 },
-        { DISPOSE_MODE_REL_PARENT, 0, 0, 0 },
+        { DISPOSE_MODE_NULL, 0, 0, 0 },
+        { DISPOSE_MODE_NULL, 0, 0, 0 },
       },
-      0, 0, 0, 0, 0, 0
+      35, 256, 0, 0, 0, 0
     },
     { 0, 0 }
   },
@@ -156,7 +156,6 @@ static APPW_CREATE_ITEM _aCreate[] = {
 *       _aSetup
 */
 static GUI_CONST_STORAGE APPW_SETUP_ITEM _aSetup[] = {
-  { ID_SCREEN_Telltale, APPW_SET_PROP_STAYONTOP,    { ARG_V(0) } },
   { ID_IMAGE_00,        APPW_SET_PROP_TILE,         { ARG_V(0) } },
   { ID_IMAGE_00,        APPW_SET_PROP_SBITMAP,      { ARG_VP(0, acw_back),
                                                       ARG_V(156), } },

@@ -156,10 +156,10 @@ static APPW_CREATE_ITEM _aCreate[] = {
 *       _aSetup
 */
 static GUI_CONST_STORAGE APPW_SETUP_ITEM _aSetup[] = {
-  { ID_SCREEN_Telltale, APPW_SET_PROP_STAYONTOP,    { ARG_V(0) } },
   { ID_IMAGE_00,        APPW_SET_PROP_TILE,         { ARG_V(0) } },
   { ID_IMAGE_00,        APPW_SET_PROP_SBITMAP,      { ARG_VP(0, acw_back),
                                                       ARG_V(156), } },
+  { ID_IMAGE_00,        APPW_SET_PROP_LQ,           { ARG_V(0) } },
   { ID_ICON_00,         APPW_SET_PROP_SBITMAP,      { ARG_VP(0, acws_masterwarning),
                                                       ARG_V(595), } },
   { ID_ICON_00,         APPW_SET_PROP_LQ,           { ARG_V(0) } },

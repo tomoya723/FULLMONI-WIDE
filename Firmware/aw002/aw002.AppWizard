@@ -131,13 +131,6 @@
     Item=4114,ID_VAR_REV_A,0
     Item=4113,ID_VAR_SW,0
     Item=4115,ID_VAR_FUEL,0
-    Item=4122,ID_VAR_WT_BAR,0
-    Item=4123,ID_VAR_IAT_BAR,0
-    Item=4125,ID_VAR_OT_BAR,0
-    Item=4120,ID_VAR_MAP_BAR,0
-    Item=4121,ID_VAR_OILP_BAR,0
-    Item=4124,ID_VAR_BATT_BAR,0
-    Item=4126,ID_VAR_AFR_BAR,0
     Item=4116,ID_VAR_AD1,0
     Item=4117,ID_VAR_AD2,0
     Item=4118,ID_VAR_AD3,0
@@ -252,9 +245,6 @@
           Id=0
         </Y1>
       </Dispose>
-      <SetStayOnTop>
-        SetStayOnTop=true
-      </SetStayOnTop>
     </Screen>
     <Image>
       ParentId=2048
@@ -281,6 +271,8 @@
       <SetSbitmap>
         Image=w_back.png
       </SetSbitmap>
+      <SetLQ>
+      </SetLQ>
     </Image>
     <Image>
       ParentId=2048
@@ -2270,7 +2262,7 @@
     </SETVALUE>
     <SETVALUE>
       RootId=6145
-      IdSrc=ID_VAR_AFR_BAR
+      IdSrc=ID_VAR_AF
       NCode=WM_NOTIFICATION_VALUE_CHANGED
       IdDst=ID_PROGBAR_AFR
       Slot=ID_SCREEN_02__WM_NOTIFICATION_VALUE_CHANGED__ID_PROGBAR_AFR__APPW_JOB_SETVALUE
@@ -2665,10 +2657,6 @@
       </Para>
     </SETVALUE>
   </Interactions>
-  <Selection>
-    Root=ID_SCREEN_01c
-    Object=2048
-  </Selection>
   <Terms>
   </Terms>
   <AnimItems>
