@@ -138,7 +138,7 @@ extern APPW_ROOT_INFO ID_SCREEN_01c_RootInfo;
 *
 *       Project path
 */
-#define APPW_PROJECT_PATH "C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001"
+#define APPW_PROJECT_PATH "D:/git/FULLMONI-WIDE/Firmware/aw001"
 
 #endif  // RESOURCE_H
 
