@@ -1,11 +1,8 @@
+# FULLMONI-WIDE 製品概要
 ![FM1](IMG/FM1.png)<br>
 ## FULLMONI-WIDE
 ![FM1](IMG/FM2.png)<br>
 ![FM1](IMG/FM3.png)<br>
-# FULLMONI-WIDE 製品概要
-
-![FULLMONI-WIDEによるワイド液晶メータ表示例](path/to/image.jpg)  
-*図1: FULLMONI-WIDEによるワイド液晶メータ表示例（オープンハードウェアの自動車デジタルメータ）*
 
 ## 製品概要
 FULLMONI-WIDEは、オープンハードウェアの自動車用デジタルメータです。  
@@ -53,4 +50,3 @@ FULLMONI-WIDEは、オープンハードウェアの自動車用デジタルメ�
 
 ---
 
-※`path/to/image.jpg` はWikiにアップロードした画像のパスに差し替えてください。
