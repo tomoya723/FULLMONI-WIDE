@@ -22,12 +22,13 @@ SOFTWARE.
 
 ## Licensing / Third-Party Notices
 - The **original code** for this project (e.g., custom `.c/.h` files in `Firmware/src`) is licensed under the **MIT License**. 
-- However, the following **third-party materials** are subject to the terms and conditions of their respective companies (i.e., not covered by the MIT License):
-- **Renesas FIT / generated code** (e.g., `smc_gen`)  
-    - Unwarranted license intended for use on Renesas products. Please retain the copyright notice and disclaimer comments without modification.
-- **SEGGER emWin** (GUI library)
-- This repository does not **redistribute** it. Those who need it should obtain it officially and run `scripts/get_emwin.sh` to install it.  
-    - emWin has a redistribution prohibition clause, and cannot be distributed to third parties without the express permission of SEGGER.
+- However, the following **third-party materials** are subject to the terms and conditions of each company (i.e., not covered by the MIT License):
+- **Renesas FIT / generated code** (e.g., `smc_gen`)
+- A no-warranty license intended for use on Renesas products. Please retain the copyright notice and disclaimer comments without modification.
+  - **SEGGER emWin** (GUI library)
+- This repository does not redistribute emWin.  
+Generate code from the preconfigured Smart Configurator and register “r_emwin_rx” in your project.  
+- emWin has a redistribution prohibition clause, and cannot be distributed to third parties without explicit permission from SEGGER.
 ### License Scope
 - **MIT**: Original code in general 
 - **Renesas License**: FIT/generated code 
