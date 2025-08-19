@@ -45,8 +45,3 @@ Desktop.ini
 Firmware/src/**/r_emwin_rx/**
 Firmware/src/**/SEGGER/**
 Firmware/src/**/GUI/**
-
-# emWin (SEGGER) は公開対象外
-Firmware/src/**/r_emwin_rx/**
-Firmware/src/**/SEGGER/**
-Firmware/src/**/GUI/**
