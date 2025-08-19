@@ -8,7 +8,7 @@ Renesas e2Studio + GNU GCC-RX + SEGGER emWIN<br>
   - **Renesas FIT / 生成コード**（`smc_gen` 等）  
     - Renesas製品上での利用を前提とする無保証ライセンス。著作権表記・免責コメントを改変せず保持してください。
   - **SEGGER emWin**（GUIライブラリ）  
-    - 本リポジトリでは **再配布しません**。必要な方は各自で正規入手し、`scripts/get_emwin.sh` を実行して配置してください。  
+    - 本リポジトリでは **再配布しません**。スマートコンフィグレータからコード生成を実行し`r_emwin_rx`をプロジェクトに追加してください。
     - emWinは再配布禁止条項があり、SEGGERの明示許諾なしに第三者へ配布できません。
 ### ライセンスの適用範囲
 - **MIT**: オリジナルコード全般  
@@ -17,17 +17,17 @@ Renesas e2Studio + GNU GCC-RX + SEGGER emWIN<br>
 
 詳細は `THIRD_PARTY_NOTICES.md` を参照してください。
 
-- The **original code** for this project (e.g., custom `.c/.h` files in `Firmware/src`) is licensed under the **MIT License**. 
-- However, the following **third-party materials** are subject to the terms and conditions of their respective companies (i.e., not covered by the MIT License):
-- **Renesas FIT / generated code** (e.g., `smc_gen`)  
-    - Unwarranted license intended for use on Renesas products. Please retain the copyright notice and disclaimer comments without modification.
-- **SEGGER emWin** (GUI library)
-- This repository does not **redistribute** it. Those who need it should obtain it officially and run `scripts/get_emwin.sh` to install it.  
-    - emWin has a redistribution prohibition clause, and cannot be distributed to third parties without the express permission of SEGGER.
-### License Scope
-- **MIT**: Original code in general 
-- **Renesas License**: FIT/generated code 
-- **SEGGER License**: emWin (not redistributable)
+- The **original code** of this project (e.g., self-made `.c/.h` files in `Firmware/src`) is licensed under the **MIT License**.
+- However, the following **third-party materials** are subject to the terms and conditions of each company (i.e., not covered by the MIT License):
+- **Renesas FIT / Generated Code** (e.g., `smc_gen`)
+- A no-warranty license intended for use on Renesas products. Please retain the copyright notices and disclaimer comments without modification.
+  - **SEGGER emWin** (GUI library)
+- This repository does not redistribute emWin. Please generate code using the Smart Configurator and add `r_emwin_rx` to your project.
+- emWin has a redistribution prohibition clause, and cannot be distributed to third parties without explicit permission from SEGGER.
+### Scope of License Application
+- **MIT**: Original code in general
+- **Renesas License**: FIT/generated code
+- **SEGGER License**: emWin (redistribution prohibited)
 
 For details, refer to `THIRD_PARTY_NOTICES.md`.
 
