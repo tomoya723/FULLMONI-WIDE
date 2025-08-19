@@ -2,6 +2,36 @@
 Renesas e2Studio + GNU GCC-RX + SEGGER emWIN<br>
 順次更新予定
 ***
+## サードパーティライセンスについて
+- 本プロジェクトの**オリジナルコード**（例: `Firmware/src` の自作 `.c/.h` 等）は **MIT License** です。  
+- ただし、以下の**第三者提供物**は各社の条件が優先されます（＝MITの適用外）:
+  - **Renesas FIT / 生成コード**（`smc_gen` 等）  
+    - Renesas製品上での利用を前提とする無保証ライセンス。著作権表記・免責コメントを改変せず保持してください。
+  - **SEGGER emWin**（GUIライブラリ）  
+    - 本リポジトリでは **再配布しません**。必要な方は各自で正規入手し、`scripts/get_emwin.sh` を実行して配置してください。  
+    - emWinは再配布禁止条項があり、SEGGERの明示許諾なしに第三者へ配布できません。
+### ライセンスの適用範囲
+- **MIT**: オリジナルコード全般  
+- **Renesasライセンス**: FIT/生成コード  
+- **SEGGERライセンス**: emWin（再配布不可）
+
+詳細は `THIRD_PARTY_NOTICES.md` を参照してください。
+
+- The **original code** for this project (e.g., custom `.c/.h` files in `Firmware/src`) is licensed under the **MIT License**. 
+- However, the following **third-party materials** are subject to the terms and conditions of their respective companies (i.e., not covered by the MIT License):
+- **Renesas FIT / generated code** (e.g., `smc_gen`)  
+    - Unwarranted license intended for use on Renesas products. Please retain the copyright notice and disclaimer comments without modification.
+- **SEGGER emWin** (GUI library)
+- This repository does not **redistribute** it. Those who need it should obtain it officially and run `scripts/get_emwin.sh` to install it.  
+    - emWin has a redistribution prohibition clause, and cannot be distributed to third parties without the express permission of SEGGER.
+### License Scope
+- **MIT**: Original code in general 
+- **Renesas License**: FIT/generated code 
+- **SEGGER License**: emWin (not redistributable)
+
+For details, refer to `THIRD_PARTY_NOTICES.md`.
+
+***
 ## CAN data frame setting
 frame No1 address : 1000(dec) , 0x3E8(hex)
 |CAN Address|frame no| byte |assign|unit|multiplier(LSB)|
