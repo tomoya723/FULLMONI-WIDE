@@ -111,6 +111,7 @@ frame No6 address : 1005(dec) , 0x3ED(hex)
 ・Confirm that the middleware r_emwin_rx is already registered.<br>
 ・Click “Code Generation.”<br>
 ![image](https://github.com/user-attachments/assets/01f0507d-a2b9-420b-afb1-4e5bb2bbb660)<br>
+***
 ## emWin AppWizard resource swith setting
 The project provides multiple screen resources, so select the one you want to use.<br>
 Switch display resources by changing Eclipse source path settings and resource includes.<br>
