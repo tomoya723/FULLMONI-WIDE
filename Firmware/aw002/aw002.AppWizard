@@ -198,11 +198,11 @@
           Id=0
         </Y0>
       </Dispose>
-      <SetSbitmap>
-        Image=motec.bmp
-      </SetSbitmap>
       <SetLQ>
       </SetLQ>
+      <SetSbitmap>
+        Image=mtc.bmp
+      </SetSbitmap>
     </Image>
     <Timer>
       ParentId=2048
@@ -636,6 +636,44 @@
         Value=3450
       </SetValue>
     </Rotary>
+    <Rotary>
+      ParentId=2048
+      IdString=ID_ROTARY_01
+      Id=2052
+      IdPrev=0
+      IdPost=0
+      <Dispose>
+        xSize=256
+        ySize=256
+        <X0>
+          Mode=2
+          Off=-3
+          Id=0
+        </X0>
+        <Y0>
+          Mode=2
+          Off=0
+          Id=0
+        </Y0>
+      </Dispose>
+      <SetSbitmaps>
+        Index1=Marker_red_bar_20x7s.bmp
+      </SetSbitmaps>
+      <SetPos>
+        Pos=108
+      </SetPos>
+      <SetRotate>
+        Rotate=true
+      </SetRotate>
+      <SetOffset>
+        Offset=2700
+      </SetOffset>
+      <SetLQ>
+      </SetLQ>
+      <SetValue>
+        Value=2700
+      </SetValue>
+    </Rotary>
     <Text>
       ParentId=2048
       IdString=ID_NUM_AF
@@ -847,6 +885,16 @@
         Max=200
       </SetRange>
     </Progbar>
+    <Timer>
+      ParentId=2048
+      IdString=ID_TIMER_00
+      Id=2054
+      IdPrev=0
+      IdPost=0
+      <SetPeriod>
+        Period=3000
+      </SetPeriod>
+    </Timer>
     <Screen>
       ParentId=0
       IdString=ID_SCREEN_01b
@@ -1298,7 +1346,7 @@
         </X0>
         <Y0>
           Mode=2
-          Off=17
+          Off=21
           Id=0
         </Y0>
       </Dispose>
@@ -2269,6 +2317,37 @@
       Flags=0
       <Para>
         Value=0
+      </Para>
+    </SETVALUE>
+    <SETVALUE>
+      RootId=6145
+      IdSrc=ID_VAR_REV_A
+      NCode=WM_NOTIFICATION_VALUE_CHANGED
+      IdDst=ID_ROTARY_01
+      Slot=ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_ROTARY_01__APPW_JOB_SETVALUE
+      Flags=65537
+      Condition=A,1,IS_VAR,ID_VAR_REV_A,<,IS_OBJ,ID_ROTARY_01
+      <Para>
+        Value=4114
+      </Para>
+    </SETVALUE>
+    <START>
+      RootId=6145
+      IdSrc=ID_ROTARY_01
+      NCode=WM_NOTIFICATION_VALUE_CHANGED
+      IdDst=ID_TIMER_00
+      Slot=ID_SCREEN_01a__ID_ROTARY_01__WM_NOTIFICATION_VALUE_CHANGED__ID_TIMER_00__APPW_JOB_START
+      Flags=65536
+    </START>
+    <SETVALUE>
+      RootId=6145
+      IdSrc=ID_TIMER_00
+      NCode=APPW_NOTIFICATION_TIMER
+      IdDst=ID_ROTARY_01
+      Slot=ID_SCREEN_01a__ID_TIMER_00__APPW_NOTIFICATION_TIMER__ID_ROTARY_01__APPW_JOB_SETVALUE
+      Flags=1
+      <Para>
+        Value=4114
       </Para>
     </SETVALUE>
     <SETVALUE>

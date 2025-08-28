@@ -639,6 +639,7 @@
             <Setting id="ANx01_Add" value="Unuse"/>
             <Setting id="WindowABcomplex" value="AORB"/>
             <Setting id="S12CMPBIchk" value="Use"/>
+            <Setting id="CSHchk" value="Unuse"/>
             <Setting id="ANx01_Sampling" value="0.183"/>
             <Setting id="ANx02_CMPA" value="Unuse"/>
             <Setting id="DataAligh" value="Right"/>

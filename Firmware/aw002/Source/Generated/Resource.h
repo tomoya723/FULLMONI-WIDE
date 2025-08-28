@@ -63,7 +63,7 @@ extern GUI_CONST_STORAGE unsigned char acArial_16_Bold_EXT[];
 *
 *       Images
 */
-extern GUI_CONST_STORAGE unsigned char acmotec[];
+extern GUI_CONST_STORAGE unsigned char acmtc[];
 extern GUI_CONST_STORAGE unsigned char acw_back[];
 extern GUI_CONST_STORAGE unsigned char acws_masterwarning[];
 extern GUI_CONST_STORAGE unsigned char acws_oilpresswarning[];
@@ -76,6 +76,7 @@ extern GUI_CONST_STORAGE unsigned char acws_beltwarning[];
 extern GUI_CONST_STORAGE unsigned char acws_fuelcheck[];
 extern GUI_CONST_STORAGE unsigned char acBack5[];
 extern GUI_CONST_STORAGE unsigned char acMarker_red_bar_80x7s[];
+extern GUI_CONST_STORAGE unsigned char acMarker_red_bar_20x7s[];
 extern GUI_CONST_STORAGE unsigned char acBack6[];
 extern GUI_CONST_STORAGE unsigned char acBack7[];
 extern GUI_CONST_STORAGE unsigned char acfuel1[];

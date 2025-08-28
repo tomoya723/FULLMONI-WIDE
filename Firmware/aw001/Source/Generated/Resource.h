@@ -74,10 +74,12 @@ extern GUI_CONST_STORAGE unsigned char acws_beltwarning[];
 extern GUI_CONST_STORAGE unsigned char acws_fuelcheck[];
 extern GUI_CONST_STORAGE unsigned char acBack2a[];
 extern GUI_CONST_STORAGE unsigned char acMarker_red_bar_80x7s[];
+extern GUI_CONST_STORAGE unsigned char acMarker_red_bar_20x7s[];
 extern GUI_CONST_STORAGE unsigned char acBack2b[];
 extern GUI_CONST_STORAGE unsigned char acBack2c[];
 extern GUI_CONST_STORAGE unsigned char acfuel1[];
 extern GUI_CONST_STORAGE unsigned char acfuel2[];
+extern GUI_CONST_STORAGE unsigned char acmtc[];
 
 /*********************************************************************
 *
@@ -107,6 +109,7 @@ extern GUI_CONST_STORAGE unsigned char acfuel2[];
 #define ID_VAR_AD2 (GUI_ID_USER + 2069)
 #define ID_VAR_AD3 (GUI_ID_USER + 2070)
 #define ID_VAR_AD4 (GUI_ID_USER + 2071)
+#define ID_VAR_REV_Amax (GUI_ID_USER + 2072)
 
 /*********************************************************************
 *

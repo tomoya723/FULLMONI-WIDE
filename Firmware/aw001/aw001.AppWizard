@@ -57,6 +57,8 @@
     Format=Back2c.bmp,5
     Format=Marker_red_bar_80x21s.png,16
     Format=Marker_red_bar_80x21sw.png,16
+    Format=Marker_red_bar_80x7sb.png,16
+    Format=Marker_red_bar_20x7s.bmp,16
   </Bitmaps>
   <Movies>
   </Movies>
@@ -134,6 +136,7 @@
     Item=4117,ID_VAR_AD2,0
     Item=4118,ID_VAR_AD3,0
     Item=4119,ID_VAR_AD4,0
+    Item=4120,ID_VAR_REV_Amax,0
   </Variables>
   <FocusInfo>
     Color=ff2777b3
@@ -197,7 +200,7 @@
         </Y0>
       </Dispose>
       <SetSbitmap>
-        Image=motec.bmp
+        Image=mtc.bmp
       </SetSbitmap>
       <SetLQ>
       </SetLQ>
@@ -605,7 +608,7 @@
         </Y0>
       </Dispose>
       <SetSbitmaps>
-        Index1=Marker_red_bar_80x7s.png
+        Index1=Marker_red_bar_80x7s.bmp
       </SetSbitmaps>
       <SetPos>
         Pos=76
@@ -615,6 +618,44 @@
       </SetOffset>
       <SetValue>
         Value=3450
+      </SetValue>
+      <SetLQ>
+      </SetLQ>
+      <SetRotate>
+        Rotate=true
+      </SetRotate>
+    </Rotary>
+    <Rotary>
+      ParentId=2048
+      IdString=ID_ROTARY_01
+      Id=2052
+      IdPrev=0
+      IdPost=0
+      <Dispose>
+        xSize=256
+        ySize=256
+        <X0>
+          Mode=2
+          Off=0
+          Id=0
+        </X0>
+        <Y0>
+          Mode=2
+          Off=0
+          Id=0
+        </Y0>
+      </Dispose>
+      <SetSbitmaps>
+        Index1=Marker_red_bar_20x7s.bmp
+      </SetSbitmaps>
+      <SetPos>
+        Pos=106
+      </SetPos>
+      <SetOffset>
+        Offset=2700
+      </SetOffset>
+      <SetValue>
+        Value=2700
       </SetValue>
       <SetLQ>
       </SetLQ>
@@ -763,6 +804,16 @@
         Id=17
       </SetTextId>
     </Text>
+    <Timer>
+      ParentId=2048
+      IdString=ID_TIMER_00
+      Id=2054
+      IdPrev=0
+      IdPost=0
+      <SetPeriod>
+        Period=3000
+      </SetPeriod>
+    </Timer>
     <Screen>
       ParentId=0
       IdString=ID_SCREEN_01b
@@ -1457,6 +1508,37 @@
       </Para>
     </SETTEXT>
     <SETVALUE>
+      RootId=6146
+      IdSrc=ID_VAR_REV_A
+      NCode=WM_NOTIFICATION_VALUE_CHANGED
+      IdDst=ID_ROTARY_01
+      Slot=ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED
+      Flags=65537
+      Condition=A,1,IS_VAR,ID_VAR_REV_A,<,IS_OBJ,ID_ROTARY_01
+      <Para>
+        Value=4114
+      </Para>
+    </SETVALUE>
+    <START>
+      RootId=6146
+      IdSrc=ID_ROTARY_01
+      NCode=WM_NOTIFICATION_VALUE_CHANGED
+      IdDst=ID_TIMER_00
+      Slot=ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_TIMER_00__APPW_JOB_START
+      Flags=65536
+    </START>
+    <SETVALUE>
+      RootId=6146
+      IdSrc=ID_TIMER_00
+      NCode=APPW_NOTIFICATION_TIMER
+      IdDst=ID_ROTARY_01
+      Slot=ID_SCREEN_01a__ID_TIMER_00__APPW_NOTIFICATION_TIMER__ID_ROTARY_01__APPW_JOB_SETVALUE
+      Flags=1
+      <Para>
+        Value=4114
+      </Para>
+    </SETVALUE>
+    <SETVALUE>
       RootId=6145
       IdSrc=ID_VAR_01
       NCode=WM_NOTIFICATION_VALUE_CHANGED
@@ -1574,8 +1656,8 @@
     </SETVALUE>
   </Interactions>
   <Selection>
-    Root=ID_SCREEN_01a
-    Object=2053
+    Root=ID_SCREEN_00
+    Object=2050
   </Selection>
   <Terms>
   </Terms>

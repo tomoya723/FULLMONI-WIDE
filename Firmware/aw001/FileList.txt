@@ -30,10 +30,12 @@ C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Image/ws_beltwarning.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Image/ws_fuelcheck.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Image/Back2a.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Image/Marker_red_bar_80x7s.c
+C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Image/Marker_red_bar_20x7s.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Image/Back2b.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Image/Back2c.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Image/fuel1.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Image/fuel2.c
+C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Image/mtc.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Font/51_40_Normal_EXT.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Font/SuiGenerisRg_120_Bold_EXT.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Font/51_30_Normal_EXT.c

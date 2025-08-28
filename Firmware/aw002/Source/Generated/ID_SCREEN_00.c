@@ -68,9 +68,9 @@ static APPW_CREATE_ITEM _aCreate[] = {
 *       _aSetup
 */
 static GUI_CONST_STORAGE APPW_SETUP_ITEM _aSetup[] = {
-  { ID_IMAGE_01,  APPW_SET_PROP_SBITMAP,      { ARG_VP(0, acmotec),
-                                                ARG_V(587830), } },
   { ID_IMAGE_01,  APPW_SET_PROP_LQ,           { ARG_V(0) } },
+  { ID_IMAGE_01,  APPW_SET_PROP_SBITMAP,      { ARG_VP(0, acmtc),
+                                                ARG_V(587830), } },
   { ID_TIMER_00,  APPW_SET_PROP_PERIOD,       { ARG_V(1500) } },
 };
 

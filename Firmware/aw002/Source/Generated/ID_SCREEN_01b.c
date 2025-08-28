@@ -174,7 +174,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
   { WM_OBJECT_TEXT_Create,
     ID_NUM_01, ID_SCREEN_01b,
     { { { DISPOSE_MODE_REL_PARENT, 135, 0, 0 },
-        { DISPOSE_MODE_REL_PARENT, 17, 0, 0 },
+        { DISPOSE_MODE_REL_PARENT, 21, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
       },

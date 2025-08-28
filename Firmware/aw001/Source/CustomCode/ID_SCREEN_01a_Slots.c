@@ -178,4 +178,37 @@ void ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_GEAR__APPW_JOB_SETTEXT_
   GUI_USE_PARA(pResult);
 }
 
+/*********************************************************************
+*
+*       ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED
+*/
+void ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED(APPW_ACTION_ITEM * pAction, WM_HWIN hScreen, WM_MESSAGE * pMsg, int * pResult) {
+  GUI_USE_PARA(pAction);
+  GUI_USE_PARA(hScreen);
+  GUI_USE_PARA(pMsg);
+  GUI_USE_PARA(pResult);
+}
+
+/*********************************************************************
+*
+*       ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_TIMER_00__APPW_JOB_START
+*/
+void ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_TIMER_00__APPW_JOB_START(APPW_ACTION_ITEM * pAction, WM_HWIN hScreen, WM_MESSAGE * pMsg, int * pResult) {
+  GUI_USE_PARA(pAction);
+  GUI_USE_PARA(hScreen);
+  GUI_USE_PARA(pMsg);
+  GUI_USE_PARA(pResult);
+}
+
+/*********************************************************************
+*
+*       ID_SCREEN_01a__ID_TIMER_00__APPW_NOTIFICATION_TIMER__ID_ROTARY_01__APPW_JOB_SETVALUE
+*/
+void ID_SCREEN_01a__ID_TIMER_00__APPW_NOTIFICATION_TIMER__ID_ROTARY_01__APPW_JOB_SETVALUE(APPW_ACTION_ITEM * pAction, WM_HWIN hScreen, WM_MESSAGE * pMsg, int * pResult) {
+  GUI_USE_PARA(pAction);
+  GUI_USE_PARA(hScreen);
+  GUI_USE_PARA(pMsg);
+  GUI_USE_PARA(pResult);
+}
+
 /*************************** End of file ****************************/

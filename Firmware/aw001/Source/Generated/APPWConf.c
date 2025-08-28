@@ -90,6 +90,7 @@ static APPW_VAR_OBJECT _aVarList[] = {
   { ID_VAR_AD2, 0, 0, NULL },
   { ID_VAR_AD3, 0, 0, NULL },
   { ID_VAR_AD4, 0, 0, NULL },
+  { ID_VAR_REV_Amax, 0, 0, NULL },
 };
 
 /*********************************************************************

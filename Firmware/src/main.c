@@ -62,7 +62,7 @@ void ap_100ms(void);
 extern void LCD_FadeIN(void);
 
 void main(void)
-{
+ {
 	unsigned int shift_rev_cnt;
 
 //	R_Systeminit();

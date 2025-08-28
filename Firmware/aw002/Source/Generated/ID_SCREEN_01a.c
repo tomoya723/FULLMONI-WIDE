@@ -72,6 +72,17 @@ static APPW_CREATE_ITEM _aCreate[] = {
     },
     { 0, 0 }
   },
+  { WM_OBJECT_ROTARY_Create,
+    ID_ROTARY_01, ID_SCREEN_01a,
+    { { { DISPOSE_MODE_REL_PARENT, -3, 0, 0 },
+        { DISPOSE_MODE_REL_PARENT, 0, 0, 0 },
+        { DISPOSE_MODE_NULL, 0, 0, 0 },
+        { DISPOSE_MODE_NULL, 0, 0, 0 },
+      },
+      256, 256, 0, 0, 0, 0
+    },
+    { 0, 0 }
+  },
   { WM_OBJECT_TEXT_Create,
     ID_NUM_AF, ID_SCREEN_01a,
     { { { DISPOSE_MODE_REL_PARENT, 193, 0, 0 },
@@ -138,6 +149,17 @@ static APPW_CREATE_ITEM _aCreate[] = {
     },
     { 0, 0 }
   },
+  { WM_OBJECT_TIMER_Create,
+    ID_TIMER_00, ID_SCREEN_01a,
+    { { { DISPOSE_MODE_NULL, 0, 0, 0 },
+        { DISPOSE_MODE_NULL, 0, 0, 0 },
+        { DISPOSE_MODE_NULL, 0, 0, 0 },
+        { DISPOSE_MODE_NULL, 0, 0, 0 },
+      },
+      0, 0, 0, 0, 0, 0
+    },
+    { 0, 0 }
+  },
 };
 
 /*********************************************************************
@@ -166,6 +188,13 @@ static GUI_CONST_STORAGE APPW_SETUP_ITEM _aSetup[] = {
   { ID_ROTARY_00,        APPW_SET_PROP_OFFSET,       { ARG_V(2700) } },
   { ID_ROTARY_00,        APPW_SET_PROP_LQ,           { ARG_V(0) } },
   { ID_ROTARY_00,        APPW_SET_PROP_VALUE,        { ARG_V(3450) } },
+  { ID_ROTARY_01,        APPW_SET_PROP_SBITMAPS,     { ARG_VP(0, NULL),
+                                                       ARG_VP(0, acMarker_red_bar_20x7s), } },
+  { ID_ROTARY_01,        APPW_SET_PROP_POS,          { ARG_V(108) } },
+  { ID_ROTARY_01,        APPW_SET_PROP_ROTATE,       { ARG_V(0) } },
+  { ID_ROTARY_01,        APPW_SET_PROP_OFFSET,       { ARG_V(2700) } },
+  { ID_ROTARY_01,        APPW_SET_PROP_LQ,           { ARG_V(0) } },
+  { ID_ROTARY_01,        APPW_SET_PROP_VALUE,        { ARG_V(2700) } },
   { ID_NUM_AF,           APPW_SET_PROP_COLOR,        { ARG_V(GUI_WHITE) } },
   { ID_NUM_AF,           APPW_SET_PROP_ALIGNTEXT,    { ARG_V(GUI_ALIGN_RIGHT | GUI_ALIGN_VCENTER),
                                                        ARG_V(0),
@@ -207,6 +236,7 @@ static GUI_CONST_STORAGE APPW_SETUP_ITEM _aSetup[] = {
                                                        ARG_V(GUI_INVALID_COLOR) } },
   { ID_PROGBAR_AFR,      APPW_SET_PROP_RANGE,        { ARG_V(100),
                                                        ARG_V(200) } },
+  { ID_TIMER_00,         APPW_SET_PROP_PERIOD,       { ARG_V(3000) } },
 };
 
 /*********************************************************************
@@ -241,6 +271,10 @@ static APPW_COND_COMP _aComparison_0c[] = {
   { { { APPW_IS_VAR, ID_VAR_GEAR }, { APPW_IS_VAL, 6 } }, APPW__CompareIsEqual },
 };
 
+static APPW_COND_COMP _aComparison_0f[] = {
+  { { { APPW_IS_VAR, ID_VAR_REV_A }, { APPW_IS_OBJ, ID_ROTARY_01 } }, APPW__CompareIsLess },
+};
+
 /*********************************************************************
 *
 *       Condition(s)
@@ -252,6 +286,7 @@ static GUI_CONST_STORAGE APPW_COND _Condition_09 = { "A", _aComparison_09, GUI_C
 static GUI_CONST_STORAGE APPW_COND _Condition_0a = { "A", _aComparison_0a, GUI_COUNTOF(_aComparison_0a) };
 static GUI_CONST_STORAGE APPW_COND _Condition_0b = { "A", _aComparison_0b, GUI_COUNTOF(_aComparison_0b) };
 static GUI_CONST_STORAGE APPW_COND _Condition_0c = { "A", _aComparison_0c, GUI_COUNTOF(_aComparison_0c) };
+static GUI_CONST_STORAGE APPW_COND _Condition_0f = { "A", _aComparison_0f, GUI_COUNTOF(_aComparison_0f) };
 
 /*********************************************************************
 *
@@ -317,6 +352,16 @@ static GUI_CONST_STORAGE APPW_ACTION_ITEM _aAction[] = {
   { ID_VAR_AF,           WM_NOTIFICATION_VALUE_CHANGED,    ID_PROGBAR_AFR,      APPW_JOB_SETVALUE,       ID_SCREEN_02__WM_NOTIFICATION_VALUE_CHANGED__ID_PROGBAR_AFR__APPW_JOB_SETVALUE,
     { ARG_V(0),
     }, 0, NULL
+  },
+  { ID_VAR_REV_A,        WM_NOTIFICATION_VALUE_CHANGED,    ID_ROTARY_01,        APPW_JOB_SETVALUE,       ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_ROTARY_01__APPW_JOB_SETVALUE,
+    { ARG_V(4114),
+    }, 65537, &_Condition_0f
+  },
+  { ID_ROTARY_01,        WM_NOTIFICATION_VALUE_CHANGED,    ID_TIMER_00,         APPW_JOB_START,          ID_SCREEN_01a__ID_ROTARY_01__WM_NOTIFICATION_VALUE_CHANGED__ID_TIMER_00__APPW_JOB_START,
+  },
+  { ID_TIMER_00,         APPW_NOTIFICATION_TIMER,          ID_ROTARY_01,        APPW_JOB_SETVALUE,       ID_SCREEN_01a__ID_TIMER_00__APPW_NOTIFICATION_TIMER__ID_ROTARY_01__APPW_JOB_SETVALUE,
+    { ARG_V(4114),
+    }, 1, NULL
   },
 };
 
