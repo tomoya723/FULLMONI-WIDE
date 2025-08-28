@@ -11,7 +11,7 @@
 
 /* Start BUSMASTER global variable */
 STCAN_MSG tx;
-unsigned int RPM;
+unsigned int RPM, i;
 unsigned int SPD,GEAR;
 float THW,THA,OT,BATTV,OP,LA1,MAP;
 DataFrame1 sMsgStruct_Frame1;
@@ -80,10 +80,41 @@ OT = OT + 0.3;
 OP = OP +1;
 BATTV = BATTV +0.15;
 
-RPM =RPM + 10;
-
-if(RPM >= 9999){
-	RPM=0;
+if(i == 0){
+	RPM =RPM + 100;
+	if(RPM >= 7000){
+		i=1;
+	}
+}
+else if(i == 1){
+	RPM =RPM - 100;
+	if(RPM <= 4000){
+		i=2;
+	}
+}
+else if(i == 2){
+	RPM =RPM + 50;
+	if(RPM >= 7500){
+		i=3;
+	}
+}
+else if(i == 3){
+	RPM =RPM - 100;
+	if(RPM <= 4500){
+		i=4;
+	}
+}
+else if(i == 4){
+	RPM =RPM + 20;
+	if(RPM >= 8000){
+		i=5;
+	}
+}
+else if(i == 5){
+	RPM =RPM - 100;
+	if(RPM <= 1000){
+		i=0;
+	}
 }
 }/* End BUSMASTER generated function - OnTimer_updateTimeTick10ms_10 */
 /* Start BUSMASTER generated function - OnMsgName_DataFrame1 */

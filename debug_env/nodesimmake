@@ -1,0 +1,25 @@
+CXX = mingw32-g++
+BM_LIB = -L"C:\Program Files (x86)\BUSMASTER_v3.2.2\SimulatedSystems\OBJ" -lWrapper_CAN
+
+BM_INCLUDES = -I"C:\Program Files (x86)\BUSMASTER_v3.2.2\SimulatedSystems\Include"
+
+CXXFLAGS = -Wall -c
+#$(BM_INCLUDE)
+
+dll = nodesim.dll
+
+DBOBJFILE = "C:\ProgramData\BUSMASTER\General\DBCache\70BD_gcc4.8.1.obj" 
+
+DBINCLUDES = -include"C:\ProgramData\BUSMASTER\General\DBCache\70BD.h" 
+
+
+all: $(dll)
+
+$(dll): nodesim.o
+	$(CXX) -shared -Wl,--dll  nodesim.o $(DBOBJFILE) $(BM_LIB) -o $@
+
+nodesim.o: C:/Users/tomoy/git/FULLMO~1/DEBUG_~1/nodesim.cpp
+	$(CXX) $(DBINCLUDES) $(CXXFLAGS) $(BM_INCLUDES) $< -o $@
+
+clean: 
+	del /f nodesim.o
