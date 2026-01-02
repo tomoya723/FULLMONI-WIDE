@@ -32,5 +32,17 @@
     "editor.rulers": [80, 120],
     "terminal.integrated.defaultProfile.windows": "PowerShell",
     "files.trimTrailingWhitespace": true,
-    "files.insertFinalNewline": true
+    "files.insertFinalNewline": true,
+    "openInExternalApp.openMapper": [
+        {
+            "extensionName": "AppWizard",
+            "apps": [
+                {
+                    "title": "SEGGER AppWizard",
+                    "openCommand": "C:\\Program Files (x86)\\SEGGER\\AppWizard_V136a_632a\\bin\\AppWizard.exe",
+                    "isElectronApp": false
+                }
+            ]
+        }
+    ]
 }

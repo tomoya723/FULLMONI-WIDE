@@ -6,7 +6,7 @@
 
 /***********************************************************************************************************************
 * File Name        : r_cg_port.h
-* Version          : 1.0.150
+* Version          : 1.0.200
 * Device(s)        : R5F572NNDxFP
 * Description      : General header file for PORT peripheral.
 ***********************************************************************************************************************/
@@ -21,14 +21,14 @@ Macro definitions (Register bit)
 Port Mode Register (PMR)
 */
 /* Pmn Pin Mode Control (B7 -B0) */
-#define _00_Pm0_PIN_GPIO        (0x00U) /* Pm0 as general I/O pin */
-#define _00_Pm1_PIN_GPIO        (0x00U) /* Pm1 as general I/O pin */
-#define _00_Pm2_PIN_GPIO        (0x00U) /* Pm2 as general I/O pin */
-#define _00_Pm3_PIN_GPIO        (0x00U) /* Pm3 as general I/O pin */
-#define _00_Pm4_PIN_GPIO        (0x00U) /* Pm4 as general I/O pin */
-#define _00_Pm5_PIN_GPIO        (0x00U) /* Pm5 as general I/O pin */
-#define _00_Pm6_PIN_GPIO        (0x00U) /* Pm6 as general I/O pin */
-#define _00_Pm7_PIN_GPIO        (0x00U) /* Pm7 as general I/O pin */
+#define _FE_Pm0_PIN_GPIO        (0xFEU) /* Pm0 as general I/O pin */
+#define _FD_Pm1_PIN_GPIO        (0xFDU) /* Pm1 as general I/O pin */
+#define _FB_Pm2_PIN_GPIO        (0xFBU) /* Pm2 as general I/O pin */
+#define _F7_Pm3_PIN_GPIO        (0xF7U) /* Pm3 as general I/O pin */
+#define _EF_Pm4_PIN_GPIO        (0xEFU) /* Pm4 as general I/O pin */
+#define _DF_Pm5_PIN_GPIO        (0xDFU) /* Pm5 as general I/O pin */
+#define _BF_Pm6_PIN_GPIO        (0xBFU) /* Pm6 as general I/O pin */
+#define _7F_Pm7_PIN_GPIO        (0x7FU) /* Pm7 as general I/O pin */
 
 /*
     Port Direction Register (PDR)

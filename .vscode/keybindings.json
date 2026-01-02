@@ -1,0 +1,12 @@
+[
+    {
+        "key": "ctrl+shift+o",
+        "command": "extension.openInExternalApp",
+        "when": "resourceExtname == '.AppWizard'"
+    },
+    {
+        "key": "enter",
+        "command": "extension.openInExternalApp",
+        "when": "explorerViewletFocus && !inputFocus && resourceExtname == '.AppWizard'"
+    }
+]

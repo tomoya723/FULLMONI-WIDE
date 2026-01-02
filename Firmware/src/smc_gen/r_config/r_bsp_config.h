@@ -801,7 +801,7 @@ NOTE: The RAM areas are not contiguous.It is separated by 512 KB each.
 /* Version number of Smart Configurator.
    This macro definition is updated by Smart Configurator.
 */
-#define BSP_CFG_CONFIGURATOR_VERSION                (2260) /* Generated value. Do not edit this manually */
+#define BSP_CFG_CONFIGURATOR_VERSION                (2280) /* Generated value. Do not edit this manually */
 
 /* For some BSP functions, it is necessary to ensure that, while these functions are executing, interrupts from other 
    FIT modules do not occur. By controlling the IPL, these functions disable interrupts that are at or below the 
