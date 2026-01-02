@@ -85,7 +85,7 @@ void data_store(void)
 	if(g_CALC_data.num4 > 32767) g_CALC_data.num4 = g_CALC_data.num4 -65534;
 	smooth(g_CALC_data_sm.num4,0.3, g_CALC_data.num4);
 
-	g_CALC_data.num5 = (float)((((unsigned int)rx_dataframe4.data[0]) << 8) + rx_dataframe4.data[1]) * 0.1   ; // OIL Pressure
+	g_CALC_data.num5 = (float)((((unsigned int)rx_dataframe4.data[0]) << 8) + rx_dataframe4.data[1]) * 0.001 ; // OIL Pressure
 	if(g_CALC_data.num5 > 32767) g_CALC_data.num5 = g_CALC_data.num5 -65534;
 	smooth(g_CALC_data_sm.num5,0.1, g_CALC_data.num5);
 
