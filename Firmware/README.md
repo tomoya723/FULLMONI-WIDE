@@ -126,3 +126,106 @@ In the build path source folder settings, set resource paths such as "aw001", "a
 Change the contents of "src/settings.h"<br>
 Set the "DISP" number appropriately.<br>
 ![image](https://github.com/user-attachments/assets/4bc4fe29-edbc-4c54-9ac6-5f0a8b6d810b)<br>
+
+***
+## Development with Visual Studio Code
+
+This project supports development using Visual Studio Code alongside e² studio. The VSCode environment provides IntelliSense, building, and hardware debugging capabilities.
+
+### Prerequisites
+
+**1. Install VSCode**<br>
+Download from [https://code.visualstudio.com/](https://code.visualstudio.com/)<br>
+<br>
+**2. Install Renesas Extensions**<br>
+Open the Extensions view (`Ctrl+Shift+X`) and install the following extensions:<br>
+![image](https://github.com/user-attachments/assets/392ed514-0642-4526-b4b6-d237901e3c16)<br>
+- Renesas Platform (`renesas.renesas-platform`)
+- Renesas Debug (`renesas.renesas-debug`)
+- Renesas Build Utilities (`renesas.renesas-build-utilities`)
+- C/C++ Extension Pack (`ms-vscode.cpptools-extension-pack`)
+
+After installation, the Renesas tab will appear in the sidebar.<br>
+![image](https://github.com/user-attachments/assets/a0024cd8-c971-4ba2-8986-3e9b0a3c8680)<br>
+<br>
+**3. Install GCC-RX Toolchain**<br>
+Ensure GCC for Renesas RX is installed (same toolchain as e² studio)<br>
+<br>
+**4. Install E2 Lite Debugger Driver**<br>
+Install the USB driver for E2 Lite emulator from [Renesas website](https://www.renesas.com/eu/en/software-tool/e2-emulator-rte0t00020kce00000r#downloads)<br>
+
+### Building the Project
+
+**1. Open the project folder**<br>
+`File` → `Open Folder` → Select `FULLMONI-WIDE` directory<br>
+<br>
+**2. Start the build**<br>
+Press `Ctrl+Shift+B` to open the build task menu, then select `Build (GCC-RX)`<br>
+<br>
+**3. Build progress and results**<br>
+The terminal will show the build progress. Upon success, the binary size is displayed.<br>
+![image](https://github.com/user-attachments/assets/d5392bb6-5fd8-4927-bdaf-78af3955b23f)<br>
+The compiled binary will be generated at `Firmware/HardwareDebug/Firmware.elf`<br>
+<br>
+**Other Build Tasks:**<br>
+- `Clean (GCC-RX)`: Remove all build artifacts
+- `Rebuild (GCC-RX)`: Clean and rebuild the entire project
+- `Size Info (GCC-RX)`: Display memory usage information
+
+### Debugging with E2 Lite
+
+**1. Hardware Connection**<br>
+- Connect the E2 Lite debugger to your PC via USB
+- Connect the E2 Lite to the target board
+- Ensure the target board is powered externally
+
+**2. Open Run and Debug view and start debugging**<br>
+Click the Run and Debug icon in the sidebar or press `Ctrl+Shift+D`, then select the debug configuration "Debug with Renesas E2 Lite (RX72T)" and press `F5` or click the green play button<br>
+![image](https://github.com/user-attachments/assets/ac58c95a-f3c1-4db6-a730-4f3636520719)<br>
+<br>
+**3. Debugging session**<br>
+The debugger will automatically build the project, download the firmware, and stop at `main()` function.<br>
+You can use breakpoints, step execution, and variable inspection.<br>
+![image](https://github.com/user-attachments/assets/4e0c627a-ebed-4ed4-9eb4-0e46145382d6)<br>
+<br>
+**Debug Configuration:** The launch configuration is located at `.vscode/launch.json` with the following key settings:
+- Device: `R5F572NN` (RX72T)
+- Debugger: `E2LITE`
+- Debug interface parameters match e² studio settings
+
+### IntelliSense and Code Navigation
+
+VSCode is configured with IntelliSense for the RX72T microcontroller.<br>
+<br>
+**Code completion**<br>
+Type to get suggestions for Renesas BSP functions, peripheral registers, and macros.<br>
+![image](https://github.com/user-attachments/assets/0f267222-b0d5-4be4-b42f-6e5e37a4ab09)<br>
+<br>
+**Hover documentation**<br>
+Hover over functions or registers to see documentation.<br>
+![image](https://github.com/user-attachments/assets/666177fb-42c7-4113-b856-e80769cc6f46)<br>
+<br>
+**Navigation features:**<br>
+- Go to definition: `F12`
+- Find all references: `Shift+F12`
+- Peek definition: `Alt+F12`
+
+**Configuration File:** `.vscode/c_cpp_properties.json` contains compiler paths, include directories, and RX72T-specific defines.
+
+### Coexistence with e² studio
+
+Both environments can be used interchangeably:<br>
+<br>
+![image](https://github.com/user-attachments/assets/1efdbae7-e9a6-42cd-8a7d-188e0ac32e4a)<br>
+<br>
+- **Shared Build System**: Both VSCode and e² studio use the same Makefile
+- **Shared Source Code**: No duplicate code or configuration
+- **Independent Settings**: IDE-specific settings are separated (`.vscode/` vs `.settings/`)
+- **Smart Configurator**: Use e² studio for peripheral configuration, code generation is compatible with both environments
+
+### Notes
+
+- Smart Configurator code generation should be performed in e² studio
+- The `.vscode/` directory is version-controlled for team collaboration
+- Build artifacts in `Firmware/HardwareDebug/` are shared between both IDEs
+- E2 Lite debugger can be used by only one IDE at a time
