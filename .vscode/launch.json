@@ -1,0 +1,45 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug with Renesas E2 Lite (RX72T)",
+            "type": "renesas-hardware",
+            "request": "launch",
+            "program": "${workspaceFolder}/Firmware/HardwareDebug/Firmware.elf",
+            "stopAtEntry": true,
+            "preLaunchTask": "Build (GCC-RX)",
+            "target": {
+                "deviceFamily": "RX",
+                "device": "R5F572NN",
+                "debuggerType": "E2LITE",
+                "serverParameters": [
+                    "-uConnectionTimeout=", "30",
+                    "-uClockSrcHoco=", "0",
+                    "-uInputClock=", "24",
+                    "-uPTimerClock=", "240000000",
+                    "-uAllowClockSourceInternal=", "1",
+                    "-uUseFine=", "0",
+                    "-uJTagClockFreq=", "6.00",
+                    "-w", "0",
+                    "-z", "0",
+                    "-uRegisterSetting=", "0",
+                    "-uModePin=", "0",
+                    "-uChangeStartupBank=", "0",
+                    "-uStartupBank=", "0",
+                    "-uDebugMode=", "0",
+                    "-uExecuteProgram=", "0",
+                    "-uIdCode=", "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+                    "-uresetOnReload=", "1",
+                    "-n", "0",
+                    "-uWorkRamAddress=", "1000",
+                    "-uverifyOnWritingMemory=", "0",
+                    "-uProgReWriteIRom=", "0",
+                    "-uProgReWriteDFlash=", "0",
+                    "-uhookWorkRamAddr=", "0x7fb40",
+                    "-uhookWorkRamSize=", "0x4c0",
+                    "-uOSRestriction=", "0"
+                ]
+            }
+        }
+    ]
+}

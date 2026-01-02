@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-extension-pack",
+        "twxs.cmake",
+        "jbenden.c-cpp-flylint",
+        "xaver.clang-format",
+        "cschlosser.doxdocgen",
+        "formulahendry.code-runner",
+        "gruntfuggly.todo-tree"
+    ]
+}

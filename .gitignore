@@ -41,6 +41,21 @@ Desktop.ini
 *.swp
 *~
 
+# VSCode設定はプロジェクト固有のため管理対象とする
+# .vscode/
+
+# VSCodeブラウズデータベース（自動生成ファイル）
+.vscode/BROWSE.VC.DB*
+.vscode/*.db
+.vscode/*.db-*
+
+# e² studio 自動生成設定ファイル（環境依存）
+Firmware/.settings/
+
+# CANツール個人設定
+debug_env/*.cfx
+debug_env/*.dll
+
 # emWin (SEGGER) は公開対象外
 Firmware/src/**/r_emwin_rx/**
 Firmware/src/**/SEGGER/**
