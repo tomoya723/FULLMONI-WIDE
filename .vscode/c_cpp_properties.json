@@ -1,0 +1,61 @@
+{
+    "configurations": [
+        {
+            "name": "GCC-RX (Renesas RX72N)",
+            "includePath": [
+                "${workspaceFolder}/Firmware/src/**",
+                "${workspaceFolder}/Firmware/src/smc_gen/**",
+                "${workspaceFolder}/Firmware/aw002/**",
+                "C:/ProgramData/GCC for Renesas RX 8.3.0.202411-GNURX-ELF/rx-elf/rx-elf/include/**",
+                "C:/ProgramData/GCC for Renesas RX 8.3.0.202411-GNURX-ELF/rx-elf/lib/gcc/rx-elf/8.3.0.202411/include/**"
+            ],
+            "defines": [
+                "__RX72T__=1",
+                "__RXv3__=1",
+                "__RX__=1",
+                "__RX_32BIT_DOUBLES__=1",
+                "__RX_FPU_INSNS__=1",
+                "__RX_LITTLE_ENDIAN__=1",
+                "__RX_ABI__=1",
+                "__GNUC__=8",
+                "__GNUC_MINOR__=3",
+                "__GNUC_PATCHLEVEL__=0",
+                "__SIZEOF_INT__=4",
+                "__SIZEOF_LONG__=4",
+                "__SIZEOF_POINTER__=4",
+                "__SIZEOF_FLOAT__=4",
+                "__SIZEOF_DOUBLE__=4",
+                "__CHAR_UNSIGNED__=1",
+                "__ELF__=1",
+                "GRROSE",
+                "GRPEACH"
+            ],
+            "compilerPath": "C:/ProgramData/GCC for Renesas RX 8.3.0.202411-GNURX-ELF/rx-elf/rx-elf/bin/rx-elf-gcc.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-x86",
+            "compilerArgs": [
+                "-mcpu=rx72t",
+                "-misa=v3",
+                "-mlittle-endian-data",
+                "-mtfu=intrinsic,mathlib",
+                "-mtfu-version=v2",
+                "-ffunction-sections",
+                "-fdata-sections",
+                "-fno-strict-aliasing",
+                "-fdiagnostics-parseable-fixits"
+            ],
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/Firmware/src",
+                    "${workspaceFolder}/Firmware/aw002",
+                    "C:/ProgramData/GCC for Renesas RX 8.3.0.202411-GNURX-ELF/rx-elf/rx-elf/include"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": "${workspaceFolder}/.vscode/browse.vc.db"
+            },
+            "forcedInclude": []
+        }
+    ],
+    "version": 4
+}
