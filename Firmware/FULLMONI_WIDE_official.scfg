@@ -426,8 +426,8 @@
         <Item currentVect="99" id="SCI7_TXI7" priority="15" usedState="未使用"/>
         <Item currentVect="100" id="SCI8_RXI8" priority="15" usedState="未使用"/>
         <Item currentVect="101" id="SCI8_TXI8" priority="15" usedState="未使用"/>
-        <Item currentVect="102" id="SCI9_RXI9" priority="15" usedState="未使用"/>
-        <Item currentVect="103" id="SCI9_TXI9" priority="15" usedState="未使用"/>
+        <Item currentVect="102" id="SCI9_RXI9" priority="15" usedState="使用中"/>
+        <Item currentVect="103" id="SCI9_TXI9" priority="15" usedState="使用中"/>
         <Item currentVect="104" id="SCI10_RXI10" priority="15" usedState="未使用"/>
         <Item currentVect="105" id="SCI10_TXI10" priority="15" usedState="未使用"/>
         <Item currentVect="106" groupchild="&lt;br&gt;0-ERS0&lt;br&gt;1-ERS1&lt;br&gt;2-ERS2" id="BE0" priority="2" usedState="使用中"/>
@@ -436,7 +436,7 @@
         <Item currentVect="109" id="RSPI2_SPTI2" priority="15" usedState="未使用"/>
         <Item currentVect="110" groupchild="&lt;br&gt;0-TEI0&lt;br&gt;1-ERI0&lt;br&gt;2-TEI1&lt;br&gt;3-ERI1&lt;br&gt;4-TEI2&lt;br&gt;5-ERI2&lt;br&gt;6-TEI3&lt;br&gt;7-ERI3&lt;br&gt;8-TEI4&lt;br&gt;9-ERI4&lt;br&gt;10-TEI5&lt;br&gt;11-ERI5&lt;br&gt;12-TEI6&lt;br&gt;13-ERI6&lt;br&gt;16-TEI12&lt;br&gt;17-ERI12&lt;br&gt;18-SCIX0&lt;br&gt;19-SCIX1&lt;br&gt;20-SCIX2&lt;br&gt;21-SCIX3&lt;br&gt;24-QSPSSLI&lt;br&gt;26-FERRI&lt;br&gt;27-MENDI&lt;br&gt;28-OVFI&lt;br&gt;29-DOPCI&lt;br&gt;30-PCFEI&lt;br&gt;31-PCERI" id="BL0" priority="15" usedState="未使用"/>
         <Item currentVect="111" groupchild="&lt;br&gt;3-CDETI&lt;br&gt;4-CACI&lt;br&gt;5-SDACI&lt;br&gt;6-CDETIO&lt;br&gt;7-ERRIO&lt;br&gt;8-ACCIO&lt;br&gt;9-OEI1&lt;br&gt;10-OEI2&lt;br&gt;11-OEI3&lt;br&gt;12-OEI4&lt;br&gt;13-TEI0&lt;br&gt;14-EEI0&lt;br&gt;15-TEI2&lt;br&gt;16-EEI2&lt;br&gt;17-SSIF0&lt;br&gt;18-SSIF1&lt;br&gt;20-S12CMPAI&lt;br&gt;21-S12CMPBI&lt;br&gt;22-S12CMPAI1&lt;br&gt;23-S12CMPBI1&lt;br&gt;28-TEI1&lt;br&gt;29-EEI1" id="BL1" priority="15" usedState="使用中"/>
-        <Item currentVect="112" groupchild="&lt;br&gt;0-TEI8&lt;br&gt;1-ERI8&lt;br&gt;4-TEI9&lt;br&gt;5-ERI9&lt;br&gt;8-TEI10&lt;br&gt;9-ERI10&lt;br&gt;12-TEI11&lt;br&gt;13-ERI11&lt;br&gt;16-SPII0&lt;br&gt;17-SPEI0&lt;br&gt;18-SPII1&lt;br&gt;19-SPEI1&lt;br&gt;20-SPII2&lt;br&gt;21-SPEI2&lt;br&gt;22-TEI7&lt;br&gt;23-ERI7" id="AL0" priority="15" usedState="未使用"/>
+        <Item currentVect="112" groupchild="&lt;br&gt;0-TEI8&lt;br&gt;1-ERI8&lt;br&gt;4-TEI9&lt;br&gt;5-ERI9&lt;br&gt;8-TEI10&lt;br&gt;9-ERI10&lt;br&gt;12-TEI11&lt;br&gt;13-ERI11&lt;br&gt;16-SPII0&lt;br&gt;17-SPEI0&lt;br&gt;18-SPII1&lt;br&gt;19-SPEI1&lt;br&gt;20-SPII2&lt;br&gt;21-SPEI2&lt;br&gt;22-TEI7&lt;br&gt;23-ERI7" id="AL0" priority="15" usedState="使用中"/>
         <Item currentVect="113" groupchild="&lt;br&gt;0-MINT&lt;br&gt;1-PINT&lt;br&gt;4-EINT0&lt;br&gt;5-EINT1&lt;br&gt;8-VPOS&lt;br&gt;9-GR1UF&lt;br&gt;10-GR2UF&lt;br&gt;11-DRW_IRQ" id="AL1" priority="15" usedState="未使用"/>
         <Item currentVect="114" id="SCI11_RXI11" priority="15" usedState="未使用"/>
         <Item currentVect="115" id="SCI11_TXI11" priority="15" usedState="未使用"/>
@@ -597,6 +597,7 @@
         <pinItem allocation="82" comments="" direction="I" id="PD4" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
         <pinItem allocation="79" comments="" direction="I" id="PD7" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
         <pinItem allocation="4" comments="" direction="None" id="MTIOC3C" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
+        <pinItem allocation="54" comments="" direction="None" id="RXD9" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
         <pinItem allocation="89" comments="" direction="None" id="AN005" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
         <pinItem allocation="88" comments="" direction="None" id="AN006" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
         <pinItem allocation="87" comments="" direction="None" id="AN007" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
@@ -608,6 +609,7 @@
         <pinItem allocation="8" comments="" direction="None" id="XCIN" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
         <pinItem allocation="24" comments="" direction="None" id="MTCLKA" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
         <pinItem allocation="23" comments="" direction="None" id="MTCLKB" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
+        <pinItem allocation="53" comments="" direction="None" id="TXD9" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
         <pinItem allocation="55$B" comments="" direction="None" id="LCD_CLK" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
         <pinItem allocation="33" comments="" direction="None" id="SDA0" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
         <pinItem allocation="28" comments="" direction="None" id="SDA1" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
@@ -1199,6 +1201,10 @@
                     <item id="Unuse" input="" vlaue="0"/>
                 </option>
                 <option enabled="true" id="ANx02DSHchk" selection="Unuse">
+                    <item id="Use" input="" vlaue="0"/>
+                    <item id="Unuse" input="" vlaue="0"/>
+                </option>
+                <option enabled="false" id="CSHchk" selection="Unuse">
                     <item id="Use" input="" vlaue="0"/>
                     <item id="Unuse" input="" vlaue="0"/>
                 </option>
@@ -2835,6 +2841,10 @@
                 <option enabled="true" id="clockSource" selection="subclock">
                     <item id="subclock" input="" vlaue="0"/>
                     <item id="mainclock" input="" vlaue="0"/>
+                    <item id="noclock" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="clockSourceSelection" selection="clockSourceSelection">
+                    <item id="clockSourceSelection" input="メインクロック発振器" vlaue="0"/>
                 </option>
                 <option enabled="true" id="hourmode" selection="24hourmode">
                     <item id="12hourmode" input="" vlaue="0"/>
@@ -4546,6 +4556,253 @@
             <component description="依存モジュール: なし&#10;Drawing 2D engine(DRW2D) driver for RX MCUs" detailDescription="Drawing 2D engine driver for RX MCUs" display="r_drw2d_rx" id="r_drw2d_rx1.12" version="1.12"/>
             <source description="Components supporting Firmware Integration Technology" display="Firmware Integration Technology" id="com.renesas.smc.tools.swcomponent.fit.source"/>
             <source description="Components supporting Firmware Integration Technology" display="Firmware Integration Technology" id="com.renesas.smc.tools.swcomponent.fit.source"/>
+        </configuration>
+        <configuration apiMode="FULL_API" id="74e7c4c4-e74c-4d77-9d07-7b0b0a1dfa5d" inuse="true" name="Config_SCI9">
+            <allocatable id="SCI9">
+                <isocket id="CountingClockB" selection="Clock.tool_clock_pclka" value="1.2E8"/>
+                <option enabled="true" id="FIFOMode" selection="NonFIFO">
+                    <item id="NonFIFO" input="" vlaue="0"/>
+                    <item id="FIFO" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="BitEdge" selection="LowLevel">
+                    <item id="LowLevel" input="" vlaue="0"/>
+                    <item id="FallEdge" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="DataLength" selection="8Bits">
+                    <item id="9Bits" input="" vlaue="0"/>
+                    <item id="8Bits" input="" vlaue="0"/>
+                    <item id="7Bits" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="Parity" selection="None">
+                    <item id="None" input="" vlaue="0"/>
+                    <item id="Even" input="" vlaue="0"/>
+                    <item id="Odd" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="StopBit" selection="1Bit">
+                    <item id="1Bit" input="" vlaue="0"/>
+                    <item id="2Bits" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="TransDir" selection="LSB">
+                    <item id="LSB" input="" vlaue="0"/>
+                    <item id="MSB" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="TransInstant" selection="Disable">
+                    <item id="Enable" input="" vlaue="0"/>
+                    <item id="Disable" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="TransClock" selection="Internal">
+                    <item id="Internal" input="" vlaue="0"/>
+                    <item id="External" input="" vlaue="0"/>
+                </option>
+                <option enabled="false" id="BaseClk" selection="16Cyl">
+                    <item id="16Cyl" input="" vlaue="0"/>
+                    <item id="8Cyl" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="Bitrate" selection="FreeValue">
+                    <item id="FreeValue" input="115200" vlaue="9600"/>
+                    <item id="9600" input="9600" vlaue="0"/>
+                    <item id="19200" input="19200" vlaue="0"/>
+                    <item id="31250" input="31250" vlaue="0"/>
+                    <item id="38400" input="38400" vlaue="0"/>
+                    <item id="75000" input="75000" vlaue="0"/>
+                    <item id="150000" input="150000" vlaue="0"/>
+                    <item id="325000" input="325000" vlaue="0"/>
+                    <item id="375000" input="375000" vlaue="0"/>
+                </option>
+                <option enabled="true" id="DutyCorrection" selection="Disable">
+                    <item id="Enable" input="" vlaue="0"/>
+                    <item id="Disable" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="SCKPinFun" selection="SckUnuse">
+                    <item id="SckUnuse" input="" vlaue="0"/>
+                    <item id="ClkOut" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="NoiseFilt" selection="Disable">
+                    <item id="Enable" input="" vlaue="0"/>
+                    <item id="Disable" input="" vlaue="0"/>
+                </option>
+                <option enabled="false" id="FiltClk" selection="Div1">
+                    <item id="Div1" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="FlowControl" selection="None">
+                    <item id="None" input="" vlaue="0"/>
+                    <item id="CTS" input="" vlaue="0"/>
+                    <item id="RTS" input="" vlaue="0"/>
+                </option>
+                <option enabled="false" id="OutActiveNum" selection="Num15">
+                    <item id="Num1" input="" vlaue="0"/>
+                    <item id="Num2" input="" vlaue="0"/>
+                    <item id="Num3" input="" vlaue="0"/>
+                    <item id="Num4" input="" vlaue="0"/>
+                    <item id="Num5" input="" vlaue="0"/>
+                    <item id="Num6" input="" vlaue="0"/>
+                    <item id="Num7" input="" vlaue="0"/>
+                    <item id="Num8" input="" vlaue="0"/>
+                    <item id="Num9" input="" vlaue="0"/>
+                    <item id="Num10" input="" vlaue="0"/>
+                    <item id="Num11" input="" vlaue="0"/>
+                    <item id="Num12" input="" vlaue="0"/>
+                    <item id="Num13" input="" vlaue="0"/>
+                    <item id="Num14" input="" vlaue="0"/>
+                    <item id="Num15" input="" vlaue="0"/>
+                </option>
+                <option enabled="false" id="TransFIFONum" selection="Num0">
+                    <item id="Num0" input="" vlaue="0"/>
+                    <item id="Num1" input="" vlaue="0"/>
+                    <item id="Num2" input="" vlaue="0"/>
+                    <item id="Num3" input="" vlaue="0"/>
+                    <item id="Num4" input="" vlaue="0"/>
+                    <item id="Num5" input="" vlaue="0"/>
+                    <item id="Num6" input="" vlaue="0"/>
+                    <item id="Num7" input="" vlaue="0"/>
+                    <item id="Num8" input="" vlaue="0"/>
+                    <item id="Num9" input="" vlaue="0"/>
+                    <item id="Num10" input="" vlaue="0"/>
+                    <item id="Num11" input="" vlaue="0"/>
+                    <item id="Num12" input="" vlaue="0"/>
+                    <item id="Num13" input="" vlaue="0"/>
+                    <item id="Num14" input="" vlaue="0"/>
+                    <item id="Num15" input="" vlaue="0"/>
+                </option>
+                <option enabled="false" id="RecvFIFONum" selection="Num8">
+                    <item id="Num1" input="" vlaue="0"/>
+                    <item id="Num2" input="" vlaue="0"/>
+                    <item id="Num3" input="" vlaue="0"/>
+                    <item id="Num4" input="" vlaue="0"/>
+                    <item id="Num5" input="" vlaue="0"/>
+                    <item id="Num6" input="" vlaue="0"/>
+                    <item id="Num7" input="" vlaue="0"/>
+                    <item id="Num8" input="" vlaue="0"/>
+                    <item id="Num9" input="" vlaue="0"/>
+                    <item id="Num10" input="" vlaue="0"/>
+                    <item id="Num11" input="" vlaue="0"/>
+                    <item id="Num12" input="" vlaue="0"/>
+                    <item id="Num13" input="" vlaue="0"/>
+                    <item id="Num14" input="" vlaue="0"/>
+                    <item id="Num15" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="DataMatch" selection="Disable">
+                    <item id="Enable" input="" vlaue="0"/>
+                    <item id="Disable" input="" vlaue="0"/>
+                </option>
+                <option enabled="false" id="CmpData" selection="CmpData">
+                    <item id="CmpData" input="0x00" vlaue="0"/>
+                </option>
+                <option enabled="true" id="TransDataHandle" selection="ISR">
+                    <item id="ISR" input="" vlaue="0"/>
+                    <item id="DMAC" input="" vlaue="0"/>
+                    <item id="DTC" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="RecvDataHandle" selection="ISR">
+                    <item id="ISR" input="" vlaue="0"/>
+                    <item id="DMAC" input="" vlaue="0"/>
+                    <item id="DTC" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="TXIPriority" selection="Level15">
+                    <item id="Level0" input="" vlaue="0"/>
+                    <item id="Level1" input="" vlaue="0"/>
+                    <item id="Level2" input="" vlaue="0"/>
+                    <item id="Level3" input="" vlaue="0"/>
+                    <item id="Level4" input="" vlaue="0"/>
+                    <item id="Level5" input="" vlaue="0"/>
+                    <item id="Level6" input="" vlaue="0"/>
+                    <item id="Level7" input="" vlaue="0"/>
+                    <item id="Level8" input="" vlaue="0"/>
+                    <item id="Level9" input="" vlaue="0"/>
+                    <item id="Level10" input="" vlaue="0"/>
+                    <item id="Level11" input="" vlaue="0"/>
+                    <item id="Level12" input="" vlaue="0"/>
+                    <item id="Level13" input="" vlaue="0"/>
+                    <item id="Level14" input="" vlaue="0"/>
+                    <item id="Level15" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="RXIPriority" selection="Level15">
+                    <item id="Level0" input="" vlaue="0"/>
+                    <item id="Level1" input="" vlaue="0"/>
+                    <item id="Level2" input="" vlaue="0"/>
+                    <item id="Level3" input="" vlaue="0"/>
+                    <item id="Level4" input="" vlaue="0"/>
+                    <item id="Level5" input="" vlaue="0"/>
+                    <item id="Level6" input="" vlaue="0"/>
+                    <item id="Level7" input="" vlaue="0"/>
+                    <item id="Level8" input="" vlaue="0"/>
+                    <item id="Level9" input="" vlaue="0"/>
+                    <item id="Level10" input="" vlaue="0"/>
+                    <item id="Level11" input="" vlaue="0"/>
+                    <item id="Level12" input="" vlaue="0"/>
+                    <item id="Level13" input="" vlaue="0"/>
+                    <item id="Level14" input="" vlaue="0"/>
+                    <item id="Level15" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="ERIEnable" selection="Enable">
+                    <item id="Enable" input="" vlaue="0"/>
+                    <item id="Disable" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="ERIPriority" selection="Level15">
+                    <item id="Level0" input="" vlaue="0"/>
+                    <item id="Level1" input="" vlaue="0"/>
+                    <item id="Level2" input="" vlaue="0"/>
+                    <item id="Level3" input="" vlaue="0"/>
+                    <item id="Level4" input="" vlaue="0"/>
+                    <item id="Level5" input="" vlaue="0"/>
+                    <item id="Level6" input="" vlaue="0"/>
+                    <item id="Level7" input="" vlaue="0"/>
+                    <item id="Level8" input="" vlaue="0"/>
+                    <item id="Level9" input="" vlaue="0"/>
+                    <item id="Level10" input="" vlaue="0"/>
+                    <item id="Level11" input="" vlaue="0"/>
+                    <item id="Level12" input="" vlaue="0"/>
+                    <item id="Level13" input="" vlaue="0"/>
+                    <item id="Level14" input="" vlaue="0"/>
+                    <item id="Level15" input="" vlaue="0"/>
+                </option>
+                <option enabled="false" id="RvDataInt" selection="RXI">
+                    <item id="RXI" input="" vlaue="0"/>
+                    <item id="ERI" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="MultiIntTXIEnable" selection="UnCheck">
+                    <item id="Check" input="" vlaue="0"/>
+                    <item id="UnCheck" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="MultiIntTEIEnable" selection="UnCheck">
+                    <item id="Check" input="" vlaue="0"/>
+                    <item id="UnCheck" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="MultiIntRXIEnable" selection="UnCheck">
+                    <item id="Check" input="" vlaue="0"/>
+                    <item id="UnCheck" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="MultiIntERIEnable" selection="UnCheck">
+                    <item id="Check" input="" vlaue="0"/>
+                    <item id="UnCheck" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="TransEnd" selection="Enable">
+                    <item id="Enable" input="" vlaue="0"/>
+                    <item id="Disable" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="RecvEnd" selection="Enable">
+                    <item id="Enable" input="" vlaue="0"/>
+                    <item id="Disable" input="" vlaue="0"/>
+                </option>
+                <option enabled="true" id="RecvError" selection="Enable">
+                    <item id="Enable" input="" vlaue="0"/>
+                    <item id="Disable" input="" vlaue="0"/>
+                </option>
+            </allocatable>
+            <component description="このソフトウェアコンポーネントは、SCI(SCIF、RSCI) シングル（マルチプロセッサ）調歩同期式の構成を提供します。" detailDescription="" display="SCI(SCIF)調歩同期式モード" id="com.renesas.smc.tools.swcomponent.codegenerator.sciasyncmode" version="1.12.0"/>
+            <allocator channelLevel0="9" channelLevel1="" channelLevel2="" channelLevel3="" channelLevel4="" channelLevel5="" description="SCI チャネル 9" display="SCI9" id="com.renesas.smc.swc.cg.rx.sciasync.rx72n.sci9" type="SCI">
+                <context>
+                    <option enabled="true" id="Mode" selection="BothMode">
+                        <item enabled="true" id="TransMode"/>
+                        <item enabled="true" id="RecvMode"/>
+                        <item enabled="true" id="BothMode"/>
+                        <item enabled="true" id="MultiTransMode"/>
+                        <item enabled="true" id="MultiRecvMode"/>
+                        <item enabled="true" id="MultiBothMode"/>
+                    </option>
+                </context>
+            </allocator>
+            <source description="コード生成に対応したコンポーネントは、設定に応じた周辺ドライバのコードを小さなコードサイズで出力します。" display="コード生成" id="com.renesas.smc.tools.swcomponent.codegenerator.source"/>
         </configuration>
     </tool>
     <tool id="System">

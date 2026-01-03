@@ -47,6 +47,9 @@ void R_Interrupt_Create(void)
     /* Disable group BL1 interrupt*/
     IEN(ICU,GROUPBL1) = 0U;
     
+    /* Disable group AL0 interrupt*/
+    IEN(ICU,GROUPAL0) = 0U;
+    
 
     /* Set group BE0 interrupt priority level */
     IPR(ICU,GROUPBE0) = _02_ICU_PRIORITY_LEVEL2;
@@ -54,11 +57,17 @@ void R_Interrupt_Create(void)
     /* Set group BL1 interrupt priority level */
     IPR(ICU,GROUPBL1) = _0F_ICU_PRIORITY_LEVEL15;
 
+    /* Set group AL0 interrupt priority level */
+    IPR(ICU,GROUPAL0) = _0F_ICU_PRIORITY_LEVEL15;
+
     /* Enable group BE0 interrupt */
     IEN(ICU,GROUPBE0) = 1U;
 
     /* Enable group BL1 interrupt */
     IEN(ICU,GROUPBL1) = 1U;
+
+    /* Enable group AL0 interrupt */
+    IEN(ICU,GROUPAL0) = 1U;
 }
 
 /* Start user code for adding. Do not edit comment generated here */

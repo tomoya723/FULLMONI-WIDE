@@ -30,6 +30,7 @@ Includes
 #include "Config_RTC.h"
 #include "Config_MTU8.h"
 #include "Config_PORT.h"
+#include "Config_SCI9.h"
 #include "r_smc_cgc.h"
 #include "r_smc_interrupt.h"
 /* Start user code for include. Do not edit comment generated here */
@@ -93,6 +94,7 @@ void R_Systeminit(void)
     R_Config_MTU3_Create();
     R_Config_RTC_Create();
     R_Config_MTU8_Create();
+    R_Config_SCI9_Create();
 
     /* Set interrupt settings */
     R_Interrupt_Create();
@@ -114,6 +116,12 @@ void R_Systeminit(void)
 
     /* Register group BL1 interrupt EEI1 (RIIC1) */
     R_BSP_InterruptWrite(BSP_INT_SRC_BL1_RIIC1_EEI1,(bsp_int_cb_t)r_Config_RIIC1_error_interrupt);
+
+    /* Register group AL0 interrupt TEI9 (SCI9) */
+    R_BSP_InterruptWrite(BSP_INT_SRC_AL0_SCI9_TEI9,(bsp_int_cb_t)r_Config_SCI9_transmitend_interrupt);
+
+    /* Register group AL0 interrupt ERI9 (SCI9) */
+    R_BSP_InterruptWrite(BSP_INT_SRC_AL0_SCI9_ERI9,(bsp_int_cb_t)r_Config_SCI9_receiveerror_interrupt);
 
     /* Disable writing to MPC pin function control registers */
     MPC.PWPR.BIT.PFSWE = 0U;

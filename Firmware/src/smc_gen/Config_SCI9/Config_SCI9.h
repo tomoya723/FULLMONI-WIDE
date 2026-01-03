@@ -5,18 +5,19 @@
 */
 
 /***********************************************************************************************************************
-* File Name        : r_cg_interrupt_handlers.h
-* Version          : 1.0.200
+* File Name        : Config_SCI9.h
+* Component Version: 1.12.0
 * Device(s)        : R5F572NNDxFP
-* Description      : This file declares interrupt handlers.
+* Description      : This file implements device driver for Config_SCI9.
 ***********************************************************************************************************************/
 
-#ifndef INTERRUPT_HANDLERS_H
-#define INTERRUPT_HANDLERS_H
+#ifndef CFG_Config_SCI9_H
+#define CFG_Config_SCI9_H
 
 /***********************************************************************************************************************
 Includes
 ***********************************************************************************************************************/
+#include "r_cg_sci.h"
 
 /***********************************************************************************************************************
 Macro definitions (Register bit)
@@ -33,33 +34,17 @@ Typedef definitions
 /***********************************************************************************************************************
 Global functions
 ***********************************************************************************************************************/
-/* RIIC1 RXI1 */
-void r_Config_RIIC1_receive_interrupt(void) __attribute__ ((interrupt(".rvectors",VECT(RIIC1,RXI1))));
-
-/* RIIC1 TXI1 */
-void r_Config_RIIC1_transmit_interrupt(void) __attribute__ ((interrupt(".rvectors",VECT(RIIC1,TXI1))));
-
-/* RIIC0 RXI0 */
-void r_Config_RIIC0_receive_interrupt(void) __attribute__ ((interrupt(".rvectors",VECT(RIIC0,RXI0))));
-
-/* RIIC0 TXI0 */
-void r_Config_RIIC0_transmit_interrupt(void) __attribute__ ((interrupt(".rvectors",VECT(RIIC0,TXI0))));
-
-/* SCI9 RXI9 */
-void r_Config_SCI9_receive_interrupt(void) __attribute__ ((interrupt(".rvectors",VECT(SCI9,RXI9))));
-
-/* SCI9 TXI9 */
-void r_Config_SCI9_transmit_interrupt(void) __attribute__ ((interrupt(".rvectors",VECT(SCI9,TXI9))));
-
-/* S12AD S12ADI */
-void r_Config_S12AD0_interrupt(void) __attribute__ ((interrupt(".rvectors",VECT(PERIB,INTB186))));
-
-/* MTU0 TGIA0 */
-void r_Config_MTU0_tgia0_interrupt(void) __attribute__ ((interrupt(".rvectors",VECT(PERIA,INTA209))));
-
-/* MTU8 TGIA8 */
-void r_Config_MTU8_tgia8_interrupt(void) __attribute__ ((interrupt(".rvectors",VECT(PERIA,INTA246))));
-
+void R_Config_SCI9_Create(void);
+void R_Config_SCI9_Create_UserInit(void);
+void R_Config_SCI9_Start(void);
+void R_Config_SCI9_Stop(void);
+MD_STATUS R_Config_SCI9_Serial_Send(uint8_t * const tx_buf, uint16_t tx_num);
+MD_STATUS R_Config_SCI9_Serial_Receive(uint8_t * const rx_buf, uint16_t rx_num);
+void r_Config_SCI9_transmitend_interrupt(void);
+static void r_Config_SCI9_callback_transmitend(void);
+static void r_Config_SCI9_callback_receiveend(void);
+void r_Config_SCI9_receiveerror_interrupt(void);
+static void r_Config_SCI9_callback_receiveerror(void);
 /* Start user code for function. Do not edit comment generated here */
 /* End user code. Do not edit comment generated here */
 #endif

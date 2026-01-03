@@ -6,6 +6,8 @@
     <Segment id="Pin">
         <Setting id="PB2" value="LCD_TCON2"/>
         <Setting id="PB5" value="LCD_CLK"/>
+        <Setting id="PB7" value="TXD9"/>
+        <Setting id="PB6" value="RXD9"/>
         <Setting id="P21" value="SCL1"/>
         <Setting id="P20" value="SDA1"/>
         <Setting id="P25" value="MTCLKB"/>
@@ -105,6 +107,7 @@
         <Setting id="r_cmt_rx" value="FIT"/>
         <Setting id="Config_S12AD0" value="CG"/>
         <Setting id="Config_RIIC0" value="CG"/>
+        <Setting id="Config_SCI9" value="CG"/>
         <Setting id="Config_RIIC1" value="CG"/>
         <Setting id="Config_PORT" value="CG"/>
         <Setting id="r_emwin_rx" value="FIT"/>
@@ -694,6 +697,42 @@
             <Setting id="ALIEnable" value="Enable"/>
             <Setting id="RecvErr" value="Enable"/>
             <Setting id="MultiIntEEIEnable" value="UnCheck"/>
+        </Segment>
+        <Segment component="com.renesas.smc.tools.swcomponent.codegenerator.sciasyncmode" id="Config_SCI9" source="com.renesas.smc.tools.swcomponent.codegenerator.source">
+            <Setting id="BitEdge" value="LowLevel"/>
+            <Setting id="TransEnd" value="Enable"/>
+            <Setting id="RecvError" value="Enable"/>
+            <Setting id="TransDataHandle" value="ISR"/>
+            <Setting id="MultiIntTEIEnable" value="UnCheck"/>
+            <Setting id="ERIPriority" value="Level15"/>
+            <Setting id="TransInstant" value="Disable"/>
+            <Setting id="RvDataInt" value="RXI"/>
+            <Setting id="OutActiveNum" value="Num15"/>
+            <Setting id="MultiIntTXIEnable" value="UnCheck"/>
+            <Setting id="TransClock" value="Internal"/>
+            <Setting id="BaseClk" value="16Cyl"/>
+            <Setting id="SCKPinFun" value="SckUnuse"/>
+            <Setting id="RecvFIFONum" value="Num8"/>
+            <Setting id="TransDir" value="LSB"/>
+            <Setting id="TransFIFONum" value="Num0"/>
+            <Setting id="DataMatch" value="Disable"/>
+            <Setting id="Parity" value="None"/>
+            <Setting id="RXIPriority" value="Level15"/>
+            <Setting id="DutyCorrection" value="Disable"/>
+            <Setting id="FlowControl" value="None"/>
+            <Setting id="FIFOMode" value="NonFIFO"/>
+            <Setting id="MultiIntRXIEnable" value="UnCheck"/>
+            <Setting id="StopBit" value="1Bit"/>
+            <Setting id="ERIEnable" value="Enable"/>
+            <Setting id="Bitrate" value="115200"/>
+            <Setting id="RecvDataHandle" value="ISR"/>
+            <Setting id="RecvEnd" value="Enable"/>
+            <Setting id="DataLength" value="8Bits"/>
+            <Setting id="TXIPriority" value="Level15"/>
+            <Setting id="CmpData" value="0x00"/>
+            <Setting id="NoiseFilt" value="Disable"/>
+            <Setting id="MultiIntERIEnable" value="UnCheck"/>
+            <Setting id="FiltClk" value="Div1"/>
         </Segment>
         <Segment component="com.renesas.smc.tools.swcomponent.codegenerator.i2cmastermode" id="Config_RIIC1" source="com.renesas.smc.tools.swcomponent.codegenerator.source">
             <Setting id="SPIEnable" value="Enable"/>
