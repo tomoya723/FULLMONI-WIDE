@@ -186,16 +186,41 @@ bool flash_erase_application_area(void)
         return false;
     }
 
-    /* アプリケーション領域を消去 */
-    /* FLASH_CF_BLOCK_12 (0xFFFC8000)からFLASH_CF_BLOCK_0 (0xFFFFE000)まで */
-    /* ブロック12から0まで = 13ブロック */
-    err = R_FLASH_Erase(FLASH_CF_BLOCK_12, 13);
-    if (err != FLASH_SUCCESS) {
-        char buf[50];
-        sprintf(buf, "Flash erase failed (err=%d)\r\n", err);
+    /* アプリケーション領域を複数回に分けて消去 */
+    /* 13ブロックずつ消去（動作確認済みの安全な値） */
+    /* 130ブロック ÷ 13 = 10回 */
+    
+    for (int i = 0; i < 10; i++) {
+        flash_block_address_t start_block;
+        
+        /* 開始ブロックアドレスを計算 */
+        if (i == 0) {
+            start_block = FLASH_CF_BLOCK_0;
+        } else {
+            /* 前回の終了アドレスから32KB×13ブロック下 */
+            /* ブロック0-7は8KB、ブロック8以降は32KB */
+            if (i == 1) {
+                /* BLOCK_8から: BLOCK_0(0xFFFFE000) - 8KB×8 = 0xFFFE8000 */
+                start_block = 0xFFFE8000;
+            } else {
+                /* BLOCK_13, 26, 39, 52, 65, 78, 91, 104, 117 */
+                start_block = 0xFFFE8000 - ((i - 1) * 13 * 0x8000);
+            }
+        }
+        
+        err = R_FLASH_Erase(start_block, 13);
+        if (err != FLASH_SUCCESS) {
+            char buf[64];
+            sprintf(buf, "Flash erase failed at round %d, addr=0x%08lX (err=%d)\r\n", i, start_block, err);
+            uart_send_polling(buf);
+            R_FLASH_Close();
+            return false;
+        }
+        
+        /* プログレス表示 */
+        char buf[32];
+        sprintf(buf, "Erased %d/10 rounds\r\n", i + 1);
         uart_send_polling(buf);
-        R_FLASH_Close();
-        return false;
     }
 
     /* フラッシュAPIを完全終了（SCI9には触らない） */
@@ -233,6 +258,10 @@ fw_update_result_t firmware_update_process(void)
     char mot_line[MOT_LINE_MAX_LENGTH];
     uint32_t line_count = 0;
     uint32_t s3_count = 0;
+    uint8_t write_buffer[256];  /* フラッシュ書き込みバッファ */
+    uint32_t buffer_addr = 0;
+    uint32_t buffer_size = 0;
+    flash_err_t flash_err;
 
     uart_send_polling("\r\n========================================\r\n");
     uart_send_polling("  Firmware Update Mode\r\n");
@@ -246,6 +275,13 @@ fw_update_result_t firmware_update_process(void)
     }
     uart_send_polling("Erase completed successfully!\r\n");
 
+    /* フラッシュ書き込み準備 */
+    flash_err = R_FLASH_Open();
+    if (flash_err != FLASH_SUCCESS) {
+        uart_send_polling("ERROR: Flash open failed\r\n");
+        return FW_UPDATE_ERROR_FLASH;
+    }
+
     uart_send_polling("\r\nReady to receive MOT file...\r\n");
     uart_send_polling("Send MOT file now!\r\n\r\n");
 
@@ -254,6 +290,7 @@ fw_update_result_t firmware_update_process(void)
     
     if (!mot_receive_line(mot_line, 600)) {
         uart_send_polling("ERROR: Failed to receive first line\r\n");
+        R_FLASH_Close();
         return FW_UPDATE_ERROR_TIMEOUT;
     }
     
@@ -267,7 +304,8 @@ fw_update_result_t firmware_update_process(void)
     while (1) {
         if (!mot_receive_line(mot_line, 600)) {
             uart_send_polling("\r\nERROR: Receive failed\r\n");
-            break;
+            R_FLASH_Close();
+            return FW_UPDATE_ERROR_TIMEOUT;
         }
 
         line_count++;
@@ -275,6 +313,64 @@ fw_update_result_t firmware_update_process(void)
         /* S3レコードをカウント */
         if (mot_line[0] == 'S' && mot_line[1] == '3') {
             s3_count++;
+            
+            /* S3レコードからアドレスとデータを抽出 */
+            uint32_t address;
+            uint32_t length;
+            uint8_t data[256];
+            
+            if (parse_s3_record(mot_line, &address, data, &length)) {
+                /* バッファが空の場合、開始アドレスを設定 */
+                if (buffer_size == 0) {
+                    buffer_addr = address;
+                }
+                
+                /* アドレスが連続している場合はバッファに追加 */
+                if (address == buffer_addr + buffer_size) {
+                    memcpy(&write_buffer[buffer_size], data, length);
+                    buffer_size += length;
+                } else {
+                    /* アドレスが不連続な場合、先にバッファを書き込み */
+                    if (buffer_size > 0) {
+                        /* 128バイト境界に丸める */
+                        uint32_t aligned_size = (buffer_size + 127) & ~127;
+                        /* 残りを0xFFで埋める */
+                        memset(&write_buffer[buffer_size], 0xFF, aligned_size - buffer_size);
+                        
+                        flash_err = R_FLASH_Write((uint32_t)write_buffer, buffer_addr, aligned_size);
+                        if (flash_err != FLASH_SUCCESS) {
+                            uart_send_polling("\r\nERROR: Flash write failed\r\n");
+                            R_FLASH_Close();
+                            return FW_UPDATE_ERROR_FLASH;
+                        }
+                    }
+                    
+                    /* 新しいブロック開始 */
+                    buffer_addr = address;
+                    buffer_size = 0;
+                    memcpy(&write_buffer[buffer_size], data, length);
+                    buffer_size += length;
+                }
+                
+                /* バッファが128バイト以上溜まったら書き込み */
+                if (buffer_size >= 128) {
+                    uint32_t write_size = (buffer_size / 128) * 128;
+                    flash_err = R_FLASH_Write((uint32_t)write_buffer, buffer_addr, write_size);
+                    if (flash_err != FLASH_SUCCESS) {
+                        uart_send_polling("\r\nERROR: Flash write failed\r\n");
+                        R_FLASH_Close();
+                        return FW_UPDATE_ERROR_FLASH;
+                    }
+                    
+                    /* 残りをバッファの先頭に移動 */
+                    uint32_t remain = buffer_size - write_size;
+                    if (remain > 0) {
+                        memmove(write_buffer, &write_buffer[write_size], remain);
+                    }
+                    buffer_addr += write_size;
+                    buffer_size = remain;
+                }
+            }
         }
 
         /* 100行ごとにプログレス */
@@ -292,6 +388,19 @@ fw_update_result_t firmware_update_process(void)
             /* S7レコードの長さチェック（14～16文字程度が正常） */
             uint32_t len = strlen(mot_line);
             if (len < 20) {  /* 正常なS7レコード */
+                /* 残りのバッファを書き込み */
+                if (buffer_size > 0) {
+                    uint32_t aligned_size = (buffer_size + 127) & ~127;
+                    memset(&write_buffer[buffer_size], 0xFF, aligned_size - buffer_size);
+                    
+                    flash_err = R_FLASH_Write((uint32_t)write_buffer, buffer_addr, aligned_size);
+                    if (flash_err != FLASH_SUCCESS) {
+                        uart_send_polling("\r\nERROR: Final flash write failed\r\n");
+                        R_FLASH_Close();
+                        return FW_UPDATE_ERROR_FLASH;
+                    }
+                }
+                
                 uart_send_polling("\r\nS7: End of file\r\n");
                 uart_send_polling("S7 line: ");
                 uart_send_polling(mot_line);
@@ -304,10 +413,14 @@ fw_update_result_t firmware_update_process(void)
         }
     }
 
+    /* フラッシュクローズ */
+    R_FLASH_Close();
+
     uart_send_polling("\r\nMOT file reception complete!\r\n");
     char buf[64];
     sprintf(buf, "Total lines: %lu, S3 records: %lu\r\n", line_count, s3_count);
     uart_send_polling(buf);
+    uart_send_polling("\r\nFlash programming completed!\r\n");
 
     return FW_UPDATE_OK;
 }
