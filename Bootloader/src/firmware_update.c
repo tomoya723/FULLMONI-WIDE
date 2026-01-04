@@ -282,6 +282,7 @@ fw_update_result_t firmware_update_process(void)
 {
     char mot_line[MOT_LINE_MAX_LENGTH];
     uint32_t line_count = 0;
+    uint32_t s3_count = 0;
 
     uart_send_polling("\r\n========================================\r\n");
     uart_send_polling("  Firmware Update Mode\r\n");
@@ -312,6 +313,11 @@ fw_update_result_t firmware_update_process(void)
 
         line_count++;
 
+        /* S3レコードをカウント */
+        if (mot_line[0] == 'S' && mot_line[1] == '3') {
+            s3_count++;
+        }
+
         /* 100行ごとにプログレス */
         if (line_count % 100 == 0) {
             uart_send_polling(".");
@@ -324,14 +330,24 @@ fw_update_result_t firmware_update_process(void)
 
         /* S7で終了 */
         if (mot_line[0] == 'S' && mot_line[1] == '7') {
-            uart_send_polling("\r\nS7: End of file\r\n");
-            break;
+            /* S7レコードの長さチェック（14～16文字程度が正常） */
+            uint32_t len = strlen(mot_line);
+            if (len < 20) {  /* 正常なS7レコード */
+                uart_send_polling("\r\nS7: End of file\r\n");
+                uart_send_polling("S7 line: ");
+                uart_send_polling(mot_line);
+                uart_send_polling("\r\n");
+                break;
+            } else {
+                /* データ化けによる偽S7、スキップして継続 */
+                continue;
+            }
         }
     }
 
     uart_send_polling("\r\nMOT file reception complete!\r\n");
     char buf[64];
-    sprintf(buf, "Total lines: %lu\r\n", line_count);
+    sprintf(buf, "Total lines: %lu, S3 records: %lu\r\n", line_count, s3_count);
     uart_send_polling(buf);
 
     return FW_UPDATE_OK;
