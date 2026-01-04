@@ -186,41 +186,48 @@ bool flash_erase_application_area(void)
         return false;
     }
 
-    /* アプリケーション領域を複数回に分けて消去 */
-    /* 13ブロックずつ消去（動作確認済みの安全な値） */
-    /* 130ブロック ÷ 13 = 10回 */
+    /* アプリケーション領域を1ブロックずつ消去 */
+    /* アプリケーション領域: BLOCK_125 (0xFFC40000) ～ BLOCK_0 (0xFFFFE000) */
+    /* Bootloader保護: BLOCK_133-126 (0xFFC00000-0xFFC3FFFF, 128KB) は消去しない */
+    /* 125ブロック = 8KB×8 + 32KB×117 = 3808KB */
     
-    for (int i = 0; i < 10; i++) {
-        flash_block_address_t start_block;
+    int total_blocks = 125;
+    int erased_count = 0;
+    
+    /* BLOCK_125から開始 (0xFFC40000) */
+    for (int i = 0; i < total_blocks; i++) {
+        flash_block_address_t block_addr;
         
-        /* 開始ブロックアドレスを計算 */
-        if (i == 0) {
-            start_block = FLASH_CF_BLOCK_0;
+        if (i < 117) {
+            /* BLOCK_125 ～ BLOCK_9 (32KBブロック) */
+            block_addr = FLASH_CF_BLOCK_125 + (i * 0x8000);
+        } else if (i == 117) {
+            /* BLOCK_8 (0xFFFE8000) */
+            block_addr = FLASH_CF_BLOCK_8;
         } else {
-            /* 前回の終了アドレスから32KB×13ブロック下 */
-            /* ブロック0-7は8KB、ブロック8以降は32KB */
-            if (i == 1) {
-                /* BLOCK_8から: BLOCK_0(0xFFFFE000) - 8KB×8 = 0xFFFE8000 */
-                start_block = 0xFFFE8000;
-            } else {
-                /* BLOCK_13, 26, 39, 52, 65, 78, 91, 104, 117 */
-                start_block = 0xFFFE8000 - ((i - 1) * 13 * 0x8000);
-            }
+            /* BLOCK_7 ～ BLOCK_0 (8KBブロック) */
+            /* i=118 -> BLOCK_7 (0xFFFF0000) */
+            /* i=119 -> BLOCK_6 (0xFFFF2000) */
+            block_addr = FLASH_CF_BLOCK_7 + ((i - 118) * 0x2000);
         }
         
-        err = R_FLASH_Erase(start_block, 13);
+        err = R_FLASH_Erase(block_addr, 1);
         if (err != FLASH_SUCCESS) {
             char buf[64];
-            sprintf(buf, "Flash erase failed at round %d, addr=0x%08lX (err=%d)\r\n", i, start_block, err);
+            sprintf(buf, "Flash erase failed at block %d, addr=0x%08lX (err=%d)\r\n", i, block_addr, err);
             uart_send_polling(buf);
             R_FLASH_Close();
             return false;
         }
         
-        /* プログレス表示 */
-        char buf[32];
-        sprintf(buf, "Erased %d/10 rounds\r\n", i + 1);
-        uart_send_polling(buf);
+        erased_count++;
+        
+        /* 10ブロックごとに進捗表示 */
+        if ((erased_count % 10) == 0 || erased_count == total_blocks) {
+            char buf[32];
+            sprintf(buf, "Erased %d/%d blocks\r\n", erased_count, total_blocks);
+            uart_send_polling(buf);
+        }
     }
 
     /* フラッシュAPIを完全終了（SCI9には触らない） */

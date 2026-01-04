@@ -43,7 +43,7 @@ static void jump_to_application(void)
     uart_send_polling("\r\nJumping to Application...\r\n");
 
     /* アプリケーションの開始アドレス（.textセクションの先頭 = PowerON_Reset） */
-    #define APP_START_ADDR   0xFFC20000
+    #define APP_START_ADDR   0xFFC40000
 
     /* アプリケーションの先頭4バイトをチェック（有効なRX命令であること） */
     uint32_t first_instruction = *(uint32_t *)APP_START_ADDR;
@@ -83,6 +83,54 @@ void main(void)
     uart_send_polling("Press 'U' to enter update mode...\r\n");
     uart_send_polling("Auto-boot in 3 seconds...\r\n");
 
+    /* アプリケーションが存在するかチェック（3秒待機の前に） */
+    uint32_t *app_vector = (uint32_t *)APP_START_ADDR;
+    uint32_t app_start_value = *app_vector;
+    
+    /* デバッグ: アプリ先頭アドレスの値を表示 */
+    char debug_buf[64];
+    sprintf(debug_buf, "App start addr (0x%08lX) = 0x%08lX\r\n", (uint32_t)app_vector, app_start_value);
+    uart_send_polling(debug_buf);
+    
+    if (app_start_value == 0xFFFFFFFF) {
+        /* アプリケーションが消去されている */
+        uart_send_polling("\r\n*** ERROR: No application found! ***\r\n");
+        uart_send_polling("Application area is erased.\r\n");
+        uart_send_polling("Please update firmware via UART.\r\n");
+        uart_send_polling("Press 'U' to enter update mode...\r\n\r\n");
+        
+        /* 無限ループでメッセージを繰り返し表示 */
+        while (1) {
+            /* UART受信チェック */
+            if (SCI9.SSR.BIT.RDRF == 1) {
+                uint8_t rx_data = SCI9.RDR;
+                SCI9.SSR.BIT.RDRF = 0;
+
+                if (rx_data == 'U' || rx_data == 'u') {
+                    uart_send_polling("\r\n*** UPDATE MODE ***\r\n");
+
+                    /* ファームウェア更新処理実行 */
+                    fw_update_result_t result = firmware_update_process();
+
+                    if (result == FW_UPDATE_OK) {
+                        uart_send_polling("\r\nUpdate successful! Rebooting...\r\n");
+                        /* TODO: ソフトウェアリセット */
+                        while(1);
+                    } else {
+                        uart_send_polling("\r\nUpdate failed!\r\n");
+                        while(1);
+                    }
+                }
+            }
+            
+            counter++;
+            if (counter > 10000000) {
+                counter = 0;
+                uart_send_polling("*** No application - Press 'U' to update ***\r\n");
+            }
+        }
+    }
+
     /* 3秒間入力待ち（簡易タイムアウト） */
     while (timeout < 30000000) {
         timeout++;
@@ -111,6 +159,7 @@ void main(void)
     }
 
     /* アプリケーションにジャンプ */
+    uart_send_polling("Jumping to Application...\r\n");
     jump_to_application();
 
     /* ジャンプ失敗時 */

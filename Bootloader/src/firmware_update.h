@@ -11,7 +11,7 @@
 #include "r_flash_rx_if.h"
 
 /* 定数定義 */
-#define APP_START_ADDR          0xFFC20000  /* アプリケーション開始アドレス */
+#define APP_START_ADDR          0xFFC40000  /* アプリケーション開始アドレス (BLOCK_125) */
 #define APP_MAX_SIZE            0x3E0000    /* アプリケーション最大サイズ (約3.8MB) */
 #define FLASH_BLOCK_SIZE        0x8000      /* フラッシュブロックサイズ (32KB) */
 
