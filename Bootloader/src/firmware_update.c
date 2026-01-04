@@ -177,18 +177,14 @@ bool flash_erase_application_area(void)
 {
     flash_err_t err;
 
-    uart_send_polling("Initializing flash...\r\n");
-
     /* フラッシュ初期化 */
     err = R_FLASH_Open();
     if (err != FLASH_SUCCESS) {
         char buf[50];
-        sprintf(buf, "ERROR: Flash open failed (err=%d)\r\n", err);
+        sprintf(buf, "Flash open failed (err=%d)\r\n", err);
         uart_send_polling(buf);
         return false;
     }
-
-    uart_send_polling("Erasing application area...\r\n");
 
     /* アプリケーション領域を消去 */
     /* FLASH_CF_BLOCK_12 (0xFFFC8000)からFLASH_CF_BLOCK_0 (0xFFFFE000)まで */
@@ -196,60 +192,14 @@ bool flash_erase_application_area(void)
     err = R_FLASH_Erase(FLASH_CF_BLOCK_12, 13);
     if (err != FLASH_SUCCESS) {
         char buf[50];
-        sprintf(buf, "ERROR: Flash erase failed (err=%d)\r\n", err);
+        sprintf(buf, "Flash erase failed (err=%d)\r\n", err);
         uart_send_polling(buf);
         R_FLASH_Close();
         return false;
     }
 
-    uart_send_polling("Erase complete!\r\n");
-
-    /* フラッシュAPIをクローズ（受信前に完全終了） */
+    /* フラッシュAPIを完全終了（SCI9には触らない） */
     R_FLASH_Close();
-
-    uart_send_polling("Re-initializing UART...\r\n");
-
-    /* SCI9を完全停止 */
-    SCI9.SCR.BYTE = 0x00U;  /* TE=0, RE=0 */
-    
-    /* 短いディレイ */
-    for (volatile uint32_t i = 0; i < 1000; i++);
-
-    /* SCI9を完全に手動で再設定 */
-    SYSTEM.PRCR.WORD = 0xA502U;  /* 書き込み許可 */
-    MSTP(SCI9) = 0U;  /* SCI9モジュールストップ解除 */
-    SYSTEM.PRCR.WORD = 0xA500U;  /* 書き込み禁止 */
-    
-    /* ポート設定 */
-    PORTB.PMR.BYTE &= 0x3FU;  /* まずペリフェラル解除 */
-    PORTB.PDR.BYTE &= ~0x40U;  /* PB6を入力に設定 */
-    PORTB.PDR.BYTE |= 0x80U;   /* PB7を出力に設定 */
-    PORTB.PCR.BYTE |= 0x40U;   /* PB6のプルアップ有効 */
-    MPC.PWPR.BIT.B0WI = 0U;
-    MPC.PWPR.BIT.PFSWE = 1U;
-    MPC.PB6PFS.BYTE = 0x0AU;  /* RXD9 */
-    MPC.PB7PFS.BYTE = 0x0AU;  /* TXD9 */
-    MPC.PWPR.BYTE = 0x80U;
-    PORTB.PMR.BYTE |= 0xC0U;  /* ペリフェラル機能有効 */
-    
-    /* SCI9レジスタ設定 */
-    SCI9.SCR.BYTE = 0x00U;
-    SCI9.SIMR1.BYTE = 0x00U;
-    SCI9.SIMR2.BYTE = 0x00U;
-    SCI9.SIMR3.BYTE = 0x00U;
-    SCI9.SPMR.BYTE = 0x00U;  /* フロー制御なし */
-    SCI9.SMR.BYTE = 0x00U;   /* クロック選択 n=0, 8bit, パリティなし, 1stop */
-    SCI9.SCMR.BYTE = 0xF2U;  /* 調歩同期 */
-    SCI9.SEMR.BYTE = 0x10U;  /* ABCS=1 */
-    SCI9.BRR = 0x40U;        /* 115200bps */
-    
-    /* BRR反映待ち */
-    for (volatile uint32_t i = 0; i < 10000; i++);
-    
-    /* 送受信有効 */
-    SCI9.SCR.BYTE = 0x30U;  /* TE=1, RE=1 */
-    
-    uart_send_polling("UART re-init done!\r\n");
 
     return true;
 }
@@ -287,6 +237,15 @@ fw_update_result_t firmware_update_process(void)
     uart_send_polling("\r\n========================================\r\n");
     uart_send_polling("  Firmware Update Mode\r\n");
     uart_send_polling("========================================\r\n");
+
+    /* フラッシュ消去を先に実行 */
+    uart_send_polling("\r\nErasing application area...\r\n");
+    if (!flash_erase_application_area()) {
+        uart_send_polling("ERROR: Flash erase failed\r\n");
+        return FW_UPDATE_ERROR_FLASH;
+    }
+    uart_send_polling("Erase completed successfully!\r\n");
+
     uart_send_polling("\r\nReady to receive MOT file...\r\n");
     uart_send_polling("Send MOT file now!\r\n\r\n");
 
