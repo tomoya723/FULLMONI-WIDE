@@ -84,24 +84,24 @@ void test_sci9_init(void)
 {
     /* プロテクト解除 (PRC1ビット) */
     SYSTEM_PRCR = 0xA502;
-    
+
     /* モジュールストップ解除 */
     SYSTEM_MSTPCRB &= ~MSTPB22;
-    
+
     /* プロテクト再設定 */
     SYSTEM_PRCR = 0xA500;
-    
+
     /* MPC書き込み保護解除 */
     MPC_PWPR = 0x00;        /* B0WI書き込み許可 */
     MPC_PWPR = 0x40;        /* PFSWE書き込み許可 */
-    
+
     /* ポート機能設定 */
     MPC_PB7PFS = 0x4A;      /* TXD9 */
     MPC_PB6PFS = 0x4A;      /* RXD9 */
-    
+
     /* MPC書き込み保護設定 */
     MPC_PWPR = 0x80;        /* PFSWE書き込み禁止 */
-    
+
     /* 周辺機能モード設定 */
     PORTB_PMR |= 0xC0;      /* PB7, PB6を周辺機能に */
     SCI9_SCR = 0x00;
@@ -146,11 +146,11 @@ void main(void)
 	/* Smart Configurator生成のSCI9を使用 */
 	R_Config_SCI9_Create();
 	R_Config_SCI9_Start();
-	
+
 	/* テストメッセージ送信 */
 	const char test_msg[] = "\r\n=== SCI9 Test (Smart Configurator) ===\r\n";
 	R_Config_SCI9_Serial_Send((uint8_t*)test_msg, sizeof(test_msg)-1);
-	
+
 	/* 送信完了待ち */
 	for (volatile int i = 0; i < 1000000; i++);
 	// RIIC ch0 EEPROM 16K 400kbps

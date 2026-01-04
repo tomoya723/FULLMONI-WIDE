@@ -1,0 +1,69 @@
+/*
+ * Firmware Header for Bootloader
+ * RX72N/RX72T Application
+ * 
+ * このファイルはアプリケーションのファームウェアヘッダを定義します。
+ * ヘッダは0xFFC10000に配置され、Bootloaderによって検証されます。
+ */
+
+#include <stdint.h>
+#include "../bootloader/firmware_header.h"
+
+/* ビルド情報（ビルド時に自動更新される） */
+#ifndef FW_VERSION_MAJOR
+#define FW_VERSION_MAJOR 1
+#endif
+
+#ifndef FW_VERSION_MINOR
+#define FW_VERSION_MINOR 0
+#endif
+
+#ifndef FW_VERSION_PATCH
+#define FW_VERSION_PATCH 0
+#endif
+
+#ifndef FW_BUILD_NUMBER
+#define FW_BUILD_NUMBER 1
+#endif
+
+/* エントリポイント（リセットハンドラのアドレス） */
+extern void PowerON_Reset(void);
+
+/* CRC32計算はビルド後に別ツールで埋め込む */
+#define FW_CRC32_PLACEHOLDER 0xFFFFFFFF
+
+/* ファームウェアヘッダ（0xFFC10000に配置） */
+const firmware_header_t firmware_header __attribute__((section(".firmware_header"))) = {
+    .magic = FIRMWARE_MAGIC,           /* 0x52584657 "RXFW" */
+    .header_version = 1,                /* ヘッダ仕様バージョン */
+    .firmware_version = {
+        .major = FW_VERSION_MAJOR,
+        .minor = FW_VERSION_MINOR,
+        .patch = FW_VERSION_PATCH,
+        .build = FW_BUILD_NUMBER
+    },
+    .firmware_size = 0,                 /* ビルド後に計算して埋め込む */
+    .firmware_crc32 = FW_CRC32_PLACEHOLDER,  /* ビルド後に計算して埋め込む */
+    .entry_point = (uint32_t)PowerON_Reset,  /* アプリケーションエントリポイント */
+    .mcu_id = MCU_ID_RX72N,            /* 0x572D (RX72T) */
+    .build_timestamp = 0,               /* ビルド時刻（Unixタイムスタンプ） */
+    .description = "FULLMONI-WIDE Application",  /* アプリケーション名 */
+    .reserved = {0}                     /* 予約領域（ゼロ埋め） */
+};
+
+/*
+ * 注意事項：
+ * 
+ * 1. firmware_sizeとfirmware_crc32は初期値（0やFFFFFFFF）で定義され、
+ *    ビルド後にpost-buildスクリプトで実際の値に更新されます。
+ * 
+ * 2. entry_pointは自動的にPowerON_Resetのアドレスが設定されます。
+ * 
+ * 3. build_timestampはビルド時刻（Unixタイムスタンプ）が設定されます。
+ * 
+ * 4. ビルドスクリプトの手順：
+ *    a) 通常のビルド（CRC32はプレースホルダー）
+ *    b) ELFファイルからアプリケーション部分のサイズとCRC32を計算
+ *    c) ヘッダ領域に実際の値を書き込む
+ *    d) 最終的なHEX/MOTファイルを生成
+ */

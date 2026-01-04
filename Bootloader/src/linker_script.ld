@@ -1,8 +1,8 @@
 MEMORY
 {
-	RAM : ORIGIN = 0x00064040, LENGTH = 0x1BFC0
-	ECCRAM : ORIGIN = 0x00FF8000, LENGTH = 0x8000
-	ROM : ORIGIN = 0xFFC20000, LENGTH = 0x3E0000
+	RAM : ORIGIN = 0x4, LENGTH = 0x7fffc
+	RAM2 : ORIGIN = 0x00800000, LENGTH = 524288
+	ROM : ORIGIN = 0xFFC00000, LENGTH = 4194304
 	OFS : ORIGIN = 0xFE7F5D00, LENGTH = 128
 }
 SECTIONS
@@ -13,13 +13,19 @@ SECTIONS
 		KEEP(*(.exvectors))
 		"_exvectors_end" = .;
 	} >ROM
-	/* .fvectors removed - owned by bootloader at 0xFFFFFFFC */
-	
-	.text 0xFFC20000 : AT(0xFFC20000)
+	.fvectors 0xFFFFFFFC : AT(0xFFFFFFFC)
+	{
+		KEEP(*(.fvectors))
+	} >ROM
+	.text 0xFFC00000 : AT(0xFFC00000)
 	{
 		*(.text)
 		*(.text.*)
 		*(P)
+		KEEP(*(.text.*isr))
+		KEEP(*(.text.Excep_*))
+		KEEP(*(.text.*ISR))
+		KEEP(*(.text.*interrupt))
 		etext = .;
 	} >ROM
 	.rvectors ALIGN(4) :
@@ -102,8 +108,9 @@ SECTIONS
 		*(D)
 		*(D_1)
 		*(D_2)
+		*(.sdata.*)
 		_edata = .;
-	} >ECCRAM
+	} >RAM
 	.bss :
 	{
 		_bss = .;
@@ -153,21 +160,21 @@ SECTIONS
 	{
 		. += 0x100;
 		"_r_bsp_NULL_end" = .;
-	} >ECCRAM AT>ECCRAM
+	} >RAM AT>RAM
 	.r_bsp_istack ALIGN(0x4) (NOLOAD) :
 	{
 		KEEP(*(.r_bsp_istack))
-	} >ECCRAM AT>ECCRAM
+	} >RAM AT>RAM
 	.istack :
 	{
 		"_istack" = .;
-	} >ECCRAM
+	} >RAM
 	.r_bsp_ustack ALIGN(0x4) (NOLOAD) :
 	{
 		KEEP(*(.r_bsp_ustack))
-	} >ECCRAM AT>ECCRAM
+	} >RAM AT>RAM
 	.ustack :
 	{
 		"_ustack" = .;
-	} >ECCRAM
+	} >RAM
 }

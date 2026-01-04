@@ -87,6 +87,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/Config_PORT}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_drw2d_rx/inc/tes}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/Config_SCI9}&quot;"/>
 								</option>
 								<option id="com.renesas.cdt.managedbuild.gcc.core.option.compiler.source.std.1131375516" name="Language standard" superClass="com.renesas.cdt.managedbuild.gcc.core.option.compiler.source.std" useByScannerDiscovery="true" value="com.renesas.cdt.managedbuild.gcc.core.option.compiler.common.gnu99" valueType="enumerated"/>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.renesas.cdt.managedbuild.gcc.core.option.compiler.includes.macroDefines.1617134571" name="Macro Defines (-D)" superClass="com.renesas.cdt.managedbuild.gcc.core.option.compiler.includes.macroDefines" useByScannerDiscovery="false" valueType="definedSymbols">
@@ -129,6 +130,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/Config_PORT}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_drw2d_rx/inc/tes}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_config}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/Config_SCI9}&quot;"/>
 								</option>
 								<inputType id="com.renesas.cdt.managedbuild.gcc.core.inputType.assembler.1716681856" superClass="com.renesas.cdt.managedbuild.gcc.core.inputType.assembler"/>
 							</tool>
