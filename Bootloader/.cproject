@@ -60,6 +60,13 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_bsp}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/Config_SCI9}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_flash_rx/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_flash_rx/src/flash_type_4}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_flash_rx/src/targets}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_flash_rx}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_flash_rx/src/flash_type_3}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_flash_rx/src/flash_type_5}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_flash_rx/src/flash_type_1}&quot;"/>
 								</option>
 								<option id="com.renesas.cdt.managedbuild.gcc.core.option.compiler.source.std.1879310738" name="Language standard" superClass="com.renesas.cdt.managedbuild.gcc.core.option.compiler.source.std" useByScannerDiscovery="true" value="com.renesas.cdt.managedbuild.gcc.core.option.compiler.common.gnu99" valueType="enumerated"/>
 								<inputType id="com.renesas.cdt.managedbuild.gcc.core.inputType.compiler.c.1297487912" superClass="com.renesas.cdt.managedbuild.gcc.core.inputType.compiler.c"/>
@@ -77,6 +84,13 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_bsp}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/Config_SCI9}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_flash_rx/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_flash_rx/src/flash_type_4}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_flash_rx/src/targets}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_flash_rx}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_flash_rx/src/flash_type_3}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_flash_rx/src/flash_type_5}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_flash_rx/src/flash_type_1}&quot;"/>
 								</option>
 								<inputType id="com.renesas.cdt.managedbuild.gcc.core.inputType.assembler.504280816" superClass="com.renesas.cdt.managedbuild.gcc.core.inputType.assembler"/>
 							</tool>
@@ -86,6 +100,36 @@
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="true" id="com.renesas.cdt.managedbuild.gcc.rx.option.linker.archives.archiveSearchDirectories.293154079" name="Standard archive search directories (-L)" superClass="com.renesas.cdt.managedbuild.gcc.rx.option.linker.archives.archiveSearchDirectories" valueType="stringList"/>
 								<option id="com.renesas.cdt.managedbuild.gcc.core.option.linker.misc.inputsections.384454896" name="Enable garbage collection of unused input sections(-gc-sections)" superClass="com.renesas.cdt.managedbuild.gcc.core.option.linker.misc.inputsections" value="false" valueType="boolean"/>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.renesas.cdt.managedbuild.gcc.core.option.linker.source.linkOrderList.1208142085" name="Linkage Order List" superClass="com.renesas.cdt.managedbuild.gcc.core.option.linker.source.linkOrderList" valueType="stringList">
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_pincfg/Pin.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_bsp/mcu/rx72n/mcu_clocks.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_bsp/mcu/rx72n/mcu_init.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_bsp/mcu/rx72n/mcu_interrupts.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_bsp/mcu/rx72n/mcu_mapped_interrupts.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_bsp/mcu/rx72n/vecttbl.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_bsp/mcu/all/dbsct.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_bsp/mcu/all/lowlvl.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_bsp/mcu/all/lowsrc.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_bsp/mcu/all/mcu_locks.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_bsp/mcu/all/r_bsp_common.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_bsp/mcu/all/r_bsp_cpu.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_bsp/mcu/all/r_bsp_interrupts.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_bsp/mcu/all/r_bsp_locking.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_bsp/mcu/all/r_bsp_mcu_startup.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_bsp/mcu/all/r_bsp_software_interrupt.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_bsp/mcu/all/r_rx_intrinsic_functions.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_bsp/mcu/all/reset_program.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_bsp/mcu/all/resetprg.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_bsp/mcu/all/sbrk.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/r_bsp/board/generic_rx72n/hwsetup.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/general/r_cg_hardware_setup.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/general/r_smc_cgc.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/general/r_smc_cgc_user.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/general/r_smc_interrupt.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/Config_SCI9/Config_SCI9.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/smc_gen/Config_SCI9/Config_SCI9_user.o&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;src/Bootloader.o&quot;"/>
+								</option>
 							</tool>
 							<tool id="com.renesas.cdt.managedbuild.gcc.rx.tool.cpp.linker.955592279" name="Linker CPP" superClass="com.renesas.cdt.managedbuild.gcc.rx.tool.cpp.linker">
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.renesas.cdt.managedbuild.gcc.core.option.linker.source.linkerScript.177326044" name="Linker script" superClass="com.renesas.cdt.managedbuild.gcc.core.option.linker.source.linkerScript" valueType="stringList">

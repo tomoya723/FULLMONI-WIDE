@@ -40,6 +40,7 @@
     <Segment id="Component">
         <Setting id="r_bsp" value="FIT"/>
         <Setting id="Config_SCI9" value="CG"/>
+        <Setting id="r_flash_rx" value="FIT"/>
         <Segment component="r_bsp7.70" id="r_bsp" source="com.renesas.smc.tools.swcomponent.fit.source">
             <Setting id="BSP_CFG_SWINT_UNIT1_ENABLE" value="0"/>
             <Setting id="BSP_CFG_LOW_LEVEL_INTERFACE_STDIO_ENABLE" value="1"/>
@@ -149,6 +150,13 @@
             <Setting id="NoiseFilt" value="Disable"/>
             <Setting id="MultiIntERIEnable" value="UnCheck"/>
             <Setting id="FiltClk" value="Div1"/>
+        </Segment>
+        <Segment component="r_flash_rx5.22" id="r_flash_rx" source="com.renesas.smc.tools.swcomponent.fit.source">
+            <Setting id="FLASH_CFG_PARAM_CHECKING_ENABLE" value="1"/>
+            <Setting id="FLASH_CFG_DATA_FLASH_BGO" value="0"/>
+            <Setting id="FLASH_CFG_CODE_FLASH_RUN_FROM_ROM" value="1"/>
+            <Setting id="FLASH_CFG_CODE_FLASH_ENABLE" value="1"/>
+            <Setting id="FLASH_CFG_CODE_FLASH_BGO" value="0"/>
         </Segment>
     </Segment>
 </QE>

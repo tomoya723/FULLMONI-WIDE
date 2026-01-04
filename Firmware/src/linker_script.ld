@@ -14,7 +14,7 @@ SECTIONS
 		"_exvectors_end" = .;
 	} >ROM
 	/* .fvectors removed - owned by bootloader at 0xFFFFFFFC */
-	
+
 	.text 0xFFC20000 : AT(0xFFC20000)
 	{
 		*(.text)
