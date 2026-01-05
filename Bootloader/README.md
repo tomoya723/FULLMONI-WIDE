@@ -82,7 +82,7 @@ Firmware/HardwareDebug/Firmware.bin
 
 | フロー制御 | 設定 | 転送時間（1.2MB） |
 |-----------|------------|-------------------|
-| XON/XOFF | no delay | **約2分40秒** ✓推奨 |
+| XON/XOFF | no delay | **約2分** ✓推奨 |
 | なし | 128B/50ms | 約10分（フォールバック）|
 
 > **XON/XOFFが使えない場合**: フロー制御を`none`にして、Send size=128 bytes、Delay time=50 msに設定してください。

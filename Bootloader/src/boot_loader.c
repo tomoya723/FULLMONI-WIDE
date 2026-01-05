@@ -402,6 +402,9 @@ static e_bl_err_t write_image(void)
     
     buf_init();
     
+    /* Send initial XON to ensure PC is ready to send */
+    send_byte(BL_XON_CHAR);
+    
     /* Main receive loop */
     while (1) {
         /* Check flow control - send XON/XOFF based on buffer level */
@@ -437,8 +440,8 @@ static e_bl_err_t write_image(void)
                 send_byte(BL_XOFF_CHAR);
                 
                 /* Wait for PC to stop sending + receive any in-flight data */
-                /* At 115200bps, 1 byte = ~87us, wait 5ms = ~57 bytes margin */
-                R_BSP_SoftwareDelay(5, BSP_DELAY_MILLISECS);
+                /* At 115200bps, 1 byte = ~87us, wait 2ms = ~23 bytes margin */
+                R_BSP_SoftwareDelay(2, BSP_DELAY_MILLISECS);
                 
                 /* Drain any remaining data in ring buffer won't help here,
                  * but the delay allows in-flight bytes to be received */
