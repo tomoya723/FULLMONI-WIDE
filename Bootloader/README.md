@@ -3,6 +3,10 @@
 2線式UART（TX/RX）経由でファームウェア更新を行うブートローダーです。
 **XON/XOFF ソフトウェアフロー制御対応** により、高速かつ確実な転送を実現します。
 
+> ⚠️ **警告**: Smart Configuratorでコード生成を実行しないでください。
+> `r_Config_SCI9_receive_interrupt()` のカスタム実装が上書きされ、通信不能になります。
+> scfgファイルは意図的に削除されています。
+
 ## 特徴
 
 - **MCU**: RX72N (4MB Flash LINEAR MODE)
