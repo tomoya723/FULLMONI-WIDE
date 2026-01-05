@@ -148,6 +148,69 @@ Bootloader/
 └── README.md            # このファイル
 ```
 
+## リファレンスからの変更点
+
+本ブートローダーは **Renesas r_fwup リファレンスコード** をベースに、以下の変更を加えています。
+
+### ベースとしたリファレンス
+
+| 項目 | 内容 |
+|------|------|
+| 名称 | RX Family Firmware Update Module (r_fwup) |
+| バージョン | v2.02 |
+| 公式サイト | https://www.renesas.com/rx-fwup |
+| ドキュメント | R01AN6849EJ (Application Note) |
+
+### 1. RX72N 4MB Linear Mode対応
+
+**問題**: RX72Nの4MB Flashは単一バンク構成（Linear Mode）のため、Code Flashへの書き込み中は同じFlashからのプログラム実行ができない。
+
+**解決策**: Flash書き込み関数（`flash_write_impl`）を実行時にRAM2（0x00800000）にコピーし、RAMから実行するように変更。
+
+```c
+/* flash_write_impl関数をRAM2にコピーして実行 */
+memcpy((void*)0x00800000, flash_write_impl, FLASH_WRITE_IMPL_SIZE);
+s_ram_flash_write = (flash_write_func_t)0x00800000;
+```
+
+### 2. XON/XOFFソフトウェアフロー制御
+
+**問題**: 2線式UART（TX/RXのみ、RTS/CTSなし）ではハードウェアフロー制御が使えず、Flash書き込み中にデータロスが発生。
+
+**解決策**: XON/XOFFソフトウェアフロー制御を実装。
+- Flash書き込み前にXOFF（0x13）を送信してPC側の送信を一時停止
+- 2ms待機後にFlash書き込み実行
+- 書き込み完了後にXON（0x11）を送信して再開
+
+### 3. 256KBリングバッファ
+
+**問題**: 割り込み無効中に受信データを保持する必要がある。
+
+**解決策**: BSS領域に256KBのリングバッファを確保。
+
+### 4. 強制アップデートモード
+
+**問題**: リファレンスコードはユーザースイッチで強制アップデートモードに入るが、本ハードウェアにはスイッチがない。
+
+**解決策**: 起動後2秒以内に'U'キー（UART経由）を受信したら強制アップデートモードに入るように変更。
+
+### 5. 転送プロトコルの簡素化
+
+**変更前（リファレンス）**: コマンドベースのプロトコル（同期、消去コマンド、書き込みコマンド等）
+
+**変更後**: シンプルなバイナリ転送
+- Tera Termのファイル送信機能で直接BINファイルを転送
+- 20秒間データなしでタイムアウト → 転送完了と判断
+- 特別なツール不要
+
+### 変更したファイル
+
+| ファイル | 変更内容 |
+|---------|---------|
+| boot_loader.c | RAM実行、XON/XOFF、リングバッファ、'U'キー検出 |
+| boot_loader.h | メモリマップ、閾値定義 |
+| linker_script.ld | RAM2領域の定義 |
+
 ## ライセンス
 
 BSD-3-Clause (Renesas Electronics Corporation)
