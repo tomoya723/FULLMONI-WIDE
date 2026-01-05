@@ -454,6 +454,8 @@ static bool is_valid_image(void)
 /**********************************************************************************************************************
  * Function Name: exec_image
  * Description  : Jump to application
+ *              : Application .text starts at BL_APP_START (0xFFC20000)
+ *              : The first code at .text is PowerON_Reset function
  *********************************************************************************************************************/
 static void exec_image(void)
 {
@@ -465,8 +467,11 @@ static void exec_image(void)
     /* Close Flash */
     R_FLASH_Close();
     
-    /* Get application entry point from reset vector */
-    app_entry = (void (*)(void))(*((uint32_t *)BL_APP_START));
+    /* Disable SCI9 */
+    SCI9.SCR.BYTE = 0x00U;
+    
+    /* Application entry is at the start of .text section (PowerON_Reset) */
+    app_entry = (void (*)(void))BL_APP_START;
     
     /* Disable interrupts before jump */
     R_BSP_InterruptsDisable();
@@ -522,7 +527,7 @@ void boot_loader_main(void)
     
     /* Banner */
     BL_LOG(BL_MSG_BOOTLOADER, BL_MCU_NAME);
-    BL_LOG("  Memory: BL=256KB, App=3.75MB\r\n");
+    BL_LOG("  Memory: BL=128KB, App=3.875MB\r\n");
     BL_LOG("  Flash write unit: 128 bytes\r\n");
     BL_LOG("Press 'U' within 2 sec for UPDATE MODE...\r\n");
     

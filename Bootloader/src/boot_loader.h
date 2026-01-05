@@ -52,17 +52,21 @@
 /* Memory Map Configuration (RX72N 4MB Flash, LINEAR MODE) */
 /*
  * Block Map:
- *   Block 0-119:   0xFFC40000 - 0xFFFFFFFF  Application (3.75MB = 120 x 32KB)
- *   Block 120-127: 0xFFC00000 - 0xFFC3FFFF  Bootloader  (256KB = 8 x 32KB)
+ *   Block 0-7:     0xFFC00000 - 0xFFC1FFFF  Bootloader  (128KB = 4 x 32KB)
+ *   Block 8-127:   0xFFC20000 - 0xFFFFFFFF  Application (3.875MB = 124 x 32KB)
+ *
+ * Application Layout:
+ *   Firmware Header: 0xFFC10000 (in firmware_header_data.c but within BL area)
+ *   App .text start: 0xFFC20000 (PowerON_Reset entry point)
  */
 #define BL_BOOTLOADER_START         (0xFFC00000UL)
-#define BL_BOOTLOADER_END           (0xFFC3FFFFUL)
-#define BL_BOOTLOADER_SIZE          (0x40000UL)      /* 256KB */
+#define BL_BOOTLOADER_END           (0xFFC1FFFFUL)
+#define BL_BOOTLOADER_SIZE          (0x20000UL)      /* 128KB */
 
-#define BL_APP_START                (0xFFC40000UL)
+#define BL_APP_START                (0xFFC20000UL)
 #define BL_APP_END                  (0xFFFFFFFFUL)
-#define BL_APP_SIZE                 (0x3C0000UL)     /* 3.75MB = 3,932,160 bytes */
-#define BL_APP_BLOCKS               (120)            /* 120 x 32KB blocks */
+#define BL_APP_SIZE                 (0x3E0000UL)     /* 3.875MB = 4,063,232 bytes */
+#define BL_APP_BLOCKS               (124)            /* 124 x 32KB blocks */
 
 /* Log Control */
 #define BL_LOG_ENABLE               (1)
