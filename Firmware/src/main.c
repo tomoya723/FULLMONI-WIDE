@@ -148,7 +148,8 @@ void main(void)
 	R_Config_SCI9_Start();
 
 	/* テストメッセージ送信 */
-	const char test_msg[] = "\r\n=== SCI9 Test (Smart Configurator) ===\r\n";
+//	const char test_msg[] = "\r\n=== SCI9 Test (Smart Configurator) ===\r\n";
+	const char test_msg[] = "\r\n=== FULLMONI-WIDE Main Program Started!! ===\r\n";
 	R_Config_SCI9_Serial_Send((uint8_t*)test_msg, sizeof(test_msg)-1);
 
 	/* 送信完了待ち */

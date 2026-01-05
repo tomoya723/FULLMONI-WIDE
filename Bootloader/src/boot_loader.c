@@ -388,9 +388,9 @@ static e_bl_err_t write_image(void)
                 s_flash_buf_cnt = 0;
                 memset(s_flash_buf, 0xFF, BL_FLASH_WRITE_SIZE);
                 
-                /* Progress indicator every 4KB */
-                if ((s_total_received % 4096) == 0) {
-                    BL_LOG(".");
+                /* Progress indicator every 32KB with byte count */
+                if ((s_total_received % 32768) == 0) {
+                    BL_LOG("\r\n%luKB", s_total_received / 1024);
                 }
             }
         } else {
@@ -399,8 +399,15 @@ static e_bl_err_t write_image(void)
                 R_BSP_SoftwareDelay(1, BSP_DELAY_MILLISECS);
                 timeout_cnt++;
                 
-                /* 5 second timeout = transfer complete */
-                if (timeout_cnt >= 5000) {
+                /* Debug: Show timeout countdown every second */
+                if ((timeout_cnt % 1000) == 0) {
+                    BL_LOG("\r\nWait: %lus/%lus, Buf: %u", 
+                           timeout_cnt/1000, 20, ring_buffer_count());
+                }
+                
+                /* 20 second timeout = transfer complete */
+                if (timeout_cnt >= 20000) {
+                    BL_LOG("\r\nTimeout!\r\n");
                     break;
                 }
             } else {
@@ -436,6 +443,21 @@ static bool is_valid_image(void)
     /* Check first 4 bytes at app start - should not be 0xFFFFFFFF (erased) */
     uint32_t *app_start = (uint32_t *)BL_APP_START;
     
+    /* Debug: Show first 8 words of application */
+    BL_LOG("App data: ");
+    for (int i = 0; i < 8; i++) {
+        BL_LOG("%08lX ", app_start[i]);
+    }
+    BL_LOG("\r\n");
+    
+    /* Also check PowerON_Reset_PC_Prg location */
+    uint32_t *prg_entry = (uint32_t *)0xFFC33AFE;
+    BL_LOG("PC_Prg: ");
+    for (int i = 0; i < 4; i++) {
+        BL_LOG("%08lX ", prg_entry[i]);
+    }
+    BL_LOG("\r\n");
+    
     /* Simple check: first word should not be erased */
     if (*app_start == 0xFFFFFFFF) {
         return false;
@@ -453,31 +475,42 @@ static bool is_valid_image(void)
 
 /**********************************************************************************************************************
  * Function Name: exec_image
- * Description  : Jump to application
+ * Description  : Jump to application with clean MCU state
  *              : Application .text starts at BL_APP_START (0xFFC20000)
  *              : The first code at .text is PowerON_Reset function
  *********************************************************************************************************************/
 static void exec_image(void)
 {
-    void (*app_entry)(void);
-    
     BL_LOG(BL_MSG_EXEC_IMG);
     R_BSP_SoftwareDelay(100, BSP_DELAY_MILLISECS);  /* Allow printf to complete */
     
     /* Close Flash */
     R_FLASH_Close();
     
-    /* Disable SCI9 */
+    /* Disable all interrupts */
+    __builtin_rx_clrpsw('I');
+    
+    /* Disable and clear SCI9 */
     SCI9.SCR.BYTE = 0x00U;
+    ICU.IR[90].BIT.IR = 0;  /* Clear SCI9 RXI */
+    ICU.IR[91].BIT.IR = 0;  /* Clear SCI9 TXI */
+    ICU.IR[92].BIT.IR = 0;  /* Clear SCI9 TEI */
+    ICU.IR[93].BIT.IR = 0;  /* Clear SCI9 ERI */
+    ICU.IER[11].BIT.IEN2 = 0;  /* Disable SCI9 RXI */
+    ICU.IER[11].BIT.IEN3 = 0;  /* Disable SCI9 TXI */
+    ICU.IER[11].BIT.IEN4 = 0;  /* Disable SCI9 TEI */
+    ICU.IER[11].BIT.IEN5 = 0;  /* Disable SCI9 ERI */
     
-    /* Application entry is at the start of .text section (PowerON_Reset) */
-    app_entry = (void (*)(void))BL_APP_START;
+    /* Stop SCI9 clock */
+    MSTP(SCI9) = 1U;
     
-    /* Disable interrupts before jump */
-    R_BSP_InterruptsDisable();
-    
-    /* Jump to application */
-    app_entry();
+    /* Jump to application (PowerON_Reset will set up stack pointers) */
+    /* Use inline assembly to ensure clean jump */
+    __asm volatile (
+        "mov.l #0xFFC20000, r1\n"  /* Application entry point */
+        "jmp r1\n"                  /* Jump to application */
+        ::: "r1"
+    );
     
     /* Should never reach here */
     while (1);
