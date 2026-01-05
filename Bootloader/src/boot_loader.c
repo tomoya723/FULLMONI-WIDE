@@ -258,9 +258,6 @@ void boot_loader_rx_callback(uint8_t rx_data)
                 /* Send XOFF immediately - polling in interrupt is OK for single byte */
                 while (0 == SCI9.SSR.BIT.TDRE) { /* Wait */ }
                 SCI9.TDR = BL_XOFF_CHAR;
-                /* Send '-' for debug (XOFF indicator) */
-                while (0 == SCI9.SSR.BIT.TDRE) { /* Wait */ }
-                SCI9.TDR = '-';
                 s_xoff_sent = true;
             }
         }
@@ -328,7 +325,6 @@ static void flow_control_check(void)
         /* Buffer has space - send XON to resume transmission */
         send_byte(BL_XON_CHAR);
         s_xoff_sent = false;
-        BL_LOG("+");  /* Debug: XON sent */
     }
 }
 
@@ -473,15 +469,9 @@ static e_bl_err_t write_image(void)
                 R_BSP_SoftwareDelay(1, BSP_DELAY_MILLISECS);
                 timeout_cnt++;
                 
-                /* Debug: Show timeout countdown every second */
-                if ((timeout_cnt % 1000) == 0) {
-                    BL_LOG("\r\nWait: %lus/%lus, Buf: %u", 
-                           timeout_cnt/1000, 20, ring_buffer_count());
-                }
-                
-                /* 20 second timeout = transfer complete */
-                if (timeout_cnt >= 20000) {
-                    BL_LOG("\r\nTimeout!\r\n");
+                /* 2 second timeout = transfer complete */
+                if (timeout_cnt >= 2000) {
+                    BL_LOG("\r\nTransfer complete!\r\n");
                     break;
                 }
             } else {
@@ -501,7 +491,6 @@ static e_bl_err_t write_image(void)
         }
     }
     
-    BL_LOG("\r\nTransfer complete!\r\n");
     BL_LOG("  Received: %lu bytes\r\n", s_total_received);
     
     return BL_SUCCESS;

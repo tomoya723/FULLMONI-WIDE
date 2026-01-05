@@ -4,14 +4,12 @@
 * SPDX-License-Identifier: BSD-3-Clause
 */
 /***********************************************************************************************************************
-*  File Name    : Bootloader.c
-*  Description  : Main Program (Based on Renesas r_fwup reference)
+*  File Name    : main.c
+*  Description  : Bootloader entry point
 *  Creation Date: 2026-01-04
-*  Modified     : 2026-01-06 - RAM-based Flash write for RX72N 4MB Linear Mode
 ***********************************************************************************************************************/
 #include "r_smc_entry.h"
 #include "boot_loader.h"
-#include <string.h>
 
 void main(void);
 

@@ -138,9 +138,9 @@ XON/XOFFフロー制御と組み合わせることで、オーバーフローを
 ```
 Bootloader/
 ├── src/
-│   ├── boot_loader.c    # メインロジック
+│   ├── main.c           # エントリポイント (main関数)
+│   ├── boot_loader.c    # ブートローダー本体
 │   ├── boot_loader.h    # ヘッダ
-│   ├── Bootloader.c     # エントリポイント
 │   └── linker_script.ld # リンカスクリプト
 ├── HardwareDebug/
 │   ├── Bootloader.elf   # デバッグ用ELF
