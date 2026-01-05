@@ -19,6 +19,7 @@ SECTIONS
 	} >ROM
 	.text 0xFFC00000 : AT(0xFFC00000)
 	{
+		_text_start = .;
 		*(.text)
 		*(.text.*)
 		*(P)

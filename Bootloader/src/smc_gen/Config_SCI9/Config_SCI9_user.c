@@ -35,6 +35,8 @@ extern volatile uint8_t * gp_sci9_rx_address;                /* SCI9 receive buf
 extern volatile uint16_t  g_sci9_rx_count;                   /* SCI9 receive data number */
 extern volatile uint16_t  g_sci9_rx_length;                  /* SCI9 receive data length */
 /* Start user code for global. Do not edit comment generated here */
+/* External function for boot loader RX callback */
+extern void boot_loader_rx_callback(uint8_t rx_data);
 /* End user code. Do not edit comment generated here */
 
 /***********************************************************************************************************************
@@ -100,6 +102,18 @@ void r_Config_SCI9_transmitend_interrupt(void)
 
 void r_Config_SCI9_receive_interrupt(void)
 {
+    /* Start user code for r_Config_SCI9_receive_interrupt. Do not edit comment generated here */
+    uint8_t rx_data = SCI9.RDR;
+    
+    /* Call boot loader RX callback (from boot_loader.c) */
+    boot_loader_rx_callback(rx_data);
+    
+    /* Keep interrupt enabled for continuous reception */
+    /* RIE remains enabled - background reception continues during Flash write */
+    /* End user code. Do not edit comment generated here */
+    
+    /* Original SMC code (commented out - using boot loader ring buffer) */
+    #if 0
     if (g_sci9_rx_length > g_sci9_rx_count)
     {
         *gp_sci9_rx_address = SCI9.RDR;
@@ -114,6 +128,7 @@ void r_Config_SCI9_receive_interrupt(void)
         SCI9.SCR.BIT.RE = 0U;
         r_Config_SCI9_callback_receiveend();
     }
+    #endif
 }
 
 /***********************************************************************************************************************

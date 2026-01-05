@@ -73,6 +73,11 @@ static flash_err_t flash_write_faw_reg(fawreg_t faw);
 *                FLASH_ERR_FAILURE -
 *                   PE mode enter/exit failed
 *******************************************************************************/
+/* NOTE: Must be in PFRAM section when FLASH_CFG_CODE_FLASH_RUN_FROM_ROM=0 */
+/* because this function calls flash_write_faw_reg which is in PFRAM */
+#if (FLASH_CFG_CODE_FLASH_RUN_FROM_ROM == 0)
+R_BSP_ATTRIB_SECTION_CHANGE(P, FRAM)
+#endif
 flash_err_t R_CF_SetAccessWindow (flash_access_window_config_t  *pAccessInfo)
 {
     flash_err_t err = FLASH_SUCCESS;
@@ -104,6 +109,9 @@ flash_err_t R_CF_SetAccessWindow (flash_access_window_config_t  *pAccessInfo)
 
     return err;
 }
+#if (FLASH_CFG_CODE_FLASH_RUN_FROM_ROM == 0)
+R_BSP_ATTRIB_SECTION_CHANGE_END
+#endif
 
 
 /*******************************************************************************
@@ -165,6 +173,11 @@ uint8_t R_CF_GetCurrentStartupArea(void)
 *                FLASH_ERR_FAILURE -
 *                   PE mode enter/exit failed
 *******************************************************************************/
+/* NOTE: Must be in PFRAM section when FLASH_CFG_CODE_FLASH_RUN_FROM_ROM=0 */
+/* because this function calls flash_write_faw_reg which is in PFRAM */
+#if (FLASH_CFG_CODE_FLASH_RUN_FROM_ROM == 0)
+R_BSP_ATTRIB_SECTION_CHANGE(P, FRAM)
+#endif
 flash_err_t R_CF_ToggleStartupArea (void)
 {
     flash_err_t err;
@@ -180,6 +193,9 @@ flash_err_t R_CF_ToggleStartupArea (void)
 
     return err;
 }
+#if (FLASH_CFG_CODE_FLASH_RUN_FROM_ROM == 0)
+R_BSP_ATTRIB_SECTION_CHANGE_END
+#endif
 
 
 /*******************************************************************************

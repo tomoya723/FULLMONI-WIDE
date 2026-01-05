@@ -79,6 +79,7 @@
  * Set this to 1 when programming code flash while executing from another
  * segment in ROM (possible only with RX64M, RX71M, RX65N-2, RX72M groups).
  * See section 2.16 in the App Note.
+ * NOTE: Keep at 1, we'll handle RAM execution ourselves
  */
 #define FLASH_CFG_CODE_FLASH_RUN_FROM_ROM   (1)
 
