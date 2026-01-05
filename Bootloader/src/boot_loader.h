@@ -49,6 +49,12 @@
  * Using 256KB for safety margin with large transfers */
 #define BL_RING_BUFFER_SIZE         (256 * 1024)     /* 256KB */
 
+/* XON/XOFF Flow Control (Software flow control for 2-wire UART) */
+#define BL_XOFF_CHAR                (0x13)           /* XOFF = Ctrl+S (DC3) - Stop */
+#define BL_XON_CHAR                 (0x11)           /* XON  = Ctrl+Q (DC1) - Resume */
+#define BL_XOFF_THRESHOLD           (4 * 1024)       /* 4KB full → XOFF (low threshold for testing) */
+#define BL_XON_THRESHOLD            (1 * 1024)       /* 1KB full → XON */
+
 /* Memory Map Configuration (RX72N 4MB Flash, LINEAR MODE) */
 /*
  * Block Map:

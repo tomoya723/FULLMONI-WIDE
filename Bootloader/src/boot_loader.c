@@ -202,6 +202,9 @@ static uint8_t s_ring_buffer[BL_RING_BUFFER_SIZE] __attribute__((section(".bss")
 static volatile uint32_t s_ring_write_idx = 0;
 static volatile uint32_t s_ring_read_idx = 0;
 
+/* XON/XOFF flow control state */
+static volatile bool s_xoff_sent = false;   /* true = XOFF sent (transmission paused) */
+
 /* Flash write buffer (128 bytes) */
 static uint8_t s_flash_buf[BL_FLASH_WRITE_SIZE];
 static uint32_t s_flash_buf_cnt = 0;
@@ -216,6 +219,8 @@ static uint8_t s_err_flg = 0;
 static void buf_init(void);
 static uint32_t ring_buffer_count(void);
 static bool ring_buffer_get(uint8_t *data);
+static void send_byte(uint8_t data);
+static void flow_control_check(void);
 static e_bl_err_t erase_app_area(void);
 static e_bl_err_t write_image(void);
 static bool is_valid_image(void);
@@ -226,17 +231,39 @@ static void sw_reset(void);
  * Function Name: boot_loader_rx_callback
  * Description  : UART RX interrupt callback
  *              : Called from Config_SCI9_user.c when a byte is received
+ *              : Sends XOFF immediately when buffer reaches threshold (interrupt context)
  * Arguments    : rx_data - Received byte
  * Return Value : none
  *********************************************************************************************************************/
 void boot_loader_rx_callback(uint8_t rx_data)
 {
     uint32_t next_idx = (s_ring_write_idx + 1) % BL_RING_BUFFER_SIZE;
+    uint32_t count;
     
     /* Store data if buffer not full */
     if (next_idx != s_ring_read_idx) {
         s_ring_buffer[s_ring_write_idx] = rx_data;
         s_ring_write_idx = next_idx;
+        
+        /* Check if XOFF needs to be sent (in interrupt context for immediate response) */
+        if (!s_xoff_sent) {
+            /* Calculate buffer count */
+            if (s_ring_write_idx >= s_ring_read_idx) {
+                count = s_ring_write_idx - s_ring_read_idx;
+            } else {
+                count = BL_RING_BUFFER_SIZE - s_ring_read_idx + s_ring_write_idx;
+            }
+            
+            if (count >= BL_XOFF_THRESHOLD) {
+                /* Send XOFF immediately - polling in interrupt is OK for single byte */
+                while (0 == SCI9.SSR.BIT.TDRE) { /* Wait */ }
+                SCI9.TDR = BL_XOFF_CHAR;
+                /* Send '-' for debug (XOFF indicator) */
+                while (0 == SCI9.SSR.BIT.TDRE) { /* Wait */ }
+                SCI9.TDR = '-';
+                s_xoff_sent = true;
+            }
+        }
     }
     /* If buffer full, data is lost (overflow) */
 }
@@ -274,6 +301,38 @@ static bool ring_buffer_get(uint8_t *data)
 }
 
 /**********************************************************************************************************************
+ * Function Name: send_byte
+ * Description  : Send one byte via SCI9 (blocking)
+ *********************************************************************************************************************/
+static void send_byte(uint8_t data)
+{
+    /* Wait for transmit buffer empty */
+    while (0 == SCI9.SSR.BIT.TDRE) {
+        /* Wait */
+    }
+    SCI9.TDR = data;
+}
+
+/**********************************************************************************************************************
+ * Function Name: flow_control_check
+ * Description  : Check if XON needs to be sent (XOFF is sent in interrupt handler)
+ *              : Called periodically during receive loop after processing data
+ *********************************************************************************************************************/
+static void flow_control_check(void)
+{
+    uint32_t count = ring_buffer_count();
+    
+    /* XOFF is sent in interrupt handler (boot_loader_rx_callback) for immediate response */
+    
+    if (s_xoff_sent && count <= BL_XON_THRESHOLD) {
+        /* Buffer has space - send XON to resume transmission */
+        send_byte(BL_XON_CHAR);
+        s_xoff_sent = false;
+        BL_LOG("+");  /* Debug: XON sent */
+    }
+}
+
+/**********************************************************************************************************************
  * Function Name: buf_init
  * Description  : Initialize buffers
  *********************************************************************************************************************/
@@ -281,6 +340,7 @@ static void buf_init(void)
 {
     s_ring_write_idx = 0;
     s_ring_read_idx = 0;
+    s_xoff_sent = false;
     s_flash_buf_cnt = 0;
     s_total_received = 0;
     memset(s_flash_buf, 0xFF, BL_FLASH_WRITE_SIZE);
@@ -337,12 +397,16 @@ static e_bl_err_t write_image(void)
     BL_LOG(BL_MSG_SEND_VIA_UART);
     BL_LOG("  Target: 0x%08lX\r\n", BL_APP_START);
     BL_LOG("  Max size: %lu bytes\r\n", BL_APP_SIZE);
+    BL_LOG("  Flow control: XON/XOFF enabled\r\n");
     BL_LOG("Waiting for data...\r\n");
     
     buf_init();
     
     /* Main receive loop */
     while (1) {
+        /* Check flow control - send XON/XOFF based on buffer level */
+        flow_control_check();
+        
         /* Try to get data from ring buffer */
         if (ring_buffer_get(&rx_byte)) {
             /* Data received */
@@ -369,14 +433,21 @@ static e_bl_err_t write_image(void)
                     BL_LOG("Writing to 0x%08lX...\r\n", write_addr);
                 }
                 
-                /* Debug before write */
-                BL_LOG("W");
+                /* Send XOFF before Flash write (interrupts will be disabled) */
+                send_byte(BL_XOFF_CHAR);
+                
+                /* Wait for PC to stop sending + receive any in-flight data */
+                /* At 115200bps, 1 byte = ~87us, wait 5ms = ~57 bytes margin */
+                R_BSP_SoftwareDelay(5, BSP_DELAY_MILLISECS);
+                
+                /* Drain any remaining data in ring buffer won't help here,
+                 * but the delay allows in-flight bytes to be received */
                 
                 /* Write to Flash using RAM-based function */
                 flash_ret = ram_flash_write((uint32_t)s_flash_buf, write_addr, BL_FLASH_WRITE_SIZE);
                 
-                /* Debug after write */
-                BL_LOG("D");
+                /* Send XON after Flash write to resume */
+                send_byte(BL_XON_CHAR);
                 
                 if (flash_ret != FLASH_SUCCESS) {
                     BL_LOG("\r\nERROR: Flash write failed at 0x%08lX (err=%d)\r\n", 
@@ -388,7 +459,7 @@ static e_bl_err_t write_image(void)
                 s_flash_buf_cnt = 0;
                 memset(s_flash_buf, 0xFF, BL_FLASH_WRITE_SIZE);
                 
-                /* Progress indicator every 32KB with byte count */
+                /* Progress indicator every 32KB */
                 if ((s_total_received % 32768) == 0) {
                     BL_LOG("\r\n%luKB", s_total_received / 1024);
                 }
