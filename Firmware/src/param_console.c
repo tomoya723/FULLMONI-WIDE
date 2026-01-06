@@ -12,7 +12,7 @@
 #include "param_storage.h"
 #include "r_smc_entry.h"
 #include "smc_gen/Config_SCI9/Config_SCI9.h"
-#include "platform.h"   /* iodefine.h (RTC access) */
+#include "platform.h"   /* iodefine.h (RTC access, SYSTEM for software reset) */
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -107,6 +107,7 @@ static void cmd_help(void)
     param_console_print("  odo_init <km>     - Initialize ODO value\r\n");
     param_console_print("  trip              - Show TRIP value\r\n");
     param_console_print("  trip_reset        - Reset TRIP to 0\r\n");
+    param_console_print("  fwupdate          - Erase flash and reboot to bootloader\r\n");
     param_console_print("  exit              - Exit parameter mode\r\n");
     param_console_print("\r\nParameter IDs:\r\n");
     param_console_print("  tyre_width, tyre_aspect, tyre_rim\r\n");
@@ -255,6 +256,100 @@ static void cmd_trip_reset(void)
 }
 
 /* ============================================================
+ * Firmware Update (Bootloaderへの強制リブート)
+ * ============================================================ */
+
+/* 強制アップデートフラグ (RAM2領域、Bootloaderと共有) */
+/* RAM2末尾に配置（BootloaderのFlash書込み関数と重複しないように） */
+#define BL_FORCE_UPDATE_ADDR    (0x0087FFF0UL)  /* RAM2 end - 16 bytes */
+#define BL_FORCE_UPDATE_MAGIC   (0xDEADBEEFUL)
+
+/* 確認入力を待つ (ブロッキング) */
+static bool wait_for_confirmation(const char *expected, uint32_t timeout_sec)
+{
+    char input[16] = {0};
+    uint8_t pos = 0;
+    uint32_t timeout_cnt = 0;
+    uint8_t ch;
+    
+    while (timeout_cnt < timeout_sec * 100) {  /* 10ms x 100 = 1sec */
+        if (param_console_rx_available()) {
+            ch = param_console_rx_pop();
+            
+            if (ch == '\r' || ch == '\n') {
+                param_console_print("\r\n");
+                input[pos] = '\0';
+                return (strcmp(input, expected) == 0);
+            } else if (ch == '\b' || ch == 0x7F) {
+                if (pos > 0) {
+                    pos--;
+                    param_console_print("\b \b");
+                }
+            } else if (ch >= 0x20 && ch < 0x7F && pos < sizeof(input) - 1) {
+                input[pos++] = ch;
+                char echo[2] = {ch, '\0'};
+                param_console_print(echo);
+            }
+            timeout_cnt = 0;  /* 入力があったらタイムアウトリセット */
+        } else {
+            R_BSP_SoftwareDelay(10, BSP_DELAY_MILLISECS);
+            timeout_cnt++;
+        }
+    }
+    
+    param_console_print("\r\n(timeout)\r\n");
+    return false;
+}
+
+/* ソフトウェアリセット実行 */
+static void perform_software_reset(void)
+{
+    /* 少し待機してUART出力完了を待つ */
+    R_BSP_SoftwareDelay(100, BSP_DELAY_MILLISECS);
+    
+    /* 割り込み禁止 */
+    __builtin_rx_clrpsw('I');
+    
+    /* ソフトウェアリセット */
+    SYSTEM.PRCR.WORD = 0xA502;  /* プロテクト解除 */
+    SYSTEM.SWRR = 0xA501;       /* ソフトウェアリセット実行 */
+    
+    while (1);  /* リセット待ち */
+}
+
+/* fwupdateコマンド */
+static void cmd_fwupdate(void)
+{
+    param_console_print("\r\n");
+    param_console_print("======================================\r\n");
+    param_console_print("  *** FIRMWARE UPDATE MODE ***\r\n");
+    param_console_print("  This will reboot to bootloader\r\n");
+    param_console_print("  and enter firmware update mode.\r\n");
+    param_console_print("\r\n");
+    param_console_print("  WARNING: The device will not function\r\n");
+    param_console_print("  until new firmware is programmed!\r\n");
+    param_console_print("======================================\r\n");
+    param_console_print("Type 'yes' to confirm (10sec timeout): ");
+    
+    /* 確認入力待ち */
+    if (!wait_for_confirmation("yes", 10)) {
+        param_console_print("Aborted.\r\n");
+        return;
+    }
+    
+    /* 強制アップデートフラグをセット (RAM2領域) */
+    param_console_print("\r\nSetting update flag...\r\n");
+    volatile uint32_t *force_flag = (volatile uint32_t *)BL_FORCE_UPDATE_ADDR;
+    *force_flag = BL_FORCE_UPDATE_MAGIC;
+    
+    /* ブートローダーへリブート */
+    param_console_print("Rebooting to bootloader...\r\n");
+    perform_software_reset();
+    
+    /* ここには到達しない */
+}
+
+/* ============================================================
  * コマンドパーサー
  * ============================================================ */
 static void parse_command(const char *line)
@@ -314,6 +409,8 @@ static void parse_command(const char *line)
         cmd_trip_show();
     } else if (strcmp(cmd, "trip_reset") == 0) {
         cmd_trip_reset();
+    } else if (strcmp(cmd, "fwupdate") == 0) {
+        cmd_fwupdate();
     } else if (strcmp(cmd, "exit") == 0) {
         param_console_print("Exiting parameter mode...\r\n");
         exit_flag = true;

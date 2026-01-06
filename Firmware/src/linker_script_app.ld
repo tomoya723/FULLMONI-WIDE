@@ -3,24 +3,24 @@
  * RX72N/RX72T (R5F572NNDxBD) - Renesas RXマイコン
  *
  * メモリマップ:
- *   FW_HEADER: 0xFFC10000 - 0xFFC1013F (320B) - ファームウェアヘッダ
- *   APP_ROM:   0xFFC20000 - 0xFFFFFFFF (3.875MB) - アプリケーションコード
+ *   FW_HEADER: 0xFFC20000 - 0xFFC2003F (64B) - ファームウェアヘッダ
+ *   APP_ROM:   0xFFC20040 - 0xFFFFFFFF (3.875MB-64B) - アプリケーションコード
  *   RAM:       0x00064040 - 0x0007FFFF (111.9KB) - Frame Buffer 2の後から
  *   ECCRAM:    0x00FF8000 - 0x00FFFFFF (32KB) - スタック
  *
  * 注意:
- *   - Bootloader領域 (0xFFC00000-0xFFC0FFFF) は使用禁止
+ *   - Bootloader領域 (0xFFC00000-0xFFC1FFFF) は使用禁止
  *   - Frame Buffer 1: 0x00800000-0x00863FFF (Block 2)
  *   - Frame Buffer 2: 0x00000040-0x0006403F (Block 1)
  */
 
 MEMORY
 {
-	/* ファームウェアヘッダ領域 (320バイト) */
-	FW_HEADER : ORIGIN = 0xFFC10000, LENGTH = 320
+	/* ファームウェアヘッダ領域 (64バイト) - アプリ領域の先頭 */
+	FW_HEADER : ORIGIN = 0xFFC20000, LENGTH = 64
 
-	/* アプリケーションROM (Bootloaderとヘッダの後) */
-	APP_ROM : ORIGIN = 0xFFC20000, LENGTH = 0x003E0000
+	/* アプリケーションROM (ヘッダの後) */
+	APP_ROM : ORIGIN = 0xFFC20040, LENGTH = 0x003DFFC0
 
 	/* RAM (Frame Buffer 2の後から使用) */
 	RAM : ORIGIN = 0x00064040, LENGTH = 0x1BFC0
@@ -34,8 +34,8 @@ MEMORY
 
 SECTIONS
 {
-	/* ファームウェアヘッダ (0xFFC10000) */
-	.firmware_header 0xFFC10000 : AT(0xFFC10000)
+	/* ファームウェアヘッダ (0xFFC20000 - アプリ領域先頭) */
+	.firmware_header 0xFFC20000 : AT(0xFFC20000)
 	{
 		KEEP(*(.firmware_header))
 	} >FW_HEADER
@@ -54,8 +54,8 @@ SECTIONS
 		KEEP(*(.fvectors))
 	} >APP_ROM */
 
-	/* プログラムコード (0xFFC20000から開始) */
-	.text 0xFFC20000 : AT(0xFFC20000)
+	/* プログラムコード (0xFFC20040から開始 - ヘッダの後) */
+	.text 0xFFC20040 : AT(0xFFC20040)
 	{
 		*(.text)
 		*(.text.*)

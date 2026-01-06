@@ -44,6 +44,11 @@
 /* Wait counts for timeout */
 #define WAIT_MAX_ROM_WRITE          (31200)    /* CF write timeout */
 
+/* Force update flag (shared with Firmware via RAM2) */
+/* Address at end of RAM2 to avoid conflict with RAM2_FUNC_AREA */
+#define BL_FORCE_UPDATE_ADDR        (0x0087FFF0UL)  /* RAM2 end - 16 bytes */
+#define BL_FORCE_UPDATE_MAGIC       (0xDEADBEEFUL)
+
 /**********************************************************************************************************************
  RAM2 Flash Write Function
  The flash_write_from_ram function will be copied to RAM2 and executed from there.
@@ -498,53 +503,50 @@ static e_bl_err_t write_image(void)
 
 /**********************************************************************************************************************
  * Function Name: is_valid_image
- * Description  : Check if valid application image exists
- * Return Value : true if valid image found
+ * Description  : Check if valid application image exists by verifying firmware header
+ * Return Value : true if valid image found (firmware header magic = "RXFW")
  *********************************************************************************************************************/
 static bool is_valid_image(void)
 {
-    /* Check first 4 bytes at app start - should not be 0xFFFFFFFF (erased) */
-    uint32_t *app_start = (uint32_t *)BL_APP_START;
+    /* Read firmware header magic number */
+    uint32_t *fw_header = (uint32_t *)BL_FW_HEADER_ADDR;
+    uint32_t magic = fw_header[0];
     
-    /* Debug: Show first 8 words of application */
-    BL_LOG("App data: ");
-    for (int i = 0; i < 8; i++) {
+    /* Debug: Show firmware header info */
+    BL_LOG("FW Header @ 0x%08lX:\r\n", BL_FW_HEADER_ADDR);
+    BL_LOG("  Magic: 0x%08lX (expected: 0x%08lX)\r\n", magic, BL_FW_HEADER_MAGIC);
+    
+    /* Also show app start for debugging */
+    uint32_t *app_start = (uint32_t *)BL_APP_START;
+    BL_LOG("App data @ 0x%08lX: ", BL_APP_START);
+    for (int i = 0; i < 4; i++) {
         BL_LOG("%08lX ", app_start[i]);
     }
     BL_LOG("\r\n");
     
-    /* Also check PowerON_Reset_PC_Prg location */
-    uint32_t *prg_entry = (uint32_t *)0xFFC33AFE;
-    BL_LOG("PC_Prg: ");
-    for (int i = 0; i < 4; i++) {
-        BL_LOG("%08lX ", prg_entry[i]);
-    }
-    BL_LOG("\r\n");
-    
-    /* Simple check: first word should not be erased */
-    if (*app_start == 0xFFFFFFFF) {
+    /* Validate firmware header magic number */
+    if (magic != BL_FW_HEADER_MAGIC) {
+        BL_LOG("Invalid firmware header - no valid application\r\n");
         return false;
     }
     
-    /* Check a few more words to be sure */
-    if (app_start[1] == 0xFFFFFFFF && 
-        app_start[2] == 0xFFFFFFFF && 
-        app_start[3] == 0xFFFFFFFF) {
-        return false;
-    }
-    
+    BL_LOG("Valid firmware header found\r\n");
     return true;
 }
 
 /**********************************************************************************************************************
  * Function Name: exec_image
  * Description  : Jump to application with clean MCU state
- *              : Application .text starts at BL_APP_START (0xFFC20000)
- *              : The first code at .text is PowerON_Reset function
+ *              : Application entry point is stored in firmware header at BL_FW_HEADER_ADDR + 20
  *********************************************************************************************************************/
 static void exec_image(void)
 {
+    /* Get entry point from firmware header */
+    uint32_t *fw_header = (uint32_t *)BL_FW_HEADER_ADDR;
+    uint32_t entry_point = fw_header[5];  /* entry_point is 6th field (offset 20) */
+    
     BL_LOG(BL_MSG_EXEC_IMG);
+    BL_LOG("Entry point: 0x%08lX\r\n", entry_point);
     R_BSP_SoftwareDelay(100, BSP_DELAY_MILLISECS);  /* Allow printf to complete */
     
     /* Close Flash */
@@ -567,13 +569,9 @@ static void exec_image(void)
     /* Stop SCI9 clock */
     MSTP(SCI9) = 1U;
     
-    /* Jump to application (PowerON_Reset will set up stack pointers) */
-    /* Use inline assembly to ensure clean jump */
-    __asm volatile (
-        "mov.l #0xFFC20000, r1\n"  /* Application entry point */
-        "jmp r1\n"                  /* Jump to application */
-        ::: "r1"
-    );
+    /* Jump to application entry point from firmware header */
+    void (*app_entry)(void) = (void (*)(void))entry_point;
+    app_entry();
     
     /* Should never reach here */
     while (1);
@@ -601,11 +599,16 @@ static void sw_reset(void)
  * Function Name: boot_loader_main
  * Description  : Boot loader main entry point
  *              : Called from Bootloader.c after SCI9 initialization
+ *              : Modified 2026-01-06: Removed 2-second 'U' key wait
+ *              :   - Check force update flag from Firmware (RAM2)
+ *              :   - If application is valid and no force flag, boot immediately
+ *              :   - If application is erased/invalid or force flag set, enter update mode
  *********************************************************************************************************************/
 void boot_loader_main(void)
 {
     flash_err_t flash_ret;
     bool force_update = false;
+    volatile uint32_t *force_flag = (volatile uint32_t *)BL_FORCE_UPDATE_ADDR;
     
     /* Enable SCI9 TX and RX for polling mode first */
     SCI9.SCR.BIT.RIE = 0U;  /* Disable RX Interrupt for polling */
@@ -625,27 +628,12 @@ void boot_loader_main(void)
     BL_LOG(BL_MSG_BOOTLOADER, BL_MCU_NAME);
     BL_LOG("  Memory: BL=128KB, App=3.875MB\r\n");
     BL_LOG("  Flash write unit: 128 bytes\r\n");
-    BL_LOG("Press 'U' within 2 sec for UPDATE MODE...\r\n");
     
-    /* Wait for 'U' key (2 second timeout) */
-    for (uint32_t i = 0; i < 200; i++) {  /* 200 x 10ms = 2 seconds */
-        /* Clear any errors first */
-        if (SCI9.SSR.BIT.ORER) SCI9.SSR.BIT.ORER = 0;
-        if (SCI9.SSR.BIT.FER) SCI9.SSR.BIT.FER = 0;
-        if (SCI9.SSR.BIT.PER) SCI9.SSR.BIT.PER = 0;
-        
-        /* Check for received data */
-        if (SCI9.SSR.BIT.RDRF) {
-            uint8_t ch = SCI9.RDR;
-            if (ch == 'U' || ch == 'u') {
-                force_update = true;
-                BL_LOG("\r\n** 'U' pressed - FORCE UPDATE MODE **\r\n");
-                break;
-            }
-        }
-        
-        /* 10ms delay */
-        R_BSP_SoftwareDelay(10, BSP_DELAY_MILLISECS);
+    /* Check force update flag from Firmware */
+    if (*force_flag == BL_FORCE_UPDATE_MAGIC) {
+        BL_LOG("** FORCE UPDATE FLAG DETECTED **\r\n");
+        *force_flag = 0;  /* Clear flag */
+        force_update = true;
     }
     
     /* Enable RX interrupt for ring buffer mode */
@@ -660,7 +648,7 @@ void boot_loader_main(void)
         goto ERROR_END;
     }
     
-    /* Check if valid application exists (skip if force update) */
+    /* Check if valid application exists - boot immediately if valid and no force flag */
     BL_LOG("Checking application...");
     if (!force_update && is_valid_image()) {
         BL_LOG(BL_MSG_OK);

@@ -2,11 +2,17 @@ MEMORY
 {
 	RAM : ORIGIN = 0x00064040, LENGTH = 0x1BFC0
 	ECCRAM : ORIGIN = 0x00FF8000, LENGTH = 0x8000
-	ROM : ORIGIN = 0xFFC20000, LENGTH = 0x3E0000
+	FW_HEADER : ORIGIN = 0xFFC20000, LENGTH = 64
+	ROM : ORIGIN = 0xFFC20040, LENGTH = 0x3DFFC0
 	OFS : ORIGIN = 0xFE7F5D00, LENGTH = 128
 }
 SECTIONS
 {
+	/* ファームウェアヘッダ (アプリ領域先頭 0xFFC20000) */
+	.firmware_header 0xFFC20000 : AT(0xFFC20000)
+	{
+		KEEP(*(.firmware_header))
+	} >FW_HEADER
 	.exvectors 0xFFFFFF80 : AT(0xFFFFFF80)
 	{
 		"_exvectors_start" = .;
@@ -14,7 +20,7 @@ SECTIONS
 		"_exvectors_end" = .;
 	} >ROM
 	/* .fvectors removed - owned by bootloader at 0xFFFFFFFC */
-	.text 0xFFC20000 : AT(0xFFC20000)
+	.text 0xFFC20040 : AT(0xFFC20040)
 	{
 		*(.text)
 		*(.text.*)

@@ -62,8 +62,8 @@
  *   Block 8-127:   0xFFC20000 - 0xFFFFFFFF  Application (3.875MB = 124 x 32KB)
  *
  * Application Layout:
- *   Firmware Header: 0xFFC10000 (in firmware_header_data.c but within BL area)
- *   App .text start: 0xFFC20000 (PowerON_Reset entry point)
+ *   Firmware Header: 0xFFC20000 (64 bytes at app area start)
+ *   App .text start: 0xFFC20040 (after header)
  */
 #define BL_BOOTLOADER_START         (0xFFC00000UL)
 #define BL_BOOTLOADER_END           (0xFFC1FFFFUL)
@@ -73,6 +73,10 @@
 #define BL_APP_END                  (0xFFFFFFFFUL)
 #define BL_APP_SIZE                 (0x3E0000UL)     /* 3.875MB = 4,063,232 bytes */
 #define BL_APP_BLOCKS               (124)            /* 124 x 32KB blocks */
+
+/* Firmware Header (for application validity check) */
+#define BL_FW_HEADER_ADDR           (0xFFC20000UL)   /* Firmware header at app start */
+#define BL_FW_HEADER_MAGIC          (0x52584657UL)   /* "RXFW" in little-endian */
 
 /* Log Control */
 #define BL_LOG_ENABLE               (1)

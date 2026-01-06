@@ -105,10 +105,10 @@ void r_Config_SCI9_transmitend_interrupt(void)
 void r_Config_SCI9_receive_interrupt(void)
 {
     uint8_t rx_data;
-    
+
     /* 受信データ取得 */
     rx_data = SCI9.RDR;
-    
+
     /* パラメータモードアクティブ時はリングバッファに格納 */
     if (g_param_mode_active)
     {
@@ -119,7 +119,7 @@ void r_Config_SCI9_receive_interrupt(void)
         /* 通常モード時は受信トリガーをセット（モード切替用） */
         g_uart_rx_trigger = 1;
     }
-    
+
     /* 継続受信のため、受信割り込みを有効のまま維持 */
     /* 注意: 元のバッファ処理は使用しない（リングバッファに移行） */
 }

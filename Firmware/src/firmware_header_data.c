@@ -3,7 +3,7 @@
  * RX72N/RX72T FULLMONI-WIDE Application
  *
  * このファイルはアプリケーションのファームウェアヘッダ実体を定義します。
- * .firmware_headerセクションに配置され、0xFFC10000に配置されます。
+ * .firmware_headerセクションに配置され、0xFFC20000（アプリ領域先頭）に配置されます。
  *
  * ビルドフロー:
  * 1. 通常ビルド (CRC32とsizeはプレースホルダー)
@@ -25,7 +25,7 @@ typedef struct {
     uint32_t reserved[10];
 } firmware_header_t;
 
-/* マジックナンバー */
+/* マジックナンバー "RXFW" */
 #define FIRMWARE_MAGIC  0x52584657  /* "RXFW" */
 
 /* バージョン定義 (ビルド時にカスタマイズ可能) */
