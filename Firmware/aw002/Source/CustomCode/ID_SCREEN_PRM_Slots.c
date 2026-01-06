@@ -9,14 +9,14 @@
 *                                                                    *
 **********************************************************************
 ----------------------------------------------------------------------
-File        : ID_SCREEN_Telltale_Slots.c
+File        : ID_SCREEN_PRM_Slots.c
 Purpose     : AppWizard managed file, function content could be changed
 ---------------------------END-OF-HEADER------------------------------
 */
 
 #include "Application.h"
 #include "../Generated/Resource.h"
-#include "../Generated/ID_SCREEN_Telltale.h"
+#include "../Generated/ID_SCREEN_PRM.h"
 
 /*** Begin of user code area ***/
 /*** End of user code area ***/
@@ -29,10 +29,21 @@ Purpose     : AppWizard managed file, function content could be changed
 */
 /*********************************************************************
 *
-*       cbID_SCREEN_Telltale
+*       cbID_SCREEN_PRM
 */
-void cbID_SCREEN_Telltale(WM_MESSAGE * pMsg) {
+void cbID_SCREEN_PRM(WM_MESSAGE * pMsg) {
   GUI_USE_PARA(pMsg);
+}
+
+/*********************************************************************
+*
+*       ID_SCREEN_PRM__WM_NOTIFICATION_VALUE_CHANGED
+*/
+void ID_SCREEN_PRM__WM_NOTIFICATION_VALUE_CHANGED(APPW_ACTION_ITEM * pAction, WM_HWIN hScreen, WM_MESSAGE * pMsg, int * pResult) {
+  GUI_USE_PARA(pAction);
+  GUI_USE_PARA(hScreen);
+  GUI_USE_PARA(pMsg);
+  GUI_USE_PARA(pResult);
 }
 
 /*************************** End of file ****************************/

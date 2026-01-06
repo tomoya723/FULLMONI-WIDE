@@ -3,7 +3,7 @@
 *        Solutions for real time microcontroller applications        *
 **********************************************************************
 *                                                                    *
-*        (c) 1996 - 2025  SEGGER Microcontroller GmbH                *
+*        (c) 1996 - 2026  SEGGER Microcontroller GmbH                *
 *                                                                    *
 *        Internet: www.segger.com    Support:  support@segger.com    *
 *                                                                    *
@@ -43,6 +43,7 @@ Purpose     : Generated file do NOT edit!
 #define ID_RTEXT_4 17
 #define ID_RTEXT_5 18
 #define ID_RTEXT_6 19
+#define ID_RTEXT_PRM 20
 
 #define APPW_MANAGE_TEXT APPW_MANAGE_TEXT_EXT
 extern GUI_CONST_STORAGE unsigned char acAPPW_Language_0[];
@@ -51,6 +52,7 @@ extern GUI_CONST_STORAGE unsigned char acAPPW_Language_0[];
 *
 *       Fonts
 */
+extern GUI_CONST_STORAGE unsigned char ac51_40_Normal_EXT[];
 extern GUI_CONST_STORAGE unsigned char acx14y24pxHeadUpDaisy_36_Bold_EXT[];
 extern GUI_CONST_STORAGE unsigned char acx14y24pxHeadUpDaisy_72_Bold_EXT[];
 extern GUI_CONST_STORAGE unsigned char acx14y24pxHeadUpDaisy_30_Bold_EXT_AA2[];
@@ -111,6 +113,7 @@ extern GUI_CONST_STORAGE unsigned char acfuel2[];
 #define ID_VAR_AD3 (GUI_ID_USER + 2070)
 #define ID_VAR_AD4 (GUI_ID_USER + 2071)
 #define ID_VAR_SPEED_CAN (GUI_ID_USER + 2079)
+#define ID_VAR_PRM (GUI_ID_USER + 2072)
 
 /*********************************************************************
 *
@@ -125,12 +128,14 @@ extern GUI_CONST_STORAGE APPW_ANIM_DATA ID_ANIM_000_Data;
 *       Screens
 */
 #define ID_SCREEN_00 (GUI_ID_USER + 4096)
+#define ID_SCREEN_PRM (GUI_ID_USER + 4098)
 #define ID_SCREEN_Telltale (GUI_ID_USER + 4099)
 #define ID_SCREEN_01a (GUI_ID_USER + 4097)
 #define ID_SCREEN_01b (GUI_ID_USER + 4100)
 #define ID_SCREEN_01c (GUI_ID_USER + 4101)
 
 extern APPW_ROOT_INFO ID_SCREEN_00_RootInfo;
+extern APPW_ROOT_INFO ID_SCREEN_PRM_RootInfo;
 extern APPW_ROOT_INFO ID_SCREEN_Telltale_RootInfo;
 extern APPW_ROOT_INFO ID_SCREEN_01a_RootInfo;
 extern APPW_ROOT_INFO ID_SCREEN_01b_RootInfo;

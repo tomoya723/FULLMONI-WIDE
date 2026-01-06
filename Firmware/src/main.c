@@ -194,9 +194,14 @@ void main(void)
 				g_uart_rx_trigger = 0;
 				g_system_mode = MODE_PARAM;
 				g_param_mode_active = 1;
+				APPW_SetVarData(ID_VAR_PRM, 1);  // パラメータモード画面表示
+//				GUI_Exec1();
+//				APPW_Exec();
 				param_console_enter();
+
 				continue;
 			}
+
 		}
 		else
 		{
@@ -206,9 +211,15 @@ void main(void)
 				// exitコマンドで通常モードへ戻る
 				g_system_mode = MODE_NORMAL;
 				g_param_mode_active = 0;
+				APPW_SetVarData(ID_VAR_PRM, 0);  // 通常画面表示（解除直前）
 				printf("Returned to normal mode.\n");
 			}
-			
+
+			GUI_Exec1();
+			APPW_Exec();
+//			GUI_Exec1();
+//			APPW_Exec();
+
 			// CAN処理は継続
 			main_CAN();
 			continue;

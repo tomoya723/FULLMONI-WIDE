@@ -83,6 +83,7 @@
       Id=ID_RTEXT_4
       Id=ID_RTEXT_5
       Id=ID_RTEXT_6
+      Id=ID_RTEXT_PRM
     </Id>
     <Lang>
       Name=JP
@@ -106,6 +107,7 @@
       Text=00:00
       Text=1100
       Text=CANSPEED
+      Text=PARAMETER MODE
     </Lang>
   </Text>
   <Content>
@@ -136,6 +138,7 @@
     Item=4118,ID_VAR_AD3,0
     Item=4119,ID_VAR_AD4,0
     Item=4127,ID_VAR_SPEED_CAN,0
+    Item=4120,ID_VAR_PRM,0
   </Variables>
   <FocusInfo>
     Color=ff2777b3
@@ -214,6 +217,107 @@
         Period=1500
       </SetPeriod>
     </Timer>
+    <Screen>
+      ParentId=0
+      IdString=ID_SCREEN_PRM
+      Id=2048
+      IdPrev=0
+      IdPost=0
+      RootId=6146
+      <Dispose>
+        xSize=0
+        ySize=0
+        <X0>
+          Mode=2
+          Off=0
+          Id=0
+        </X0>
+        <Y0>
+          Mode=2
+          Off=0
+          Id=0
+        </Y0>
+        <X1>
+          Mode=2
+          Off=0
+          Id=0
+        </X1>
+        <Y1>
+          Mode=2
+          Off=0
+          Id=0
+        </Y1>
+      </Dispose>
+    </Screen>
+    <Box>
+      ParentId=2048
+      IdString=ID_BOX_00
+      Id=2049
+      IdPrev=0
+      IdPost=0
+      <Dispose>
+        xSize=0
+        ySize=0
+        <X0>
+          Mode=2
+          Off=0
+          Id=0
+        </X0>
+        <Y0>
+          Mode=2
+          Off=0
+          Id=0
+        </Y0>
+        <X1>
+          Mode=2
+          Off=0
+          Id=0
+        </X1>
+        <Y1>
+          Mode=2
+          Off=0
+          Id=0
+        </Y1>
+      </Dispose>
+      <SetColor>
+        Color=c8000000
+      </SetColor>
+    </Box>
+    <Text>
+      ParentId=2048
+      IdString=ID_TEXT_00
+      Id=2050
+      IdPrev=0
+      IdPost=0
+      <Dispose>
+        xSize=478
+        ySize=32
+        <X0>
+          Mode=2
+          Off=162
+          Id=0
+        </X0>
+        <Y0>
+          Mode=2
+          Off=115
+          Id=0
+        </Y0>
+      </Dispose>
+      <SetColor>
+        Color=ffffffff
+      </SetColor>
+      <SetTextAlign>
+        Alignment=14
+        xOff=0
+        yOff=0
+      </SetTextAlign>
+      <SetTextId>
+        Id=20
+      </SetTextId>
+      <SetFont>
+        Font=51_40_Normal_EXT.xbf
+      </SetFont>
+    </Text>
     <Screen>
       ParentId=0
       IdString=ID_SCREEN_Telltale
@@ -2140,6 +2244,17 @@
         RootId=6145
       </Para>
     </SWAPSCREEN>
+    <CLOSESCREEN>
+      RootId=6146
+      IdSrc=ID_VAR_PRM
+      NCode=WM_NOTIFICATION_VALUE_CHANGED
+      Slot=ID_SCREEN_PRM__WM_NOTIFICATION_VALUE_CHANGED
+      Flags=0
+      Condition=A,1,IS_VAR,ID_VAR_PRM,==,IS_VAL,0
+      <Para>
+        RootId=6146
+      </Para>
+    </CLOSESCREEN>
     <MODALMESSAGE>
       RootId=6145
       IdSrc=ID_SCREEN_01a
@@ -2350,6 +2465,17 @@
         Value=4114
       </Para>
     </SETVALUE>
+    <MODALMESSAGE>
+      RootId=6145
+      IdSrc=ID_VAR_PRM
+      NCode=WM_NOTIFICATION_VALUE_CHANGED
+      Slot=ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED
+      Flags=0
+      Condition=A,1,IS_VAR,ID_VAR_PRM,==,IS_VAL,1
+      <Para>
+        RootId=6146
+      </Para>
+    </MODALMESSAGE>
     <SETVALUE>
       RootId=6148
       IdSrc=ID_SCREEN_01b
@@ -2736,6 +2862,10 @@
       </Para>
     </SETVALUE>
   </Interactions>
+  <Selection>
+    Root=ID_SCREEN_01a
+    Object=2048
+  </Selection>
   <Terms>
   </Terms>
   <AnimItems>

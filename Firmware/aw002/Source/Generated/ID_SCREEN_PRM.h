@@ -9,44 +9,35 @@
 *                                                                    *
 **********************************************************************
 ----------------------------------------------------------------------
-File        : APPW_MainTask.c
-Purpose     : APPWIZARD application entry point
+File        : ID_SCREEN_PRM.h
+Purpose     : Generated file do NOT edit!
 ---------------------------END-OF-HEADER------------------------------
 */
 
-#include "Generated/Resource.h"
+#ifndef ID_SCREEN_PRM_H
+#define ID_SCREEN_PRM_H
+
+#include "AppWizard.h"
 
 /*********************************************************************
 *
-*       MainTask
+*       Objects
 */
-void MainTask(void) {
-  //
-  // Setup configuration dependent pointers
-  //
-  APPW_X_Setup();
-  //
-  // Initialize AppWizard
-  //
-  APPW_Init(APPW_PROJECT_PATH);
-  //
-  // Create all persistent screens except initial screen
-  //
-  APPW_CreatePersistentScreens();
-  //
-  // Create initial screen...
-  //
-  APPW_CreateRoot(APPW_INITIAL_SCREEN, WM_HBKWIN);
-  //
-  // ...and keep it alive
-  //
-  while (1) {
-    while (GUI_Exec1()) {
-      APPW_Exec();
-    }
-    APPW_Exec();
-    GUI_X_Delay(5);
-  }
-}
+#define ID_BOX_00  (GUI_ID_USER + 1)
+#define ID_TEXT_00 (GUI_ID_USER + 2)
+
+/*********************************************************************
+*
+*       Slots
+*/
+void ID_SCREEN_PRM__WM_NOTIFICATION_VALUE_CHANGED(APPW_ACTION_ITEM * pAction, WM_HWIN hScreen, WM_MESSAGE * pMsg, int * pResult);
+
+/*********************************************************************
+*
+*       Callback
+*/
+void cbID_SCREEN_PRM(WM_MESSAGE * pMsg);
+
+#endif  // ID_SCREEN_PRM_H
 
 /*************************** End of file ****************************/

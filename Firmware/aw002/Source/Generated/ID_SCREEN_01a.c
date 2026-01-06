@@ -3,7 +3,7 @@
 *        Solutions for real time microcontroller applications        *
 **********************************************************************
 *                                                                    *
-*        (c) 1996 - 2025  SEGGER Microcontroller GmbH                *
+*        (c) 1996 - 2026  SEGGER Microcontroller GmbH                *
 *                                                                    *
 *        Internet: www.segger.com    Support:  support@segger.com    *
 *                                                                    *
@@ -275,6 +275,10 @@ static APPW_COND_COMP _aComparison_0f[] = {
   { { { APPW_IS_VAR, ID_VAR_REV_A }, { APPW_IS_OBJ, ID_ROTARY_01 } }, APPW__CompareIsLess },
 };
 
+static APPW_COND_COMP _aComparison_12[] = {
+  { { { APPW_IS_VAR, ID_VAR_PRM }, { APPW_IS_VAL, 1 } }, APPW__CompareIsEqual },
+};
+
 /*********************************************************************
 *
 *       Condition(s)
@@ -287,6 +291,7 @@ static GUI_CONST_STORAGE APPW_COND _Condition_0a = { "A", _aComparison_0a, GUI_C
 static GUI_CONST_STORAGE APPW_COND _Condition_0b = { "A", _aComparison_0b, GUI_COUNTOF(_aComparison_0b) };
 static GUI_CONST_STORAGE APPW_COND _Condition_0c = { "A", _aComparison_0c, GUI_COUNTOF(_aComparison_0c) };
 static GUI_CONST_STORAGE APPW_COND _Condition_0f = { "A", _aComparison_0f, GUI_COUNTOF(_aComparison_0f) };
+static GUI_CONST_STORAGE APPW_COND _Condition_12 = { "A", _aComparison_12, GUI_COUNTOF(_aComparison_12) };
 
 /*********************************************************************
 *
@@ -362,6 +367,10 @@ static GUI_CONST_STORAGE APPW_ACTION_ITEM _aAction[] = {
   { ID_TIMER_00,         APPW_NOTIFICATION_TIMER,          ID_ROTARY_01,        APPW_JOB_SETVALUE,       ID_SCREEN_01a__ID_TIMER_00__APPW_NOTIFICATION_TIMER__ID_ROTARY_01__APPW_JOB_SETVALUE,
     { ARG_V(4114),
     }, 1, NULL
+  },
+  { ID_VAR_PRM,          WM_NOTIFICATION_VALUE_CHANGED,    0,                   APPW_JOB_MODALMESSAGE,   ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED,
+    { ARG_V(ID_SCREEN_PRM),
+    }, 0, &_Condition_12
   },
 };
 

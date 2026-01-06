@@ -34,6 +34,7 @@ extern volatile uint8_t g_param_mode_active;
 	#include "../aw001/Source/Generated/ID_SCREEN_01c.h"
 #elif (DISP == 2)
 	#include "../aw002/Source/Generated/Resource.h"
+	#include "../aw002/Source/Generated/ID_SCREEN_PRM.h"
 	#include "../aw002/Source/Generated/ID_SCREEN_Telltale.h"
 	#include "../aw002/Source/Generated/ID_SCREEN_01a.h"
 	#include "../aw002/Source/Generated/ID_SCREEN_01b.h"
