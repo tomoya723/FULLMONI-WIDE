@@ -33,7 +33,7 @@ emWinの画面描画と排他制御を行い、パラメータ変更モード時
 ┌─────────────────────────────────┐
 │ 1. g_system_mode = MODE_PARAM  │
 │ 2. g_param_mode_active = 1     │
-│ 3. emWin停止（GUI_Exec停止）   │
+│ 3. パラメータ画面表示          │
 │ 4. コンソールメニュー表示      │
 └─────────────────────────────────┘
     │
@@ -43,7 +43,7 @@ emWinの画面描画と排他制御を行い、パラメータ変更モード時
 │ exitコマンド実行               │
 │ 1. g_system_mode = MODE_NORMAL │
 │ 2. g_param_mode_active = 0     │
-│ 3. emWin再開                   │
+│ 3. 通常画面に復帰              │
 └─────────────────────────────────┘
 ```
 
@@ -383,9 +383,10 @@ void param_storage_reset_trip(void)
 
 ## 8. 注意事項
 
-### 8.1 emWin排他制御
+### 8.1 emWin画面切替
 
-- パラメータモード中は `GUI_Exec1()` と `APPW_Exec()` をスキップ
+- パラメータモード中は `APPW_SetVarData(ID_VAR_PRM, 1)` でパラメータ画面表示
+- 通常モード復帰時は `APPW_SetVarData(ID_VAR_PRM, 0)` で通常画面表示
 - CAN処理 (`main_CAN()`) は継続動作
 
 ### 8.2 defaultコマンド
