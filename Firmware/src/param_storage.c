@@ -229,13 +229,15 @@ void param_storage_set_odo(uint32_t km)
 
 /* ============================================================
  * TRIPリセット
+ * TRIP = (sp_int - tr_int) なので、tr_int = sp_int にすることでTRIP=0
  * ============================================================ */
 void param_storage_reset_trip(void)
 {
+    /* 現在のODOパルス値をTRIP基準値に設定 → TRIP = 0 */
+    tr_int = sp_int;
     g_param.trip_pulse = sp_int;
-    tr_int = g_param.trip_pulse;
 
-    /* 即時保存 */
+    /* 即時保存（save内で再同期されるのでtr_intを先に設定） */
     param_storage_save();
 }
 
