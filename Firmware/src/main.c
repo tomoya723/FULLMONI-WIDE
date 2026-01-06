@@ -177,6 +177,10 @@ void main(void)
 		printf("EEPROM CRC error, using defaults.\n");
 	}
 
+	// SCI9受信を常時有効化（1バイト受信で割り込み発生）
+	static uint8_t sci9_rx_buf[1];
+	R_Config_SCI9_Serial_Receive(sci9_rx_buf, 1);
+
 	while (1)
 	{
 		// ============================================================

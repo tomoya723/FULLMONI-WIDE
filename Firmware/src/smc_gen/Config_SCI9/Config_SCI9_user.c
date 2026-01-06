@@ -120,21 +120,8 @@ void r_Config_SCI9_receive_interrupt(void)
         g_uart_rx_trigger = 1;
     }
     
-    /* 元の処理も維持（互換性のため） */
-    if (g_sci9_rx_length > g_sci9_rx_count)
-    {
-        *gp_sci9_rx_address = rx_data;
-        gp_sci9_rx_address++;
-        g_sci9_rx_count++;
-    }
-    
-    if (g_sci9_rx_length <= g_sci9_rx_count)
-    {
-        /* All data received */
-        SCI9.SCR.BIT.RIE = 0U;
-        SCI9.SCR.BIT.RE = 0U;
-        r_Config_SCI9_callback_receiveend();
-    }
+    /* 継続受信のため、受信割り込みを有効のまま維持 */
+    /* 注意: 元のバッファ処理は使用しない（リングバッファに移行） */
 }
 
 /***********************************************************************************************************************
