@@ -16,6 +16,8 @@
 #include "can.h"
 #include "dataregister.h"
 #include "smc_gen/general/r_cg_rtc.h"
+#include "param_console.h"
+#include "param_storage.h"
 
 // --------------------------------------------------------------------
 // グローバル変数宣言
@@ -35,6 +37,9 @@ volatile uint8_t I2C1_TX_END_FLG = 0;
 volatile uint8_t I2C1_RX_END_FLG = 0;
 volatile uint8_t I2C1_RCV_ERR_FLG = 0;
 volatile MD_STATUS I2C1_md_status;
+
+// システムモード（通常/パラメータ変更）
+volatile SYSTEM_MODE g_system_mode = MODE_NORMAL;
 
 // --------------------------------------------------------------------
 // グローバル構造体宣言
@@ -166,8 +171,48 @@ void main(void)
 	Neopixel_InitRGB();
 	g_CALC_data.AD7 = S12AD.ADDR7; // issue#4暫定対策：LPF値リセット
 
+	// パラメータストレージ初期化（EEPROM読み込み）
+	param_storage_init();
+	if (!param_storage_load()) {
+		printf("EEPROM CRC error, using defaults.\n");
+	}
+
 	while (1)
 	{
+		// ============================================================
+		// モード切替判定
+		// ============================================================
+		if (g_system_mode == MODE_NORMAL)
+		{
+			// 通常モード時：UART受信でパラメータモードへ切替
+			if (g_uart_rx_trigger)
+			{
+				g_uart_rx_trigger = 0;
+				g_system_mode = MODE_PARAM;
+				g_param_mode_active = 1;
+				param_console_enter();
+				continue;
+			}
+		}
+		else
+		{
+			// パラメータ変更モード
+			if (!param_console_process())
+			{
+				// exitコマンドで通常モードへ戻る
+				g_system_mode = MODE_NORMAL;
+				g_param_mode_active = 0;
+				printf("Returned to normal mode.\n");
+			}
+			
+			// CAN処理は継続
+			main_CAN();
+			continue;
+		}
+
+		// ============================================================
+		// 通常モード処理
+		// ============================================================
 		// wait Reflesh Cycletime
 		g_int10mscnt =  -3;		// peiod 10ms x  3 = 30ms  33fps
 //		g_int10mscnt =  -4;		// peiod 10ms x  4 = 40ms  25fps

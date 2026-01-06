@@ -8,6 +8,21 @@
 #ifndef SETTINGS_H_
 #define SETTINGS_H_
 
+#include <stdint.h>
+
+/* ============================================================
+ * システム動作モード定義
+ * ============================================================ */
+typedef enum {
+    MODE_NORMAL = 0,    /* 通常動作（emWin描画有効） */
+    MODE_PARAM  = 1     /* パラメータ変更モード（emWin停止） */
+} SYSTEM_MODE;
+
+/* グローバル変数宣言 */
+extern volatile SYSTEM_MODE g_system_mode;
+extern volatile uint8_t g_uart_rx_trigger;
+extern volatile uint8_t g_param_mode_active;
+
 // emwin display resource number select
 #define DISP (2)  // 1-2
 

@@ -23,6 +23,7 @@ Includes
 #include "r_cg_macrodriver.h"
 #include "Config_SCI9.h"
 /* Start user code for include. Do not edit comment generated here */
+#include "../../param_console.h"
 /* End user code. Do not edit comment generated here */
 #include "r_cg_userdefine.h"
 
@@ -35,6 +36,9 @@ extern volatile uint8_t * gp_sci9_rx_address;                /* SCI9 receive buf
 extern volatile uint16_t  g_sci9_rx_count;                   /* SCI9 receive data number */
 extern volatile uint16_t  g_sci9_rx_length;                  /* SCI9 receive data length */
 /* Start user code for global. Do not edit comment generated here */
+/* パラメータ変更モード用フラグ */
+volatile uint8_t g_uart_rx_trigger = 0;     /* 受信トリガーフラグ */
+volatile uint8_t g_param_mode_active = 0;   /* パラメータモードアクティブ */
 /* End user code. Do not edit comment generated here */
 
 /***********************************************************************************************************************
@@ -100,9 +104,26 @@ void r_Config_SCI9_transmitend_interrupt(void)
 
 void r_Config_SCI9_receive_interrupt(void)
 {
+    uint8_t rx_data;
+    
+    /* 受信データ取得 */
+    rx_data = SCI9.RDR;
+    
+    /* パラメータモードアクティブ時はリングバッファに格納 */
+    if (g_param_mode_active)
+    {
+        param_console_rx_push(rx_data);
+    }
+    else
+    {
+        /* 通常モード時は受信トリガーをセット（モード切替用） */
+        g_uart_rx_trigger = 1;
+    }
+    
+    /* 元の処理も維持（互換性のため） */
     if (g_sci9_rx_length > g_sci9_rx_count)
     {
-        *gp_sci9_rx_address = SCI9.RDR;
+        *gp_sci9_rx_address = rx_data;
         gp_sci9_rx_address++;
         g_sci9_rx_count++;
     }
