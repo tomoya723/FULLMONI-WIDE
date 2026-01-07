@@ -1,0 +1,356 @@
+﻿<Window x:Class="FullmoniTerminal.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FullmoniTerminal"
+        xmlns:vm="clr-namespace:FullmoniTerminal.ViewModels"
+        mc:Ignorable="d"
+        Title="FULLMONI-WIDE パラメータ設定" 
+        Height="560" Width="480"
+        ResizeMode="CanMinimize"
+        FontFamily="Meiryo UI"
+        Background="{DynamicResource BackgroundGradient}"
+        Icon="Assets/FMW.ico"
+        Closing="Window_Closing">
+
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 接続バー -->
+        <Border Grid.Row="0" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="6" Margin="0,0,0,6">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <ComboBox Grid.Column="0" ItemsSource="{Binding AvailablePorts}" 
+                          SelectedItem="{Binding SelectedPort}"
+                          Style="{DynamicResource ModernComboBox}"
+                          Width="80" Height="24" FontSize="12" IsEnabled="{Binding IsNotConnected}"/>
+
+                <Button Grid.Column="1" Content="{Binding ConnectionButtonText}" Width="60" Height="24" Margin="4,0,0,0" FontSize="12"
+                        Command="{Binding ConnectCommand}"
+                        Style="{DynamicResource PrimaryButton}"
+                        IsEnabled="{Binding CanCloseWindow}"/>
+
+                <!-- 接続状態インジケータ（中央） -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Ellipse Width="8" Height="8" Margin="0,0,4,0">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="#E74C3C"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                        <Setter Property="Fill" Value="{DynamicResource SuccessBrush}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                    <TextBlock Text="{Binding StatusText}" FontSize="12" Foreground="{DynamicResource TextBrush}"/>
+                </StackPanel>
+
+                <!-- テーマ切り替え（右側） -->
+                <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
+                    <TextBlock Text="☀" FontSize="12" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="{DynamicResource TextMutedBrush}"/>
+                    <ToggleButton Style="{DynamicResource ThemeToggleButton}" 
+                                  IsChecked="{Binding IsDarkTheme}"/>
+                    <TextBlock Text="🌙" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- タブコントロール -->
+        <TabControl Grid.Row="1" Margin="0,0,0,6">
+            <!-- タブ1: ステータス -->
+            <TabItem Header="ステータス">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- ODO/TRIP/RTC -->
+                    <Border Grid.Row="0" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="ODO" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" Margin="0,3,0,3"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding OdoValue, StringFormat={}{0} km}" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" Margin="0,3,0,3"/>
+                            <Border Grid.Row="0" Grid.Column="2" Width="90" Height="24"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="TRIP" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" Margin="0,3,0,3"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TripValue, StringFormat={}{0} km}" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" Margin="0,3,0,3"/>
+                            <Button Grid.Row="1" Grid.Column="2" Content="RESET" Width="90" Height="24" FontSize="12"
+                                    Background="White" Foreground="#FF4A90D9" BorderBrush="#FF4A90D9" BorderThickness="1"
+                                    Command="{Binding ResetTripCommand}"
+                                    IsEnabled="{Binding IsOperationEnabled}"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="日時" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" Margin="0,3,0,3"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding RtcValue}" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" Margin="0,3,0,3"/>
+                            <Button Grid.Row="2" Grid.Column="2" Content="PC時刻と同期" Width="90" Height="24" FontSize="12"
+                                    Background="White" Foreground="#FF4A90D9" BorderBrush="#FF4A90D9" BorderThickness="1"
+                                    Command="{Binding SyncRtcCommand}"
+                                    IsEnabled="{Binding IsOperationEnabled}"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- 再読込ボタン -->
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+                        <Button Content="再読込" Width="80" Height="28" FontSize="12"
+                                Style="{DynamicResource PrimaryButton}"
+                                Command="{Binding LoadParametersCommand}"
+                                IsEnabled="{Binding IsOperationEnabled}"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <!-- タブ2: 設定項目 -->
+            <TabItem Header="設定項目">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="8"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- 左カラム: タイヤ設定 -->
+                            <StackPanel Grid.Column="0">
+                            <Border Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="8" Margin="0,0,0,6">
+                                <StackPanel>
+                                    <TextBlock Text="タイヤサイズ" FontWeight="Bold" FontSize="12" Margin="0,0,0,6" Foreground="{DynamicResource TextBrush}"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="50"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="30"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="幅" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding TyreWidth}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="mm" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="扁平率" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding TyreAspect}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="2" Text="%" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
+
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="径" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding WheelDia}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="2" Text="inch" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="8">
+                                <StackPanel>
+                                    <TextBlock Text="ギア比" FontWeight="Bold" FontSize="12" Margin="0,0,0,6" Foreground="{DynamicResource TextBrush}"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="50"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="プリセット" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                        <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding GearPresets}" SelectedItem="{Binding SelectedGearPreset}"
+                                                  Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="1速" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Gear1}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="2速" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Gear2}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="3速" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Gear3}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+
+                                        <TextBlock Grid.Row="4" Grid.Column="0" Text="4速" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Gear4}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+
+                                        <TextBlock Grid.Row="5" Grid.Column="0" Text="5速" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Gear5}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+
+                                        <TextBlock Grid.Row="6" Grid.Column="0" Text="6速" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding Gear6}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+
+                                        <TextBlock Grid.Row="7" Grid.Column="0" Text="ファイナル" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding FinalGear}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- 右カラム: 警告設定 -->
+                        <Border Grid.Column="2" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="8">
+                            <StackPanel>
+                                <TextBlock Text="警告設定" FontWeight="Bold" FontSize="12" Margin="0,0,0,6" Foreground="{DynamicResource TextBrush}"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="70"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="30"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="水温低温" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding WaterTempLow}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="°C" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="水温高温" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding WaterTempHigh}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="°C" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="燃料警告" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding FuelWarn}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="2" Text="L" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </ScrollViewer>
+
+                <!-- 下部ボタン -->
+                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
+                    <Button Content="再読込" Width="70" Height="26" FontSize="12" Margin="0,0,6,0"
+                            Style="{DynamicResource PrimaryButton}"
+                            Command="{Binding LoadParametersCommand}"
+                            IsEnabled="{Binding IsOperationEnabled}"/>
+                    <Button Content="書込" Width="70" Height="26" FontSize="12" Margin="0,0,6,0"
+                            Style="{DynamicResource SuccessButton}"
+                            Command="{Binding SaveParametersCommand}"
+                            IsEnabled="{Binding IsOperationEnabled}"/>
+                    <Button Content="デフォルト" Width="70" Height="26" FontSize="12"
+                            Style="{DynamicResource SecondaryButton}"
+                            Command="{Binding ResetDefaultCommand}"
+                            IsEnabled="{Binding IsOperationEnabled}"/>
+                </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <!-- タブ3: ファームウェア更新 -->
+            <TabItem Header="ファームウェア更新">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- ファイル選択 -->
+                    <Border Grid.Row="0" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Text="{Binding FirmwareFilePath}" IsReadOnly="True" 
+                                     Height="24" FontSize="12" Margin="0,0,6,0" VerticalContentAlignment="Center"/>
+                            <Button Grid.Column="1" Content="参照..." Width="60" Height="24" FontSize="12"
+                                    Style="{DynamicResource SecondaryButton}"
+                                    Command="{Binding BrowseFirmwareCommand}"
+                                    IsEnabled="{Binding IsOperationEnabled}"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- 進捗表示 -->
+                    <Border Grid.Row="1" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock Text="転送進捗" FontWeight="Bold" FontSize="12" Margin="0,0,0,6" Foreground="{DynamicResource TextBrush}"/>
+                            <ProgressBar Height="20" Value="{Binding FirmwareProgress}" Maximum="100" Margin="0,0,0,4"/>
+                            <TextBlock Text="{Binding FirmwareStatus}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 通信ログ -->
+                    <Border Grid.Row="2" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10,10,10,6" Margin="0,0,0,8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,6">
+                                <TextBlock Text="通信ログ" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                <Button Content="クリア" Width="60" Height="20" FontSize="12" Margin="10,0,0,0"
+                                        Background="White" Foreground="#3498DB" BorderBrush="#3498DB" BorderThickness="1"
+                                        Command="{Binding ClearFirmwareLogCommand}"
+                                        IsEnabled="{Binding IsOperationEnabled}"/>
+                                <Button Content="コピー" Width="60" Height="20" FontSize="12" Margin="6,0,0,0"
+                                        Background="White" Foreground="#3498DB" BorderBrush="#3498DB" BorderThickness="1"
+                                        Command="{Binding CopyFirmwareLogCommand}"
+                                        IsEnabled="{Binding IsOperationEnabled}"/>
+                            </StackPanel>
+                            <TextBox Grid.Row="1" Text="{Binding FirmwareLog, Mode=OneWay}" 
+                                     x:Name="FirmwareLogTextBox"
+                                     Height="140" FontSize="12" FontFamily="Consolas"
+                                     IsReadOnly="True" TextWrapping="Wrap" 
+                                     VerticalScrollBarVisibility="Auto"
+                                     Background="#1E1E1E" Foreground="#DCDCDC"
+                                     Padding="6"
+                                     TextChanged="FirmwareLogTextBox_TextChanged"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- 更新ボタン -->
+                    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,0">
+                        <Button Content="ファームウェア更新開始" Width="160" Height="32" FontSize="12"
+                                Style="{DynamicResource WarningButton}"
+                                Command="{Binding StartFirmwareUpdateCommand}"
+                                IsEnabled="{Binding CanStartFirmwareUpdate}"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <!-- ステータス -->
+        <TextBlock Grid.Row="2" Text="{Binding ActivityStatus}" FontSize="12"
+                   Foreground="{DynamicResource TextMutedBrush}" 
+                   HorizontalAlignment="Center"/>
+    </Grid>
+</Window>

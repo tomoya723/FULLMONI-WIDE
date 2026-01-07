@@ -1,0 +1,38 @@
+# FULLMONI-WIDE Host Applications
+
+FULLMONI-WIDEファームウェアと通信するWindowsホストアプリケーション集です。
+
+## アプリケーション一覧
+
+### FullmoniTerminal
+
+UARTターミナルアプリケーション。ファームウェアのパラメータコンソールと対話するためのGUIツールです。
+
+- 詳細: [FullmoniTerminal/README.md](FullmoniTerminal/README.md)
+
+## 必要環境
+
+- Windows 10/11
+- .NET 8.0 SDK（開発・ビルド時）
+- .NET 8.0 Desktop Runtime（実行時のみ必要な場合）
+
+### .NET 8.0 SDKのインストール
+
+以下のURLからダウンロード:
+https://dotnet.microsoft.com/download/dotnet/8.0
+
+## ビルド方法
+
+各アプリケーションのディレクトリで以下を実行:
+
+```powershell
+dotnet build
+```
+
+## 発行（配布用実行ファイル作成）
+
+```powershell
+dotnet publish -c Release -r win-x64 --self-contained
+```
+
+これにより、.NET Runtimeがインストールされていない環境でも実行可能なスタンドアロン実行ファイルが作成されます。

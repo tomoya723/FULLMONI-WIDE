@@ -1,0 +1,159 @@
+<Window x:Class="FullmoniTerminal.Views.FirmwareUpdateWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="💾 ファームウェアアップデート" 
+        Height="520" Width="650"
+        MinHeight="480" MinWidth="580"
+        Background="{StaticResource BackgroundGradient}"
+        WindowStartupLocation="CenterOwner"
+        Closing="Window_Closing">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="💾" FontSize="32" VerticalAlignment="Center"/>
+                <TextBlock Text="ファームウェアアップデート" 
+                           FontSize="24" FontWeight="Bold" Margin="12,0,0,0"
+                           Foreground="{StaticResource PrimaryBrush}"/>
+            </StackPanel>
+            <TextBlock Text="MOTファイルを選択してファームウェアを更新します" 
+                       Foreground="{StaticResource TextMutedBrush}" Margin="44,4,0,0" FontSize="13"/>
+        </StackPanel>
+
+        <!-- File Selection Card -->
+        <Border Grid.Row="1" Style="{StaticResource CardPanel}" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="📁 ファームウェアファイル" Style="{StaticResource CardTitle}"/>
+                
+                <Grid Margin="0,12,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox Grid.Column="0" x:Name="FilePathBox" 
+                             Style="{StaticResource ModernTextBox}" 
+                             IsReadOnly="True" Margin="0,0,12,0"/>
+                    <Button Grid.Column="1" Content="📂 参照..." 
+                            Style="{StaticResource SecondaryButton}" Width="100"
+                            Click="BrowseButton_Click"/>
+                </Grid>
+
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <TextBlock Text="ファイルサイズ: " Foreground="{StaticResource TextMutedBrush}"/>
+                    <TextBlock x:Name="FileSizeText" Text="-" 
+                               Foreground="{StaticResource TextBrush}" FontWeight="SemiBold"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Status Card -->
+        <Border Grid.Row="2" Style="{StaticResource CardPanel}" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="📊 進捗状況" Style="{StaticResource CardTitle}"/>
+                
+                <!-- Progress Bar -->
+                <Grid Margin="0,12,0,0">
+                    <ProgressBar x:Name="ProgressBar" 
+                                 Height="28" Minimum="0" Maximum="100" Value="0"
+                                 Background="{StaticResource InputBackgroundBrush}"
+                                 Foreground="{StaticResource PrimaryBrush}">
+                        <ProgressBar.Style>
+                            <Style TargetType="ProgressBar">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ProgressBar">
+                                            <Grid>
+                                                <Border Background="{TemplateBinding Background}" 
+                                                        CornerRadius="14"/>
+                                                <Border x:Name="PART_Track" CornerRadius="14"/>
+                                                <Border x:Name="PART_Indicator" 
+                                                        HorizontalAlignment="Left"
+                                                        CornerRadius="14">
+                                                    <Border.Background>
+                                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                            <GradientStop Color="#5B9BD5" Offset="0"/>
+                                                            <GradientStop Color="#7BC67E" Offset="1"/>
+                                                        </LinearGradientBrush>
+                                                    </Border.Background>
+                                                </Border>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ProgressBar.Style>
+                    </ProgressBar>
+                    <TextBlock x:Name="ProgressText" Text="0%" 
+                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                               FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
+                </Grid>
+
+                <!-- Status Text -->
+                <Border Background="{StaticResource InputBackgroundBrush}" 
+                        CornerRadius="8" Padding="12" Margin="0,12,0,0">
+                    <TextBlock x:Name="StatusText" Text="ファイルを選択してください" 
+                               Foreground="{StaticResource TextBrush}"
+                               TextWrapping="Wrap"/>
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <!-- Warning Card -->
+        <Border Grid.Row="3" CornerRadius="12" Padding="16" Margin="0,0,0,16">
+            <Border.Background>
+                <SolidColorBrush Color="#FFFBEB"/>
+            </Border.Background>
+            <Border.BorderBrush>
+                <SolidColorBrush Color="#F59E0B"/>
+            </Border.BorderBrush>
+            <Border.BorderThickness>2</Border.BorderThickness>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="⚠️" FontSize="18"/>
+                    <TextBlock Text=" 注意事項" FontWeight="Bold" FontSize="14" 
+                               Foreground="#B45309" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock TextWrapping="Wrap" Margin="26,6,0,0" Foreground="#92400E" FontSize="12">
+                    ファームウェア更新中は絶対に電源を切らないでください。
+                    更新に失敗した場合、デバイスが起動しなくなる可能性があります。
+                </TextBlock>
+            </StackPanel>
+        </Border>
+
+        <!-- Buttons -->
+        <Grid Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="1" x:Name="Step1Button" Content="📡 Step 1: ブートローダーへ" 
+                    Style="{StaticResource PrimaryButton}" 
+                    Width="200" Height="42" Margin="0,0,12,0"
+                    Click="Step1Button_Click"/>
+            <Button Grid.Column="2" x:Name="Step2Button" Content="🚀 Step 2: 転送開始" 
+                    Style="{StaticResource SuccessButton}" 
+                    Width="160" Height="42" Margin="0,0,12,0"
+                    Click="Step2Button_Click" IsEnabled="False"/>
+            <Button Grid.Column="3" Content="閉じる" 
+                    Style="{StaticResource SecondaryButton}" 
+                    Width="90" Height="42"
+                    Click="CloseButton_Click"/>
+        </Grid>
+    </Grid>
+</Window>
