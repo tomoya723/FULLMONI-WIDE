@@ -160,6 +160,17 @@ static APPW_CREATE_ITEM _aCreate[] = {
     },
     { 0, 0 }
   },
+  { WM_OBJECT_TEXT_Create,
+    ID_TEXT_ACC, ID_SCREEN_01a,
+    { { { DISPOSE_MODE_REL_PARENT, 0, 0, 0 },
+        { DISPOSE_MODE_REL_PARENT, 0, 0, 0 },
+        { DISPOSE_MODE_NULL, 0, 0, 0 },
+        { DISPOSE_MODE_NULL, 0, 0, 0 },
+      },
+      256, 32, 0, 0, 0, 0
+    },
+    { 0, 0 }
+  },
 };
 
 /*********************************************************************
@@ -237,6 +248,13 @@ static GUI_CONST_STORAGE APPW_SETUP_ITEM _aSetup[] = {
   { ID_PROGBAR_AFR,      APPW_SET_PROP_RANGE,        { ARG_V(100),
                                                        ARG_V(200) } },
   { ID_TIMER_00,         APPW_SET_PROP_PERIOD,       { ARG_V(3000) } },
+  { ID_TEXT_ACC,         APPW_SET_PROP_COLOR,        { ARG_V(GUI_WHITE) } },
+  { ID_TEXT_ACC,         APPW_SET_PROP_ALIGNTEXT,    { ARG_V(GUI_ALIGN_HCENTER | GUI_ALIGN_VCENTER),
+                                                       ARG_V(0),
+                                                       ARG_V(0) } },
+  { ID_TEXT_ACC,         APPW_SET_PROP_TEXTID,       { ARG_V(ID_RTEXT_ACC) } },
+  { ID_TEXT_ACC,         APPW_SET_PROP_BKCOLOR,      { ARG_V(0xff00aa00) } },
+  { ID_TEXT_ACC,         APPW_SET_PROP_FONT,         { ARG_VP(0, ac51_20_Normal_EXT_AA2) } },
 };
 
 /*********************************************************************
@@ -275,8 +293,12 @@ static APPW_COND_COMP _aComparison_0f[] = {
   { { { APPW_IS_VAR, ID_VAR_REV_A }, { APPW_IS_OBJ, ID_ROTARY_01 } }, APPW__CompareIsLess },
 };
 
-static APPW_COND_COMP _aComparison_12[] = {
+static APPW_COND_COMP _aComparison_13[] = {
   { { { APPW_IS_VAR, ID_VAR_PRM }, { APPW_IS_VAL, 1 } }, APPW__CompareIsEqual },
+};
+
+static APPW_COND_COMP _aComparison_14[] = {
+  { { { APPW_IS_VAR, ID_VAR_PRM }, { APPW_IS_VAL, 0 } }, APPW__CompareIsEqual },
 };
 
 /*********************************************************************
@@ -291,7 +313,8 @@ static GUI_CONST_STORAGE APPW_COND _Condition_0a = { "A", _aComparison_0a, GUI_C
 static GUI_CONST_STORAGE APPW_COND _Condition_0b = { "A", _aComparison_0b, GUI_COUNTOF(_aComparison_0b) };
 static GUI_CONST_STORAGE APPW_COND _Condition_0c = { "A", _aComparison_0c, GUI_COUNTOF(_aComparison_0c) };
 static GUI_CONST_STORAGE APPW_COND _Condition_0f = { "A", _aComparison_0f, GUI_COUNTOF(_aComparison_0f) };
-static GUI_CONST_STORAGE APPW_COND _Condition_12 = { "A", _aComparison_12, GUI_COUNTOF(_aComparison_12) };
+static GUI_CONST_STORAGE APPW_COND _Condition_13 = { "A", _aComparison_13, GUI_COUNTOF(_aComparison_13) };
+static GUI_CONST_STORAGE APPW_COND _Condition_14 = { "A", _aComparison_14, GUI_COUNTOF(_aComparison_14) };
 
 /*********************************************************************
 *
@@ -368,9 +391,17 @@ static GUI_CONST_STORAGE APPW_ACTION_ITEM _aAction[] = {
     { ARG_V(4114),
     }, 1, NULL
   },
-  { ID_VAR_PRM,          WM_NOTIFICATION_VALUE_CHANGED,    0,                   APPW_JOB_MODALMESSAGE,   ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED,
-    { ARG_V(ID_SCREEN_PRM),
-    }, 0, &_Condition_12
+  { ID_SCREEN_01a,       APPW_NOTIFICATION_INITDIALOG,     ID_TEXT_ACC,         APPW_JOB_SETVIS,         ID_SCREEN_01a__APPW_NOTIFICATION_INITDIALOG__ID_TEXT_ACC__APPW_JOB_SETVIS,
+    { ARG_V(APPW_SET_OFF),
+    }, 0, NULL
+  },
+  { ID_VAR_PRM,          WM_NOTIFICATION_VALUE_CHANGED,    ID_TEXT_ACC,         APPW_JOB_SETVIS,         ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_TEXT_ACC__APPW_JOB_SETVIS,
+    { ARG_V(APPW_SET_ON),
+    }, 65536, &_Condition_13
+  },
+  { ID_VAR_PRM,          WM_NOTIFICATION_VALUE_CHANGED,    ID_TEXT_ACC,         APPW_JOB_SETVIS,         ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_TEXT_ACC__APPW_JOB_SETVIS_0,
+    { ARG_V(APPW_SET_OFF),
+    }, 65536, &_Condition_14
   },
 };
 

@@ -1,0 +1,36 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\tomoy\\git\\FULLMONI-WIDE\\HostApp\\FullmoniTerminal\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{31F70E30-436B-4820-AC90-F8E3CAFC9367}|FullmoniTerminal.csproj|c:\\users\\tomoy\\git\\fullmoni-wide\\hostapp\\fullmoniterminal\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{31F70E30-436B-4820-AC90-F8E3CAFC9367}|FullmoniTerminal.csproj|solutionrelative:mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainWindow.xaml",
+              "DocumentMoniker": "C:\\Users\\tomoy\\git\\FULLMONI-WIDE\\HostApp\\FullmoniTerminal\\MainWindow.xaml",
+              "RelativeDocumentMoniker": "MainWindow.xaml",
+              "ToolTip": "C:\\Users\\tomoy\\git\\FULLMONI-WIDE\\HostApp\\FullmoniTerminal\\MainWindow.xaml",
+              "RelativeToolTip": "MainWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-01-06T12:48:50.055Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

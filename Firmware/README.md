@@ -226,6 +226,7 @@ Both environments can be used interchangeably:<br>
 ### Notes
 
 - Smart Configurator code generation should be performed in e² studio
+- ⚠️ **注意**: Smart Configuratorでコード生成すると、`Config_SCI9_user.c` のユーザーコード部分が初期化されます。UART受信処理（`r_Config_SCI9_callback_receiveend` 内のトリガーフラグ設定など）を手動で復元してください。
 - The `.vscode/` directory is version-controlled for team collaboration
 - Build artifacts in `Firmware/HardwareDebug/` are shared between both IDEs
 - E2 Lite debugger can be used by only one IDE at a time

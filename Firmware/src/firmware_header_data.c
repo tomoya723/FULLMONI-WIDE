@@ -28,22 +28,8 @@ typedef struct {
 /* マジックナンバー "RXFW" */
 #define FIRMWARE_MAGIC  0x52584657  /* "RXFW" */
 
-/* バージョン定義 (ビルド時にカスタマイズ可能) */
-#ifndef FW_VERSION_MAJOR
-#define FW_VERSION_MAJOR    1
-#endif
-
-#ifndef FW_VERSION_MINOR
-#define FW_VERSION_MINOR    0
-#endif
-
-#ifndef FW_VERSION_PATCH
-#define FW_VERSION_PATCH    0
-#endif
-
-/* ビルド情報用マクロ */
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
+/* バージョン定義 (共通ヘッダから取得) */
+#include "firmware_version.h"
 
 /* エントリポイント (アプリケーションのリセットハンドラ) */
 extern void PowerON_Reset(void);

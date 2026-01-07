@@ -84,6 +84,7 @@
       Id=ID_RTEXT_5
       Id=ID_RTEXT_6
       Id=ID_RTEXT_PRM
+      Id=ID_RTEXT_ACC
     </Id>
     <Lang>
       Name=JP
@@ -108,6 +109,7 @@
       Text=1100
       Text=CANSPEED
       Text=PARAMETER MODE
+      Text=Param Access
     </Lang>
   </Text>
   <Content>
@@ -217,107 +219,6 @@
         Period=1500
       </SetPeriod>
     </Timer>
-    <Screen>
-      ParentId=0
-      IdString=ID_SCREEN_PRM
-      Id=2048
-      IdPrev=0
-      IdPost=0
-      RootId=6146
-      <Dispose>
-        xSize=0
-        ySize=0
-        <X0>
-          Mode=2
-          Off=0
-          Id=0
-        </X0>
-        <Y0>
-          Mode=2
-          Off=0
-          Id=0
-        </Y0>
-        <X1>
-          Mode=2
-          Off=0
-          Id=0
-        </X1>
-        <Y1>
-          Mode=2
-          Off=0
-          Id=0
-        </Y1>
-      </Dispose>
-    </Screen>
-    <Box>
-      ParentId=2048
-      IdString=ID_BOX_00
-      Id=2049
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=0
-        ySize=0
-        <X0>
-          Mode=2
-          Off=0
-          Id=0
-        </X0>
-        <Y0>
-          Mode=2
-          Off=0
-          Id=0
-        </Y0>
-        <X1>
-          Mode=2
-          Off=0
-          Id=0
-        </X1>
-        <Y1>
-          Mode=2
-          Off=0
-          Id=0
-        </Y1>
-      </Dispose>
-      <SetColor>
-        Color=c8000000
-      </SetColor>
-    </Box>
-    <Text>
-      ParentId=2048
-      IdString=ID_TEXT_00
-      Id=2050
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=478
-        ySize=32
-        <X0>
-          Mode=2
-          Off=162
-          Id=0
-        </X0>
-        <Y0>
-          Mode=2
-          Off=115
-          Id=0
-        </Y0>
-      </Dispose>
-      <SetColor>
-        Color=ffffffff
-      </SetColor>
-      <SetTextAlign>
-        Alignment=14
-        xOff=0
-        yOff=0
-      </SetTextAlign>
-      <SetTextId>
-        Id=20
-      </SetTextId>
-      <SetFont>
-        Font=51_40_Normal_EXT.xbf
-      </SetFont>
-    </Text>
     <Screen>
       ParentId=0
       IdString=ID_SCREEN_Telltale
@@ -999,6 +900,44 @@
         Period=3000
       </SetPeriod>
     </Timer>
+    <Text>
+      ParentId=2048
+      IdString=ID_TEXT_ACC
+      Id=2055
+      IdPrev=0
+      IdPost=0
+      <Dispose>
+        xSize=256
+        ySize=32
+        <X0>
+          Mode=2
+          Off=0
+          Id=0
+        </X0>
+        <Y0>
+          Mode=2
+          Off=0
+          Id=0
+        </Y0>
+      </Dispose>
+      <SetColor>
+        Color=ffffffff
+      </SetColor>
+      <SetTextAlign>
+        Alignment=14
+        xOff=0
+        yOff=0
+      </SetTextAlign>
+      <SetTextId>
+        Id=21
+      </SetTextId>
+      <SetBkColor>
+        BkColor=ff00aa00
+      </SetBkColor>
+      <SetFont>
+        Font=51_20_Normal_EXT_AA2.xbf
+      </SetFont>
+    </Text>
     <Screen>
       ParentId=0
       IdString=ID_SCREEN_01b
@@ -2244,17 +2183,6 @@
         RootId=6145
       </Para>
     </SWAPSCREEN>
-    <CLOSESCREEN>
-      RootId=6146
-      IdSrc=ID_VAR_PRM
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      Slot=ID_SCREEN_PRM__WM_NOTIFICATION_VALUE_CHANGED
-      Flags=0
-      Condition=A,1,IS_VAR,ID_VAR_PRM,==,IS_VAL,0
-      <Para>
-        RootId=6146
-      </Para>
-    </CLOSESCREEN>
     <MODALMESSAGE>
       RootId=6145
       IdSrc=ID_SCREEN_01a
@@ -2465,17 +2393,41 @@
         Value=4114
       </Para>
     </SETVALUE>
-    <MODALMESSAGE>
+    <SETVIS>
+      RootId=6145
+      IdSrc=ID_SCREEN_01a
+      NCode=APPW_NOTIFICATION_INITDIALOG
+      IdDst=ID_TEXT_ACC
+      Slot=ID_SCREEN_01a__APPW_NOTIFICATION_INITDIALOG__ID_TEXT_ACC__APPW_JOB_SETVIS
+      Flags=0
+      <Para>
+        OnOff=0
+      </Para>
+    </SETVIS>
+    <SETVIS>
       RootId=6145
       IdSrc=ID_VAR_PRM
       NCode=WM_NOTIFICATION_VALUE_CHANGED
-      Slot=ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED
-      Flags=0
+      IdDst=ID_TEXT_ACC
+      Slot=ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_TEXT_ACC__APPW_JOB_SETVIS
+      Flags=65536
       Condition=A,1,IS_VAR,ID_VAR_PRM,==,IS_VAL,1
       <Para>
-        RootId=6146
+        OnOff=1
       </Para>
-    </MODALMESSAGE>
+    </SETVIS>
+    <SETVIS>
+      RootId=6145
+      IdSrc=ID_VAR_PRM
+      NCode=WM_NOTIFICATION_VALUE_CHANGED
+      IdDst=ID_TEXT_ACC
+      Slot=ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_TEXT_ACC__APPW_JOB_SETVIS_0
+      Flags=65536
+      Condition=A,1,IS_VAR,ID_VAR_PRM,==,IS_VAL,0
+      <Para>
+        OnOff=0
+      </Para>
+    </SETVIS>
     <SETVALUE>
       RootId=6148
       IdSrc=ID_SCREEN_01b
@@ -2864,7 +2816,7 @@
   </Interactions>
   <Selection>
     Root=ID_SCREEN_01a
-    Object=2048
+    Object=2052
   </Selection>
   <Terms>
   </Terms>

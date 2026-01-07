@@ -7,12 +7,16 @@
         xmlns:vm="clr-namespace:FullmoniTerminal.ViewModels"
         mc:Ignorable="d"
         Title="FULLMONI-WIDE パラメータ設定" 
-        Height="560" Width="480"
+        Height="640" Width="480"
         ResizeMode="CanMinimize"
         FontFamily="Meiryo UI"
         Background="{DynamicResource BackgroundGradient}"
         Icon="Assets/FMW.ico"
         Closing="Window_Closing">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+    </Window.Resources>
 
     <Window.DataContext>
         <vm:MainViewModel/>
@@ -60,6 +64,10 @@
                         </Ellipse.Style>
                     </Ellipse>
                     <TextBlock Text="{Binding StatusText}" FontSize="12" Foreground="{DynamicResource TextBrush}"/>
+                    <TextBlock Text=" | " FontSize="12" Foreground="{DynamicResource TextMutedBrush}" 
+                               Visibility="{Binding IsConnected, Converter={StaticResource BoolToVisibility}}"/>
+                    <TextBlock Text="{Binding FirmwareVersion, StringFormat=v{0}}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
+                               Visibility="{Binding IsConnected, Converter={StaticResource BoolToVisibility}}"/>
                 </StackPanel>
 
                 <!-- テーマ切り替え（右側） -->
@@ -104,14 +112,14 @@
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="TRIP" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" Margin="0,3,0,3"/>
                             <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TripValue, StringFormat={}{0} km}" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" Margin="0,3,0,3"/>
                             <Button Grid.Row="1" Grid.Column="2" Content="RESET" Width="90" Height="24" FontSize="12"
-                                    Background="White" Foreground="#FF4A90D9" BorderBrush="#FF4A90D9" BorderThickness="1"
+                                    Style="{DynamicResource OutlineButton}"
                                     Command="{Binding ResetTripCommand}"
                                     IsEnabled="{Binding IsOperationEnabled}"/>
 
                             <TextBlock Grid.Row="2" Grid.Column="0" Text="日時" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" Margin="0,3,0,3"/>
                             <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding RtcValue}" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" Margin="0,3,0,3"/>
                             <Button Grid.Row="2" Grid.Column="2" Content="PC時刻と同期" Width="90" Height="24" FontSize="12"
-                                    Background="White" Foreground="#FF4A90D9" BorderBrush="#FF4A90D9" BorderThickness="1"
+                                    Style="{DynamicResource OutlineButton}"
                                     Command="{Binding SyncRtcCommand}"
                                     IsEnabled="{Binding IsOperationEnabled}"/>
                         </Grid>
@@ -195,7 +203,17 @@
 
                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="プリセット" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
                                         <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding GearPresets}" SelectedItem="{Binding SelectedGearPreset}"
-                                                  Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                                  Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}">
+                                            <ComboBox.ItemContainerStyle>
+                                                <Style TargetType="ComboBoxItem" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding}" Value="-- 選択 --">
+                                                            <Setter Property="IsEnabled" Value="False"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ComboBox.ItemContainerStyle>
+                                        </ComboBox>
 
                                         <TextBlock Grid.Row="1" Grid.Column="0" Text="1速" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
                                         <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Gear1}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
@@ -279,12 +297,39 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- ファイル選択 -->
+                    <!-- 現在のバージョン -->
                     <Border Grid.Row="0" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="現在のファームウェア:" FontWeight="Bold" FontSize="12" 
+                                       VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                            <TextBlock Grid.Column="1" FontSize="14" FontWeight="Bold" Margin="8,0,0,0" VerticalAlignment="Center"
+                                       Foreground="#2ECC71">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="{Binding FirmwareVersion, StringFormat=v{0}}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding FirmwareVersion}" Value="">
+                                                <Setter Property="Text" Value="未取得"/>
+                                                <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                    </Border>
+
+                    <!-- ファイル選択 -->
+                    <Border Grid.Row="1" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,8">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -300,7 +345,7 @@
                     </Border>
 
                     <!-- 進捗表示 -->
-                    <Border Grid.Row="1" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,8">
+                    <Border Grid.Row="2" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,8">
                         <StackPanel>
                             <TextBlock Text="転送進捗" FontWeight="Bold" FontSize="12" Margin="0,0,0,6" Foreground="{DynamicResource TextBrush}"/>
                             <ProgressBar Height="20" Value="{Binding FirmwareProgress}" Maximum="100" Margin="0,0,0,4"/>
@@ -309,7 +354,7 @@
                     </Border>
 
                     <!-- 通信ログ -->
-                    <Border Grid.Row="2" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10,10,10,6" Margin="0,0,0,8">
+                    <Border Grid.Row="3" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10,10,10,6" Margin="0,0,0,8">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -318,11 +363,11 @@
                             <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,6">
                                 <TextBlock Text="通信ログ" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
                                 <Button Content="クリア" Width="60" Height="20" FontSize="12" Margin="10,0,0,0"
-                                        Background="White" Foreground="#3498DB" BorderBrush="#3498DB" BorderThickness="1"
+                                        Style="{DynamicResource OutlineButton}"
                                         Command="{Binding ClearFirmwareLogCommand}"
                                         IsEnabled="{Binding IsOperationEnabled}"/>
                                 <Button Content="コピー" Width="60" Height="20" FontSize="12" Margin="6,0,0,0"
-                                        Background="White" Foreground="#3498DB" BorderBrush="#3498DB" BorderThickness="1"
+                                        Style="{DynamicResource OutlineButton}"
                                         Command="{Binding CopyFirmwareLogCommand}"
                                         IsEnabled="{Binding IsOperationEnabled}"/>
                             </StackPanel>
@@ -338,7 +383,7 @@
                     </Border>
 
                     <!-- 更新ボタン -->
-                    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,0">
+                    <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,0">
                         <Button Content="ファームウェア更新開始" Width="160" Height="32" FontSize="12"
                                 Style="{DynamicResource WarningButton}"
                                 Command="{Binding StartFirmwareUpdateCommand}"

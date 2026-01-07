@@ -44,6 +44,7 @@ Purpose     : Generated file do NOT edit!
 #define ID_RTEXT_5 18
 #define ID_RTEXT_6 19
 #define ID_RTEXT_PRM 20
+#define ID_RTEXT_ACC 21
 
 #define APPW_MANAGE_TEXT APPW_MANAGE_TEXT_EXT
 extern GUI_CONST_STORAGE unsigned char acAPPW_Language_0[];
@@ -52,11 +53,11 @@ extern GUI_CONST_STORAGE unsigned char acAPPW_Language_0[];
 *
 *       Fonts
 */
-extern GUI_CONST_STORAGE unsigned char ac51_40_Normal_EXT[];
 extern GUI_CONST_STORAGE unsigned char acx14y24pxHeadUpDaisy_36_Bold_EXT[];
 extern GUI_CONST_STORAGE unsigned char acx14y24pxHeadUpDaisy_72_Bold_EXT[];
 extern GUI_CONST_STORAGE unsigned char acx14y24pxHeadUpDaisy_30_Bold_EXT_AA2[];
 extern GUI_CONST_STORAGE unsigned char acx14y24pxHeadUpDaisy_18_Normal_EXT[];
+extern GUI_CONST_STORAGE unsigned char ac51_20_Normal_EXT_AA2[];
 extern GUI_CONST_STORAGE unsigned char acx14y24pxHeadUpDaisy_27_Bold_EXT[];
 extern GUI_CONST_STORAGE unsigned char acArial_19_Normal_EXT[];
 extern GUI_CONST_STORAGE unsigned char acArial_16_Bold_EXT[];
@@ -128,14 +129,12 @@ extern GUI_CONST_STORAGE APPW_ANIM_DATA ID_ANIM_000_Data;
 *       Screens
 */
 #define ID_SCREEN_00 (GUI_ID_USER + 4096)
-#define ID_SCREEN_PRM (GUI_ID_USER + 4098)
 #define ID_SCREEN_Telltale (GUI_ID_USER + 4099)
 #define ID_SCREEN_01a (GUI_ID_USER + 4097)
 #define ID_SCREEN_01b (GUI_ID_USER + 4100)
 #define ID_SCREEN_01c (GUI_ID_USER + 4101)
 
 extern APPW_ROOT_INFO ID_SCREEN_00_RootInfo;
-extern APPW_ROOT_INFO ID_SCREEN_PRM_RootInfo;
 extern APPW_ROOT_INFO ID_SCREEN_Telltale_RootInfo;
 extern APPW_ROOT_INFO ID_SCREEN_01a_RootInfo;
 extern APPW_ROOT_INFO ID_SCREEN_01b_RootInfo;

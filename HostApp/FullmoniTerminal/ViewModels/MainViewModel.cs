@@ -179,6 +179,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private string _rtcValue = "";
 
+    // ファームウェアバージョン
+    [ObservableProperty]
+    private string _firmwareVersion = "";
+
     // ファームウェア更新関連
     [ObservableProperty]
     private string _firmwareFilePath = "";
@@ -295,6 +299,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
             _serialService.SendCommand("");
             TxCount++;
             await Task.Delay(500);
+
+            // versionコマンドでバージョン取得
+            _responseBuffer.Clear();
+            _serialService.SendCommand("version");
+            TxCount++;
+            await Task.Delay(500);
+            
+            var versionResponse = _responseBuffer.ToString();
+            ParseVersionResponse(versionResponse);
 
             // listコマンドを送信
             _responseBuffer.Clear();
@@ -766,6 +779,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (tripMatch.Success)
         {
             TripValue = tripMatch.Groups[1].Value;
+        }
+    }
+
+    private void ParseVersionResponse(string response)
+    {
+        // VERSION出力形式: "VERSION 1.0.0"
+        var versionMatch = Regex.Match(response, @"VERSION\s+(\d+\.\d+\.\d+)");
+        if (versionMatch.Success)
+        {
+            FirmwareVersion = versionMatch.Groups[1].Value;
         }
     }
 

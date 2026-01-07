@@ -39,6 +39,7 @@ extern volatile uint16_t  g_sci9_rx_length;                  /* SCI9 receive dat
 /* パラメータ変更モード用フラグ */
 volatile uint8_t g_uart_rx_trigger = 0;     /* 受信トリガーフラグ */
 volatile uint8_t g_param_mode_active = 0;   /* パラメータモードアクティブ */
+static uint8_t g_sci9_rx_single_buf[1];     /* 1バイト受信用バッファ */
 /* End user code. Do not edit comment generated here */
 
 /***********************************************************************************************************************
@@ -104,25 +105,20 @@ void r_Config_SCI9_transmitend_interrupt(void)
 
 void r_Config_SCI9_receive_interrupt(void)
 {
-    uint8_t rx_data;
-
-    /* 受信データ取得 */
-    rx_data = SCI9.RDR;
-
-    /* パラメータモードアクティブ時はリングバッファに格納 */
-    if (g_param_mode_active)
-    {
+    /* Start user code for r_Config_SCI9_receive_interrupt. Do not edit comment generated here */
+    uint8_t rx_data = SCI9.RDR;
+    
+    if (g_param_mode_active) {
+        /* パラメータモード中：リングバッファに追加 */
         param_console_rx_push(rx_data);
-    }
-    else
-    {
-        /* 通常モード時は受信トリガーをセット（モード切替用） */
+        /* 継続受信（RIE, REは有効のまま） */
+    } else {
+        /* 通常モード：トリガーフラグをセット */
         g_uart_rx_trigger = 1;
+        /* 継続受信のため再設定 */
+        R_Config_SCI9_Serial_Receive(g_sci9_rx_single_buf, 1);
     }
-
-    /* 継続受信のため、RE(受信許可)とRIE(受信割込み許可)を明示的に維持 */
-    /* SCR.RE=1, SCR.RIE=1 を確実にセット (0x50) */
-    SCI9.SCR.BYTE |= 0x50U;
+    /* End user code. Do not edit comment generated here */
 }
 
 /***********************************************************************************************************************
@@ -143,9 +139,6 @@ void r_Config_SCI9_receiveerror_interrupt(void)
     err_type &= 0xC7U;
     err_type |= 0xC0U;
     SCI9.SSR.BYTE = err_type;
-
-    /* エラー後も受信を継続するため、RE(受信許可)とRIE(受信割込み許可)を再設定 */
-    SCI9.SCR.BYTE |= 0x50U;
 }
 
 /***********************************************************************************************************************
@@ -171,6 +164,9 @@ static void r_Config_SCI9_callback_transmitend(void)
 static void r_Config_SCI9_callback_receiveend(void)
 {
     /* Start user code for r_Config_SCI9_callback_receiveend. Do not edit comment generated here */
+    g_uart_rx_trigger = 1;  /* 受信トリガーフラグをセット */
+    /* 次の1バイト受信を開始 */
+    R_Config_SCI9_Serial_Receive(g_sci9_rx_single_buf, 1);
     /* End user code. Do not edit comment generated here */
 }
 

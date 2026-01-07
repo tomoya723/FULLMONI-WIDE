@@ -13,6 +13,7 @@
 #include "r_smc_entry.h"
 #include "smc_gen/Config_SCI9/Config_SCI9.h"
 #include "platform.h"   /* iodefine.h (RTC access, SYSTEM for software reset) */
+#include "firmware_version.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -96,6 +97,7 @@ static void cmd_help(void)
     param_console_print("\r\n=== FULLMONI-WIDE Parameter Console ===\r\n");
     param_console_print("Commands:\r\n");
     param_console_print("  help              - Show this help\r\n");
+    param_console_print("  version           - Show firmware version\r\n");
     param_console_print("  list              - Show all parameters\r\n");
     param_console_print("  set <id> <value>  - Set parameter value\r\n");
     param_console_print("  save              - Save to EEPROM\r\n");
@@ -373,6 +375,9 @@ static void parse_command(const char *line)
     /* コマンド実行 */
     if (strcmp(cmd, "help") == 0) {
         cmd_help();
+    } else if (strcmp(cmd, "version") == 0) {
+        param_console_printf("VERSION %d.%d.%d\r\n", 
+            FW_VERSION_MAJOR, FW_VERSION_MINOR, FW_VERSION_PATCH);
     } else if (strcmp(cmd, "list") == 0) {
         cmd_list();
     } else if (strcmp(cmd, "set") == 0 && argc >= 3) {
