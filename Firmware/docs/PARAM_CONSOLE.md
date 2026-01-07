@@ -142,13 +142,14 @@ typedef struct {
 | データビット | 8 bit |
 | パリティ | なし |
 | ストップビット | 1 bit |
-| フロー制御 | なし |
+| フロー制御 | XON/XOFF（ソフトウェアフロー制御） |
 
 ### 5.2 コマンド一覧
 
 | コマンド | 説明 | EEPROM |
 |----------|------|--------|
 | `help` | コマンド一覧表示 | - |
+| `version` | ファームウェアバージョン表示 | - |
 | `list` | 全パラメータ表示 | - |
 | `set <id> <value>` | パラメータ設定 | - |
 | `save` | EEPROMに保存 | ✅ Write |
@@ -188,8 +189,12 @@ typedef struct {
 === FULLMONI-WIDE Parameter Console ===
 Commands:
   help              - Show this help
+  version           - Show firmware version
   list              - Show all parameters
   ...
+
+> version
+VERSION 1.0.0
 
 > list
 === Current Parameters ===
@@ -199,6 +204,7 @@ Gear4: 1.257  Gear5: 1.000  Gear6: 0.843
 Final: 4.300
 Water Temp Warning: 60 - 100 C
 Fuel Warning: 10 %
+Shift RPM: 5500 / 6000 / 6500 / 7000 / 7500
 ODO: 184578 km  TRIP: 0.0 km
 
 > set tyre_width 205
