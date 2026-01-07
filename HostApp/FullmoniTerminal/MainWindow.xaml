@@ -240,8 +240,9 @@
                             </Border>
                         </StackPanel>
 
-                        <!-- 右カラム: 警告設定 -->
-                        <Border Grid.Column="2" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="8">
+                        <!-- 右カラム: 警告設定 + シフトインジケータ -->
+                        <StackPanel Grid.Column="2">
+                        <Border Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="8" Margin="0,0,0,6">
                             <StackPanel>
                                 <TextBlock Text="警告設定" FontWeight="Bold" FontSize="12" Margin="0,0,0,6" Foreground="{DynamicResource TextBrush}"/>
                                 <Grid>
@@ -270,6 +271,48 @@
                                 </Grid>
                             </StackPanel>
                         </Border>
+
+                        <!-- シフトインジケータ設定 -->
+                        <Border Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="8">
+                            <StackPanel>
+                                <TextBlock Text="シフトインジケータ" FontWeight="Bold" FontSize="12" Margin="0,0,0,6" Foreground="{DynamicResource TextBrush}"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="70"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="30"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="青2灯" FontSize="12" VerticalAlignment="Center" Foreground="#3498DB"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ShiftRpm1}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="rpm" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="青4灯" FontSize="12" VerticalAlignment="Center" Foreground="#3498DB"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ShiftRpm2}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="rpm" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="緑6灯" FontSize="12" VerticalAlignment="Center" Foreground="#2ECC71"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ShiftRpm3}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="2" Text="rpm" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
+
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="赤8灯" FontSize="12" VerticalAlignment="Center" Foreground="#E74C3C"/>
+                                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding ShiftRpm4}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="2" Text="rpm" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
+
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="白点滅" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                    <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding ShiftRpm5}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="2" Text="rpm" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                        </StackPanel>
                     </Grid>
                 </ScrollViewer>
 

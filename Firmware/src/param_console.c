@@ -115,6 +115,7 @@ static void cmd_help(void)
     param_console_print("  tyre_width, tyre_aspect, tyre_rim\r\n");
     param_console_print("  gear1-gear6, final\r\n");
     param_console_print("  water_low, water_high, fuel_warn\r\n");
+    param_console_print("  shift_rpm1-shift_rpm5 (shift indicator thresholds)\r\n");
 }
 
 /* パラメータ一覧表示 */
@@ -137,6 +138,9 @@ static void cmd_list(void)
                         g_param.water_temp_low, g_param.water_temp_high);
     param_console_printf("Fuel Warning: %d %%\r\n",
                         g_param.fuel_warn_level);
+    param_console_printf("Shift RPM: %d / %d / %d / %d / %d\r\n",
+                        g_param.shift_rpm1, g_param.shift_rpm2,
+                        g_param.shift_rpm3, g_param.shift_rpm4, g_param.shift_rpm5);
     param_console_printf("ODO: %lu km  TRIP: %.1f km\r\n",
                         param_storage_get_odo_km(),
                         param_storage_get_trip_km10() / 10.0f);
@@ -186,6 +190,21 @@ static void cmd_set(const char *id, const char *value)
     } else if (strcmp(id, "fuel_warn") == 0) {
         g_param.fuel_warn_level = val;
         param_console_printf("fuel_warn = %d\r\n", val);
+    } else if (strcmp(id, "shift_rpm1") == 0) {
+        g_param.shift_rpm1 = val;
+        param_console_printf("shift_rpm1 = %d\r\n", val);
+    } else if (strcmp(id, "shift_rpm2") == 0) {
+        g_param.shift_rpm2 = val;
+        param_console_printf("shift_rpm2 = %d\r\n", val);
+    } else if (strcmp(id, "shift_rpm3") == 0) {
+        g_param.shift_rpm3 = val;
+        param_console_printf("shift_rpm3 = %d\r\n", val);
+    } else if (strcmp(id, "shift_rpm4") == 0) {
+        g_param.shift_rpm4 = val;
+        param_console_printf("shift_rpm4 = %d\r\n", val);
+    } else if (strcmp(id, "shift_rpm5") == 0) {
+        g_param.shift_rpm5 = val;
+        param_console_printf("shift_rpm5 = %d\r\n", val);
     } else {
         param_console_printf("Unknown parameter: %s\r\n", id);
     }

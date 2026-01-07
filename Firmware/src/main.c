@@ -267,7 +267,7 @@ void main(void)
 			wr_cnt ++;
 		}
 
-		if((g_CALC_data.rev >= 5500) && (g_CALC_data.rev < 6000))
+		if((g_CALC_data.rev >= g_param.shift_rpm1) && (g_CALC_data.rev < g_param.shift_rpm2))
 		{
 			Neopixel_SetRGB(0, 0, 0, 255);
 			Neopixel_SetRGB(1, 0, 0, 0);
@@ -278,7 +278,7 @@ void main(void)
 			Neopixel_SetRGB(6, 0, 0, 0);
 			Neopixel_SetRGB(7, 0, 0, 255);
 		}
-		else if((g_CALC_data.rev >= 6000) && (g_CALC_data.rev < 6500))
+		else if((g_CALC_data.rev >= g_param.shift_rpm2) && (g_CALC_data.rev < g_param.shift_rpm3))
 		{
 			Neopixel_SetRGB(0, 0, 0, 255);
 			Neopixel_SetRGB(1, 0, 0, 255);
@@ -289,7 +289,7 @@ void main(void)
 			Neopixel_SetRGB(6, 0, 0, 255);
 			Neopixel_SetRGB(7, 0, 0, 255);
 		}
-		else if((g_CALC_data.rev >= 6500) && (g_CALC_data.rev < 7000))
+		else if((g_CALC_data.rev >= g_param.shift_rpm3) && (g_CALC_data.rev < g_param.shift_rpm4))
 		{
 			Neopixel_SetRGB(0, 0, 255, 0);
 			Neopixel_SetRGB(1, 0, 255, 0);
@@ -300,7 +300,7 @@ void main(void)
 			Neopixel_SetRGB(6, 0, 255, 0);
 			Neopixel_SetRGB(7, 0, 255, 0);
 		}
-		else if((g_CALC_data.rev >= 7000) && (g_CALC_data.rev < 7500))
+		else if((g_CALC_data.rev >= g_param.shift_rpm4) && (g_CALC_data.rev < g_param.shift_rpm5))
 		{
 			Neopixel_SetRGB(0, 255, 0, 0);
 			Neopixel_SetRGB(1, 255, 0, 0);
@@ -311,7 +311,7 @@ void main(void)
 			Neopixel_SetRGB(6, 255, 0, 0);
 			Neopixel_SetRGB(7, 255, 0, 0);
 		}
-		else if((g_CALC_data.rev >= 7500))
+		else if((g_CALC_data.rev >= g_param.shift_rpm5))
 		{
 			if(shift_rev_cnt == 0)
 			{

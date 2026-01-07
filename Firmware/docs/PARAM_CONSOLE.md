@@ -91,6 +91,13 @@ typedef struct {
     int16_t water_temp_high;        /* 水温警告高 [℃] */
     uint16_t fuel_warn_level;       /* 燃料警告レベル [%] */
 
+    /* シフトインジケータ閾値 [rpm] */
+    uint16_t shift_rpm1;            /* 段階1開始 (青2灯) */
+    uint16_t shift_rpm2;            /* 段階2開始 (青4灯) */
+    uint16_t shift_rpm3;            /* 段階3開始 (緑6灯) */
+    uint16_t shift_rpm4;            /* 段階4開始 (赤8灯) */
+    uint16_t shift_rpm5;            /* 段階5開始 (白点滅) */
+
     /* 距離計 */
     uint32_t odo_pulse;             /* ODOパルス累積値 */
     uint32_t trip_pulse;            /* TRIPパルス基準値 */
@@ -117,6 +124,11 @@ typedef struct {
 | water_temp_low | 60 | ℃ |
 | water_temp_high | 100 | ℃ |
 | fuel_warn_level | 10 | % |
+| shift_rpm1 | 5500 | 段階1開始 (青2灯) |
+| shift_rpm2 | 6000 | 段階2開始 (青4灯) |
+| shift_rpm3 | 6500 | 段階3開始 (緑6灯) |
+| shift_rpm4 | 7000 | 段階4開始 (赤8灯) |
+| shift_rpm5 | 7500 | 段階5開始 (白点滅) |
 
 ---
 
@@ -163,6 +175,11 @@ typedef struct {
 | `water_low` | 水温警告低 | ℃ (整数) |
 | `water_high` | 水温警告高 | ℃ (整数) |
 | `fuel_warn` | 燃料警告 | % (整数) |
+| `shift_rpm1` | シフト段階1開始 | rpm (青2灯) |
+| `shift_rpm2` | シフト段階2開始 | rpm (青4灯) |
+| `shift_rpm3` | シフト段階3開始 | rpm (緑6灯) |
+| `shift_rpm4` | シフト段階4開始 | rpm (赤8灯) |
+| `shift_rpm5` | シフト段階5開始 | rpm (白点滅) |
 
 ### 5.4 使用例
 

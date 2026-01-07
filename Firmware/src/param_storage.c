@@ -37,6 +37,13 @@ static const PARAM_Storage_t PARAM_DEFAULT = {
     .water_temp_high = 100,
     .fuel_warn_level = 10,
 
+    /* シフトインジケータ閾値 [rpm] */
+    .shift_rpm1 = 5500,
+    .shift_rpm2 = 6000,
+    .shift_rpm3 = 6500,
+    .shift_rpm4 = 7000,
+    .shift_rpm5 = 7500,
+
     /* 距離計 */
     .odo_pulse  = 0,
     .trip_pulse = 0,

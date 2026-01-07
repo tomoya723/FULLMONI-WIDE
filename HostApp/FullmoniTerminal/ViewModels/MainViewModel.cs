@@ -168,6 +168,22 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private string _fuelWarn = "";
 
+    // シフトインジケータ設定
+    [ObservableProperty]
+    private string _shiftRpm1 = "";
+
+    [ObservableProperty]
+    private string _shiftRpm2 = "";
+
+    [ObservableProperty]
+    private string _shiftRpm3 = "";
+
+    [ObservableProperty]
+    private string _shiftRpm4 = "";
+
+    [ObservableProperty]
+    private string _shiftRpm5 = "";
+
     // ODO/TRIP (表示のみ)
     [ObservableProperty]
     private string _odoValue = "";
@@ -377,6 +393,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
             await SendParameterIfValid("water_low", WaterTempLow);
             await SendParameterIfValid("water_high", WaterTempHigh);
             await SendParameterIfValid("fuel_warn", FuelWarn);
+
+            // シフトインジケータ設定
+            await SendParameterIfValid("shift_rpm1", ShiftRpm1);
+            await SendParameterIfValid("shift_rpm2", ShiftRpm2);
+            await SendParameterIfValid("shift_rpm3", ShiftRpm3);
+            await SendParameterIfValid("shift_rpm4", ShiftRpm4);
+            await SendParameterIfValid("shift_rpm5", ShiftRpm5);
 
             // 保存コマンド
             _serialService.SendCommand("save");
@@ -767,6 +790,17 @@ public partial class MainViewModel : ObservableObject, IDisposable
         // 燃料警告: "Fuel Warning: 10 %"
         var fuelMatch = Regex.Match(response, @"Fuel Warning:\s*(\d+)");
         if (fuelMatch.Success) FuelWarn = fuelMatch.Groups[1].Value;
+
+        // シフトインジケータ: "Shift RPM: 5500 / 6000 / 6500 / 7000 / 7500"
+        var shiftMatch = Regex.Match(response, @"Shift RPM:\s*(\d+)\s*/\s*(\d+)\s*/\s*(\d+)\s*/\s*(\d+)\s*/\s*(\d+)");
+        if (shiftMatch.Success)
+        {
+            ShiftRpm1 = shiftMatch.Groups[1].Value;
+            ShiftRpm2 = shiftMatch.Groups[2].Value;
+            ShiftRpm3 = shiftMatch.Groups[3].Value;
+            ShiftRpm4 = shiftMatch.Groups[4].Value;
+            ShiftRpm5 = shiftMatch.Groups[5].Value;
+        }
 
         // ODO/TRIP: "ODO: 106894 km  TRIP: 250.5 km"
         var odoMatch = Regex.Match(response, @"ODO:\s*([\d.]+)\s*km");
