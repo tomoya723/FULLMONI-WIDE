@@ -31,7 +31,9 @@
     <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource CardColor}"/>
     <SolidColorBrush x:Key="TextBrush" Color="{StaticResource TextColor}"/>
     <SolidColorBrush x:Key="TextLightBrush" Color="{StaticResource TextLightColor}"/>
-    <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextLightColor}"/>
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#2D3436"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#555555"/>
+    <SolidColorBrush x:Key="TextMutedBrush" Color="#888888"/>
     <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}"/>
     <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}"/>
     <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}"/>

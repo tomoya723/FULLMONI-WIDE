@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <Resource Include="Assets\FMW.ico" />
+    <Resource Include="Assets\FM1.png" />
   </ItemGroup>
 
   <ItemGroup>

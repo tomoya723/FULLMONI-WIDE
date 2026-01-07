@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -39,6 +40,45 @@ public partial class MainWindow : Window
         if (sender is TextBox textBox)
         {
             textBox.ScrollToEnd();
+        }
+    }
+
+    private void OpenGitHubLink_Click(object sender, RoutedEventArgs e)
+    {
+        OpenUrl("https://github.com/tomoya723/FULLMONI-WIDE");
+    }
+
+    private void OpenDocsLink_Click(object sender, RoutedEventArgs e)
+    {
+        OpenUrl("https://github.com/tomoya723/FULLMONI-WIDE/blob/main/Firmware/docs/PARAM_CONSOLE.md");
+    }
+
+    private void OpenIssuesLink_Click(object sender, RoutedEventArgs e)
+    {
+        OpenUrl("https://github.com/tomoya723/FULLMONI-WIDE/issues");
+    }
+
+    private void AboutScrollViewer_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is ScrollViewer scrollViewer)
+        {
+            scrollViewer.ScrollToTop();
+        }
+    }
+
+    private static void OpenUrl(string url)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = url,
+                UseShellExecute = true
+            });
+        }
+        catch
+        {
+            // ブラウザで開けなかった場合は無視
         }
     }
 }

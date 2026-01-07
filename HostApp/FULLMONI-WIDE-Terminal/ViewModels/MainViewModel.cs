@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -24,6 +25,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
     /// シリアルサービスへの公開アクセス（子ウィンドウ用）
     /// </summary>
     public SerialPortService SerialService => _serialService;
+
+    /// <summary>
+    /// アプリバージョン
+    /// </summary>
+    public string AppVersion => Assembly.GetExecutingAssembly()
+        .GetName().Version?.ToString(3) ?? "1.0.0";
 
     /// <summary>
     /// コマンド送信メソッド（子ウィンドウ用）

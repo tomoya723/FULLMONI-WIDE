@@ -434,6 +434,108 @@
                     </StackPanel>
                 </Grid>
             </TabItem>
+
+            <!-- Aboutタブ -->
+            <TabItem Header="About">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Loaded="AboutScrollViewer_Loaded">
+                    <StackPanel Margin="16">
+                        <!-- ロゴ -->
+                        <Image Source="Assets/FM1.png" Width="200" Height="200" Margin="0,0,0,16"
+                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                        
+                        <!-- アプリ名 -->
+                        <TextBlock Text="FULLMONI-WIDE Terminal" FontSize="20" FontWeight="Bold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                        
+                        <!-- バージョン -->
+                        <TextBlock Text="{Binding AppVersion, StringFormat=Version {0}}" FontSize="12"
+                                   Foreground="{DynamicResource TextMutedBrush}"
+                                   HorizontalAlignment="Center" Margin="0,0,0,16"/>
+                        
+                        <!-- 説明 -->
+                        <Border Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="12" Margin="0,0,0,12">
+                            <StackPanel>
+                                <TextBlock Text="概要" FontSize="14" FontWeight="Bold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8"/>
+                                <TextBlock TextWrapping="Wrap" FontSize="12"
+                                           Foreground="{DynamicResource TextSecondaryBrush}">
+                                    FULLMONI-WIDEファームウェアとUART通信するためのWindowsホストアプリケーションです。
+                                    パラメータの設定・保存、ファームウェアの更新などが行えます。
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+                        
+                        <!-- 開発情報 -->
+                        <Border Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="12" Margin="0,0,0,12">
+                            <StackPanel>
+                                <TextBlock Text="開発情報" FontSize="14" FontWeight="Bold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="フレームワーク" FontSize="12"
+                                               Foreground="{DynamicResource TextMutedBrush}"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text=".NET 8.0 WPF" FontSize="12"
+                                               Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="アーキテクチャ" FontSize="12"
+                                               Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="MVVM (CommunityToolkit.Mvvm)" FontSize="12"
+                                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+                                    
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="通信設定" FontSize="12"
+                                               Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="115200bps, 8N1, XON/XOFF" FontSize="12"
+                                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+                                    
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="ライセンス" FontSize="12"
+                                               Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="MIT License" FontSize="12"
+                                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                        
+                        <!-- リンク -->
+                        <Border Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="12">
+                            <StackPanel>
+                                <TextBlock Text="リンク" FontSize="14" FontWeight="Bold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8"/>
+                                
+                                <Button Content="🔗 GitHub リポジトリ" 
+                                        Style="{DynamicResource LinkButton}"
+                                        Click="OpenGitHubLink_Click"
+                                        HorizontalAlignment="Left" Margin="0,0,0,4"/>
+                                
+                                <Button Content="📖 ドキュメント" 
+                                        Style="{DynamicResource LinkButton}"
+                                        Click="OpenDocsLink_Click"
+                                        HorizontalAlignment="Left" Margin="0,0,0,4"/>
+                                
+                                <Button Content="🐛 Issue報告" 
+                                        Style="{DynamicResource LinkButton}"
+                                        Click="OpenIssuesLink_Click"
+                                        HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <!-- コピーライト -->
+                        <TextBlock Text="© 2024-2026 FULLMONI-WIDE Project" FontSize="11"
+                                   Foreground="{DynamicResource TextMutedBrush}"
+                                   HorizontalAlignment="Center" Margin="0,16,0,0"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
         </TabControl>
 
         <!-- ステータス -->
