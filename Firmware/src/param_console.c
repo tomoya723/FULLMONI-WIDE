@@ -292,11 +292,11 @@ static bool wait_for_confirmation(const char *expected, uint32_t timeout_sec)
     uint8_t pos = 0;
     uint32_t timeout_cnt = 0;
     uint8_t ch;
-    
+
     while (timeout_cnt < timeout_sec * 100) {  /* 10ms x 100 = 1sec */
         if (param_console_rx_available()) {
             ch = param_console_rx_pop();
-            
+
             if (ch == '\r' || ch == '\n') {
                 param_console_print("\r\n");
                 input[pos] = '\0';
@@ -317,7 +317,7 @@ static bool wait_for_confirmation(const char *expected, uint32_t timeout_sec)
             timeout_cnt++;
         }
     }
-    
+
     param_console_print("\r\n(timeout)\r\n");
     return false;
 }
@@ -327,14 +327,14 @@ static void perform_software_reset(void)
 {
     /* 少し待機してUART出力完了を待つ */
     R_BSP_SoftwareDelay(100, BSP_DELAY_MILLISECS);
-    
+
     /* 割り込み禁止 */
     __builtin_rx_clrpsw('I');
-    
+
     /* ソフトウェアリセット */
     SYSTEM.PRCR.WORD = 0xA502;  /* プロテクト解除 */
     SYSTEM.SWRR = 0xA501;       /* ソフトウェアリセット実行 */
-    
+
     while (1);  /* リセット待ち */
 }
 
@@ -351,22 +351,22 @@ static void cmd_fwupdate(void)
     param_console_print("  until new firmware is programmed!\r\n");
     param_console_print("======================================\r\n");
     param_console_print("Type 'yes' to confirm (10sec timeout): ");
-    
+
     /* 確認入力待ち */
     if (!wait_for_confirmation("yes", 10)) {
         param_console_print("Aborted.\r\n");
         return;
     }
-    
+
     /* 強制アップデートフラグをセット (RAM2領域) */
     param_console_print("\r\nSetting update flag...\r\n");
     volatile uint32_t *force_flag = (volatile uint32_t *)BL_FORCE_UPDATE_ADDR;
     *force_flag = BL_FORCE_UPDATE_MAGIC;
-    
+
     /* ブートローダーへリブート */
     param_console_print("Rebooting to bootloader...\r\n");
     perform_software_reset();
-    
+
     /* ここには到達しない */
 }
 
@@ -395,7 +395,7 @@ static void parse_command(const char *line)
     if (strcmp(cmd, "help") == 0) {
         cmd_help();
     } else if (strcmp(cmd, "version") == 0) {
-        param_console_printf("VERSION %d.%d.%d\r\n", 
+        param_console_printf("VERSION %d.%d.%d\r\n",
             FW_VERSION_MAJOR, FW_VERSION_MINOR, FW_VERSION_PATCH);
     } else if (strcmp(cmd, "list") == 0) {
         cmd_list();

@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="💾 ファームウェアアップデート" 
+        Title="💾 ファームウェアアップデート"
         Height="520" Width="650"
         MinHeight="480" MinWidth="580"
         Background="{StaticResource BackgroundGradient}"
@@ -24,11 +24,11 @@
         <StackPanel Grid.Row="0" Margin="0,0,0,20">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="💾" FontSize="32" VerticalAlignment="Center"/>
-                <TextBlock Text="ファームウェアアップデート" 
+                <TextBlock Text="ファームウェアアップデート"
                            FontSize="24" FontWeight="Bold" Margin="12,0,0,0"
                            Foreground="{StaticResource PrimaryBrush}"/>
             </StackPanel>
-            <TextBlock Text="MOTファイルを選択してファームウェアを更新します" 
+            <TextBlock Text="MOTファイルを選択してファームウェアを更新します"
                        Foreground="{StaticResource TextMutedBrush}" Margin="44,4,0,0" FontSize="13"/>
         </StackPanel>
 
@@ -36,24 +36,24 @@
         <Border Grid.Row="1" Style="{StaticResource CardPanel}" Margin="0,0,0,16">
             <StackPanel>
                 <TextBlock Text="📁 ファームウェアファイル" Style="{StaticResource CardTitle}"/>
-                
+
                 <Grid Margin="0,12,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBox Grid.Column="0" x:Name="FilePathBox" 
-                             Style="{StaticResource ModernTextBox}" 
+                    <TextBox Grid.Column="0" x:Name="FilePathBox"
+                             Style="{StaticResource ModernTextBox}"
                              IsReadOnly="True" Margin="0,0,12,0"/>
-                    <Button Grid.Column="1" Content="📂 参照..." 
+                    <Button Grid.Column="1" Content="📂 参照..."
                             Style="{StaticResource SecondaryButton}" Width="100"
                             Click="BrowseButton_Click"/>
                 </Grid>
 
                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                     <TextBlock Text="ファイルサイズ: " Foreground="{StaticResource TextMutedBrush}"/>
-                    <TextBlock x:Name="FileSizeText" Text="-" 
+                    <TextBlock x:Name="FileSizeText" Text="-"
                                Foreground="{StaticResource TextBrush}" FontWeight="SemiBold"/>
                 </StackPanel>
             </StackPanel>
@@ -63,10 +63,10 @@
         <Border Grid.Row="2" Style="{StaticResource CardPanel}" Margin="0,0,0,16">
             <StackPanel>
                 <TextBlock Text="📊 進捗状況" Style="{StaticResource CardTitle}"/>
-                
+
                 <!-- Progress Bar -->
                 <Grid Margin="0,12,0,0">
-                    <ProgressBar x:Name="ProgressBar" 
+                    <ProgressBar x:Name="ProgressBar"
                                  Height="28" Minimum="0" Maximum="100" Value="0"
                                  Background="{StaticResource InputBackgroundBrush}"
                                  Foreground="{StaticResource PrimaryBrush}">
@@ -76,10 +76,10 @@
                                     <Setter.Value>
                                         <ControlTemplate TargetType="ProgressBar">
                                             <Grid>
-                                                <Border Background="{TemplateBinding Background}" 
+                                                <Border Background="{TemplateBinding Background}"
                                                         CornerRadius="14"/>
                                                 <Border x:Name="PART_Track" CornerRadius="14"/>
-                                                <Border x:Name="PART_Indicator" 
+                                                <Border x:Name="PART_Indicator"
                                                         HorizontalAlignment="Left"
                                                         CornerRadius="14">
                                                     <Border.Background>
@@ -96,15 +96,15 @@
                             </Style>
                         </ProgressBar.Style>
                     </ProgressBar>
-                    <TextBlock x:Name="ProgressText" Text="0%" 
+                    <TextBlock x:Name="ProgressText" Text="0%"
                                HorizontalAlignment="Center" VerticalAlignment="Center"
                                FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
                 </Grid>
 
                 <!-- Status Text -->
-                <Border Background="{StaticResource InputBackgroundBrush}" 
+                <Border Background="{StaticResource InputBackgroundBrush}"
                         CornerRadius="8" Padding="12" Margin="0,12,0,0">
-                    <TextBlock x:Name="StatusText" Text="ファイルを選択してください" 
+                    <TextBlock x:Name="StatusText" Text="ファイルを選択してください"
                                Foreground="{StaticResource TextBrush}"
                                TextWrapping="Wrap"/>
                 </Border>
@@ -123,7 +123,7 @@
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="⚠️" FontSize="18"/>
-                    <TextBlock Text=" 注意事項" FontWeight="Bold" FontSize="14" 
+                    <TextBlock Text=" 注意事項" FontWeight="Bold" FontSize="14"
                                Foreground="#B45309" VerticalAlignment="Center"/>
                 </StackPanel>
                 <TextBlock TextWrapping="Wrap" Margin="26,6,0,0" Foreground="#92400E" FontSize="12">
@@ -142,16 +142,16 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="1" x:Name="Step1Button" Content="📡 Step 1: ブートローダーへ" 
-                    Style="{StaticResource PrimaryButton}" 
+            <Button Grid.Column="1" x:Name="Step1Button" Content="📡 Step 1: ブートローダーへ"
+                    Style="{StaticResource PrimaryButton}"
                     Width="200" Height="42" Margin="0,0,12,0"
                     Click="Step1Button_Click"/>
-            <Button Grid.Column="2" x:Name="Step2Button" Content="🚀 Step 2: 転送開始" 
-                    Style="{StaticResource SuccessButton}" 
+            <Button Grid.Column="2" x:Name="Step2Button" Content="🚀 Step 2: 転送開始"
+                    Style="{StaticResource SuccessButton}"
                     Width="160" Height="42" Margin="0,0,12,0"
                     Click="Step2Button_Click" IsEnabled="False"/>
-            <Button Grid.Column="3" Content="閉じる" 
-                    Style="{StaticResource SecondaryButton}" 
+            <Button Grid.Column="3" Content="閉じる"
+                    Style="{StaticResource SecondaryButton}"
                     Width="90" Height="42"
                     Click="CloseButton_Click"/>
         </Grid>

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:FullmoniTerminal"
         xmlns:vm="clr-namespace:FullmoniTerminal.ViewModels"
         mc:Ignorable="d"
-        Title="FULLMONI-WIDE パラメータ設定" 
+        Title="FULLMONI-WIDE Terminal"
         Height="640" Width="480"
         ResizeMode="CanMinimize"
         FontFamily="Meiryo UI"
@@ -39,7 +39,7 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <ComboBox Grid.Column="0" ItemsSource="{Binding AvailablePorts}" 
+                <ComboBox Grid.Column="0" ItemsSource="{Binding AvailablePorts}"
                           SelectedItem="{Binding SelectedPort}"
                           Style="{DynamicResource ModernComboBox}"
                           Width="80" Height="24" FontSize="12" IsEnabled="{Binding IsNotConnected}"/>
@@ -64,7 +64,7 @@
                         </Ellipse.Style>
                     </Ellipse>
                     <TextBlock Text="{Binding StatusText}" FontSize="12" Foreground="{DynamicResource TextBrush}"/>
-                    <TextBlock Text=" | " FontSize="12" Foreground="{DynamicResource TextMutedBrush}" 
+                    <TextBlock Text=" | " FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
                                Visibility="{Binding IsConnected, Converter={StaticResource BoolToVisibility}}"/>
                     <TextBlock Text="{Binding FirmwareVersion, StringFormat=v{0}}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
                                Visibility="{Binding IsConnected, Converter={StaticResource BoolToVisibility}}"/>
@@ -73,7 +73,7 @@
                 <!-- テーマ切り替え（右側） -->
                 <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
                     <TextBlock Text="☀" FontSize="12" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="{DynamicResource TextMutedBrush}"/>
-                    <ToggleButton Style="{DynamicResource ThemeToggleButton}" 
+                    <ToggleButton Style="{DynamicResource ThemeToggleButton}"
                                   IsChecked="{Binding IsDarkTheme}"/>
                     <TextBlock Text="🌙" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
                 </StackPanel>
@@ -352,7 +352,7 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="現在のファームウェア:" FontWeight="Bold" FontSize="12" 
+                            <TextBlock Grid.Column="0" Text="現在のファームウェア:" FontWeight="Bold" FontSize="12"
                                        VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
                             <TextBlock Grid.Column="1" FontSize="14" FontWeight="Bold" Margin="8,0,0,0" VerticalAlignment="Center"
                                        Foreground="#2ECC71">
@@ -378,7 +378,7 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Text="{Binding FirmwareFilePath}" IsReadOnly="True" 
+                            <TextBox Grid.Column="0" Text="{Binding FirmwareFilePath}" IsReadOnly="True"
                                      Height="24" FontSize="12" Margin="0,0,6,0" VerticalContentAlignment="Center"/>
                             <Button Grid.Column="1" Content="参照..." Width="60" Height="24" FontSize="12"
                                     Style="{DynamicResource SecondaryButton}"
@@ -414,10 +414,10 @@
                                         Command="{Binding CopyFirmwareLogCommand}"
                                         IsEnabled="{Binding IsOperationEnabled}"/>
                             </StackPanel>
-                            <TextBox Grid.Row="1" Text="{Binding FirmwareLog, Mode=OneWay}" 
+                            <TextBox Grid.Row="1" Text="{Binding FirmwareLog, Mode=OneWay}"
                                      x:Name="FirmwareLogTextBox"
                                      Height="140" FontSize="12" FontFamily="Consolas"
-                                     IsReadOnly="True" TextWrapping="Wrap" 
+                                     IsReadOnly="True" TextWrapping="Wrap"
                                      VerticalScrollBarVisibility="Auto"
                                      Background="#1E1E1E" Foreground="#DCDCDC"
                                      Padding="6"
@@ -438,7 +438,7 @@
 
         <!-- ステータス -->
         <TextBlock Grid.Row="2" Text="{Binding ActivityStatus}" FontSize="12"
-                   Foreground="{DynamicResource TextMutedBrush}" 
+                   Foreground="{DynamicResource TextMutedBrush}"
                    HorizontalAlignment="Center"/>
     </Grid>
 </Window>

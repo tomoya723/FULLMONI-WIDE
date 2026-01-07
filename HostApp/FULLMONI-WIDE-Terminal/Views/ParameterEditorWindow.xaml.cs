@@ -18,7 +18,7 @@ public partial class ParameterEditorWindow : Window
         InitializeComponent();
         _serialService = serialService;
         _sendCommand = sendCommand;
-        
+
         // テキストボックスの変更イベントを登録
         TyreWidthBox.TextChanged += TyreSize_TextChanged;
         TyreAspectBox.TextChanged += TyreSize_TextChanged;
@@ -35,7 +35,7 @@ public partial class ParameterEditorWindow : Window
         var width = TyreWidthBox.Text;
         var aspect = TyreAspectBox.Text;
         var rim = TyreRimBox.Text;
-        
+
         if (!string.IsNullOrEmpty(width) && !string.IsNullOrEmpty(aspect) && !string.IsNullOrEmpty(rim))
         {
             TyreSizePreview.Text = $"プレビュー: {width}/{aspect} R{rim}";
@@ -52,10 +52,10 @@ public partial class ParameterEditorWindow : Window
 
         // listコマンドで現在のパラメータを取得
         _sendCommand("list");
-        
+
         // 応答を待つ（少し遅延）
         await Task.Delay(500);
-        
+
         MessageBox.Show("ターミナルの出力からパラメータを確認してください。\n" +
                        "（自動パース機能は今後実装予定）", "情報", MessageBoxButton.OK, MessageBoxImage.Information);
     }
@@ -116,7 +116,7 @@ public partial class ParameterEditorWindow : Window
         }
 
         MessageBox.Show($"{commands.Count}個のパラメータを送信しました。\n" +
-                       "EEPROMに保存するには「保存」ボタンを押してください。", 
+                       "EEPROMに保存するには「保存」ボタンを押してください。",
                        "完了", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
@@ -128,7 +128,7 @@ public partial class ParameterEditorWindow : Window
             return;
         }
 
-        var result = MessageBox.Show("パラメータをEEPROMに保存しますか？", "確認", 
+        var result = MessageBox.Show("パラメータをEEPROMに保存しますか？", "確認",
                                      MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (result == MessageBoxResult.Yes)
         {

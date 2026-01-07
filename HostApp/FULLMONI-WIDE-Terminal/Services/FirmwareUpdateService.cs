@@ -9,15 +9,15 @@ namespace FullmoniTerminal.Services;
 public class FirmwareUpdateService
 {
     private readonly SerialPortService _serialService;
-    
+
     // XON/XOFFフロー制御
     private const byte XON = 0x11;   // DC1 - Resume
     private const byte XOFF = 0x13; // DC3 - Pause
-    
+
     // 送信制御
     private const int ChunkSize = 512;     // 一度に送信するバイト数
     private const int SendDelayMs = 5;     // チャンク間の待機時間
-    
+
     private volatile bool _xoffReceived;
     private volatile bool _transferCancelled;
 
@@ -57,7 +57,7 @@ public class FirmwareUpdateService
         }
 
         var data = File.ReadAllBytes(filePath);
-        
+
         if (data.Length == 0)
         {
             throw new InvalidDataException("ファイルが空です");
@@ -126,25 +126,25 @@ public class FirmwareUpdateService
             if (switchToBootloader)
             {
                 Log("=== ブートローダーモードへ切り替え ===");
-                
+
                 // 0. UARTの同期を取るためにダミー文字を送信（最初の1文字が欠落する問題対策）
                 Log("TX: (sync)");
                 _serialService.SendCommand("");  // 空コマンド（改行のみ）を送信
                 await Task.Delay(100, cancellationToken);
-                
+
                 // 1. fwupdateコマンドを送信
                 Log("TX: fwupdate");
                 UpdateStatus("fwupdateコマンド送信中...");
                 _serialService.SendCommand("fwupdate");
-                
+
                 // 2. Firmwareの応答を待つ（"Type 'yes' to confirm"）
                 Log("Firmwareの確認プロンプトを待機中...");
                 await Task.Delay(1000, cancellationToken);
-                
+
                 // 3. "yes"を送信して確認
                 Log("TX: yes");
                 _serialService.SendCommand("yes");
-                
+
                 // 4. リブートを待つ（Firmwareがブートローダーにリブートするまで）
                 Log("デバイスのリブートを待機中...");
                 UpdateStatus("デバイスがブートローダーにリブート中...");
@@ -165,7 +165,7 @@ public class FirmwareUpdateService
             while (sentBytes < totalBytes)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                
+
                 if (_transferCancelled)
                 {
                     throw new OperationCanceledException("転送がキャンセルされました");
@@ -181,12 +181,12 @@ public class FirmwareUpdateService
                 // チャンクサイズを計算
                 var remaining = totalBytes - sentBytes;
                 var chunkSize = Math.Min(ChunkSize, remaining);
-                
+
                 // データを送信
                 var chunk = new byte[chunkSize];
                 Array.Copy(firmwareData, sentBytes, chunk, 0, chunkSize);
                 _serialService.SendRaw(chunk);
-                
+
                 sentBytes += chunkSize;
 
                 // 進捗更新
@@ -195,7 +195,7 @@ public class FirmwareUpdateService
                 {
                     lastProgress = progress;
                     ProgressChanged?.Invoke(this, progress);
-                    
+
                     // 10%ごとにログ出力
                     if (progress % 10 == 0)
                     {
@@ -208,10 +208,10 @@ public class FirmwareUpdateService
             }
 
             UpdateStatus($"転送完了: {sentBytes:N0} bytes - 検証中...");
-            
+
             // 転送完了後、Bootloaderが検証・再起動するのを待つ
             await Task.Delay(5000, cancellationToken);
-            
+
             UpdateStatus("更新完了");
             UpdateCompleted?.Invoke(this, true);
         }
@@ -244,22 +244,22 @@ public class FirmwareUpdateService
     private async Task WaitForXonAsync(TimeSpan timeout, CancellationToken cancellationToken)
     {
         var deadline = DateTime.Now.Add(timeout);
-        
+
         // 最初はXOFF状態と仮定（初期XONを受信するまで待つ）
         _xoffReceived = true;
-        
+
         while (DateTime.Now < deadline)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            
+
             if (!_xoffReceived)
             {
                 return; // XON受信
             }
-            
+
             await Task.Delay(100, cancellationToken);
         }
-        
+
         // タイムアウトしても続行（Bootloaderがすでに待機中の可能性）
         UpdateStatus("警告: XON待機タイムアウト - 転送を開始します");
         _xoffReceived = false;

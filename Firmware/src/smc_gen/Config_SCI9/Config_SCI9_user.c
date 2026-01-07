@@ -92,7 +92,7 @@ void r_Config_SCI9_transmitend_interrupt(void)
     SCI9.SCR.BIT.TIE = 0U;
     SCI9.SCR.BIT.TE = 0U;
     SCI9.SCR.BIT.TEIE = 0U;
-    
+
     r_Config_SCI9_callback_transmitend();
 }
 
@@ -107,7 +107,7 @@ void r_Config_SCI9_receive_interrupt(void)
 {
     /* Start user code for r_Config_SCI9_receive_interrupt. Do not edit comment generated here */
     uint8_t rx_data = SCI9.RDR;
-    
+
     if (g_param_mode_active) {
         /* パラメータモード中：リングバッファに追加 */
         param_console_rx_push(rx_data);
@@ -131,9 +131,9 @@ void r_Config_SCI9_receive_interrupt(void)
 void r_Config_SCI9_receiveerror_interrupt(void)
 {
     uint8_t err_type;
-    
+
     r_Config_SCI9_callback_receiveerror();
-    
+
     /* Clear overrun, framing and parity error flags */
     err_type = SCI9.SSR.BYTE;
     err_type &= 0xC7U;

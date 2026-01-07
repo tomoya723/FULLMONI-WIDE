@@ -39,9 +39,9 @@ public class ThemeService
         if (app == null) return;
 
         var mergedDicts = app.Resources.MergedDictionaries;
-        
+
         // 既存のテーマを削除
-        var existingTheme = mergedDicts.FirstOrDefault(d => 
+        var existingTheme = mergedDicts.FirstOrDefault(d =>
             d.Source?.OriginalString.Contains("Theme.xaml") == true);
         if (existingTheme != null)
         {
@@ -49,8 +49,8 @@ public class ThemeService
         }
 
         // 新しいテーマを適用
-        var themePath = _isDarkTheme 
-            ? "Themes/DarkPopTheme.xaml" 
+        var themePath = _isDarkTheme
+            ? "Themes/DarkPopTheme.xaml"
             : "Themes/PopTheme.xaml";
 
         try

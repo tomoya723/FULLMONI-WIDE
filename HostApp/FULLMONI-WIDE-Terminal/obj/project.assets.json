@@ -286,11 +286,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\tomoy\\git\\FULLMONI-WIDE\\HostApp\\FullmoniTerminal\\FullmoniTerminal.csproj",
-      "projectName": "FullmoniTerminal",
-      "projectPath": "C:\\Users\\tomoy\\git\\FULLMONI-WIDE\\HostApp\\FullmoniTerminal\\FullmoniTerminal.csproj",
+      "projectUniqueName": "C:\\Users\\tomoy\\git\\FULLMONI-WIDE\\HostApp\\FULLMONI-WIDE-Terminal\\FULLMONI-WIDE-Terminal.csproj",
+      "projectName": "FULLMONI-WIDE-Terminal",
+      "projectPath": "C:\\Users\\tomoy\\git\\FULLMONI-WIDE\\HostApp\\FULLMONI-WIDE-Terminal\\FULLMONI-WIDE-Terminal.csproj",
       "packagesPath": "C:\\Users\\tomoy\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\tomoy\\git\\FULLMONI-WIDE\\HostApp\\FullmoniTerminal\\obj\\",
+      "outputPath": "C:\\Users\\tomoy\\git\\FULLMONI-WIDE\\HostApp\\FULLMONI-WIDE-Terminal\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\tomoy\\AppData\\Roaming\\NuGet\\NuGet.Config",

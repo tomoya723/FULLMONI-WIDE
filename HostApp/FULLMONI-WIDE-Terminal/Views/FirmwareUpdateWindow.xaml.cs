@@ -24,7 +24,7 @@ public partial class FirmwareUpdateWindow : Window
         _serialService = serialService;
         _sendCommand = sendCommand;
         _updateService = new FirmwareUpdateService(serialService);
-        
+
         // イベント登録
         _updateService.ProgressChanged += UpdateService_ProgressChanged;
         _updateService.StatusChanged += UpdateService_StatusChanged;
@@ -43,12 +43,12 @@ public partial class FirmwareUpdateWindow : Window
         {
             _selectedFilePath = dialog.FileName;
             FilePathBox.Text = _selectedFilePath;
-            
+
             try
             {
                 var fileInfo = new FileInfo(_selectedFilePath);
                 FileSizeText.Text = $"{fileInfo.Length:N0} bytes ({fileInfo.Length / 1024.0:F1} KB)";
-                
+
                 // BINファイルを読み込む
                 _firmwareData = FirmwareUpdateService.LoadBinFile(_selectedFilePath);
                 AppendLog($"バイナリファイルを読み込みました: {_firmwareData.Length:N0} bytes");
@@ -83,27 +83,27 @@ public partial class FirmwareUpdateWindow : Window
 
         AppendLog("=== Step 1: ブートローダーへ移行 ===");
         AppendLog("fwupdateコマンドを送信中...");
-        
+
         // fwupdateコマンドを送信
         _sendCommand("fwupdate");
-        
+
         // ユーザーに確認入力を求める
         await Task.Delay(1000);
         AppendLog("ターミナルで 'yes' と入力して確認してください。");
-        
+
         // 確認待ち（ユーザーがターミナルで'yes'を入力する）
         await Task.Delay(2000);
         _sendCommand("yes");
-        
+
         AppendLog("デバイスがリブートしてブートローダーが起動するまで待機...");
         AppendLog("（約5秒後に接続が切断される場合があります）");
-        
+
         // ブートローダー起動を待つ
         await Task.Delay(5000);
-        
+
         Step1Button.IsEnabled = false;
         Step2Button.IsEnabled = true;
-        
+
         AppendLog("Step 2 に進んでください。");
         AppendLog("※ 接続が切れた場合は再接続してください。");
     }
@@ -119,7 +119,7 @@ public partial class FirmwareUpdateWindow : Window
         if (!_serialService.IsConnected)
         {
             MessageBox.Show("シリアルポートに接続してください。\n" +
-                          "ブートローダーモードでデバイスが起動している必要があります。", 
+                          "ブートローダーモードでデバイスが起動している必要があります。",
                           "エラー", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
@@ -142,11 +142,11 @@ public partial class FirmwareUpdateWindow : Window
         _isUpdating = true;
         Step1Button.IsEnabled = false;
         Step2Button.IsEnabled = false;
-        
+
         _cts = new CancellationTokenSource();
-        
+
         AppendLog("=== Step 2: ファームウェア転送 ===");
-        
+
         try
         {
             // このウィンドウではすでにブートローダーモードに切り替え済みの想定
@@ -159,7 +159,7 @@ public partial class FirmwareUpdateWindow : Window
         catch (Exception ex)
         {
             AppendLog($"エラー: {ex.Message}");
-            MessageBox.Show($"ファームウェア転送中にエラーが発生しました:\n{ex.Message}", 
+            MessageBox.Show($"ファームウェア転送中にエラーが発生しました:\n{ex.Message}",
                           "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
         }
         finally
@@ -200,7 +200,7 @@ public partial class FirmwareUpdateWindow : Window
                               "デバイスの電源を入れ直して再試行してください。",
                               "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            
+
             Step1Button.IsEnabled = true;
             Step2Button.IsEnabled = false;
         });
@@ -226,7 +226,7 @@ public partial class FirmwareUpdateWindow : Window
                 return;
             }
         }
-        
+
         Close();
     }
 
@@ -243,7 +243,7 @@ public partial class FirmwareUpdateWindow : Window
             }
             _cts?.Cancel();
         }
-        
+
         _updateService.ProgressChanged -= UpdateService_ProgressChanged;
         _updateService.StatusChanged -= UpdateService_StatusChanged;
         _updateService.UpdateCompleted -= UpdateService_UpdateCompleted;

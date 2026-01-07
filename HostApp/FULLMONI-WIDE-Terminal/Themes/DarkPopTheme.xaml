@@ -56,9 +56,9 @@
     </LinearGradientBrush>
 
     <!-- Drop Shadow Effect -->
-    <DropShadowEffect x:Key="CardShadow" BlurRadius="15" ShadowDepth="2" 
+    <DropShadowEffect x:Key="CardShadow" BlurRadius="15" ShadowDepth="2"
                       Color="#40000000" Direction="270"/>
-    <DropShadowEffect x:Key="ButtonShadow" BlurRadius="8" ShadowDepth="2" 
+    <DropShadowEffect x:Key="ButtonShadow" BlurRadius="8" ShadowDepth="2"
                       Color="#60000000" Direction="270"/>
 
     <!-- ============================================
@@ -256,7 +256,7 @@
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="2">
-                        <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" 
+                        <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"
                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                     </Border>
                     <ControlTemplate.Triggers>
@@ -323,7 +323,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBox">
                     <Grid>
-                        <ToggleButton x:Name="ToggleButton" 
+                        <ToggleButton x:Name="ToggleButton"
                                       Background="{TemplateBinding Background}"
                                       BorderBrush="{TemplateBinding BorderBrush}"
                                       BorderThickness="{TemplateBinding BorderThickness}"
@@ -341,7 +341,7 @@
                                                 <ColumnDefinition Width="20"/>
                                             </Grid.ColumnDefinitions>
                                             <ContentPresenter Grid.Column="0"/>
-                                            <Path Grid.Column="1" Data="M0,0 L4,4 L8,0" 
+                                            <Path Grid.Column="1" Data="M0,0 L4,4 L8,0"
                                                   Stroke="{StaticResource TextBrush}" StrokeThickness="1.5"
                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Grid>
@@ -512,7 +512,7 @@
                     <Border x:Name="border" Background="{TemplateBinding Background}"
                             BorderThickness="0,0,0,2" BorderBrush="Transparent"
                             Padding="{TemplateBinding Padding}" Margin="0,0,4,0">
-                        <ContentPresenter ContentSource="Header" 
+                        <ContentPresenter ContentSource="Header"
                                           HorizontalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
@@ -542,7 +542,7 @@
                     <Grid>
                         <Border Background="{TemplateBinding Background}" CornerRadius="4"/>
                         <Border x:Name="PART_Track"/>
-                        <Border x:Name="PART_Indicator" HorizontalAlignment="Left" 
+                        <Border x:Name="PART_Indicator" HorizontalAlignment="Left"
                                 Background="{TemplateBinding Foreground}" CornerRadius="4"/>
                     </Grid>
                 </ControlTemplate>
@@ -560,7 +560,7 @@
                     <Grid>
                         <Border Background="{TemplateBinding Background}" CornerRadius="4"/>
                         <Border x:Name="PART_Track"/>
-                        <Border x:Name="PART_Indicator" HorizontalAlignment="Left" 
+                        <Border x:Name="PART_Indicator" HorizontalAlignment="Left"
                                 Background="{TemplateBinding Foreground}" CornerRadius="4"/>
                     </Grid>
                 </ControlTemplate>

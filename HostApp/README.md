@@ -4,11 +4,11 @@ FULLMONI-WIDEファームウェアと通信するWindowsホストアプリケー
 
 ## アプリケーション一覧
 
-### FullmoniTerminal
+### FULLMONI-WIDE Terminal
 
 UARTターミナルアプリケーション。ファームウェアのパラメータコンソールと対話するためのGUIツールです。
 
-- 詳細: [FullmoniTerminal/README.md](FullmoniTerminal/README.md)
+- 詳細: [FULLMONI-WIDE-Terminal/README.md](FULLMONI-WIDE-Terminal/README.md)
 
 ## 必要環境
 

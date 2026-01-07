@@ -281,7 +281,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             }
 
             ActivityStatus = $"接続中... {SelectedPort}";
-            
+
             if (_serialService.Connect(SelectedPort, SelectedBaudRate))
             {
                 ActivityStatus = "✅ 接続完了！パラメータを取得中...";
@@ -321,7 +321,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             _serialService.SendCommand("version");
             TxCount++;
             await Task.Delay(500);
-            
+
             var versionResponse = _responseBuffer.ToString();
             ParseVersionResponse(versionResponse);
 
@@ -330,7 +330,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             _serialService.SendCommand("list");
             TxCount++;
             await Task.Delay(1000); // レスポンス収集のため待機
-            
+
             var response = _responseBuffer.ToString();
             ParseParameterResponse(response);
 
@@ -339,7 +339,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             _serialService.SendCommand("rtc");
             TxCount++;
             await Task.Delay(500);
-            
+
             var rtcResponse = _responseBuffer.ToString();
             ParseRtcResponse(rtcResponse);
 
@@ -366,6 +366,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         if (!IsConnected) return;
 
+        // 入力バリデーション
+        var validationErrors = ValidateAllParameters();
+        if (validationErrors.Count > 0)
+        {
+            var errorMessage = "入力エラーがあります。以下を確認してください:\n\n" + string.Join("\n", validationErrors);
+            System.Windows.MessageBox.Show(errorMessage, "入力エラー", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+            return;
+        }
+
         ActivityStatus = "📤 パラメータを送信中...";
 
         try
@@ -379,7 +388,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             await SendParameterIfValid("tyre_width", TyreWidth);
             await SendParameterIfValid("tyre_aspect", TyreAspect);
             await SendParameterIfValid("tyre_rim", WheelDia);
-            
+
             // ギア比設定
             await SendGearRatioIfValid("gear1", Gear1);
             await SendGearRatioIfValid("gear2", Gear2);
@@ -388,7 +397,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             await SendGearRatioIfValid("gear5", Gear5);
             await SendGearRatioIfValid("gear6", Gear6);
             await SendGearRatioIfValid("final", FinalGear);
-            
+
             // 警告設定
             await SendParameterIfValid("water_low", WaterTempLow);
             await SendParameterIfValid("water_high", WaterTempHigh);
@@ -550,7 +559,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             _serialService.SendCommand("rtc");
             TxCount++;
             await Task.Delay(500);
-            
+
             var rtcResponse = _responseBuffer.ToString();
             ParseRtcResponse(rtcResponse);
 
@@ -637,7 +646,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             // BINファイルを読み込む
             AppendFirmwareLog($"ファイル読み込み: {FirmwareFilePath}");
-            var firmwareData = await Task.Run(() => 
+            var firmwareData = await Task.Run(() =>
                 Services.FirmwareUpdateService.LoadBinFile(FirmwareFilePath));
 
             AppendFirmwareLog($"ファイルサイズ: {firmwareData.Length:N0} bytes");
@@ -645,7 +654,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             // ファームウェア更新サービスを作成
             var updateService = new Services.FirmwareUpdateService(_serialService);
-            
+
             // イベントハンドラを設定
             updateService.ProgressChanged += (s, progress) =>
             {
@@ -654,7 +663,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     FirmwareProgress = progress;
                 });
             };
-            
+
             updateService.StatusChanged += (s, status) =>
             {
                 Application.Current.Dispatcher.Invoke(() =>
@@ -662,12 +671,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     FirmwareStatus = status;
                 });
             };
-            
+
             updateService.LogMessage += (s, message) =>
             {
                 AppendFirmwareLog(message);
             };
-            
+
             updateService.UpdateCompleted += (s, success) =>
             {
                 Application.Current.Dispatcher.Invoke(() =>
@@ -693,7 +702,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             IsFirmwareUpdating = false;
             FirmwareStatus = $"エラー: {ex.Message}";
             ActivityStatus = $"❌ ファームウェア更新エラー: {ex.Message}";
-            
+
             await Application.Current.Dispatcher.InvokeAsync(() =>
                 MessageBox.Show(
                     Application.Current.MainWindow,
@@ -883,6 +892,128 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             ActivityStatus = $"❌ エラー: {e}";
         });
+    }
+
+    #endregion
+
+    #region Validation
+
+    private List<string> ValidateAllParameters()
+    {
+        var errors = new List<string>();
+
+        // === タイヤ設定バリデーション ===
+        // 正の整数で最大500まで
+        if (!ValidatePositiveInt(TyreWidth, 1, 500, out _))
+            errors.Add("【タイヤ幅】正の整数で1～500の範囲で入力してください");
+        if (!ValidatePositiveInt(TyreAspect, 1, 500, out _))
+            errors.Add("【扁平率】正の整数で1～500の範囲で入力してください");
+        if (!ValidatePositiveInt(WheelDia, 1, 500, out _))
+            errors.Add("【リム径】正の整数で1～500の範囲で入力してください");
+
+        // === 警告設定バリデーション ===
+        // 温度: -40～200
+        if (!ValidateInt(WaterTempLow, -40, 200, out int waterLow))
+            errors.Add("【水温低温】-40～200の整数で入力してください");
+        if (!ValidateInt(WaterTempHigh, -40, 200, out int waterHigh))
+            errors.Add("【水温高温】-40～200の整数で入力してください");
+        if (waterLow >= waterHigh && !string.IsNullOrEmpty(WaterTempLow) && !string.IsNullOrEmpty(WaterTempHigh))
+            errors.Add("【水温警告】水温低温 < 水温高温 の関係にしてください");
+
+        // 燃料: 0～1000
+        if (!ValidatePositiveInt(FuelWarn, 0, 1000, out _))
+            errors.Add("【燃料警告】0～1000の整数で入力してください");
+
+        // === ギア比バリデーション ===
+        // 正の小数で、1速>2速>3速>4速>5速>6速の関係
+        bool gear1Valid = ValidatePositiveDecimal(Gear1, out double g1);
+        bool gear2Valid = ValidatePositiveDecimal(Gear2, out double g2);
+        bool gear3Valid = ValidatePositiveDecimal(Gear3, out double g3);
+        bool gear4Valid = ValidatePositiveDecimal(Gear4, out double g4);
+        bool gear5Valid = ValidatePositiveDecimal(Gear5, out double g5);
+        bool gear6Valid = ValidatePositiveDecimal(Gear6, out double g6);
+
+        if (!gear1Valid) errors.Add("【1速】正の小数で入力してください");
+        if (!gear2Valid) errors.Add("【2速】正の小数で入力してください");
+        if (!gear3Valid) errors.Add("【3速】正の小数で入力してください");
+        if (!gear4Valid) errors.Add("【4速】正の小数で入力してください");
+        if (!gear5Valid) errors.Add("【5速】正の小数で入力してください");
+        // 6速は0許可（5速車の場合）
+        if (!string.IsNullOrEmpty(Gear6) && !gear6Valid && Gear6 != "0")
+            errors.Add("【6速】正の小数で入力してください（5速車は0）");
+
+        if (!ValidatePositiveDecimal(FinalGear, out _))
+            errors.Add("【ファイナル】正の小数で入力してください");
+
+        // ギア比の大小関係チェック（入力がある場合のみ）
+        if (gear1Valid && gear2Valid && g1 <= g2)
+            errors.Add("【ギア比】1速 > 2速 の関係にしてください");
+        if (gear2Valid && gear3Valid && g2 <= g3)
+            errors.Add("【ギア比】2速 > 3速 の関係にしてください");
+        if (gear3Valid && gear4Valid && g3 <= g4)
+            errors.Add("【ギア比】3速 > 4速 の関係にしてください");
+        if (gear4Valid && gear5Valid && g4 <= g5)
+            errors.Add("【ギア比】4速 > 5速 の関係にしてください");
+        if (gear5Valid && gear6Valid && g6 > 0 && g5 <= g6)
+            errors.Add("【ギア比】5速 > 6速 の関係にしてください");
+
+        // === シフトインジケータバリデーション ===
+        // 正の整数で最大15000まで、昇順関係
+        bool rpm1Valid = ValidatePositiveInt(ShiftRpm1, 1, 15000, out int rpm1);
+        bool rpm2Valid = ValidatePositiveInt(ShiftRpm2, 1, 15000, out int rpm2);
+        bool rpm3Valid = ValidatePositiveInt(ShiftRpm3, 1, 15000, out int rpm3);
+        bool rpm4Valid = ValidatePositiveInt(ShiftRpm4, 1, 15000, out int rpm4);
+        bool rpm5Valid = ValidatePositiveInt(ShiftRpm5, 1, 15000, out int rpm5);
+
+        if (!rpm1Valid) errors.Add("【青2灯】正の整数で1～15000の範囲で入力してください");
+        if (!rpm2Valid) errors.Add("【青4灯】正の整数で1～15000の範囲で入力してください");
+        if (!rpm3Valid) errors.Add("【緑6灯】正の整数で1～15000の範囲で入力してください");
+        if (!rpm4Valid) errors.Add("【赤8灯】正の整数で1～15000の範囲で入力してください");
+        if (!rpm5Valid) errors.Add("【白点滅】正の整数で1～15000の範囲で入力してください");
+
+        // シフトRPMの大小関係チェック
+        if (rpm1Valid && rpm2Valid && rpm1 >= rpm2)
+            errors.Add("【シフトインジケータ】青2灯 < 青4灯 の関係にしてください");
+        if (rpm2Valid && rpm3Valid && rpm2 >= rpm3)
+            errors.Add("【シフトインジケータ】青4灯 < 緑6灯 の関係にしてください");
+        if (rpm3Valid && rpm4Valid && rpm3 >= rpm4)
+            errors.Add("【シフトインジケータ】緑6灯 < 赤8灯 の関係にしてください");
+        if (rpm4Valid && rpm5Valid && rpm4 >= rpm5)
+            errors.Add("【シフトインジケータ】赤8灯 < 白点滅 の関係にしてください");
+
+        return errors;
+    }
+
+    private bool ValidatePositiveInt(string value, int min, int max, out int result)
+    {
+        result = 0;
+        if (string.IsNullOrEmpty(value)) return false;
+        if (!int.TryParse(value, out result)) return false;
+        return result >= min && result <= max;
+    }
+
+    private bool ValidateInt(string value, int min, int max, out int result)
+    {
+        result = 0;
+        if (string.IsNullOrEmpty(value)) return false;
+        if (!int.TryParse(value, out result)) return false;
+        return result >= min && result <= max;
+    }
+
+    private bool ValidatePositiveDecimal(string value, out double result)
+    {
+        result = 0;
+        if (string.IsNullOrEmpty(value)) return false;
+        if (!double.TryParse(value, out result)) return false;
+        return result > 0;
+    }
+
+    private bool ValidateDecimalRange(string value, double min, double max, out double result)
+    {
+        result = 0;
+        if (string.IsNullOrEmpty(value)) return false;
+        if (!double.TryParse(value, out result)) return false;
+        return result >= min && result <= max;
     }
 
     #endregion

@@ -6,10 +6,11 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <RootNamespace>FullmoniTerminal</RootNamespace>
     <Authors>FULLMONI-WIDE Project</Authors>
-    <Description>FULLMONI-WIDE Parameter Console - Windows Host Application for UART communication with firmware</Description>
-    <Product>FULLMONI Terminal</Product>
-    <AssemblyName>FullmoniTerminal</AssemblyName>
+    <Description>FULLMONI-WIDE Terminal - Windows Host Application for UART communication with firmware</Description>
+    <Product>FULLMONI-WIDE Terminal</Product>
+    <AssemblyName>FULLMONI-WIDE-Terminal</AssemblyName>
     <Version>1.0.0</Version>
     <ApplicationIcon>Assets\FMW.ico</ApplicationIcon>
   </PropertyGroup>

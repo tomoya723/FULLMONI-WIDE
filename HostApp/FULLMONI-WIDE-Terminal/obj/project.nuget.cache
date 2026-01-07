@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "3mdXgyVIfuQ=",
+  "dgSpecHash": "5vlkPiIGyx4=",
   "success": true,
-  "projectFilePath": "C:\\Users\\tomoy\\git\\FULLMONI-WIDE\\HostApp\\FullmoniTerminal\\FullmoniTerminal.csproj",
+  "projectFilePath": "C:\\Users\\tomoy\\git\\FULLMONI-WIDE\\HostApp\\FULLMONI-WIDE-Terminal\\FULLMONI-WIDE-Terminal.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\tomoy\\.nuget\\packages\\communitytoolkit.mvvm\\8.2.2\\communitytoolkit.mvvm.8.2.2.nupkg.sha512",
     "C:\\Users\\tomoy\\.nuget\\packages\\runtime.linux-arm.runtime.native.system.io.ports\\8.0.0\\runtime.linux-arm.runtime.native.system.io.ports.8.0.0.nupkg.sha512",

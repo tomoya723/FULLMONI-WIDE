@@ -56,9 +56,9 @@
     </LinearGradientBrush>
 
     <!-- Drop Shadow Effect -->
-    <DropShadowEffect x:Key="CardShadow" BlurRadius="15" ShadowDepth="2" 
+    <DropShadowEffect x:Key="CardShadow" BlurRadius="15" ShadowDepth="2"
                       Color="#20000000" Direction="270"/>
-    <DropShadowEffect x:Key="ButtonShadow" BlurRadius="8" ShadowDepth="2" 
+    <DropShadowEffect x:Key="ButtonShadow" BlurRadius="8" ShadowDepth="2"
                       Color="#40000000" Direction="270"/>
 
     <!-- ============================================
@@ -365,7 +365,7 @@
                     <Grid>
                         <Border Background="{TemplateBinding Background}" CornerRadius="4"/>
                         <Border x:Name="PART_Track"/>
-                        <Border x:Name="PART_Indicator" HorizontalAlignment="Left" 
+                        <Border x:Name="PART_Indicator" HorizontalAlignment="Left"
                                 Background="{TemplateBinding Foreground}" CornerRadius="4"/>
                     </Grid>
                 </ControlTemplate>
