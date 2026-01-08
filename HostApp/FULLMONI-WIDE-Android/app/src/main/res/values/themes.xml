@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.FULLMONIWIDEAndroid" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:colorPrimary">@color/fullmoni_primary</item>
+        <item name="android:colorPrimaryDark">@color/fullmoni_primary_dark</item>
+        <item name="android:colorAccent">@color/fullmoni_accent</item>
+        <item name="android:statusBarColor">@color/fullmoni_primary_dark</item>
+    </style>
+</resources>

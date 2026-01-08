@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FULLMONI Terminal</string>
+    <string name="connect">接続</string>
+    <string name="disconnect">切断</string>
+    <string name="send">送信</string>
+    <string name="clear">クリア</string>
+    <string name="terminal">ターミナル</string>
+    <string name="parameters">パラメータ</string>
+    <string name="command_hint">コマンドを入力...</string>
+    <string name="not_connected">未接続</string>
+    <string name="connected">接続中</string>
+    <string name="connection_failed">接続に失敗しました</string>
+    <string name="no_device">USBデバイスが見つかりません</string>
+    <string name="permission_denied">USB許可が拒否されました</string>
+    
+    <!-- Quick Commands -->
+    <string name="cmd_help">help</string>
+    <string name="cmd_version">version</string>
+    <string name="cmd_list">list</string>
+    <string name="cmd_save">save</string>
+    <string name="cmd_load">load</string>
+    <string name="cmd_default">default</string>
+</resources>

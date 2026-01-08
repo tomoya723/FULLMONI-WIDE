@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- USB CDC ACM デバイスフィルタ -->
+<resources>
+    <!-- 一般的なUSB-UARTブリッジチップ -->
+    
+    <!-- FTDI FT232 -->
+    <usb-device vendor-id="1027" product-id="24577" />
+    
+    <!-- Silicon Labs CP210x -->
+    <usb-device vendor-id="4292" product-id="60000" />
+    <usb-device vendor-id="4292" product-id="60001" />
+    
+    <!-- Prolific PL2303 -->
+    <usb-device vendor-id="1659" product-id="8963" />
+    
+    <!-- CH340/CH341 -->
+    <usb-device vendor-id="6790" product-id="29987" />
+    
+    <!-- 汎用CDC ACMデバイス（class指定） -->
+    <usb-device class="2" subclass="2" protocol="1" />
+</resources>
