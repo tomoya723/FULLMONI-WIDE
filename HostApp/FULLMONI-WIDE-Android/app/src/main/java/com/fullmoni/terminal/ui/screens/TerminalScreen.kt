@@ -25,6 +25,7 @@ import com.fullmoni.terminal.viewmodel.MainViewModel
 /**
  * ターミナル画面
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TerminalScreen(viewModel: MainViewModel) {
     val isConnected by viewModel.isConnected.collectAsState()
