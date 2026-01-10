@@ -6,7 +6,9 @@
 /***********************************************************************************************************************
 *  File Name    : main_fit_cdc.c
 *  Description  : Bootloader entry point using FIT USB CDC Driver
+*                 Protocol: Size-prefix + ACK (verified working)
 *  Creation Date: 2026-01-10
+*  Modified     : 2026-01-11 - Reverted to size+ACK protocol
 ***********************************************************************************************************************/
 #include "r_smc_entry.h"
 #include "r_usb_basic_if.h"
@@ -134,7 +136,6 @@ static uint32_t s_flash_buf_cnt = 0;
 static uint32_t s_write_addr = 0;
 static uint32_t s_total_received = 0;
 static bool s_update_mode = false;
-static uint32_t s_progress_kb = 0;  /* Progress counter for KB display */
 static uint32_t s_last_error = 0;   /* Last flash error code */
 static uint32_t s_error_addr = 0;   /* Address where error occurred */
 static uint32_t s_fw_size = 0;      /* Expected firmware size */
@@ -165,6 +166,12 @@ static usb_pcdc_linecoding_t g_line_coding = {
 };
 static bool g_tx_busy = false;       /* TX in progress flag */
 
+static bool is_valid_image(void)
+{
+    uint32_t *fw_header = (uint32_t *)BL_FW_HEADER_ADDR;
+    return (fw_header[0] == BL_FW_MAGIC);
+}
+
 void main(void)
 {
     usb_err_t err;
@@ -183,6 +190,24 @@ void main(void)
         while (1);  /* Halt on Flash init error */
     }
 
+    /*
+     * ★ 起動直後にアプリチェック（USB接続不要）
+     * 有効なファームウェアがあれば即座にジャンプ
+     */
+    if (is_valid_image()) {
+        uint32_t *fw_header = (uint32_t *)BL_FW_HEADER_ADDR;
+        uint32_t entry_point = fw_header[5];  /* entry_point at offset 20 */
+
+        R_FLASH_Close();
+        __builtin_rx_clrpsw('I');
+
+        void (*app_entry)(void) = (void (*)(void))entry_point;
+        app_entry();
+        while (1);
+    }
+
+    /* No valid firmware - initialize USB for update */
+
     /* Initialize USB configuration */
     g_usb_ctrl.module = USB_IP0;        /* Use USB0 */
     g_usb_ctrl.type   = USB_PCDC;       /* Peripheral CDC */
@@ -196,8 +221,6 @@ void main(void)
     if (USB_SUCCESS != err) {
         while (1);  /* Halt on error */
     }
-
-    /* Note: attach_process is now called in R_USB_Open (modified FIT driver) */
 
     while (1)
     {
@@ -278,7 +301,7 @@ void main(void)
                             done = true;
 
                             /* Send completion message */
-                            const char *done_msg = "\r\nDone! Received:        \r\n> ";
+                            const char *done_msg = "\r\nDone! Received:        \r\n";
                             int mlen = 0;
                             while (done_msg[mlen]) { g_usb_tx_buf[mlen] = done_msg[mlen]; mlen++; }
                             /* Insert received count (7 digits) */
@@ -292,7 +315,19 @@ void main(void)
                             g_usb_tx_buf[22] = '0' + cnt % 10;
                             g_usb_ctrl.type = USB_PCDC;
                             g_usb_ctrl.module = USB_IP0;
+                            g_tx_busy = true;
                             R_USB_Write(&g_usb_ctrl, g_usb_tx_buf, mlen);
+
+                            /* Wait and verify */
+                            for (volatile uint32_t d = 0; d < 1000000; d++);
+                            if (is_valid_image()) {
+                                /* Success - reset */
+                                for (volatile uint32_t d = 0; d < 2000000; d++);
+                                R_FLASH_Close();
+                                SYSTEM.PRCR.WORD = 0xA502;
+                                SYSTEM.SWRR = 0xA501;
+                                while (1);
+                            }
                             break;
                         }
 
@@ -382,7 +417,6 @@ void main(void)
                             s_write_addr = BL_APP_START;
                             s_flash_buf_cnt = 0;
                             s_total_received = 0;
-                            s_progress_kb = 0;
                             s_fw_size = 0;
                             s_size_received = false;
                             for (int i = 0; i < BL_FLASH_WRITE_SIZE; i++) s_flash_buf[i] = 0xFF;
@@ -525,7 +559,7 @@ void main(void)
                 break;
         }
 
-        /* Send banner ONCE after delay (started by SET_CONTROL_LINE_STATE) */
+        /* Send banner ONCE after delay */
         if (cdc_configured && !g_tx_busy && counting) {
             delay_counter++;
             if (delay_counter >= 3000000) {
@@ -533,20 +567,19 @@ void main(void)
                 banner_sent = true;
 
                 const char *banner = "\r\n=== FULLMONI Bootloader ===\r\nU=Update B=Boot R=Reset S=Status\r\n> ";
-            int len = 0;
-            while (banner[len]) {
-                g_usb_tx_buf[len] = banner[len];
-                len++;
-            }
+                int len = 0;
+                while (banner[len]) {
+                    g_usb_tx_buf[len] = banner[len];
+                    len++;
+                }
 
-            g_usb_ctrl.type = USB_PCDC;
-            g_usb_ctrl.module = USB_IP0;
+                g_usb_ctrl.type = USB_PCDC;
+                g_usb_ctrl.module = USB_IP0;
 
-            g_tx_busy = true;
-            if (R_USB_Write(&g_usb_ctrl, g_usb_tx_buf, len) != USB_SUCCESS) {
-                g_tx_busy = false;
-            }
-            /* R_USB_Read will be called in WRITE_COMPLETE handler */
+                g_tx_busy = true;
+                if (R_USB_Write(&g_usb_ctrl, g_usb_tx_buf, len) != USB_SUCCESS) {
+                    g_tx_busy = false;
+                }
             }
         }
     }
