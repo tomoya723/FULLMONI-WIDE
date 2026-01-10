@@ -67,6 +67,11 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_flash_rx/src/flash_type_3}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_flash_rx/src/flash_type_5}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_flash_rx/src/flash_type_1}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_usb_basic/src/driver/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_usb_basic}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_usb_pcdc/src/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_usb_basic/src/hw/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_usb_pcdc}&quot;"/>
 								</option>
 								<option id="com.renesas.cdt.managedbuild.gcc.core.option.compiler.source.std.1879310738" name="Language standard" superClass="com.renesas.cdt.managedbuild.gcc.core.option.compiler.source.std" useByScannerDiscovery="true" value="com.renesas.cdt.managedbuild.gcc.core.option.compiler.common.gnu99" valueType="enumerated"/>
 								<inputType id="com.renesas.cdt.managedbuild.gcc.core.inputType.compiler.c.1297487912" superClass="com.renesas.cdt.managedbuild.gcc.core.inputType.compiler.c"/>
@@ -91,6 +96,11 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_flash_rx/src/flash_type_3}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_flash_rx/src/flash_type_5}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_flash_rx/src/flash_type_1}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_usb_basic/src/driver/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_usb_basic}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_usb_pcdc/src/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_usb_basic/src/hw/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_usb_pcdc}&quot;"/>
 								</option>
 								<inputType id="com.renesas.cdt.managedbuild.gcc.core.inputType.assembler.504280816" superClass="com.renesas.cdt.managedbuild.gcc.core.inputType.assembler"/>
 							</tool>

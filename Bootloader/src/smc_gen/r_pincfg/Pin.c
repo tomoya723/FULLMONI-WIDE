@@ -52,6 +52,10 @@ void R_Pins_Create(void)
     PORTB.PDR.BYTE |= 0x80U;
     // PORTB.PMR.BIT.B7 = 1U; // Please set the PMR bit after TE bit is set to 1.
 
+    /* Set USB0_VBUS pin */
+    MPC.P16PFS.BYTE = 0x11U;
+    PORT1.PMR.BYTE |= 0x40U;
+
     R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_MPC);
 }
 

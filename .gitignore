@@ -60,3 +60,7 @@ debug_env/*.dll
 Firmware/src/**/r_emwin_rx/**
 Firmware/src/**/SEGGER/**
 Firmware/src/**/GUI/**
+
+# Android build files
+HostApp/FULLMONI-WIDE-Android/.gradle/
+HostApp/FULLMONI-WIDE-Android/local.properties
