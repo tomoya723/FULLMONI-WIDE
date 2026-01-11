@@ -1,17 +1,18 @@
 /*
  * param_console.c
  *
- * UARTターミナルコンソール機能
+ * USB CDCターミナルコンソール機能
  * パラメータ変更モードのコマンド処理
  *
  *  Created on: 2026/01/06
  *      Author: FULLMONI-WIDE Project
+ *  Modified: 2026/01/11 - SCI9 → USB CDC に変更
  */
 
 #include "param_console.h"
 #include "param_storage.h"
 #include "r_smc_entry.h"
-#include "smc_gen/Config_SCI9/Config_SCI9.h"
+#include "usb_cdc.h"  /* USB CDC driver */
 #include "platform.h"   /* iodefine.h (RTC access, SYSTEM for software reset) */
 #include "firmware_version.h"
 #include <stdio.h>
@@ -22,13 +23,6 @@
 /* ============================================================
  * RTC レジスタアクセス (platform.h経由で iodefine.h を参照)
  * ============================================================ */
-
-/* ============================================================
- * リングバッファ
- * ============================================================ */
-static volatile uint8_t rx_buffer[UART_RX_BUFFER_SIZE];
-static volatile uint16_t rx_head = 0;
-static volatile uint16_t rx_tail = 0;
 
 /* コマンドラインバッファ */
 static char cmd_line[CMD_LINE_SIZE];
@@ -41,41 +35,19 @@ static char tx_buffer[UART_TX_BUFFER_SIZE];
 static bool exit_flag = false;
 
 /* ============================================================
- * リングバッファ操作
+ * 受信データ取得（USB CDCから直接取得）
  * ============================================================ */
-void param_console_rx_push(uint8_t data)
+static int console_getchar(void)
 {
-    uint16_t next = (rx_head + 1) % UART_RX_BUFFER_SIZE;
-    if (next != rx_tail) {
-        rx_buffer[rx_head] = data;
-        rx_head = next;
-    }
-}
-
-bool param_console_rx_available(void)
-{
-    return (rx_head != rx_tail);
-}
-
-uint8_t param_console_rx_pop(void)
-{
-    if (rx_head == rx_tail) {
-        return 0;
-    }
-    uint8_t data = rx_buffer[rx_tail];
-    rx_tail = (rx_tail + 1) % UART_RX_BUFFER_SIZE;
-    return data;
+    return usb_cdc_getchar();
 }
 
 /* ============================================================
- * UART出力
+ * USB CDC出力（SCI9から変更）
  * ============================================================ */
 void param_console_print(const char *str)
 {
-    uint16_t len = strlen(str);
-    R_Config_SCI9_Serial_Send((uint8_t *)str, len);
-    /* 送信完了待ち */
-    for (volatile int i = 0; i < 10000 * len; i++);
+    usb_cdc_print(str);
 }
 
 void param_console_printf(const char *fmt, ...)
@@ -291,12 +263,14 @@ static bool wait_for_confirmation(const char *expected, uint32_t timeout_sec)
     char input[16] = {0};
     uint8_t pos = 0;
     uint32_t timeout_cnt = 0;
-    uint8_t ch;
+    int ch;
 
     while (timeout_cnt < timeout_sec * 100) {  /* 10ms x 100 = 1sec */
-        if (param_console_rx_available()) {
-            ch = param_console_rx_pop();
-
+        /* USB CDCポーリング */
+        usb_cdc_process();
+        
+        ch = console_getchar();
+        if (ch >= 0) {
             if (ch == '\r' || ch == '\n') {
                 param_console_print("\r\n");
                 input[pos] = '\0';
@@ -307,8 +281,8 @@ static bool wait_for_confirmation(const char *expected, uint32_t timeout_sec)
                     param_console_print("\b \b");
                 }
             } else if (ch >= 0x20 && ch < 0x7F && pos < sizeof(input) - 1) {
-                input[pos++] = ch;
-                char echo[2] = {ch, '\0'};
+                input[pos++] = (char)ch;
+                char echo[2] = {(char)ch, '\0'};
                 param_console_print(echo);
             }
             timeout_cnt = 0;  /* 入力があったらタイムアウトリセット */
@@ -449,8 +423,6 @@ static void parse_command(const char *line)
  * ============================================================ */
 void param_console_init(void)
 {
-    rx_head = 0;
-    rx_tail = 0;
     cmd_pos = 0;
     exit_flag = false;
     memset(cmd_line, 0, CMD_LINE_SIZE);
@@ -476,11 +448,10 @@ void param_console_enter(void)
  * ============================================================ */
 bool param_console_process(void)
 {
-    uint8_t ch;
+    int ch;
 
-    /* 受信データ処理 */
-    while (param_console_rx_available()) {
-        ch = param_console_rx_pop();
+    /* USB CDCから受信データ処理 */
+    while ((ch = console_getchar()) >= 0) {
 
         if (ch == '\r' || ch == '\n') {
             /* コマンド確定 */
@@ -506,9 +477,9 @@ bool param_console_process(void)
         } else if (ch >= 0x20 && ch < 0x7F) {
             /* 通常文字 */
             if (cmd_pos < CMD_LINE_SIZE - 1) {
-                cmd_line[cmd_pos++] = ch;
+                cmd_line[cmd_pos++] = (char)ch;
                 /* エコーバック */
-                char echo[2] = {ch, '\0'};
+                char echo[2] = {(char)ch, '\0'};
                 param_console_print(echo);
             }
         }

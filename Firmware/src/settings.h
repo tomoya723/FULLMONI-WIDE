@@ -20,8 +20,8 @@ typedef enum {
 
 /* グローバル変数宣言 */
 extern volatile SYSTEM_MODE g_system_mode;
-extern volatile uint8_t g_uart_rx_trigger;
 extern volatile uint8_t g_param_mode_active;
+/* g_uart_rx_trigger は USB CDC化により削除 */
 
 // emwin display resource number select
 #define DISP (2)  // 1-2

@@ -61,7 +61,7 @@ def upload_firmware(port, firmware_path, baudrate=115200):
         # 最初に4バイトのサイズを送信 (little-endian)
         size_bytes = file_size.to_bytes(4, 'little')
         ser.write(size_bytes)
-        
+
         # ACK待ち
         ack = ser.read(1)
         if ack != b'.':

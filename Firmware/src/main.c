@@ -18,6 +18,7 @@
 #include "smc_gen/general/r_cg_rtc.h"
 #include "param_console.h"
 #include "param_storage.h"
+#include "usb_cdc.h"  /* USB CDC for parameter mode */
 
 // --------------------------------------------------------------------
 // グローバル変数宣言
@@ -40,6 +41,7 @@ volatile MD_STATUS I2C1_md_status;
 
 // システムモード（通常/パラメータ変更）
 volatile SYSTEM_MODE g_system_mode = MODE_NORMAL;
+volatile uint8_t g_param_mode_active = 0;   /* パラメータモードアクティブ（USB CDC用） */
 
 // --------------------------------------------------------------------
 // グローバル構造体宣言
@@ -69,17 +71,12 @@ void main(void)
  {
 	unsigned int shift_rev_cnt;
 
-	/* Smart Configurator生成のSCI9を使用 */
-	R_Config_SCI9_Create();
-	R_Config_SCI9_Start();
+	/* USB CDC初期化（SCI9の代わり） */
+	usb_cdc_init();
 
-	/* テストメッセージ送信 */
-//	const char test_msg[] = "\r\n=== SCI9 Test (Smart Configurator) ===\r\n";
-	const char test_msg[] = "\r\n=== FULLMONI-WIDE Main Program Started!! ===\r\n";
-	R_Config_SCI9_Serial_Send((uint8_t*)test_msg, sizeof(test_msg)-1);
-
-	/* 送信完了待ち */
-	for (volatile int i = 0; i < 1000000; i++);
+	/* テストメッセージ（デバッグ用 - USB接続時のみ表示） */
+	// USB CDCは非同期なので、ここではまだ送信しない
+	// パラメータモード時に送信される
 	// RIIC ch0 EEPROM 16K 400kbps
 	// RIIC ch1 ATtiny85 Neopixel Driver 400kbps
 
@@ -177,31 +174,37 @@ void main(void)
 		printf("EEPROM CRC error, using defaults.\n");
 	}
 
-	// SCI9受信を常時有効化（1バイト受信で割り込み発生）
-	static uint8_t sci9_rx_buf[1];
-	R_Config_SCI9_Serial_Receive(sci9_rx_buf, 1);
+	/* 
+	 * メインループ
+	 * 
+	 * 通常動作時: USB最小監視（PARAM_ENTERのみ検出）
+	 *            → emWin/CAN処理に100%集中、33fps維持
+	 * パラメータモード時: USB CDC フル通信
+	 *            → 設定画面表示、コマンド処理
+	 */
 
 	while (1)
 	{
+		// ============================================================
+		// USB CDC ポーリング（低優先度・最小負荷）
+		// ============================================================
+		usb_cdc_process();
+		
 		// ============================================================
 		// モード切替判定
 		// ============================================================
 		if (g_system_mode == MODE_NORMAL)
 		{
-			// 通常モード時：UART受信でパラメータモードへ切替
-			if (g_uart_rx_trigger)
+			// 通常モード時：USB経由で "PARAM_ENTER" 受信でパラメータモードへ
+			if (usb_cdc_check_param_request())
 			{
-				g_uart_rx_trigger = 0;
 				g_system_mode = MODE_PARAM;
 				g_param_mode_active = 1;
-				APPW_SetVarData(ID_VAR_PRM, 1);  // パラメータモード画面表示
-//				GUI_Exec1();
-//				APPW_Exec();
+				usb_cdc_set_mode(USB_MODE_ACTIVE);  /* フル通信モードへ */
+				APPW_SetVarData(ID_VAR_PRM, 1);     /* パラメータモード画面表示 */
 				param_console_enter();
-
 				continue;
 			}
-
 		}
 		else
 		{
@@ -211,8 +214,9 @@ void main(void)
 				// exitコマンドで通常モードへ戻る
 				g_system_mode = MODE_NORMAL;
 				g_param_mode_active = 0;
-				APPW_SetVarData(ID_VAR_PRM, 0);  // 通常画面表示（解除直前）
-				printf("Returned to normal mode.\n");
+				usb_cdc_set_mode(USB_MODE_STANDBY);  /* 最小監視モードへ */
+				APPW_SetVarData(ID_VAR_PRM, 0);      /* 通常画面表示 */
+				usb_cdc_print("Returned to normal mode.\r\n");
 			}
 
 			GUI_Exec1();

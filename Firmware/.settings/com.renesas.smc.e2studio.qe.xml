@@ -10,7 +10,9 @@
         <Setting id="PB6" value="RXD9"/>
         <Setting id="P21" value="SCL1"/>
         <Setting id="P20" value="SDA1"/>
+        <Setting id="USB0_DM" value="USB0_DM"/>
         <Setting id="P25" value="MTCLKB"/>
+        <Setting id="USB0_DP" value="USB0_DP"/>
         <Setting id="P24" value="MTCLKA"/>
         <Setting id="XCOUT" value="XCOUT"/>
         <Setting id="PC0" value="PC0"/>
@@ -62,6 +64,7 @@
         <Setting id="P12" value="SCL0"/>
         <Setting id="P55" value="P55"/>
         <Setting id="P13" value="SDA0"/>
+        <Setting id="P16" value="USB0_VBUS"/>
         <Setting id="P17" value="P17"/>
         <Setting id="PJ3" value="MTIOC3C"/>
         <Setting id="XCIN" value="XCIN"/>
@@ -99,6 +102,7 @@
         <Setting id="Config_MTU1" value="CG"/>
         <Setting id="Config_RTC" value="CG"/>
         <Setting id="r_drw2d_rx" value="FIT"/>
+        <Setting id="r_usb_pcdc" value="FIT"/>
         <Setting id="Config_MTU8" value="CG"/>
         <Setting id="r_glcdc_rx" value="FIT"/>
         <Setting id="r_gpio_rx" value="FIT"/>
@@ -112,6 +116,7 @@
         <Setting id="Config_PORT" value="CG"/>
         <Setting id="r_emwin_rx" value="FIT"/>
         <Setting id="Config_MTU0" value="CG"/>
+        <Setting id="r_usb_basic" value="FIT"/>
         <Segment component="com.renesas.smc.tools.swcomponent.codegenerator.pwmmode" id="Config_MTU3" source="com.renesas.smc.tools.swcomponent.codegenerator.source">
             <Setting id="CntClk" value="Div4"/>
             <Setting id="TGRCValue" value="2999"/>
@@ -305,6 +310,14 @@
             <Setting id="enablecapturepin2" value="uncheck"/>
         </Segment>
         <Segment component="r_drw2d_rx1.12" id="r_drw2d_rx" source="com.renesas.smc.tools.swcomponent.fit.source"/>
+        <Segment component="r_usb_pcdc1.44" id="r_usb_pcdc" source="com.renesas.smc.tools.swcomponent.fit.source">
+            <Setting id="USB_CFG_PCDC_INT_IN2" value="USB_PIPE7"/>
+            <Setting id="USB_CFG_PCDC_BULK_OUT" value="USB_PIPE2"/>
+            <Setting id="USB_CFG_PCDC_BULK_IN" value="USB_PIPE1"/>
+            <Setting id="USB_CFG_PCDC_BULK_IN2" value="USB_PIPE3"/>
+            <Setting id="USB_CFG_PCDC_BULK_OUT2" value="USB_PIPE4"/>
+            <Setting id="USB_CFG_PCDC_INT_IN" value="USB_PIPE6"/>
+        </Segment>
         <Segment component="com.renesas.smc.tools.swcomponent.codegenerator.normalmode" id="Config_MTU8" source="com.renesas.smc.tools.swcomponent.codegenerator.source">
             <Setting id="CntClk" value="Div1024"/>
             <Setting id="TGRCValue" value="100"/>
@@ -1524,6 +1537,35 @@
             <Setting id="ExtNoiseClk" value="PCLK"/>
             <Setting id="MultiIntTcivEnable" value="UnCheck"/>
             <Setting id="TGRBValue" value="100"/>
+        </Segment>
+        <Segment component="r_usb_basic1.44" id="r_usb_basic" source="com.renesas.smc.tools.swcomponent.fit.source">
+            <Setting id="USB_CFG_HUB" value="USB_CFG_DISABLE"/>
+            <Setting id="USB_CFG_VBUS" value="USB_CFG_HIGH"/>
+            <Setting id="USB_CFG_TPL" value="USB_NOVENDOR, USB_NOPRODUCT"/>
+            <Setting id="USB_CFG_ELECTRICAL" value="USB_CFG_DISABLE"/>
+            <Setting id="USB_CFG_USE_USBIP" value="USB_CFG_IP0"/>
+            <Setting id="USB_CFG_CLKSEL" value="USB_CFG_24MHZ"/>
+            <Setting id="USB_CFG_DBLB" value="USB_CFG_DBLBON"/>
+            <Setting id="USB_CFG_REQUEST" value="USB_CFG_ENABLE"/>
+            <Setting id="USB_CFG_USB1_DMA_TX" value="USB_CFG_CH2"/>
+            <Setting id="USB_CFG_COMPLIANCE" value="USB_CFG_DISABLE"/>
+            <Setting id="USB_CFG_USB0_DMA_RX" value="USB_CFG_CH1"/>
+            <Setting id="USB_CFG_MODE" value="USB_CFG_PERI"/>
+            <Setting id="USB_CFG_USB0_DMA_TX" value="USB_CFG_CH0"/>
+            <Setting id="USB_CFG_USB1_DMA_RX" value="USB_CFG_CH3"/>
+            <Setting id="USB_CFG_DEVICE_CLASS" value="#define USB_CFG_PCDC_USE"/>
+            <Setting id="USB_CFG_HUB_TPL" value="USB_NOVENDOR, USB_NOPRODUCT"/>
+            <Setting id="USB_CFG_CNTMD" value="USB_CFG_CNTMDOFF"/>
+            <Setting id="USB_CFG_DTC" value="USB_CFG_DISABLE"/>
+            <Setting id="USB_CFG_DCP" value="USB_CFG_DISABLE"/>
+            <Setting id="USB_CFG_BUSWAIT" value="USB_CFG_BUSWAIT_7"/>
+            <Setting id="USB_CFG_TPLCNT" value="1"/>
+            <Setting id="USB_CFG_HUB_TPLCNT" value="1"/>
+            <Setting id="USB_CFG_BC" value="USB_CFG_DISABLE"/>
+            <Setting id="USB_CFG_INTERRUPT_PRIORITY" value="1"/>
+            <Setting id="USB_CFG_DMA" value="USB_CFG_DISABLE"/>
+            <Setting id="USB_CFG_PARAM_CHECKING" value="USB_CFG_ENABLE"/>
+            <Setting id="USB_CFG_TYPEC" value="USB_CFG_DISABLE"/>
         </Segment>
     </Segment>
 </QE>

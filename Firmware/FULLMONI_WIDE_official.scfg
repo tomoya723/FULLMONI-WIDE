@@ -507,7 +507,7 @@
         <Item currentVect="182" defaultVect="182" id="CAN1_TXF1" priority="2" usedState="未使用"/>
         <Item currentVect="183" defaultVect="183" id="CAN1_RXM1" priority="2" usedState="未使用"/>
         <Item currentVect="184" defaultVect="184" id="CAN1_TXM1" priority="2" usedState="未使用"/>
-        <Item currentVect="185" defaultVect="185" id="USB0_USBI0" priority="15" usedState="未使用"/>
+        <Item currentVect="185" defaultVect="185" id="USB0_USBI0" priority="1" usedState="使用中"/>
         <Item currentVect="186" defaultVect="186" id="S12AD_S12ADI" priority="15" usedState="使用中"/>
         <Item currentVect="187" defaultVect="187" id="S12AD_S12GBADI" priority="15" usedState="未使用"/>
         <Item currentVect="188" defaultVect="188" id="S12AD_S12GCADI" priority="15" usedState="未使用"/>
@@ -582,6 +582,7 @@
     <tool id="Pins" version="1.0.1.0">
         <pinItem allocation="11" comments="" direction="None" id="XTAL" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
         <pinItem allocation="58$B" comments="" direction="None" id="LCD_TCON2" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
+        <pinItem allocation="30" comments="" direction="None" id="USB0_VBUS" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
         <pinItem allocation="9" comments="" direction="None" id="XCOUT" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
         <pinItem allocation="52" comments="" direction="O" id="PC0" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
         <pinItem allocation="50" comments="" direction="O" id="PC2" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
@@ -629,7 +630,9 @@
         <pinItem allocation="41" comments="" direction="O" id="P53" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
         <pinItem allocation="39" comments="" direction="O" id="P55" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
         <pinItem allocation="18" comments="" direction="None" id="CTX0" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
+        <pinItem allocation="36" comments="" direction="None" id="USB0_DM" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
         <pinItem allocation="34" comments="" direction="None" id="SCL0" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
+        <pinItem allocation="37" comments="" direction="None" id="USB0_DP" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
         <pinItem allocation="27" comments="" direction="None" id="SCL1" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
         <pinItem allocation="17" comments="" direction="None" id="CRX0" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
         <pinItem allocation="61$B" comments="" direction="None" id="LCD_DATA0" isUsedBySoftware="true" locked="false" operationMode="" status="0"/>
@@ -4803,6 +4806,81 @@
                 </context>
             </allocator>
             <source description="コード生成に対応したコンポーネントは、設定に応じた周辺ドライバのコードを小さなコードサイズで出力します。" display="コード生成" id="com.renesas.smc.tools.swcomponent.codegenerator.source"/>
+        </configuration>
+        <configuration inuse="true" name="r_usb_basic">
+            <component description="依存モジュール: r_bsp バージョン 7.53&#10;The r_usb_basic package provides USB basic host and peripheral firmware" detailDescription="USB basic(low-level) driver" display="r_usb_basic" id="r_usb_basic1.44" version="1.44">
+                <gridItem id="USB0_DP" selectedIndex="1"/>
+                <gridItem id="USB0_DM" selectedIndex="1"/>
+                <gridItem id="USB0_VBUSEN" selectedIndex="0"/>
+                <gridItem id="USB0_OVRCURA" selectedIndex="0"/>
+                <gridItem id="USB0_OVRCURB" selectedIndex="0"/>
+                <gridItem id="USB0_HOST" selectedIndex="0"/>
+                <gridItem id="USB0_DP" selectedIndex="1"/>
+                <gridItem id="USB0_DM" selectedIndex="1"/>
+                <gridItem id="USB0_VBUS" selectedIndex="1"/>
+                <gridItem id="USB0_PERI" selectedIndex="1"/>
+                <gridItem id="USBA_DP" selectedIndex="0"/>
+                <gridItem id="USBA_DM" selectedIndex="0"/>
+                <gridItem id="USBA_VBUSEN" selectedIndex="0"/>
+                <gridItem id="USBA_OVRCURA" selectedIndex="0"/>
+                <gridItem id="USBA_OVRCURB" selectedIndex="0"/>
+                <gridItem id="USBA_HOST" selectedIndex="0"/>
+                <gridItem id="USBA_DP" selectedIndex="0"/>
+                <gridItem id="USBA_DM" selectedIndex="0"/>
+                <gridItem id="USBA_VBUS" selectedIndex="0"/>
+                <gridItem id="USBA_PERI" selectedIndex="0"/>
+                <gridItem id="USB1_DP" selectedIndex="0"/>
+                <gridItem id="USB1_DM" selectedIndex="0"/>
+                <gridItem id="USB1_VBUSEN" selectedIndex="0"/>
+                <gridItem id="USB1_OVRCURA" selectedIndex="0"/>
+                <gridItem id="USB1_OVRCURB" selectedIndex="0"/>
+                <gridItem id="USB1_HOST" selectedIndex="0"/>
+                <gridItem id="USB1_DP" selectedIndex="0"/>
+                <gridItem id="USB1_DM" selectedIndex="0"/>
+                <gridItem id="USB1_VBUS" selectedIndex="0"/>
+                <gridItem id="USB1_PERI" selectedIndex="0"/>
+                <gridItem id="USB_CFG_MODE" selectedIndex="1"/>
+                <gridItem id="USB_CFG_PARAM_CHECKING" selectedIndex="0"/>
+                <gridItem id="USB_CFG_DEVICE_CLASS" selectedIndex="4"/>
+                <gridItem id="USB_CFG_DTC" selectedIndex="1"/>
+                <gridItem id="USB_CFG_DMA" selectedIndex="1"/>
+                <gridItem id="USB_CFG_USB0_DMA_TX" selectedIndex="1"/>
+                <gridItem id="USB_CFG_USB0_DMA_RX" selectedIndex="2"/>
+                <gridItem id="USB_CFG_USB1_DMA_TX" selectedIndex="3"/>
+                <gridItem id="USB_CFG_USB1_DMA_RX" selectedIndex="4"/>
+                <gridItem id="USB_CFG_CLKSEL" selectedIndex="0"/>
+                <gridItem id="USB_CFG_BUSWAIT" selectedIndex="7"/>
+                <gridItem id="USB_CFG_INTERRUPT_PRIORITY" selectedIndex="0"/>
+                <gridItem id="USB_CFG_VBUS" selectedIndex="0"/>
+                <gridItem id="USB_CFG_BC" selectedIndex="1"/>
+                <gridItem id="USB_CFG_DCP" selectedIndex="1"/>
+                <gridItem id="USB_CFG_HUB" selectedIndex="0"/>
+                <gridItem id="USB_CFG_TYPEC" selectedIndex="0"/>
+                <gridItem id="USB_CFG_COMPLIANCE" selectedIndex="1"/>
+                <gridItem id="USB_CFG_TPLCNT" selectedIndex="1"/>
+                <gridItem id="USB_CFG_TPL" selectedIndex="USB_NOVENDOR, USB_NOPRODUCT"/>
+                <gridItem id="USB_CFG_HUB_TPLCNT" selectedIndex="1"/>
+                <gridItem id="USB_CFG_HUB_TPL" selectedIndex="USB_NOVENDOR, USB_NOPRODUCT"/>
+                <gridItem id="USB_CFG_ELECTRICAL" selectedIndex="1"/>
+                <gridItem id="USB_CFG_USE_USBIP" selectedIndex="0"/>
+                <gridItem id="USB_CFG_REQUEST" selectedIndex="1"/>
+                <gridItem id="USB_CFG_DBLB" selectedIndex="0"/>
+                <gridItem id="USB_CFG_CNTMD" selectedIndex="1"/>
+            </component>
+            <source description="Components supporting Firmware Integration Technology" display="Firmware Integration Technology" id="com.renesas.smc.tools.swcomponent.fit.source"/>
+            <source description="Components supporting Firmware Integration Technology" display="Firmware Integration Technology" id="com.renesas.smc.tools.swcomponent.fit.source"/>
+        </configuration>
+        <configuration inuse="true" name="r_usb_pcdc">
+            <component description="依存モジュール: r_bsp バージョン 7.53&#10;依存モジュール: r_usb_basic バージョン 1.44&#10;The r_usb_pcdc package provides USB peripheral communications device class driver" detailDescription="USB Peripheral Communications Device Class" display="r_usb_pcdc" id="r_usb_pcdc1.44" version="1.44">
+                <gridItem id="USB_CFG_PCDC_BULK_IN" selectedIndex="0"/>
+                <gridItem id="USB_CFG_PCDC_BULK_OUT" selectedIndex="1"/>
+                <gridItem id="USB_CFG_PCDC_INT_IN" selectedIndex="0"/>
+                <gridItem id="USB_CFG_PCDC_BULK_IN2" selectedIndex="2"/>
+                <gridItem id="USB_CFG_PCDC_BULK_OUT2" selectedIndex="3"/>
+                <gridItem id="USB_CFG_PCDC_INT_IN2" selectedIndex="1"/>
+            </component>
+            <source description="Components supporting Firmware Integration Technology" display="Firmware Integration Technology" id="com.renesas.smc.tools.swcomponent.fit.source"/>
+            <source description="Components supporting Firmware Integration Technology" display="Firmware Integration Technology" id="com.renesas.smc.tools.swcomponent.fit.source"/>
         </configuration>
     </tool>
     <tool id="System">

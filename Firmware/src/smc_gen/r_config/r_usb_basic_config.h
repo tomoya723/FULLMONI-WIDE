@@ -136,8 +136,11 @@
  * SET USB INTERRUPT PRIORITY; 
  *  1                   : lowest
  *  15                  : highest
+ * 
+ * FULLMONI-WIDE: 最低優先度に設定
+ * CAN/GLCDC/DRW2Dより優先度を下げ、描画処理に影響を与えない
  */
-#define USB_CFG_INTERRUPT_PRIORITY  (3)
+#define USB_CFG_INTERRUPT_PRIORITY  (1)
 
 /******************************************************************************/
 /** Settings in USB Host Mode                                                 */

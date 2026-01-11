@@ -1,11 +1,12 @@
 /*
  * param_console.h
  *
- * UARTターミナルコンソール機能
+ * USB CDCターミナルコンソール機能
  * パラメータ変更モードのコマンド処理
  *
  *  Created on: 2026/01/06
  *      Author: FULLMONI-WIDE Project
+ *  Modified: 2026/01/11 - SCI9 → USB CDC に変更
  */
 
 #ifndef PARAM_CONSOLE_H_
@@ -18,8 +19,7 @@
  * 定数定義
  * ============================================================ */
 
-/* UARTリングバッファサイズ */
-#define UART_RX_BUFFER_SIZE     256
+/* TX送信バッファサイズ */
 #define UART_TX_BUFFER_SIZE     256
 
 /* コマンドラインバッファサイズ */
@@ -45,25 +45,6 @@ void param_console_enter(void);
  * @return true: モード継続, false: 通常モードへ戻る
  */
 bool param_console_process(void);
-
-/**
- * @brief UART受信データをリングバッファに追加
- *        （受信割り込みから呼び出し）
- * @param data 受信データ
- */
-void param_console_rx_push(uint8_t data);
-
-/**
- * @brief リングバッファにデータがあるか確認
- * @return true: データあり
- */
-bool param_console_rx_available(void);
-
-/**
- * @brief リングバッファからデータを取得
- * @return 受信データ (データなしの場合は0)
- */
-uint8_t param_console_rx_pop(void);
 
 /**
  * @brief コンソールに文字列を出力

@@ -18,5 +18,6 @@ Includes
 ***********************************************************************************************************************/
 #include "r_can_rx_pinset.h"
 #include "r_glcdc_rx_pinset.h"
+#include "r_usb_basic_pinset.h"
 
 #endif /* R_PINSET_H */

@@ -29,7 +29,7 @@ class FirmwareUploader:
         self.prompt_received = False
         self.stop_receiver = False
         self.received_data = []
-        
+
     def receiver_thread(self):
         """受信スレッド - XON/XOFFとメッセージを処理"""
         while not self.stop_receiver:
@@ -72,7 +72,7 @@ class FirmwareUploader:
                 if not self.stop_receiver:
                     print(f"Receiver error: {e}")
                 break
-    
+
     def wait_for_xon(self, timeout=10):
         """XONを待つ"""
         print(f"Waiting for XON (timeout: {timeout}s)...")
@@ -83,17 +83,17 @@ class FirmwareUploader:
                 return True
             time.sleep(0.01)
         return False
-    
+
     def upload(self, firmware_path):
         """ファームウェアをアップロード"""
         # ファームウェア読み込み
         print(f"Loading firmware: {firmware_path}")
         with open(firmware_path, 'rb') as f:
             fw_data = f.read()
-        
+
         fw_size = len(fw_data)
         print(f"Firmware size: {fw_size:,} bytes")
-        
+
         # マジック確認
         if fw_size >= 4:
             magic = int.from_bytes(fw_data[0:4], 'little')
@@ -101,7 +101,7 @@ class FirmwareUploader:
                 print("Firmware header: OK (RXFW)")
             else:
                 print(f"Warning: Invalid magic (0x{magic:08X})")
-        
+
         # シリアルポートを開く
         print(f"Opening {self.port} at {self.baudrate} baud...")
         self.ser = serial.Serial(
@@ -114,23 +114,23 @@ class FirmwareUploader:
             xonxoff=False,  # ソフトウェアフロー制御は自前で処理
             rtscts=False
         )
-        
+
         # 受信スレッド開始
         self.stop_receiver = False
         self.xoff_received = True  # 初期状態：XON待ち（送信停止）
         self.xon_received = False  # XON受信フラグ
         rx_thread = threading.Thread(target=self.receiver_thread, daemon=True)
         rx_thread.start()
-        
+
         try:
             # 少し待ってから開始（接続安定化）
             time.sleep(0.5)
-            
+
             # 受信バッファをクリア
             if self.ser.in_waiting > 0:
                 garbage = self.ser.read(self.ser.in_waiting)
                 print(f"[RX] Cleared {len(garbage)} bytes from buffer")
-            
+
             # プロンプトを待つ（最大10秒）
             print("Waiting for bootloader prompt...")
             start = time.time()
@@ -141,13 +141,13 @@ class FirmwareUploader:
                 time.sleep(0.1)
             else:
                 print("Warning: Prompt not detected, sending 'U' anyway...")
-            
+
             time.sleep(0.2)
-            
+
             # 「U」コマンドを送信してUpdate開始
             print("Sending 'U' command to start update...")
             self.ser.write(b'U')
-            
+
             # 「Erase complete」メッセージを待つ（消去に時間がかかる）
             print("Waiting for erase to complete (timeout: 120s)...")
             start = time.time()
@@ -159,32 +159,32 @@ class FirmwareUploader:
             else:
                 print("ERROR: Timeout waiting for erase")
                 return False
-            
+
             # XONを待つ（既に送信されているはず）
             time.sleep(0.5)  # XON送信のための待ち
             if not self.xon_received:
                 print("Warning: XON not explicitly received, continuing anyway...")
             else:
                 print("XON received!")
-            
+
             print("XON received - starting transfer...")
-            
+
             # データ送信
             sent = 0
             last_progress = -1
             start_time = time.time()
-            
+
             while sent < fw_size:
                 # XOFFなら待機
                 while self.xoff_received:
                     time.sleep(0.001)
-                
+
                 # チャンク送信
                 chunk_size = min(CHUNK_SIZE, fw_size - sent)
                 chunk = fw_data[sent:sent + chunk_size]
                 self.ser.write(chunk)
                 sent += chunk_size
-                
+
                 # 進捗表示
                 progress = (sent * 100) // fw_size
                 if progress != last_progress:
@@ -193,21 +193,21 @@ class FirmwareUploader:
                         elapsed = time.time() - start_time
                         speed = sent / elapsed / 1024 if elapsed > 0 else 0
                         print(f"  {sent:,}/{fw_size:,} bytes ({progress}%) - {speed:.1f} KB/s")
-                
+
                 # ディレイ
                 time.sleep(SEND_DELAY_MS / 1000.0)
-            
+
             elapsed = time.time() - start_time
             speed = fw_size / elapsed / 1024 if elapsed > 0 else 0
             print(f"\nTransfer complete: {fw_size:,} bytes in {elapsed:.1f}s ({speed:.1f} KB/s)")
             print("Waiting for bootloader to verify (2s timeout)...")
-            
+
             # ブートローダーの検証・リセットを待つ
             time.sleep(5)
-            
+
             print("Done!")
             return True
-            
+
         finally:
             self.stop_receiver = True
             time.sleep(0.1)
@@ -220,12 +220,12 @@ def main():
     parser.add_argument('firmware', help='Firmware file (.mot or .bin)')
     parser.add_argument('-p', '--port', default='COM7', help='Serial port (default: COM7)')
     parser.add_argument('-b', '--baud', type=int, default=115200, help='Baud rate (default: 115200)')
-    
+
     args = parser.parse_args()
-    
+
     uploader = FirmwareUploader(args.port, args.baud)
     success = uploader.upload(args.firmware)
-    
+
     sys.exit(0 if success else 1)
 
 

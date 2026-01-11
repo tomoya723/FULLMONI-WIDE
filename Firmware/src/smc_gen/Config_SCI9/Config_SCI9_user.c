@@ -36,9 +36,10 @@ extern volatile uint8_t * gp_sci9_rx_address;                /* SCI9 receive buf
 extern volatile uint16_t  g_sci9_rx_count;                   /* SCI9 receive data number */
 extern volatile uint16_t  g_sci9_rx_length;                  /* SCI9 receive data length */
 /* Start user code for global. Do not edit comment generated here */
-/* パラメータ変更モード用フラグ */
-volatile uint8_t g_uart_rx_trigger = 0;     /* 受信トリガーフラグ */
-volatile uint8_t g_param_mode_active = 0;   /* パラメータモードアクティブ */
+/* パラメータ変更モード用フラグ - USB CDC化により main.c に移動 */
+/* g_uart_rx_trigger は USB CDC 化により不使用 */
+volatile uint8_t g_uart_rx_trigger = 0;     /* 互換性のため残す（未使用） */
+extern volatile uint8_t g_param_mode_active;   /* main.c で定義 */
 static uint8_t g_sci9_rx_single_buf[1];     /* 1バイト受信用バッファ */
 /* End user code. Do not edit comment generated here */
 
@@ -92,7 +93,7 @@ void r_Config_SCI9_transmitend_interrupt(void)
     SCI9.SCR.BIT.TIE = 0U;
     SCI9.SCR.BIT.TE = 0U;
     SCI9.SCR.BIT.TEIE = 0U;
-
+    
     r_Config_SCI9_callback_transmitend();
 }
 
@@ -105,20 +106,20 @@ void r_Config_SCI9_transmitend_interrupt(void)
 
 void r_Config_SCI9_receive_interrupt(void)
 {
-    /* Start user code for r_Config_SCI9_receive_interrupt. Do not edit comment generated here */
-    uint8_t rx_data = SCI9.RDR;
-
-    if (g_param_mode_active) {
-        /* パラメータモード中：リングバッファに追加 */
-        param_console_rx_push(rx_data);
-        /* 継続受信（RIE, REは有効のまま） */
-    } else {
-        /* 通常モード：トリガーフラグをセット */
-        g_uart_rx_trigger = 1;
-        /* 継続受信のため再設定 */
-        R_Config_SCI9_Serial_Receive(g_sci9_rx_single_buf, 1);
+    if (g_sci9_rx_length > g_sci9_rx_count)
+    {
+        *gp_sci9_rx_address = SCI9.RDR;
+        gp_sci9_rx_address++;
+        g_sci9_rx_count++;
     }
-    /* End user code. Do not edit comment generated here */
+    
+    if (g_sci9_rx_length <= g_sci9_rx_count)
+    {
+        /* All data received */
+        SCI9.SCR.BIT.RIE = 0U;
+        SCI9.SCR.BIT.RE = 0U;
+        r_Config_SCI9_callback_receiveend();
+    }
 }
 
 /***********************************************************************************************************************
@@ -131,9 +132,9 @@ void r_Config_SCI9_receive_interrupt(void)
 void r_Config_SCI9_receiveerror_interrupt(void)
 {
     uint8_t err_type;
-
+    
     r_Config_SCI9_callback_receiveerror();
-
+    
     /* Clear overrun, framing and parity error flags */
     err_type = SCI9.SSR.BYTE;
     err_type &= 0xC7U;
