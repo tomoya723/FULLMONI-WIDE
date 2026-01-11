@@ -1,0 +1,14 @@
+# カスタムスタートアップ画像を無視
+# Ignore custom startup images
+
+# すべての画像ファイルを無視 (README.mdは除く)
+# Ignore all image files (except README.md)
+*.bmp
+*.png
+*.jpg
+*.jpeg
+
+# サンプル/テンプレートファイルは除く
+# Except sample/template files
+!template_*.bmp
+!sample_*.bmp

@@ -128,6 +128,18 @@ Set the "DISP" number appropriately.<br>
 ![image](https://github.com/user-attachments/assets/4bc4fe29-edbc-4c54-9ac6-5f0a8b6d810b)<br>
 
 ***
+## Startup Screen Customization
+You can customize the startup screen (boot logo) displayed when the device powers on.<br>
+See the detailed guide: [docs/STARTUP_SCREEN_CUSTOMIZATION.md](docs/STARTUP_SCREEN_CUSTOMIZATION.md)<br>
+<br>
+**Quick Start:**<br>
+1. Prepare your custom logo (765x256 BMP format)<br>
+2. Place it in `custom_resources/startup_images/`<br>
+3. Follow the guide to integrate it using emWin AppWizard<br>
+<br>
+Configuration file: `src/startup_config.h`<br>
+
+***
 ## Development with Visual Studio Code
 
 This project supports development using Visual Studio Code alongside e² studio. The VSCode environment provides IntelliSense, building, and hardware debugging capabilities.
