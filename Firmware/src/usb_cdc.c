@@ -377,7 +377,7 @@ void usb_cdc_shutdown(void)
     IEN(USB0, D0FIFO0) = 0;
     IEN(USB0, D1FIFO0) = 0;
     IEN(USB0, USBI0) = 0;
-    
+
     /* 短い待機でバッファフラッシュ */
     R_BSP_SoftwareDelay(100, BSP_DELAY_MILLISECS);
 }

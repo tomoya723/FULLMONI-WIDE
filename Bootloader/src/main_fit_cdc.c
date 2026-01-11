@@ -569,7 +569,7 @@ void main(void)
                 counting = false;
                 banner_sent = true;
 
-                const char *banner = force_update ? 
+                const char *banner = force_update ?
                     "\r\n=== FULLMONI Bootloader (FORCE UPDATE) ===\r\nU=Update B=Boot R=Reset S=Status\r\n> " :
                     "\r\n=== FULLMONI Bootloader ===\r\nU=Update B=Boot R=Reset S=Status\r\n> ";
                 int len = 0;

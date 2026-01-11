@@ -5,7 +5,7 @@ namespace FullmoniTerminal.Services;
 /// <summary>
 /// ファームウェアアップデートサービス
 /// Size prefix + Streaming プロトコルでバイナリデータをBootloaderに転送
-/// 
+///
 /// プロトコル:
 /// 1. Bootloaderにリブート後、バナー待ち
 /// 2. 'U' コマンド送信 → Flash消去
@@ -22,9 +22,16 @@ public class FirmwareUpdateService
     private const byte ACK_CHAR = (byte)'.';
 
     // 送信制御 - ストリーミングモード（中間ACKなし）
-    private const int ChunkSize = 4096;        // 大きめのチャンクで高速転送
+    private const int ChunkSize = 16384;       // 16KB チャンクで最大速度
     private const int AckTimeoutMs = 10000;    // サイズACK待ちタイムアウト
-    private const int TransferDelayMs = 1;     // チャンク間の微小遅延（デバイス側バッファ溶れ防止）
+    private const int ProgressUpdateInterval = 1; // 進捗更新間隔（%）- 細かく更新
+
+    // 全体進捗のフェーズ重み付け（合計100%）
+    private const int PhaseBootloaderSwitch = 5;   // Bootloader切り替え: 0-5%
+    private const int PhaseFlashErase = 15;        // Flash消去: 5-20%
+    private const int PhaseTransferStart = 20;     // 転送開始: 20%
+    private const int PhaseTransferEnd = 98;       // 転送終了: 98%
+    private const int PhaseVerify = 100;           // 検証完了: 100%
 
     private volatile bool _transferCancelled;
 
@@ -108,7 +115,7 @@ public class FirmwareUpdateService
             foreach (var c in data)
             {
                 receivedData.Add((byte)c);
-                
+
                 if (c == (char)ACK_CHAR)
                 {
                     Log($"RX: ACK ('.')");
@@ -138,14 +145,15 @@ public class FirmwareUpdateService
             if (switchToBootloader)
             {
                 Log("=== Bootloaderモードへ切り替え ===");
-                
+                ProgressChanged?.Invoke(this, 0);
+
                 // Step 1: Parameter Consoleに入る（空コマンドを送信）
                 // FirmwareはSTANDBYモードで任意のデータ受信でParameter Consoleに遷移
                 // 注意: この最初のデータはParam Console起動トリガーとして消費される
                 Log("Parameter Console起動中...");
                 UpdateStatus("Parameter Consoleに接続中...");
                 _serialService.SendCommand("");  // 改行のみ送信
-                
+
                 // Parameter Consoleのバナーを待つ
                 var consoleTimeout = DateTime.Now.AddSeconds(5);
                 while (DateTime.Now < consoleTimeout)
@@ -155,18 +163,20 @@ public class FirmwareUpdateService
                     if (received.Contains("Parameter Console") || received.Contains("> "))
                     {
                         Log("Parameter Console起動確認");
+                        ProgressChanged?.Invoke(this, 1);
                         break;
                     }
                     await Task.Delay(100, cancellationToken);
                 }
                 receivedData.Clear();
                 await Task.Delay(200, cancellationToken);
-                
+
                 // Step 2: fwupdateコマンドを送信
                 Log("TX: fwupdate");
                 UpdateStatus("fwupdateコマンド送信中...");
+                ProgressChanged?.Invoke(this, 2);
                 _serialService.SendCommand("fwupdate");
-                
+
                 // Step 3: 確認プロンプトを待つ
                 Log("確認プロンプト待機中...");
                 var confirmTimeout = DateTime.Now.AddSeconds(5);
@@ -183,48 +193,50 @@ public class FirmwareUpdateService
                 }
                 receivedData.Clear();
                 await Task.Delay(100, cancellationToken);
-                
+
                 // Step 4: "yes"を送信して確認
                 Log("TX: yes");
                 UpdateStatus("確認中...");
+                ProgressChanged?.Invoke(this, 3);
                 _serialService.SendCommand("yes");
-                
+
                 // リブート前の準備
                 var portName = _serialService.CurrentPortName;
                 var baudRate = _serialService.CurrentBaudRate;
-                
+
                 if (string.IsNullOrEmpty(portName))
                 {
                     throw new InvalidOperationException("ポート名が取得できません");
                 }
-                
+
                 // USBリセットを待つ（デバイスが切断される）
                 Log("デバイスリブート中...");
                 UpdateStatus("デバイスリブート中...");
+                ProgressChanged?.Invoke(this, 4);
                 await Task.Delay(1000, cancellationToken);
-                
+
                 // COMポートの再接続を試みる
                 Log($"COMポート({portName})の再接続を試行中...");
                 UpdateStatus($"{portName}に再接続中...");
-                
+
                 // イベントハンドラを一時解除
                 _serialService.DataReceived -= DataReceivedHandler;
-                
+
                 // 再接続（最大10秒待機）
                 var reconnected = await _serialService.ReconnectAsync(portName!, baudRate, maxRetries: 20, retryDelayMs: 500);
-                
+
                 if (!reconnected)
                 {
                     throw new TimeoutException($"COMポート({portName})の再接続に失敗しました");
                 }
-                
+
                 // イベントハンドラを再登録
                 _serialService.DataReceived += DataReceivedHandler;
                 Log("COMポート再接続完了");
-                
+
                 // 少し待ってからバナーを探す
                 await Task.Delay(1000, cancellationToken);
-                
+
                 // Bootloaderの起動を待つ - バナーは起動時に1回だけ送信されるので
                 // 再接続タイミングで見逃す可能性がある。改行を送ってプロンプトを得る
                 Log("Bootloaderの起動を待機中...");
@@ -235,39 +247,40 @@ public class FirmwareUpdateService
             Log("Bootloaderバナーを待機中...");
             UpdateStatus("Bootloader接続待機中...");
             receivedData.Clear();  // バッファクリア
-            
+
             // 改行を送信してBootloaderのプロンプトを表示させる
             await Task.Delay(500, cancellationToken);
             _serialService.SendCommand("");  // 改行のみ送信してBootloaderのレスポンスを確認
-            
+
             var bannerTimeout = DateTime.Now.AddSeconds(10);
             bool bootloaderFound = false;
             while (DateTime.Now < bannerTimeout)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                
+
                 var received = GetReceivedString(receivedData);
                 // デバッグ: 受信データをログ出力
                 if (receivedData.Count > 0 && DateTime.Now.Second % 2 == 0)
                 {
                     Log($"DEBUG: Buffer contains {receivedData.Count} bytes");
                 }
-                
-                // Bootloaderのバナーは "=== FULLMONI-WIDE Bootloader ===" 
+
+                // Bootloaderのバナーは "=== FULLMONI-WIDE Bootloader ==="
                 // またはコマンドプロンプト ">" やメニュー表示を探す
-                if (received.Contains("Bootloader") || 
-                    received.Contains("U)pdate") || 
+                if (received.Contains("Bootloader") ||
+                    received.Contains("U)pdate") ||
                     received.Contains("Commands:") ||
                     received.Contains("> "))
                 {
                     Log("Bootloaderバナー/プロンプト受信");
+                    ProgressChanged?.Invoke(this, PhaseBootloaderSwitch);
                     bootloaderFound = true;
                     break;
                 }
-                
+
                 await Task.Delay(100, cancellationToken);
             }
-            
+
             if (!bootloaderFound)
             {
                 // 最後に受信したデータをログに出力
@@ -281,36 +294,45 @@ public class FirmwareUpdateService
             // 'U' コマンドを送信してFlash消去開始
             Log("TX: U (Update command)");
             UpdateStatus("Flash消去中...");
+            ProgressChanged?.Invoke(this, PhaseBootloaderSwitch + 1); // 6%
             _serialService.SendCommand("U");
 
             // "Erase OK" を待つ
             var eraseTimeout = DateTime.Now.AddSeconds(60);  // Flash消去は時間がかかる
+            var eraseStartTime = DateTime.Now;
             while (DateTime.Now < eraseTimeout)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                
+
+                // Flash消去中の進捗を推定（約刀6秒かかる）
+                var eraseElapsed = (DateTime.Now - eraseStartTime).TotalSeconds;
+                var eraseProgress = Math.Min((int)(eraseElapsed / 6.0 * (PhaseFlashErase - PhaseBootloaderSwitch - 1)), PhaseFlashErase - PhaseBootloaderSwitch - 2);
+                ProgressChanged?.Invoke(this, PhaseBootloaderSwitch + 1 + eraseProgress);
+
                 var received = GetReceivedString(receivedData);
                 if (received.Contains("Erase OK"))
                 {
                     Log("RX: Erase OK");
+                    ProgressChanged?.Invoke(this, PhaseFlashErase); // 15%
                     break;
                 }
                 if (received.Contains("Fail"))
                 {
                     throw new Exception("Bootloader: Flash消去エラー");
                 }
-                
+
                 await Task.Delay(100, cancellationToken);
             }
-            
+
             receivedData.Clear();
 
             // Size を送信 (4byte, little-endian)
             var totalBytes = firmwareData.Length;
             var sizeBytes = BitConverter.GetBytes((uint)totalBytes);
-            
+
             Log($"TX: Size = {totalBytes} bytes (0x{totalBytes:X8})");
             UpdateStatus($"サイズ送信中: {totalBytes:N0} bytes");
+            ProgressChanged?.Invoke(this, PhaseFlashErase + 2); // 17%
             _serialService.SendRaw(sizeBytes);
 
             // ACK を待つ
@@ -322,14 +344,15 @@ public class FirmwareUpdateService
 
             // ファームウェアデータをストリーミング送信（中間ACKなし）
             UpdateStatus($"転送中: 0/{totalBytes:N0} bytes");
+            ProgressChanged?.Invoke(this, PhaseTransferStart); // 20%
             var sentBytes = 0;
-            var lastProgress = -1;
+            var lastProgressLog = -1;
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
             while (sentBytes < totalBytes)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                
+
                 if (_transferCancelled)
                 {
                     throw new OperationCanceledException("転送がキャンセルされました");
@@ -346,34 +369,26 @@ public class FirmwareUpdateService
 
                 sentBytes += chunkSize;
 
-                // 進捗更新（頻度を下げてUI負荷を軽減）
-                var progress = (int)((sentBytes * 100L) / totalBytes);
-                if (progress != lastProgress)
+                // 全体進捗を計算（転送は20%-98%の範囲）
+                var transferProgress = (int)((sentBytes * 100L) / totalBytes);
+                var overallProgress = PhaseTransferStart + (int)((transferProgress * (PhaseTransferEnd - PhaseTransferStart)) / 100);
+                
+                if (transferProgress >= lastProgressLog + ProgressUpdateInterval || transferProgress == 100)
                 {
-                    lastProgress = progress;
-                    ProgressChanged?.Invoke(this, progress);
-                    
+                    lastProgressLog = transferProgress;
+                    ProgressChanged?.Invoke(this, overallProgress);
+
                     // ステータス更新
                     var elapsedSec = stopwatch.ElapsedMilliseconds / 1000.0;
                     var speedKBps = elapsedSec > 0 ? (sentBytes / 1024.0) / elapsedSec : 0;
-                    UpdateStatus($"転送中: {sentBytes:N0}/{totalBytes:N0} bytes ({progress}%) - {speedKBps:F1} KB/s");
-                    
-                    if (progress % 10 == 0)
-                    {
-                        Log($"TX: {sentBytes:N0}/{totalBytes:N0} bytes ({progress}%) - {speedKBps:F1} KB/s");
-                    }
-                    
-                    // UIスレッドに制御を返す
+                    UpdateStatus($"転送中: {sentBytes:N0}/{totalBytes:N0} bytes ({transferProgress}%) - {speedKBps:F1} KB/s");
+                    Log($"TX: {sentBytes:N0}/{totalBytes:N0} bytes ({transferProgress}%) - {speedKBps:F1} KB/s");
+
+                    // UIスレッドに制御を返す（5%ごとのみ）
                     await Task.Yield();
                 }
-                
-                // 微小遅延（デバイス側のバッファ溶れ防止）
-                if (TransferDelayMs > 0)
-                {
-                    await Task.Delay(TransferDelayMs, cancellationToken).ConfigureAwait(false);
-                }
             }
-            
+
             stopwatch.Stop();
             var totalElapsedSec = stopwatch.ElapsedMilliseconds / 1000.0;
             var avgSpeedKBps = totalElapsedSec > 0 ? (totalBytes / 1024.0) / totalElapsedSec : 0;
@@ -381,12 +396,14 @@ public class FirmwareUpdateService
 
             // 完了メッセージを待つ
             UpdateStatus("転送完了 - 検証中...");
+            ProgressChanged?.Invoke(this, PhaseTransferEnd); // 98%
             await Task.Delay(2000, cancellationToken);
 
             var finalReceived = GetReceivedString(receivedData);
             if (finalReceived.Contains("Done"))
             {
                 Log($"RX: Done! 転送成功");
+                ProgressChanged?.Invoke(this, PhaseVerify); // 100%
                 UpdateStatus("更新完了！デバイスが再起動します");
             }
             else if (finalReceived.Contains("Write ERR"))
@@ -449,7 +466,7 @@ public class FirmwareUpdateService
         {
             var delayTask = Task.Delay(timeoutMs, cts.Token);
             var completedTask = await Task.WhenAny(ackReceived.Task, delayTask);
-            
+
             if (completedTask == ackReceived.Task)
             {
                 return await ackReceived.Task;

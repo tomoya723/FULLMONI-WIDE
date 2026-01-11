@@ -631,15 +631,15 @@ void boot_loader_main(void)
 
     /* Check force update flag from Firmware (RAM2) */
     volatile uint32_t *force_flag = (volatile uint32_t *)BL_FORCE_UPDATE_ADDR;
-    
+
     /* デバッグ: フラグ値を常に表示 */
     {
         char buf[64];
-        sprintf(buf, "DEBUG: Flag addr=0x%08lX, value=0x%08lX\r\n", 
+        sprintf(buf, "DEBUG: Flag addr=0x%08lX, value=0x%08lX\r\n",
                 (uint32_t)force_flag, *force_flag);
         BL_LOG(buf);
     }
-    
+
     if (*force_flag == BL_FORCE_UPDATE_MAGIC) {
         BL_LOG("** FORCE UPDATE FLAG DETECTED **\r\n");
         *force_flag = 0;  /* Clear flag */

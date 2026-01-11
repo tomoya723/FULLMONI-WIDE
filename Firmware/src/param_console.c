@@ -343,9 +343,9 @@ static void cmd_fwupdate(void)
     param_console_print("\r\nSetting update flag...\r\n");
     volatile uint32_t *force_flag = (volatile uint32_t *)BL_FORCE_UPDATE_ADDR;
     *force_flag = BL_FORCE_UPDATE_MAGIC;
-    
+
     /* デバッグ: フラグ書き込み確認 */
-    param_console_printf("DEBUG: Flag addr=0x%08lX, value=0x%08lX\r\n", 
+    param_console_printf("DEBUG: Flag addr=0x%08lX, value=0x%08lX\r\n",
                         (uint32_t)force_flag, *force_flag);
 
     /* ブートローダーへリブート */
