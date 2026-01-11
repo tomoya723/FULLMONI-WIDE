@@ -16,7 +16,10 @@ public class StartupImageService
     private const string BmpMagic = "BM";
     
     // フラッシュ書き込み設定
-    private const int ChunkSize = 256;  // FirmwareUpdateServiceと同様の256バイトチャンク
+    // 注: チャンクサイズは256バイトに設定（FirmwareUpdateServiceの16KBより小さい）
+    // 理由: フラッシュ書き込みは各チャンクごとにACK待ちが必要で、
+    // RX72Nのフラッシュプログラミング単位（128または256バイト）に合わせるため
+    private const int ChunkSize = 256;
     private const int AckTimeoutMs = 5000;
     private const byte AckChar = (byte)'.';
     
@@ -75,6 +78,12 @@ public class StartupImageService
         // 画像サイズをBMPヘッダから読み取る（little-endian）
         // オフセット18: 幅（4バイト）
         // オフセット22: 高さ（4バイト）
+        // 配列境界チェック
+        if (data.Length < 26)
+        {
+            throw new InvalidDataException("BMPヘッダが不完全です（サイズ情報が読み取れません）");
+        }
+        
         int width = BitConverter.ToInt32(data, 18);
         int height = Math.Abs(BitConverter.ToInt32(data, 22)); // 高さは負の場合あり（トップダウン）
         
@@ -113,10 +122,6 @@ public class StartupImageService
                 {
                     Log($"RX: ACK ('.')");
                     currentAckWaiter?.TrySetResult(true);
-                }
-                else if (c >= 0x20 && c <= 0x7E)
-                {
-                    // 印字可能文字をログ
                 }
                 else if (c == '\r' || c == '\n')
                 {
@@ -272,7 +277,8 @@ public class StartupImageService
     
     private static string GetReceivedString(List<byte> data)
     {
-        return string.Join("", data.Select(b => (char)b));
+        if (data.Count == 0) return string.Empty;
+        return System.Text.Encoding.ASCII.GetString(data.ToArray());
     }
     
     private static string GetReceivedLine(List<byte> data)
