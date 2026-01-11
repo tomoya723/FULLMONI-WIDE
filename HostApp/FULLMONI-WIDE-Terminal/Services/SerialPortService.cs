@@ -32,6 +32,49 @@ public class SerialPortService : IDisposable
     public bool IsConnected => _serialPort?.IsOpen ?? false;
 
     /// <summary>
+    /// 現在接続中のポート名
+    /// </summary>
+    public string? CurrentPortName => _serialPort?.PortName;
+
+    /// <summary>
+    /// 現在のボーレート
+    /// </summary>
+    public int CurrentBaudRate => _serialPort?.BaudRate ?? 115200;
+
+    /// <summary>
+    /// COMポートの再接続を試みる
+    /// </summary>
+    /// <param name="portName">ポート名</param>
+    /// <param name="baudRate">ボーレート</param>
+    /// <param name="maxRetries">最大リトライ回数</param>
+    /// <param name="retryDelayMs">リトライ間隔(ms)</param>
+    /// <returns>接続成功時true</returns>
+    public async Task<bool> ReconnectAsync(string portName, int baudRate, int maxRetries = 20, int retryDelayMs = 500)
+    {
+        // 現在の接続を閉じる
+        Disconnect();
+
+        // リトライループ
+        for (int i = 0; i < maxRetries; i++)
+        {
+            await Task.Delay(retryDelayMs);
+
+            // ポートが存在するか確認
+            var availablePorts = GetAvailablePorts();
+            if (availablePorts.Contains(portName))
+            {
+                // 接続を試みる
+                if (Connect(portName, baudRate))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// 利用可能なCOMポート一覧を取得
     /// </summary>
     public static string[] GetAvailablePorts()
@@ -61,9 +104,11 @@ public class SerialPortService : IDisposable
                 DataBits = 8,
                 Parity = Parity.None,
                 StopBits = StopBits.One,
-                Handshake = Handshake.XOnXOff,  // XON/XOFFソフトウェアフロー制御
+                Handshake = Handshake.None,     // USB CDC ではフロー制御不要
                 ReadTimeout = 500,
-                WriteTimeout = 500,
+                WriteTimeout = 5000,            // ファームウェア転送用に長めに設定
+                WriteBufferSize = 8192,         // 書き込みバッファを大きく
+                ReadBufferSize = 8192,          // 読み込みバッファも大きく
                 Encoding = System.Text.Encoding.ASCII,
                 NewLine = "\r\n"
             };

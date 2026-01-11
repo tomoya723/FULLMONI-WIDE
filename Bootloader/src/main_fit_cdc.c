@@ -144,6 +144,8 @@ static uint32_t s_last_error = 0;   /* Last flash error code */
 static uint32_t s_error_addr = 0;   /* Address where error occurred */
 static uint32_t s_fw_size = 0;      /* Expected firmware size */
 static bool s_size_received = false; /* Size header received flag */
+static uint32_t s_bytes_since_ack = 0; /* Bytes since last ACK (for throttling) */
+#define ACK_INTERVAL_BYTES  4096    /* Send ACK every 4KB (32 flash writes) for speed */
 
 /* Stub functions for unused debug references in usb_cdc_minimal.c */
 void debug_print(const char *s) { (void)s; }
@@ -358,7 +360,12 @@ void main(void)
                                 s_write_addr += BL_FLASH_WRITE_SIZE;
                                 s_flash_buf_cnt = 0;
                                 for (int j = 0; j < BL_FLASH_WRITE_SIZE; j++) s_flash_buf[j] = 0xFF;
-                                need_ack = true;  /* Send ACK after each 128-byte write */
+                                s_bytes_since_ack += BL_FLASH_WRITE_SIZE;
+                                /* Send ACK every ACK_INTERVAL_BYTES (128 bytes) */
+                                if (s_bytes_since_ack >= ACK_INTERVAL_BYTES) {
+                                    need_ack = true;
+                                    s_bytes_since_ack = 0;
+                                }
                             }
                         }
                     }
@@ -431,6 +438,7 @@ void main(void)
                             s_total_received = 0;
                             s_fw_size = 0;
                             s_size_received = false;
+                            s_bytes_since_ack = 0;  /* Reset ACK counter */
                             for (int i = 0; i < BL_FLASH_WRITE_SIZE; i++) s_flash_buf[i] = 0xFF;
 
                             msg = "\r\nErase OK! Send size+firmware\r\n";
