@@ -130,6 +130,42 @@ static bool eeprom_read(uint16_t addr, uint8_t *data, uint16_t len)
 }
 
 /* ============================================================
+ * レガシー領域（0x0000）への保存
+ * main.cの起動シーケンスで読み込まれる形式に【完全に】合わせる
+ * main.cの形式: I2C_WriteData[14] で14バイト送信
+ *   [0]=0x00(アドレス上位、固定), [1-4]=wr_cnt, [5-8]=sp_int, [9-12]=tr_int, [13]=0x00
+ * ============================================================ */
+static void save_legacy_eeprom(void)
+{
+    uint8_t legacy_buf[14];
+    extern volatile unsigned long wr_cnt;  /* main.cの書き込みカウンタを参照 */
+
+    /* main.cと【完全に同じ形式】: 14バイト送信 */
+    legacy_buf[0]  = 0x00;  /* アドレス上位 (main.cのI2C_WriteData[0]と同じ) */
+    legacy_buf[1]  = (wr_cnt >> 24) & 0xFF;
+    legacy_buf[2]  = (wr_cnt >> 16) & 0xFF;
+    legacy_buf[3]  = (wr_cnt >>  8) & 0xFF;
+    legacy_buf[4]  = (wr_cnt      ) & 0xFF;
+    legacy_buf[5]  = (sp_int >> 24) & 0xFF;
+    legacy_buf[6]  = (sp_int >> 16) & 0xFF;
+    legacy_buf[7]  = (sp_int >>  8) & 0xFF;
+    legacy_buf[8]  = (sp_int      ) & 0xFF;
+    legacy_buf[9]  = (tr_int >> 24) & 0xFF;
+    legacy_buf[10] = (tr_int >> 16) & 0xFF;
+    legacy_buf[11] = (tr_int >>  8) & 0xFF;
+    legacy_buf[12] = (tr_int      ) & 0xFF;
+    legacy_buf[13] = 0x00;  /* main.cのI2C_WriteData[13]と同じ */
+
+    /* I2C送信 (14バイト: main.cと同じ) */
+    I2C0_TX_END_FLG = 0;
+    R_Config_RIIC0_Master_Send(EEPROM_I2C_ADDR, (void *)legacy_buf, 14);
+    while (I2C0_TX_END_FLG == 0);
+
+    /* EEPROM書き込み待ち (約5ms) */
+    for (volatile int wait = 0; wait < 50000; wait++);
+}
+
+/* ============================================================
  * パラメータ初期化
  * ============================================================ */
 void param_storage_init(void)
@@ -243,8 +279,11 @@ void param_storage_set_odo(uint32_t km)
     g_param.trip_pulse = g_param.odo_pulse;
     tr_int = g_param.trip_pulse;
 
-    /* 即時保存 */
+    /* 即時保存（新フォーマット） */
     param_storage_save();
+
+    /* レガシー領域（0x0000）にも保存 - 起動時に読まれるため必須 */
+    save_legacy_eeprom();
 }
 
 /* ============================================================
@@ -262,6 +301,16 @@ void param_storage_reset_trip(void)
 }
 
 /* ============================================================
+ * 書き込みカウンタをリセット
+ * ============================================================ */
+void param_storage_reset_wr_cnt(void)
+{
+    extern volatile unsigned long wr_cnt;
+    wr_cnt = 0;
+    save_legacy_eeprom();
+}
+
+/* ============================================================
  * ODO値取得 [km]
  * ============================================================ */
 uint32_t param_storage_get_odo_km(void)
@@ -276,3 +325,37 @@ uint32_t param_storage_get_trip_km10(void)
 {
     return ((sp_int - tr_int) * 10) / PULSE_PER_KM;
 }
+
+/* ============================================================
+ * デバッグ用：レガシーEEPROM(0x0000)の内容をダンプ
+ * ============================================================ */
+extern void param_console_printf(const char *fmt, ...);
+
+void debug_dump_legacy_eeprom(void)
+{
+    uint8_t buf[16];
+    uint32_t legacy_sp_int, legacy_tr_int, legacy_wr_cnt;
+
+    /* レガシー領域を読み込み (アドレス0x0000から12バイト) */
+    eeprom_read(0x0000, buf, 12);
+
+    /* パース (ビッグエンディアン) */
+    legacy_wr_cnt = ((uint32_t)buf[0] << 24) | ((uint32_t)buf[1] << 16) |
+                    ((uint32_t)buf[2] << 8)  | (uint32_t)buf[3];
+    legacy_sp_int = ((uint32_t)buf[4] << 24) | ((uint32_t)buf[5] << 16) |
+                    ((uint32_t)buf[6] << 8)  | (uint32_t)buf[7];
+    legacy_tr_int = ((uint32_t)buf[8] << 24) | ((uint32_t)buf[9] << 16) |
+                    ((uint32_t)buf[10] << 8) | (uint32_t)buf[11];
+
+    param_console_printf("=== Legacy EEPROM (0x0000) ===\r\n");
+    param_console_printf("Raw: %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X\r\n",
+           buf[0], buf[1], buf[2], buf[3], buf[4], buf[5],
+           buf[6], buf[7], buf[8], buf[9], buf[10], buf[11]);
+    param_console_printf("wr_cnt: %lu\r\n", legacy_wr_cnt);
+    param_console_printf("sp_int: %lu (= %lu km)\r\n", legacy_sp_int, legacy_sp_int / PULSE_PER_KM);
+    param_console_printf("tr_int: %lu (= %lu km)\r\n", legacy_tr_int, legacy_tr_int / PULSE_PER_KM);
+    param_console_printf("=== Current RAM ===\r\n");
+    param_console_printf("sp_int: %lu (= %lu km)\r\n", sp_int, sp_int / PULSE_PER_KM);
+    param_console_printf("tr_int: %lu (= %lu km)\r\n", tr_int, tr_int / PULSE_PER_KM);
+    param_console_printf("g_param.odo_pulse:  %lu (= %lu km)\r\n", g_param.odo_pulse, g_param.odo_pulse / PULSE_PER_KM);
+    param_console_printf("g_param.trip_pulse: %lu (= %lu km)\r\n", g_param.trip_pulse, g_param.trip_pulse / PULSE_PER_KM);}

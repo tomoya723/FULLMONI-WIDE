@@ -423,6 +423,14 @@ static void parse_command(const char *line)
         cmd_trip_reset();
     } else if (strcmp(cmd, "fwupdate") == 0) {
         cmd_fwupdate();
+    } else if (strcmp(cmd, "debug_eeprom") == 0) {
+        /* レガシー領域(0x0000)の生データを表示 */
+        extern void debug_dump_legacy_eeprom(void);
+        debug_dump_legacy_eeprom();
+    } else if (strcmp(cmd, "wr_cnt_reset") == 0) {
+        extern void param_storage_reset_wr_cnt(void);
+        param_storage_reset_wr_cnt();
+        param_console_print("wr_cnt reset to 0.\r\n");
     } else if (strcmp(cmd, "exit") == 0) {
         param_console_print("Exiting parameter mode...\r\n");
         exit_flag = true;
