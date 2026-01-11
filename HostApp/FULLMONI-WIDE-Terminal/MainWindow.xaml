@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FullmoniTerminal"
         xmlns:vm="clr-namespace:FullmoniTerminal.ViewModels"
+        xmlns:views="clr-namespace:FullmoniTerminal.Views"
         mc:Ignorable="d"
         Title="FULLMONI-WIDE Terminal"
         Height="640" Width="480"
@@ -441,6 +442,11 @@
                                 IsEnabled="{Binding CanStartFirmwareUpdate}"/>
                     </StackPanel>
                 </Grid>
+            </TabItem>
+
+            <!-- タブ4: 起動画面書き込み -->
+            <TabItem Header="起動画面書き込み">
+                <views:StartupImageView DataContext="{Binding StartupImageViewModel}" />
             </TabItem>
 
             <!-- Aboutタブ -->
