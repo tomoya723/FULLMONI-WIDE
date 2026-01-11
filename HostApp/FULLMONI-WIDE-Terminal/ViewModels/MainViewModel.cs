@@ -75,12 +75,28 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private bool _isConnected;
 
+    [ObservableProperty]
+    private bool _isBootloaderMode;
+
+    partial void OnIsBootloaderModeChanged(bool value)
+    {
+        OnPropertyChanged(nameof(IsFirmwareMode));
+        OnPropertyChanged(nameof(IsOperationEnabled));
+        OnPropertyChanged(nameof(CanStartFirmwareUpdate));
+    }
+
+    /// <summary>
+    /// Firmwareモードかどうか（Bootloaderモードでない）
+    /// </summary>
+    public bool IsFirmwareMode => IsConnected && !IsBootloaderMode;
+
     partial void OnIsConnectedChanged(bool value)
     {
         OnPropertyChanged(nameof(IsNotConnected));
         OnPropertyChanged(nameof(ConnectionButtonText));
         OnPropertyChanged(nameof(CanStartFirmwareUpdate));
         OnPropertyChanged(nameof(IsOperationEnabled));
+        OnPropertyChanged(nameof(IsFirmwareMode));
     }
 
     [ObservableProperty]
@@ -239,9 +255,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public bool IsNotConnected => !IsConnected;
 
     /// <summary>
-    /// 操作が可能かどうか（接続中かつファームウェア更新中でない）
+    /// 操作が可能かどうか（接続中かFirmwareモードかつファームウェア更新中でない）
     /// </summary>
-    public bool IsOperationEnabled => IsConnected && !IsFirmwareUpdating;
+    public bool IsOperationEnabled => IsFirmwareMode && !IsFirmwareUpdating;
 
     /// <summary>
     /// ウィンドウを閉じられるかどうか
@@ -291,12 +307,51 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             if (_serialService.Connect(SelectedPort, SelectedBaudRate))
             {
-                ActivityStatus = "✅ 接続完了！パラメータを取得中...";
-                // 接続直後に自動でパラメータ読込
-                await Task.Delay(300);
-                await LoadParametersInternal();
+                ActivityStatus = "✅ 接続完了！モードを確認中...";
+                // 接続後、BootloaderかFirmwareかを判定
+                await DetectConnectionMode();
             }
         }
+    }
+
+    /// <summary>
+    /// 接続先がBootloaderかFirmwareかを検出
+    /// </summary>
+    private async Task DetectConnectionMode()
+    {
+        _responseBuffer.Clear();
+        IsBootloaderMode = false;
+
+        // Bootloaderにキー送信してメニューを表示させる
+        _serialService.SendCommand("\r");
+        TxCount++;
+
+        // 少し待ってデータを受信
+        await Task.Delay(800);
+
+        var received = _responseBuffer.ToString();
+
+        // デバッグ: 受信内容をログ出力
+        System.Diagnostics.Debug.WriteLine($"[DetectConnectionMode] Received ({received.Length} chars): {received.Replace("\r", "\\r").Replace("\n", "\\n")}");
+
+        // Bootloaderの特徴的な文字列をチェック
+        // 実際のBootloader出力: "=== FULLMONI Bootloader ===" "U=Update B=Boot R=Reset S=Status"
+        if (received.Contains("Bootloader") ||
+            received.Contains("U=Update") ||
+            received.Contains("B=Boot") ||
+            received.Contains("S=Status"))
+        {
+            IsBootloaderMode = true;
+            StatusText = $"Bootloaderモード ({SelectedPort})";
+            ActivityStatus = "⚠️ Bootloaderモードで接続 - ファームウェア更新タブを使用してください";
+            System.Diagnostics.Debug.WriteLine("[DetectConnectionMode] -> Bootloader mode detected!");
+            return;
+        }
+
+        // Firmwareとして接続 - パラメータ取得
+        System.Diagnostics.Debug.WriteLine("[DetectConnectionMode] -> Firmware mode, loading parameters...");
+        ActivityStatus = "✅ Firmwareモード - パラメータを取得中...";
+        await LoadParametersInternal();
     }
 
     [RelayCommand]
@@ -629,14 +684,22 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         if (!IsConnected || string.IsNullOrEmpty(FirmwareFilePath)) return;
 
+        // Bootloaderモードか確認し、メッセージを変更
+        var message = IsBootloaderMode
+            ? "ファームウェアの更新を開始しますか？\n\n" +
+              "【Bootloaderモード】\n" +
+              "• 更新中は絶対に電源を切らないでください\n" +
+              "• 更新完了後、デバイスは自動的に再起動します"
+            : "ファームウェアの更新を開始しますか？\n\n" +
+              "【重要】\n" +
+              "• 更新中は絶対に電源を切らないでください\n" +
+              "• デバイスがBootloaderモードに切り替わります\n" +
+              "• 更新完了後、デバイスは自動的に再起動します";
+
         var result = await Application.Current.Dispatcher.InvokeAsync(() =>
             MessageBox.Show(
                 Application.Current.MainWindow,
-                "ファームウェアの更新を開始しますか？\n\n" +
-                "【重要】\n" +
-                "• 更新中は絶対に電源を切らないでください\n" +
-                "• デバイスをブートローダーモードにしてから実行してください\n" +
-                "• 更新完了後、デバイスは自動的に再起動します",
+                message,
                 "ファームウェア更新",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning));
@@ -716,6 +779,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
                             await Task.Delay(500);
                             if (_serialService.Connect(currentPort))
                             {
+                                // 再接続後、モードを再検出（Firmwareに戻っているはず）
+                                await DetectConnectionMode();
                                 ActivityStatus = "✅ ファームウェア更新完了 - 再接続しました";
                             }
                             else
@@ -735,9 +800,17 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 });
             };
 
-            // ファームウェア転送を開始（ブートローダー切り替え含む）
-            FirmwareStatus = "ブートローダーモードに切り替え中...";
-            await updateService.SendFirmwareAsync(firmwareData, switchToBootloader: true);
+            // ファームウェア転送を開始
+            // Bootloaderモードの場合は切り替えをスキップ
+            if (IsBootloaderMode)
+            {
+                FirmwareStatus = "ファームウェア転送を開始中...";
+            }
+            else
+            {
+                FirmwareStatus = "ブートローダーモードに切り替え中...";
+            }
+            await updateService.SendFirmwareAsync(firmwareData, switchToBootloader: !IsBootloaderMode);
         }
         catch (Exception ex)
         {
@@ -923,6 +996,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
             else
             {
                 StatusText = "未接続";
+                // Bootloaderモードをリセット
+                IsBootloaderMode = false;
                 // ファームウェア更新中は「切断されました」を表示しない（Bootloader切替時に一時的に切断されるため）
                 if (!IsFirmwareUpdating)
                 {

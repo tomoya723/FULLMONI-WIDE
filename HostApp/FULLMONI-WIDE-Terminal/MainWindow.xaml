@@ -91,7 +91,7 @@
         <!-- タブコントロール -->
         <TabControl Grid.Row="1" Margin="0,0,0,6">
             <!-- タブ1: ステータス -->
-            <TabItem Header="ステータス">
+            <TabItem Header="ステータス" IsEnabled="{Binding IsFirmwareMode}">
                 <Grid Margin="8">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -144,7 +144,7 @@
             </TabItem>
 
             <!-- タブ2: 設定項目 -->
-            <TabItem Header="設定項目">
+            <TabItem Header="設定項目" IsEnabled="{Binding IsFirmwareMode}">
                 <Grid Margin="8">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
@@ -391,7 +391,7 @@
                             <Button Grid.Column="1" Content="参照..." Width="60" Height="24" FontSize="12"
                                     Style="{DynamicResource SecondaryButton}"
                                     Command="{Binding BrowseFirmwareCommand}"
-                                    IsEnabled="{Binding IsOperationEnabled}"/>
+                                    IsEnabled="{Binding IsConnected}"/>
                         </Grid>
                     </Border>
 
@@ -416,11 +416,11 @@
                                 <Button Content="クリア" Width="60" Height="20" FontSize="12" Margin="10,0,0,0"
                                         Style="{DynamicResource OutlineButton}"
                                         Command="{Binding ClearFirmwareLogCommand}"
-                                        IsEnabled="{Binding IsOperationEnabled}"/>
+                                        IsEnabled="{Binding IsConnected}"/>
                                 <Button Content="コピー" Width="60" Height="20" FontSize="12" Margin="6,0,0,0"
                                         Style="{DynamicResource OutlineButton}"
                                         Command="{Binding CopyFirmwareLogCommand}"
-                                        IsEnabled="{Binding IsOperationEnabled}"/>
+                                        IsEnabled="{Binding IsConnected}"/>
                             </StackPanel>
                             <TextBox Grid.Row="1" Text="{Binding FirmwareLog, Mode=OneWay}"
                                      x:Name="FirmwareLogTextBox"
