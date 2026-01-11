@@ -888,7 +888,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
             else
             {
                 StatusText = "未接続";
-                ActivityStatus = "切断されました";
+                // ファームウェア更新中は「切断されました」を表示しない（Bootloader切替時に一時的に切断されるため）
+                if (!IsFirmwareUpdating)
+                {
+                    ActivityStatus = "切断されました";
+                }
             }
         });
     }

@@ -372,7 +372,7 @@ public class FirmwareUpdateService
                 // 全体進捗を計算（転送は20%-98%の範囲）
                 var transferProgress = (int)((sentBytes * 100L) / totalBytes);
                 var overallProgress = PhaseTransferStart + (int)((transferProgress * (PhaseTransferEnd - PhaseTransferStart)) / 100);
-                
+
                 if (transferProgress >= lastProgressLog + ProgressUpdateInterval || transferProgress == 100)
                 {
                     lastProgressLog = transferProgress;
