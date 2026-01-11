@@ -2,15 +2,18 @@
 
 ## 1. 概要
 
-SCI9（UART）経由でターミナルから内部パラメータを書き換え、EEPROM（RIIC0経由）に保存する機能。
+USB CDC（仮想COMポート）経由でターミナルから内部パラメータを書き換え、EEPROM（RIIC0経由）に保存する機能。
 emWinの画面描画と排他制御を行い、パラメータ変更モード時はLCD更新を停止する。
 
+> **注意**: 以前はSCI9（UART）を使用していましたが、USB CDCに変更されました。
+
 ### 1.1 機能概要
-- UARTターミナル経由でのパラメータ設定・確認
+- USB CDCターミナル経由でのパラメータ設定・確認
 - EEPROM永続化（CRC16チェックサム付き）
 - RTC日時設定
 - ODO/TRIP管理
 - emWinとの排他制御
+- ファームウェア更新（Bootloaderへの切り替え）
 
 ---
 
@@ -28,7 +31,7 @@ emWinの画面描画と排他制御を行い、パラメータ変更モード時
 ```
 [通常モード]
     │
-    │ SCI9受信割り込み（任意キー入力）
+    │ USB CDC受信（"PARAM_ENTER"）
     ▼
 ┌─────────────────────────────────┐
 │ 1. g_system_mode = MODE_PARAM  │
@@ -58,15 +61,16 @@ emWinの画面描画と排他制御を行い、パラメータ変更モード時
 | `src/param_storage.h` | パラメータ構造体定義、EEPROM関数宣言 |
 | `src/param_storage.c` | EEPROM読み書き、CRC16計算、ODO/TRIP管理 |
 | `src/param_console.h` | コンソール関数宣言、バッファサイズ定義 |
-| `src/param_console.c` | UARTコンソール処理、コマンドパーサー |
+| `src/param_console.c` | USB CDCコンソール処理、コマンドパーサー |
+| `src/usb_cdc.h` | USB CDC通信関数宣言 |
+| `src/usb_cdc.c` | USB CDC通信処理、送受信バッファ管理 |
 
 ### 3.2 変更ファイル
 
 | ファイル | 変更内容 |
 |----------|----------|
 | `src/settings.h` | `SYSTEM_MODE` enum追加、グローバル変数宣言 |
-| `src/main.c` | モード切替ロジック、パラメータ初期化、SCI9受信開始 |
-| `src/smc_gen/Config_SCI9/Config_SCI9_user.c` | 継続受信処理、リングバッファ連携 |
+| `src/main.c` | モード切替ロジック、パラメータ初期化、USB CDCポーリング |
 | `src/dataregister.h` | `data_setLCD50ms` プロトタイプ追加 |
 
 ---
