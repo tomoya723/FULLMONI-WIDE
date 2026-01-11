@@ -114,6 +114,8 @@ void main(void)
 	init_data_store();
 
 	// Init Qe for Display
+	// Note: Startup screen (ID_SCREEN_00) settings can be configured in startup_config.h
+	//       スタートアップ画面(ID_SCREEN_00)の設定は startup_config.h で変更可能
 	APPW_X_Setup();
 	APPW_Init(APPW_PROJECT_PATH);
 	APPW_CreateRoot(APPW_INITIAL_SCREEN, WM_HBKWIN);

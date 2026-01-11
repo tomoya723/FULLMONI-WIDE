@@ -19,6 +19,24 @@ By default, the "MTC" logo (mtc.bmp) is displayed for 1.5 seconds at startup.
 
 ## カスタマイズ方法 / Customization Methods
 
+### クイックスタート: ヘルパースクリプトを使用 / Quick Start: Using Helper Script
+
+カスタム画像を簡単に準備するためのヘルパースクリプトを用意しています:  
+A helper script is available to easily prepare custom images:
+
+```bash
+cd Firmware
+./customize_startup.sh <画像ファイル> <aw001|aw002>
+```
+
+例 / Example:
+```bash
+./customize_startup.sh my_company_logo.bmp aw001
+```
+
+このスクリプトは画像をカスタムディレクトリにコピーし、次のステップを案内します。  
+This script copies the image to the custom directory and guides you through the next steps.
+
 ### 方法1: emWin AppWizardを使用 (推奨) / Method 1: Using emWin AppWizard (Recommended)
 
 この方法は、GUIツールを使用するため最も安全で推奨されます。  
