@@ -146,6 +146,10 @@ bool param_storage_load(void)
     uint16_t calc_crc;
     PARAM_Storage_t *loaded;
 
+    /* 現在のsp_int/tr_intを保存（旧形式で読み込み済みの場合に備える） */
+    uint32_t saved_sp_int = sp_int;
+    uint32_t saved_tr_int = tr_int;
+
     /* EEPROMから読み込み */
     eeprom_read(EEPROM_ADDR_PARAM, buf, PARAM_STORAGE_SIZE);
 
@@ -158,14 +162,23 @@ bool param_storage_load(void)
         /* CRC OK - パラメータをコピー */
         memcpy(&g_param, loaded, sizeof(PARAM_Storage_t));
 
-        /* グローバル変数に同期 */
-        sp_int = g_param.odo_pulse;
-        tr_int = g_param.trip_pulse;
+        /*
+         * ODO/TRIPは旧形式（0x0000）を正とする
+         * 新形式に保存されている値は使用しない（互換性のため）
+         * sp_int/tr_intは変更しない
+         */
+        g_param.odo_pulse = saved_sp_int;
+        g_param.trip_pulse = saved_tr_int;
 
         return true;
     } else {
-        /* CRCエラー - デフォルト値使用 */
+        /* CRCエラー - デフォルト値使用（但しODO/TRIPは旧形式の値を維持） */
         param_storage_init();
+
+        /* 旧形式で読み込んだODO/TRIPがあれば復元 */
+        g_param.odo_pulse = saved_sp_int;
+        g_param.trip_pulse = saved_tr_int;
+
         return false;
     }
 }
