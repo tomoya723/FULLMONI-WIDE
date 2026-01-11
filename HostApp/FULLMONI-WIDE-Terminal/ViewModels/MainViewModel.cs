@@ -684,14 +684,49 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 AppendFirmwareLog(message);
             };
 
-            updateService.UpdateCompleted += (s, success) =>
+            updateService.UpdateCompleted += async (s, success) =>
             {
-                Application.Current.Dispatcher.Invoke(() =>
+                await Application.Current.Dispatcher.InvokeAsync(async () =>
                 {
                     IsFirmwareUpdating = false;
                     if (success)
                     {
-                        ActivityStatus = "✅ ファームウェア更新が完了しました";
+                        ActivityStatus = "✅ ファームウェア更新完了 - 再接続中...";
+
+                        // デバイス再起動を待つ
+                        await Task.Delay(3000);
+
+                        // 現在のポートを切断
+                        var currentPort = SelectedPort;
+                        if (_serialService.IsConnected)
+                        {
+                            _serialService.Disconnect();
+                        }
+
+                        // 少し待ってから再接続
+                        await Task.Delay(1000);
+
+                        // COMポートリストを更新
+                        RefreshPorts();
+
+                        // 同じポートに再接続を試みる
+                        if (!string.IsNullOrEmpty(currentPort) && AvailablePorts.Contains(currentPort))
+                        {
+                            SelectedPort = currentPort;
+                            await Task.Delay(500);
+                            if (_serialService.Connect(currentPort))
+                            {
+                                ActivityStatus = "✅ ファームウェア更新完了 - 再接続しました";
+                            }
+                            else
+                            {
+                                ActivityStatus = "✅ ファームウェア更新完了 - 手動で再接続してください";
+                            }
+                        }
+                        else
+                        {
+                            ActivityStatus = "✅ ファームウェア更新完了 - 手動で再接続してください";
+                        }
                     }
                     else
                     {

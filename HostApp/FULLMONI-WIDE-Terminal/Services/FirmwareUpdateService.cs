@@ -259,11 +259,6 @@ public class FirmwareUpdateService
                 cancellationToken.ThrowIfCancellationRequested();
 
                 var received = GetReceivedString(receivedData);
-                // デバッグ: 受信データをログ出力
-                if (receivedData.Count > 0 && DateTime.Now.Second % 2 == 0)
-                {
-                    Log($"DEBUG: Buffer contains {receivedData.Count} bytes");
-                }
 
                 // Bootloaderのバナーは "=== FULLMONI-WIDE Bootloader ==="
                 // またはコマンドプロンプト ">" やメニュー表示を探す
@@ -283,9 +278,6 @@ public class FirmwareUpdateService
 
             if (!bootloaderFound)
             {
-                // 最後に受信したデータをログに出力
-                var debugBuffer = GetReceivedString(receivedData);
-                Log($"DEBUG: Final buffer: [{debugBuffer}]");
                 throw new TimeoutException("Bootloaderバナー待ちタイムアウト - Bootloaderが起動していません");
             }
 

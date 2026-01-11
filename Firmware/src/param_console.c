@@ -20,6 +20,9 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
+/* LCD FadeOUT (TFTLCD102.c) */
+extern void LCD_FadeOUT(void);
+
 /* ============================================================
  * RTC レジスタアクセス (platform.h経由で iodefine.h を参照)
  * ============================================================ */
@@ -344,9 +347,9 @@ static void cmd_fwupdate(void)
     volatile uint32_t *force_flag = (volatile uint32_t *)BL_FORCE_UPDATE_ADDR;
     *force_flag = BL_FORCE_UPDATE_MAGIC;
 
-    /* デバッグ: フラグ書き込み確認 */
-    param_console_printf("DEBUG: Flag addr=0x%08lX, value=0x%08lX\r\n",
-                        (uint32_t)force_flag, *force_flag);
+    /* LCDバックライト消灯 */
+    param_console_print("LCD FadeOUT...\r\n");
+    LCD_FadeOUT();
 
     /* ブートローダーへリブート */
     param_console_print("Rebooting to bootloader...\r\n");
