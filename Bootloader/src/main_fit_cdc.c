@@ -144,8 +144,7 @@ static uint32_t s_last_error = 0;   /* Last flash error code */
 static uint32_t s_error_addr = 0;   /* Address where error occurred */
 static uint32_t s_fw_size = 0;      /* Expected firmware size */
 static bool s_size_received = false; /* Size header received flag */
-static uint32_t s_bytes_since_ack = 0; /* Bytes since last ACK (for throttling) */
-#define ACK_INTERVAL_BYTES  4096    /* Send ACK every 4KB (32 flash writes) for speed */
+/* Streaming mode - no intermediate ACKs for maximum speed */
 
 /* Stub functions for unused debug references in usb_cdc_minimal.c */
 void debug_print(const char *s) { (void)s; }
@@ -154,8 +153,8 @@ void debug_hex(uint32_t v) { (void)v; }
 /* External USB descriptor structure */
 extern usb_descriptor_t g_usb_descriptor;
 
-/* USB CDC buffers */
-#define USB_CDC_BUF_SIZE    64
+/* USB CDC buffers - 512 bytes for high-speed transfer */
+#define USB_CDC_BUF_SIZE    512
 static uint8_t g_usb_rx_buf[USB_CDC_BUF_SIZE];
 static uint8_t g_usb_tx_buf[USB_CDC_BUF_SIZE];
 
@@ -270,11 +269,10 @@ void main(void)
 
             case USB_STS_READ_COMPLETE:
                 if (s_update_mode) {
-                    /* Firmware receive mode */
+                    /* Firmware receive mode - streaming (no intermediate ACKs) */
                     uint32_t rx_size = g_usb_ctrl.size;
                     bool write_error = false;
                     bool done = false;
-                    bool need_ack = false;
 
                     /* First 4 bytes = firmware size (little-endian) */
                     if (!s_size_received) {
@@ -282,7 +280,7 @@ void main(void)
                             s_fw_size = g_usb_rx_buf[0] | (g_usb_rx_buf[1] << 8) |
                                        (g_usb_rx_buf[2] << 16) | (g_usb_rx_buf[3] << 24);
                             s_size_received = true;
-                            /* Send ACK for size */
+                            /* Send ACK for size, then host starts streaming */
                             g_usb_tx_buf[0] = '.';
                             g_usb_ctrl.type = USB_PCDC;
                             g_usb_ctrl.module = USB_IP0;
@@ -360,12 +358,7 @@ void main(void)
                                 s_write_addr += BL_FLASH_WRITE_SIZE;
                                 s_flash_buf_cnt = 0;
                                 for (int j = 0; j < BL_FLASH_WRITE_SIZE; j++) s_flash_buf[j] = 0xFF;
-                                s_bytes_since_ack += BL_FLASH_WRITE_SIZE;
-                                /* Send ACK every ACK_INTERVAL_BYTES (128 bytes) */
-                                if (s_bytes_since_ack >= ACK_INTERVAL_BYTES) {
-                                    need_ack = true;
-                                    s_bytes_since_ack = 0;
-                                }
+                                /* No intermediate ACK - streaming mode for maximum speed */
                             }
                         }
                     }
@@ -390,19 +383,10 @@ void main(void)
                         g_usb_ctrl.module = USB_IP0;
                         R_USB_Write(&g_usb_ctrl, g_usb_tx_buf, p - (char *)g_usb_tx_buf);
                     } else if (s_update_mode) {
-                        if (need_ack) {
-                            /* Send ACK '.' after flash write, then USB_STS_WRITE_COMPLETE will request next data */
-                            g_usb_tx_buf[0] = '.';
-                            g_usb_ctrl.type = USB_PCDC;
-                            g_usb_ctrl.module = USB_IP0;
-                            g_tx_busy = true;
-                            R_USB_Write(&g_usb_ctrl, g_usb_tx_buf, 1);
-                        } else {
-                            /* No flash write happened, request next data immediately */
-                            g_usb_ctrl.type = USB_PCDC;
-                            g_usb_ctrl.module = USB_IP0;
-                            R_USB_Read(&g_usb_ctrl, g_usb_rx_buf, USB_CDC_BUF_SIZE);
-                        }
+                        /* Streaming mode - always request next data immediately (no ACK wait) */
+                        g_usb_ctrl.type = USB_PCDC;
+                        g_usb_ctrl.module = USB_IP0;
+                        R_USB_Read(&g_usb_ctrl, g_usb_rx_buf, USB_CDC_BUF_SIZE);
                     }
                 }
                 /* Command mode */
@@ -438,7 +422,6 @@ void main(void)
                             s_total_received = 0;
                             s_fw_size = 0;
                             s_size_received = false;
-                            s_bytes_since_ack = 0;  /* Reset ACK counter */
                             for (int i = 0; i < BL_FLASH_WRITE_SIZE; i++) s_flash_buf[i] = 0xFF;
 
                             msg = "\r\nErase OK! Send size+firmware\r\n";

@@ -4,14 +4,14 @@ namespace FullmoniTerminal.Services;
 
 /// <summary>
 /// ファームウェアアップデートサービス
-/// Size prefix + ACK プロトコルでバイナリデータをBootloaderに転送
+/// Size prefix + Streaming プロトコルでバイナリデータをBootloaderに転送
 /// 
 /// プロトコル:
 /// 1. Bootloaderにリブート後、バナー待ち
 /// 2. 'U' コマンド送信 → Flash消去
 /// 3. "Erase OK" 受信
 /// 4. Size (4byte LE) 送信 → ACK '.'
-/// 5. データ送信 (64byte単位) → 128byte毎に ACK '.'
+/// 5. データ送信 (ストリーミング、中間ACKなし)
 /// 6. "Done!" 受信 → 自動リセット
 /// </summary>
 public class FirmwareUpdateService
@@ -21,10 +21,10 @@ public class FirmwareUpdateService
     // ACK文字
     private const byte ACK_CHAR = (byte)'.';
 
-    // 送信制御
-    private const int ChunkSize = 512;         // 大きめのチャンクで送信効率向上
-    private const int AckIntervalBytes = 4096; // ACK受信間隔 4KB (Bootloaderと合わせる)
-    private const int AckTimeoutMs = 10000;    // ACK待ちタイムアウト
+    // 送信制御 - ストリーミングモード（中間ACKなし）
+    private const int ChunkSize = 4096;        // 大きめのチャンクで高速転送
+    private const int AckTimeoutMs = 10000;    // サイズACK待ちタイムアウト
+    private const int TransferDelayMs = 1;     // チャンク間の微小遅延（デバイス側バッファ溶れ防止）
 
     private volatile bool _transferCancelled;
 
@@ -320,11 +320,11 @@ public class FirmwareUpdateService
                 throw new TimeoutException("サイズACK待ちタイムアウト");
             }
 
-            // ファームウェアデータを送信
+            // ファームウェアデータをストリーミング送信（中間ACKなし）
             UpdateStatus($"転送中: 0/{totalBytes:N0} bytes");
             var sentBytes = 0;
-            var bytesSinceLastAck = 0;
             var lastProgress = -1;
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
             while (sentBytes < totalBytes)
             {
@@ -345,21 +345,6 @@ public class FirmwareUpdateService
                 _serialService.SendRaw(chunk);
 
                 sentBytes += chunkSize;
-                bytesSinceLastAck += chunkSize;
-
-                // AckIntervalBytesごとにACKを待つ
-                if (bytesSinceLastAck >= AckIntervalBytes)
-                {
-                    currentAckWaiter = new TaskCompletionSource<bool>();
-                    if (!await WaitForAckAsync(currentAckWaiter, AckTimeoutMs, cancellationToken).ConfigureAwait(false))
-                    {
-                        throw new TimeoutException($"ACK待ちタイムアウト (sent: {sentBytes})");
-                    }
-                    bytesSinceLastAck = 0;
-                    
-                    // UIスレッドに制御を返す
-                    await Task.Yield();
-                }
 
                 // 進捗更新（頻度を下げてUI負荷を軽減）
                 var progress = (int)((sentBytes * 100L) / totalBytes);
@@ -368,22 +353,31 @@ public class FirmwareUpdateService
                     lastProgress = progress;
                     ProgressChanged?.Invoke(this, progress);
                     
-                    // 1%ごとにステータス更新、10%ごとにログ
-                    UpdateStatus($"転送中: {sentBytes:N0}/{totalBytes:N0} bytes ({progress}%)");
+                    // ステータス更新
+                    var elapsedSec = stopwatch.ElapsedMilliseconds / 1000.0;
+                    var speedKBps = elapsedSec > 0 ? (sentBytes / 1024.0) / elapsedSec : 0;
+                    UpdateStatus($"転送中: {sentBytes:N0}/{totalBytes:N0} bytes ({progress}%) - {speedKBps:F1} KB/s");
                     
                     if (progress % 10 == 0)
                     {
-                        Log($"TX: {sentBytes:N0}/{totalBytes:N0} bytes ({progress}%)");
+                        Log($"TX: {sentBytes:N0}/{totalBytes:N0} bytes ({progress}%) - {speedKBps:F1} KB/s");
                     }
+                    
+                    // UIスレッドに制御を返す
+                    await Task.Yield();
+                }
+                
+                // 微小遅延（デバイス側のバッファ溶れ防止）
+                if (TransferDelayMs > 0)
+                {
+                    await Task.Delay(TransferDelayMs, cancellationToken).ConfigureAwait(false);
                 }
             }
-
-            // 最終ACKを待つ（残りデータがある場合）
-            if (bytesSinceLastAck > 0)
-            {
-                currentAckWaiter = new TaskCompletionSource<bool>();
-                await WaitForAckAsync(currentAckWaiter, AckTimeoutMs, cancellationToken).ConfigureAwait(false);
-            }
+            
+            stopwatch.Stop();
+            var totalElapsedSec = stopwatch.ElapsedMilliseconds / 1000.0;
+            var avgSpeedKBps = totalElapsedSec > 0 ? (totalBytes / 1024.0) / totalElapsedSec : 0;
+            Log($"転送完了: {totalBytes:N0} bytes in {totalElapsedSec:F1}s ({avgSpeedKBps:F1} KB/s)");
 
             // 完了メッセージを待つ
             UpdateStatus("転送完了 - 検証中...");

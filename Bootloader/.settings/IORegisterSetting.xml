@@ -1,15 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Configs>
-    <History>
-        <Keyword>MSTPCRB</Keyword>
-        <Keyword>SCI9</Keyword>
-        <Keyword>PB7PFS</Keyword>
-        <Keyword>MPC</Keyword>
-        <Keyword>SSR</Keyword>
-        <Keyword>SSR9</Keyword>
-        <Keyword>PORT5</Keyword>
-        <Keyword>SCR</Keyword>
-        <Keyword>SSCR</Keyword>
-        <Keyword>SCI9_SCR</Keyword>
-    </History>
+    <History/>
 </Configs>
