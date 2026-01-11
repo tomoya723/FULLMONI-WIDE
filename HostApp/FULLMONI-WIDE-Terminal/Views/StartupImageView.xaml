@@ -47,14 +47,22 @@
                         <!-- プレビュー画像がない場合のメッセージ -->
                         <TextBlock Text="画像が選択されていません" 
                                    FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   Visibility="{Binding PreviewImage, Converter={StaticResource BoolToVisibility}, 
-                                                ConverterParameter=Inverse}"/>
+                                   HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding PreviewImage}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                         
                         <!-- プレビュー画像 -->
                         <Image Source="{Binding PreviewImage}" Stretch="Uniform" 
-                               Margin="4" RenderOptions.BitmapScalingMode="HighQuality"
-                               Visibility="{Binding PreviewImage, Converter={StaticResource BoolToVisibility}}"/>
+                               Margin="4" RenderOptions.BitmapScalingMode="HighQuality"/>
                     </Grid>
                 </Border>
             </StackPanel>
