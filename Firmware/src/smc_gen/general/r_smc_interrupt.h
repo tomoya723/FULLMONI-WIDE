@@ -197,7 +197,7 @@ Macro definitions
 #define ICU_CAN1_TXF1_PRIORITY                     (_02_ICU_PRIORITY_LEVEL2)
 #define ICU_CAN1_RXM1_PRIORITY                     (_02_ICU_PRIORITY_LEVEL2)
 #define ICU_CAN1_TXM1_PRIORITY                     (_02_ICU_PRIORITY_LEVEL2)
-#define ICU_USB0_USBI0_PRIORITY                    (_0F_ICU_PRIORITY_LEVEL15)
+#define ICU_USB0_USBI0_PRIORITY                    (_01_ICU_PRIORITY_LEVEL1)
 #define ICU_S12AD_S12ADI_PRIORITY                  (_0F_ICU_PRIORITY_LEVEL15)
 #define ICU_S12AD_S12GBADI_PRIORITY                (_0F_ICU_PRIORITY_LEVEL15)
 #define ICU_S12AD_S12GCADI_PRIORITY                (_0F_ICU_PRIORITY_LEVEL15)

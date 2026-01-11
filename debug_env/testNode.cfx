@@ -16,7 +16,7 @@
     <LogOnConnect_J1939>FALSE</LogOnConnect_J1939>
     <LogOnConnect_LIN>FALSE</LogOnConnect_LIN>
     <Window_Position>
-      <Visibility>SHOWMINIMIZED</Visibility>
+      <Visibility>SHOWNORMAL</Visibility>
       <WindowPlacement>HIDE</WindowPlacement>
       <Top>613</Top>
       <Left>0</Left>
@@ -30,7 +30,7 @@
     </CAN_Database_Files>
     <J1939_Database_Files/>
     <CAN_DIL_Section>
-      <DriverName>PEAK USB</DriverName>
+      <DriverName>Kvaser CAN</DriverName>
       <ControllerMode>Unknown</ControllerMode>
       <ControllerSettings>
         <Channel>
@@ -63,7 +63,7 @@
           <AccMaskByte3_1>FF</AccMaskByte3_1>
           <AccMaskByte4_0>FF</AccMaskByte4_0>
           <AccMaskByte4_1>FF</AccMaskByte4_1>
-          <HardwareDesc>PCAN-USB Driver Id 16</HardwareDesc>
+          <HardwareDesc>Kvaser - USBcan II #0 (Channel 0), Serial Number- 0, Firmware- 0x0000006f 0x00030006</HardwareDesc>
           <ItemUnderFocus>0</ItemUnderFocus>
           <BTR0BTR1>20</BTR0BTR1>
           <AccFilterMode>0</AccFilterMode>
@@ -165,7 +165,7 @@
       </GRAPH_ELEMENT>
       <Window_Position>
         <Visibility>SHOWMINIMIZED</Visibility>
-        <Window_Position>SHOWNORMAL</Window_Position>
+        <Window_Position>HIDE</Window_Position>
         <Top>0</Top>
         <Left>0</Left>
         <Bottom>751</Bottom>
@@ -297,10 +297,10 @@
       <Interpretation_Window_Position>
         <Visibility>SHOWNORMAL</Visibility>
         <WindowPlacement>RESTORETOMAXIMIZED</WindowPlacement>
-        <Top>273</Top>
-        <Left>458</Left>
-        <Bottom>562</Bottom>
-        <Right>1098</Right>
+        <Top>181</Top>
+        <Left>19</Left>
+        <Bottom>459</Bottom>
+        <Right>368</Right>
       </Interpretation_Window_Position>
     </CAN_Message_Window>
     <J1939_Message_Window>
@@ -397,10 +397,10 @@
       <Interpretation_Window_Position>
         <Visibility>SHOWNORMAL</Visibility>
         <WindowPlacement>RESTORETOMAXIMIZED</WindowPlacement>
-        <Top>251</Top>
-        <Left>34</Left>
-        <Bottom>529</Bottom>
-        <Right>383</Right>
+        <Top>181</Top>
+        <Left>19</Left>
+        <Bottom>459</Bottom>
+        <Right>368</Right>
       </Interpretation_Window_Position>
     </J1939_Message_Window>
     <LIN_Message_Window>
@@ -482,10 +482,10 @@
       <Interpretation_Window_Position>
         <Visibility>SHOWNORMAL</Visibility>
         <WindowPlacement>RESTORETOMAXIMIZED</WindowPlacement>
-        <Top>251</Top>
-        <Left>34</Left>
-        <Bottom>529</Bottom>
-        <Right>383</Right>
+        <Top>181</Top>
+        <Left>19</Left>
+        <Bottom>459</Bottom>
+        <Right>368</Right>
       </Interpretation_Window_Position>
     </LIN_Message_Window>
     <CAN_Tx_Window>

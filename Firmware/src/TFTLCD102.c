@@ -32,7 +32,7 @@ void LCD_FadeOUT(void)
 
 	for(z = 2999; z >= 0; z -- )			// duty 0→100%
 	{
-		for(y = 0; y <= 500; y ++ )
+		for(y = 0; y <= 2500; y ++ )
 		{
 			MTU3.TGRD = z & 0xFFFF;
 		}

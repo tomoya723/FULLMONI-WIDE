@@ -45,6 +45,12 @@ void r_Config_RIIC0_receive_interrupt(void) __attribute__ ((interrupt(".rvectors
 /* RIIC0 TXI0 */
 void r_Config_RIIC0_transmit_interrupt(void) __attribute__ ((interrupt(".rvectors",VECT(RIIC0,TXI0))));
 
+/* SCI9 RXI9 */
+void r_Config_SCI9_receive_interrupt(void) __attribute__ ((interrupt(".rvectors",VECT(SCI9,RXI9))));
+
+/* SCI9 TXI9 */
+void r_Config_SCI9_transmit_interrupt(void) __attribute__ ((interrupt(".rvectors",VECT(SCI9,TXI9))));
+
 /* S12AD S12ADI */
 void r_Config_S12AD0_interrupt(void) __attribute__ ((interrupt(".rvectors",VECT(PERIB,INTB186))));
 

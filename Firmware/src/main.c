@@ -16,6 +16,9 @@
 #include "can.h"
 #include "dataregister.h"
 #include "smc_gen/general/r_cg_rtc.h"
+#include "param_console.h"
+#include "param_storage.h"
+#include "usb_cdc.h"  /* USB CDC for parameter mode */
 
 // --------------------------------------------------------------------
 // グローバル変数宣言
@@ -35,6 +38,10 @@ volatile uint8_t I2C1_TX_END_FLG = 0;
 volatile uint8_t I2C1_RX_END_FLG = 0;
 volatile uint8_t I2C1_RCV_ERR_FLG = 0;
 volatile MD_STATUS I2C1_md_status;
+
+// システムモード（通常/パラメータ変更）
+volatile SYSTEM_MODE g_system_mode = MODE_NORMAL;
+volatile uint8_t g_param_mode_active = 0;   /* パラメータモードアクティブ（USB CDC用） */
 
 // --------------------------------------------------------------------
 // グローバル構造体宣言
@@ -58,28 +65,28 @@ void ap_10ms(void);
 void ap_50ms(void);
 void ap_100ms(void);
 
-
 extern void LCD_FadeIN(void);
 
 void main(void)
  {
 	unsigned int shift_rev_cnt;
 
-//	R_Systeminit();
-	// MTU0 (10ms Interupt function)
-	// MTU1 (Rotary Encorder Input function)
-	// MTU3 (LCD Back Light Control)
-	// MTU8 (Vehicle speed　Pulse　Interupt function)
+	/* USB CDC初期化（SCI9の代わり） */
+	usb_cdc_init();
+
+	/* テストメッセージ（デバッグ用 - USB接続時のみ表示） */
+	// USB CDCは非同期なので、ここではまだ送信しない
+	// パラメータモード時に送信される
 	// RIIC ch0 EEPROM 16K 400kbps
 	// RIIC ch1 ATtiny85 Neopixel Driver 400kbps
 
 	// RTC Start
 /*	R_Config_RTC_Stop();
-	RTC.RYRCNT.WORD = 0x0025U;
-	RTC.RMONCNT.BYTE = 0x03U;
-	RTC.RDAYCNT.BYTE = 0x24U;
-	RTC.RHRCNT.BYTE = 0x08U;
-	RTC.RMINCNT.BYTE = 0x21U;
+	RTC.RYRCNT.WORD = 0x0026U;
+	RTC.RMONCNT.BYTE = 0x01U;
+	RTC.RDAYCNT.BYTE = 0x03U;
+	RTC.RHRCNT.BYTE = 0x03U;
+	RTC.RMINCNT.BYTE = 0x7U;
 	RTC.RSECCNT.BYTE = 0x00U;*/
 
 	R_Config_RTC_Start();
@@ -161,8 +168,70 @@ void main(void)
 	Neopixel_InitRGB();
 	g_CALC_data.AD7 = S12AD.ADDR7; // issue#4暫定対策：LPF値リセット
 
+	// パラメータストレージ初期化（EEPROM読み込み）
+	param_storage_init();
+	if (!param_storage_load()) {
+		printf("EEPROM CRC error, using defaults.\n");
+	}
+
+	/*
+	 * メインループ
+	 *
+	 * 通常動作時: USB最小監視（PARAM_ENTERのみ検出）
+	 *            → emWin/CAN処理に100%集中、33fps維持
+	 * パラメータモード時: USB CDC フル通信
+	 *            → 設定画面表示、コマンド処理
+	 */
+
 	while (1)
 	{
+		// ============================================================
+		// USB CDC ポーリング（低優先度・最小負荷）
+		// ============================================================
+		usb_cdc_process();
+
+		// ============================================================
+		// モード切替判定
+		// ============================================================
+		if (g_system_mode == MODE_NORMAL)
+		{
+			// 通常モード時：USB経由で "PARAM_ENTER" 受信でパラメータモードへ
+			if (usb_cdc_check_param_request())
+			{
+				g_system_mode = MODE_PARAM;
+				g_param_mode_active = 1;
+				usb_cdc_set_mode(USB_MODE_ACTIVE);  /* フル通信モードへ */
+				APPW_SetVarData(ID_VAR_PRM, 1);     /* パラメータモード画面表示 */
+				param_console_enter();
+				continue;
+			}
+		}
+		else
+		{
+			// パラメータ変更モード
+			if (!param_console_process())
+			{
+				// exitコマンドで通常モードへ戻る
+				g_system_mode = MODE_NORMAL;
+				g_param_mode_active = 0;
+				usb_cdc_set_mode(USB_MODE_STANDBY);  /* 最小監視モードへ */
+				APPW_SetVarData(ID_VAR_PRM, 0);      /* 通常画面表示 */
+				usb_cdc_print("Returned to normal mode.\r\n");
+			}
+
+			GUI_Exec1();
+			APPW_Exec();
+//			GUI_Exec1();
+//			APPW_Exec();
+
+			// CAN処理は継続
+			main_CAN();
+			continue;
+		}
+
+		// ============================================================
+		// 通常モード処理
+		// ============================================================
 		// wait Reflesh Cycletime
 		g_int10mscnt =  -3;		// peiod 10ms x  3 = 30ms  33fps
 //		g_int10mscnt =  -4;		// peiod 10ms x  4 = 40ms  25fps
@@ -202,7 +271,7 @@ void main(void)
 			wr_cnt ++;
 		}
 
-		if((g_CALC_data.rev >= 5500) && (g_CALC_data.rev < 6000))
+		if((g_CALC_data.rev >= g_param.shift_rpm1) && (g_CALC_data.rev < g_param.shift_rpm2))
 		{
 			Neopixel_SetRGB(0, 0, 0, 255);
 			Neopixel_SetRGB(1, 0, 0, 0);
@@ -213,7 +282,7 @@ void main(void)
 			Neopixel_SetRGB(6, 0, 0, 0);
 			Neopixel_SetRGB(7, 0, 0, 255);
 		}
-		else if((g_CALC_data.rev >= 6000) && (g_CALC_data.rev < 6500))
+		else if((g_CALC_data.rev >= g_param.shift_rpm2) && (g_CALC_data.rev < g_param.shift_rpm3))
 		{
 			Neopixel_SetRGB(0, 0, 0, 255);
 			Neopixel_SetRGB(1, 0, 0, 255);
@@ -224,7 +293,7 @@ void main(void)
 			Neopixel_SetRGB(6, 0, 0, 255);
 			Neopixel_SetRGB(7, 0, 0, 255);
 		}
-		else if((g_CALC_data.rev >= 6500) && (g_CALC_data.rev < 7000))
+		else if((g_CALC_data.rev >= g_param.shift_rpm3) && (g_CALC_data.rev < g_param.shift_rpm4))
 		{
 			Neopixel_SetRGB(0, 0, 255, 0);
 			Neopixel_SetRGB(1, 0, 255, 0);
@@ -235,7 +304,7 @@ void main(void)
 			Neopixel_SetRGB(6, 0, 255, 0);
 			Neopixel_SetRGB(7, 0, 255, 0);
 		}
-		else if((g_CALC_data.rev >= 7000) && (g_CALC_data.rev < 7500))
+		else if((g_CALC_data.rev >= g_param.shift_rpm4) && (g_CALC_data.rev < g_param.shift_rpm5))
 		{
 			Neopixel_SetRGB(0, 255, 0, 0);
 			Neopixel_SetRGB(1, 255, 0, 0);
@@ -246,7 +315,7 @@ void main(void)
 			Neopixel_SetRGB(6, 255, 0, 0);
 			Neopixel_SetRGB(7, 255, 0, 0);
 		}
-		else if((g_CALC_data.rev >= 7500))
+		else if((g_CALC_data.rev >= g_param.shift_rpm5))
 		{
 			if(shift_rev_cnt == 0)
 			{

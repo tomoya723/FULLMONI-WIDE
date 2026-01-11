@@ -39,6 +39,7 @@ C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw002/Resource/Font/x14y24pxHeadUpDais
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw002/Resource/Font/x14y24pxHeadUpDaisy_72_Bold_EXT.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw002/Resource/Font/x14y24pxHeadUpDaisy_30_Bold_EXT_AA2.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw002/Resource/Font/x14y24pxHeadUpDaisy_18_Normal_EXT.c
+C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw002/Resource/Font/51_20_Normal_EXT_AA2.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw002/Resource/Font/x14y24pxHeadUpDaisy_27_Bold_EXT.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw002/Resource/Font/Arial_19_Normal_EXT.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw002/Resource/Font/Arial_16_Bold_EXT.c

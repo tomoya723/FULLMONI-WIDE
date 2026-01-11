@@ -28,6 +28,7 @@ Includes
 #include "Config_RTC.h"
 #include "Config_MTU8.h"
 #include "Config_PORT.h"
+#include "Config_SCI9.h"
 
 /***********************************************************************************************************************
 Macro definitions (Register bit)

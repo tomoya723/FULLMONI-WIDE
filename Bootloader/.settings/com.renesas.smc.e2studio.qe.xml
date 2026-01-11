@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<QE>
+    <Segment id="Project">
+        <Setting id="SrcGeneratedPath" value="src/smc_gen"/>
+    </Segment>
+    <Segment id="Pin">
+        <Setting id="EMLE" value="EMLE"/>
+        <Setting id="PB7" value="TXD9"/>
+        <Setting id="PB6" value="RXD9"/>
+        <Setting id="P30" value="TDI"/>
+        <Setting id="P31" value="TMS"/>
+        <Setting id="P34" value="TRST#"/>
+        <Setting id="USB0_DM" value="USB0_DM"/>
+        <Setting id="P36" value="EXTAL"/>
+        <Setting id="USB0_DP" value="USB0_DP"/>
+        <Setting id="P27" value="TCK"/>
+        <Setting id="P16" value="USB0_VBUS"/>
+        <Setting id="P26" value="TDO"/>
+        <Setting id="P37" value="XTAL"/>
+    </Segment>
+    <Segment id="Device">
+        <Setting id="Series" value="RX700"/>
+        <Setting id="Group" value="RX72N"/>
+        <Setting id="Board" value="カスタムユーザボード"/>
+        <Setting id="PartNo" value="R5F572NNDxFP"/>
+        <Setting id="PinCount" value="100"/>
+    </Segment>
+    <Segment id="Clock">
+        <Setting id="CacMCLK" value="24000.0"/>
+        <Setting id="PLLCLK" value="240000.0"/>
+        <Setting id="BusCLK" value="80000.0"/>
+        <Setting id="PCLKA" value="120000.0"/>
+        <Setting id="ExtCLK" value="24000.0"/>
+        <Setting id="UsbCLK" value="48000.0"/>
+        <Setting id="PCLKD" value="60000.0"/>
+        <Setting id="PCLKB" value="60000.0"/>
+        <Setting id="VCC" value="3.3"/>
+        <Setting id="PCLKC" value="60000.0"/>
+        <Setting id="ICLK" value="240000.0"/>
+        <Setting id="FCLK" value="60000.0"/>
+        <Setting id="SysCLKSrc" value="4.0"/>
+    </Segment>
+    <Segment id="Component">
+        <Setting id="r_bsp" value="FIT"/>
+        <Setting id="r_usb_pcdc" value="FIT"/>
+        <Setting id="Config_SCI9" value="CG"/>
+        <Setting id="r_usb_basic" value="FIT"/>
+        <Setting id="r_flash_rx" value="FIT"/>
+        <Segment component="r_bsp7.70" id="r_bsp" source="com.renesas.smc.tools.swcomponent.fit.source">
+            <Setting id="BSP_CFG_SWINT_UNIT1_ENABLE" value="0"/>
+            <Setting id="BSP_CFG_LOW_LEVEL_INTERFACE_STDIO_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_SWINT_UNIT2_ENABLE" value="0"/>
+            <Setting id="BSP_CFG_LOW_LEVEL_INTERFACE_REENTRANT_LIB_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA0_ENABLE" value="0"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA1_IF_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_USER_ENTER_CRITICAL_FUNCTION" value="my_enter_critical_function"/>
+            <Setting id="BSP_CFG_USER_WARM_START_POST_C_FUNCTION" value="my_sw_warmstart_postc_function"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA1_ENABLE" value="0"/>
+            <Setting id="BSP_CFG_INTERNAL_PERIPHERAL_BUS2_3_PRIORITY" value="0"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA0_DM_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_USER_WARM_START_PRE_C_FUNCTION" value="my_sw_warmstart_prec_function"/>
+            <Setting id="BSP_CFG_PARAM_CHECKING_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_SERIAL_PROGRAMMER_CONECT_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_SCI_UART_TERMINAL_INTERRUPT_PRIORITY" value="15"/>
+            <Setting id="BSP_CFG_INTERNAL_PERIPHERAL_BUS1_PRIORITY" value="0"/>
+            <Setting id="BSP_CFG_USER_WARM_START_CALLBACK_PRE_INITC_ENABLED" value="0"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA0_OA_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_LOW_LEVEL_INTERFACE_SBRK_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_USTACK_BYTES" value="0x1000"/>
+            <Setting id="BSP_CFG_MEMORY_BUS2_PRIORITY" value="0"/>
+            <Setting id="BSP_CFG_INTERNAL_PERIPHERAL_BUS4_5_PRIORITY" value="0"/>
+            <Setting id="BSP_CFG_EXTERNAL_BUS_PRIORITY" value="0"/>
+            <Setting id="BSP_CFG_IO_LIB_ENABLE" value="0"/>
+            <Setting id="BSP_CFG_MEMORY_BUS1_3_PRIORITY" value="0"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA1_ADDR" value="0xFFE00000"/>
+            <Setting id="BSP_CFG_BUS_PRIORITY_INITIALIZE_ENABLE" value="0"/>
+            <Setting id="BSP_CFG_ID_CODE_LONG_4" value="0xFFFFFFFF"/>
+            <Setting id="BSP_CFG_ID_CODE_LONG_2" value="0xFFFFFFFF"/>
+            <Setting id="BSP_CFG_EBMAPCR_2ND_PRIORITY" value="3"/>
+            <Setting id="BSP_CFG_ID_CODE_LONG_3" value="0xFFFFFFFF"/>
+            <Setting id="BSP_CFG_USER_CHARPUT_FUNCTION" value="my_sw_charput_function"/>
+            <Setting id="BSP_CFG_TRUSTED_MODE_FUNCTION" value="0xFFFFFFFF"/>
+            <Setting id="BSP_CFG_SCI_UART_TERMINAL_BITRATE" value="115200"/>
+            <Setting id="BSP_CFG_SWINT_TASK_BUFFER_NUMBER" value="8"/>
+            <Setting id="BSP_CFG_USER_LOCKING_HW_UNLOCK_FUNCTION" value="my_hw_unlocking_function"/>
+            <Setting id="BSP_CFG_ID_CODE_LONG_1" value="0xFFFFFFFF"/>
+            <Setting id="BSP_CFG_USER_STACK_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_SCI_UART_TERMINAL_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_INTERNAL_PERIPHERAL_BUS6_PRIORITY" value="0"/>
+            <Setting id="BSP_CFG_USER_LOCKING_SW_UNLOCK_FUNCTION" value="my_sw_unlocking_function"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA1_SIZE" value="0x0"/>
+            <Setting id="BSP_CFG_USER_CHARPUT_ENABLED" value="1"/>
+            <Setting id="BSP_CFG_SWINT_IPR_INITIAL_VALUE" value="0x1"/>
+            <Setting id="BSP_CFG_RUN_IN_USER_MODE" value="0"/>
+            <Setting id="BSP_CFG_USER_LOCKING_HW_LOCK_FUNCTION" value="my_hw_locking_function"/>
+            <Setting id="BSP_CFG_EBMAPCR_3RD_PRIORITY" value="1"/>
+            <Setting id="BSP_CFG_ROMCODE_REG_VALUE" value="0xFFFFFFFF"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA0_SIZE" value="0x0"/>
+            <Setting id="BSP_CFG_ROM_CACHE_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_USER_EXIT_CRITICAL_FUNCTION" value="my_exit_critical_function"/>
+            <Setting id="BSP_CFG_USER_LOCKING_TYPE" value="bsp_lock_t"/>
+            <Setting id="BSP_CFG_HEAP_BYTES" value="0x400"/>
+            <Setting id="BSP_CFG_FIT_IPL_MAX" value="0xF"/>
+            <Setting id="BSP_CFG_BOOTLOADER_PROJECT" value="1"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA0_ADDR" value="0xFFE00000"/>
+            <Setting id="BSP_CFG_EBMAPCR_4TH_PRIORITY" value="2"/>
+            <Setting id="BSP_CFG_USER_LOCKING_SW_LOCK_FUNCTION" value="my_sw_locking_function"/>
+            <Setting id="BSP_CFG_ISTACK_BYTES" value="0x400"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA1_DM_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_SCI_UART_TERMINAL_CHANNEL" value="9"/>
+            <Setting id="BSP_CFG_USER_LOCKING_ENABLED" value="0"/>
+            <Setting id="BSP_CFG_USER_CHARGET_ENABLED" value="0"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA0_IF_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_USER_CHARGET_FUNCTION" value="my_sw_charget_function"/>
+            <Setting id="BSP_CFG_CODE_FLASH_START_BANK" value="0"/>
+            <Setting id="BSP_CFG_FAW_REG_VALUE" value="0xFFFFFFFF"/>
+            <Setting id="BSP_CFG_EBMAPCR_5TH_PRIORITY" value="4"/>
+            <Setting id="BSP_CFG_NONCACHEABLE_AREA1_OA_ENABLE" value="1"/>
+            <Setting id="BSP_CFG_USER_WARM_START_CALLBACK_POST_INITC_ENABLED" value="0"/>
+            <Setting id="BSP_CFG_USER_EXCLUSIVE_CONTROL_ENABLE" value="0"/>
+            <Setting id="BSP_CFG_EBMAPCR_1ST_PRIORITY" value="0"/>
+        </Segment>
+        <Segment component="r_usb_pcdc1.44" id="r_usb_pcdc" source="com.renesas.smc.tools.swcomponent.fit.source">
+            <Setting id="USB_CFG_PCDC_INT_IN2" value="USB_PIPE7"/>
+            <Setting id="USB_CFG_PCDC_BULK_OUT" value="USB_PIPE2"/>
+            <Setting id="USB_CFG_PCDC_BULK_IN" value="USB_PIPE1"/>
+            <Setting id="USB_CFG_PCDC_BULK_IN2" value="USB_PIPE3"/>
+            <Setting id="USB_CFG_PCDC_BULK_OUT2" value="USB_PIPE4"/>
+            <Setting id="USB_CFG_PCDC_INT_IN" value="USB_PIPE6"/>
+        </Segment>
+        <Segment component="com.renesas.smc.tools.swcomponent.codegenerator.sciasyncmode" id="Config_SCI9" source="com.renesas.smc.tools.swcomponent.codegenerator.source">
+            <Setting id="BitEdge" value="LowLevel"/>
+            <Setting id="TransEnd" value="Enable"/>
+            <Setting id="RecvError" value="Enable"/>
+            <Setting id="TransDataHandle" value="ISR"/>
+            <Setting id="MultiIntTEIEnable" value="UnCheck"/>
+            <Setting id="ERIPriority" value="Level15"/>
+            <Setting id="TransInstant" value="Disable"/>
+            <Setting id="RvDataInt" value="RXI"/>
+            <Setting id="OutActiveNum" value="Num15"/>
+            <Setting id="MultiIntTXIEnable" value="UnCheck"/>
+            <Setting id="TransClock" value="Internal"/>
+            <Setting id="BaseClk" value="16Cyl"/>
+            <Setting id="SCKPinFun" value="SckUnuse"/>
+            <Setting id="RecvFIFONum" value="Num8"/>
+            <Setting id="TransDir" value="LSB"/>
+            <Setting id="TransFIFONum" value="Num0"/>
+            <Setting id="DataMatch" value="Disable"/>
+            <Setting id="Parity" value="None"/>
+            <Setting id="RXIPriority" value="Level15"/>
+            <Setting id="DutyCorrection" value="Disable"/>
+            <Setting id="FlowControl" value="None"/>
+            <Setting id="FIFOMode" value="NonFIFO"/>
+            <Setting id="MultiIntRXIEnable" value="UnCheck"/>
+            <Setting id="StopBit" value="1Bit"/>
+            <Setting id="ERIEnable" value="Enable"/>
+            <Setting id="Bitrate" value="115200"/>
+            <Setting id="RecvDataHandle" value="ISR"/>
+            <Setting id="RecvEnd" value="Enable"/>
+            <Setting id="DataLength" value="8Bits"/>
+            <Setting id="TXIPriority" value="Level15"/>
+            <Setting id="CmpData" value="0x00"/>
+            <Setting id="NoiseFilt" value="Disable"/>
+            <Setting id="MultiIntERIEnable" value="UnCheck"/>
+            <Setting id="FiltClk" value="Div1"/>
+        </Segment>
+        <Segment component="r_usb_basic1.44" id="r_usb_basic" source="com.renesas.smc.tools.swcomponent.fit.source">
+            <Setting id="USB_CFG_HUB" value="USB_CFG_DISABLE"/>
+            <Setting id="USB_CFG_VBUS" value="USB_CFG_HIGH"/>
+            <Setting id="USB_CFG_TPL" value="USB_NOVENDOR, USB_NOPRODUCT"/>
+            <Setting id="USB_CFG_ELECTRICAL" value="USB_CFG_DISABLE"/>
+            <Setting id="USB_CFG_USE_USBIP" value="USB_CFG_IP0"/>
+            <Setting id="USB_CFG_CLKSEL" value="USB_CFG_24MHZ"/>
+            <Setting id="USB_CFG_DBLB" value="USB_CFG_DBLBON"/>
+            <Setting id="USB_CFG_REQUEST" value="USB_CFG_ENABLE"/>
+            <Setting id="USB_CFG_USB1_DMA_TX" value="USB_CFG_CH2"/>
+            <Setting id="USB_CFG_COMPLIANCE" value="USB_CFG_DISABLE"/>
+            <Setting id="USB_CFG_USB0_DMA_RX" value="USB_CFG_CH1"/>
+            <Setting id="USB_CFG_MODE" value="USB_CFG_PERI"/>
+            <Setting id="USB_CFG_USB0_DMA_TX" value="USB_CFG_CH0"/>
+            <Setting id="USB_CFG_USB1_DMA_RX" value="USB_CFG_CH3"/>
+            <Setting id="USB_CFG_DEVICE_CLASS" value="#define USB_CFG_PCDC_USE"/>
+            <Setting id="USB_CFG_HUB_TPL" value="USB_NOVENDOR, USB_NOPRODUCT"/>
+            <Setting id="USB_CFG_CNTMD" value="USB_CFG_CNTMDOFF"/>
+            <Setting id="USB_CFG_DTC" value="USB_CFG_DISABLE"/>
+            <Setting id="USB_CFG_DCP" value="USB_CFG_DISABLE"/>
+            <Setting id="USB_CFG_BUSWAIT" value="USB_CFG_BUSWAIT_7"/>
+            <Setting id="USB_CFG_TPLCNT" value="1"/>
+            <Setting id="USB_CFG_HUB_TPLCNT" value="1"/>
+            <Setting id="USB_CFG_BC" value="USB_CFG_DISABLE"/>
+            <Setting id="USB_CFG_INTERRUPT_PRIORITY" value="3"/>
+            <Setting id="USB_CFG_DMA" value="USB_CFG_DISABLE"/>
+            <Setting id="USB_CFG_PARAM_CHECKING" value="USB_CFG_ENABLE"/>
+            <Setting id="USB_CFG_TYPEC" value="USB_CFG_DISABLE"/>
+        </Segment>
+        <Segment component="r_flash_rx5.22" id="r_flash_rx" source="com.renesas.smc.tools.swcomponent.fit.source">
+            <Setting id="FLASH_CFG_PARAM_CHECKING_ENABLE" value="1"/>
+            <Setting id="FLASH_CFG_DATA_FLASH_BGO" value="0"/>
+            <Setting id="FLASH_CFG_CODE_FLASH_RUN_FROM_ROM" value="1"/>
+            <Setting id="FLASH_CFG_CODE_FLASH_ENABLE" value="1"/>
+            <Setting id="FLASH_CFG_CODE_FLASH_BGO" value="0"/>
+        </Segment>
+    </Segment>
+</QE>

@@ -123,6 +123,44 @@
                 "panel": "shared"
             },
             "detail": "IntelliSense用のcompile_commands.json生成"
+        },
+        {
+            "label": "Build Bootloader (GCC-RX)",
+            "type": "shell",
+            "command": "C:/Renesas/e2_studio/eclipse/plugins/com.renesas.ide.exttools.gnumake.win32.x86_64_4.3.1.v20240909-0854/mk/make.exe",
+            "args": [
+                "-j8",
+                "all"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/Bootloader/HardwareDebug"
+            },
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "detail": "Bootloaderプロジェクトのビルド"
+        },
+        {
+            "label": "Clean Bootloader (GCC-RX)",
+            "type": "shell",
+            "command": "C:/Renesas/e2_studio/eclipse/plugins/com.renesas.ide.exttools.gnumake.win32.x86_64_4.3.1.v20240909-0854/mk/make.exe",
+            "args": [
+                "clean"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/Bootloader/HardwareDebug"
+            },
+            "group": "build",
+            "detail": "Bootloaderのビルド成果物をクリーンアップ"
         }
     ]
 }

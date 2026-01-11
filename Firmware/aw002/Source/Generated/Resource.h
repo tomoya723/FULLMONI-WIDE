@@ -3,7 +3,7 @@
 *        Solutions for real time microcontroller applications        *
 **********************************************************************
 *                                                                    *
-*        (c) 1996 - 2025  SEGGER Microcontroller GmbH                *
+*        (c) 1996 - 2026  SEGGER Microcontroller GmbH                *
 *                                                                    *
 *        Internet: www.segger.com    Support:  support@segger.com    *
 *                                                                    *
@@ -43,6 +43,8 @@ Purpose     : Generated file do NOT edit!
 #define ID_RTEXT_4 17
 #define ID_RTEXT_5 18
 #define ID_RTEXT_6 19
+#define ID_RTEXT_PRM 20
+#define ID_RTEXT_ACC 21
 
 #define APPW_MANAGE_TEXT APPW_MANAGE_TEXT_EXT
 extern GUI_CONST_STORAGE unsigned char acAPPW_Language_0[];
@@ -55,6 +57,7 @@ extern GUI_CONST_STORAGE unsigned char acx14y24pxHeadUpDaisy_36_Bold_EXT[];
 extern GUI_CONST_STORAGE unsigned char acx14y24pxHeadUpDaisy_72_Bold_EXT[];
 extern GUI_CONST_STORAGE unsigned char acx14y24pxHeadUpDaisy_30_Bold_EXT_AA2[];
 extern GUI_CONST_STORAGE unsigned char acx14y24pxHeadUpDaisy_18_Normal_EXT[];
+extern GUI_CONST_STORAGE unsigned char ac51_20_Normal_EXT_AA2[];
 extern GUI_CONST_STORAGE unsigned char acx14y24pxHeadUpDaisy_27_Bold_EXT[];
 extern GUI_CONST_STORAGE unsigned char acArial_19_Normal_EXT[];
 extern GUI_CONST_STORAGE unsigned char acArial_16_Bold_EXT[];
@@ -111,6 +114,7 @@ extern GUI_CONST_STORAGE unsigned char acfuel2[];
 #define ID_VAR_AD3 (GUI_ID_USER + 2070)
 #define ID_VAR_AD4 (GUI_ID_USER + 2071)
 #define ID_VAR_SPEED_CAN (GUI_ID_USER + 2079)
+#define ID_VAR_PRM (GUI_ID_USER + 2072)
 
 /*********************************************************************
 *

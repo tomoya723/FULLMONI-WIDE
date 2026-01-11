@@ -3,16 +3,16 @@ Renesas e2Studio + GNU GCC-RX + SEGGER emWIN<br>
 順次更新予定
 ***
 ## サードパーティライセンスについて
-- 本プロジェクトの**オリジナルコード**（例: `Firmware/src` の自作 `.c/.h` 等）は **MIT License** です。  
+- 本プロジェクトの**オリジナルコード**（例: `Firmware/src` の自作 `.c/.h` 等）は **MIT License** です。
 - ただし、以下の**第三者提供物**は各社の条件が優先されます（＝MITの適用外）:
-  - **Renesas FIT / 生成コード**（`smc_gen` 等）  
+  - **Renesas FIT / 生成コード**（`smc_gen` 等）
     - Renesas製品上での利用を前提とする無保証ライセンス。著作権表記・免責コメントを改変せず保持してください。
-  - **SEGGER emWin**（GUIライブラリ）  
+  - **SEGGER emWin**（GUIライブラリ）
     - 本リポジトリでは **再配布しません**。スマートコンフィグレータからコード生成を実行し`r_emwin_rx`をプロジェクトに追加してください。
     - emWinは再配布禁止条項があり、SEGGERの明示許諾なしに第三者へ配布できません。
 ### ライセンスの適用範囲
-- **MIT**: オリジナルコード全般  
-- **Renesasライセンス**: FIT/生成コード  
+- **MIT**: オリジナルコード全般
+- **Renesasライセンス**: FIT/生成コード
 - **SEGGERライセンス**: emWin（再配布不可）
 
 詳細は `THIRD_PARTY_NOTICES.md` を参照してください。
@@ -226,6 +226,7 @@ Both environments can be used interchangeably:<br>
 ### Notes
 
 - Smart Configurator code generation should be performed in e² studio
+- ⚠️ **注意**: Smart Configuratorでコード生成すると、`Config_SCI9_user.c` のユーザーコード部分が初期化されます。UART受信処理（`r_Config_SCI9_callback_receiveend` 内のトリガーフラグ設定など）を手動で復元してください。
 - The `.vscode/` directory is version-controlled for team collaboration
 - Build artifacts in `Firmware/HardwareDebug/` are shared between both IDEs
 - E2 Lite debugger can be used by only one IDE at a time

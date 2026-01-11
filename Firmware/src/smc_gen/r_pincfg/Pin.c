@@ -178,6 +178,10 @@ void R_Pins_Create(void)
     MPC.PD6PFS.BYTE = 0x08U;
     PORTD.PMR.BYTE |= 0x40U;
 
+    /* Set RXD9 pin */
+    MPC.PB6PFS.BYTE = 0x0AU;
+    PORTB.PMR.BYTE |= 0x40U;
+
     /* Set SCL0 pin */
     MPC.P12PFS.BYTE = 0x0FU;
     PORT1.PMR.BYTE |= 0x04U;
@@ -193,6 +197,16 @@ void R_Pins_Create(void)
     /* Set SDA1 pin */
     MPC.P20PFS.BYTE = 0x0FU;
     PORT2.PMR.BYTE |= 0x01U;
+
+    /* Set TXD9 pin */
+    PORTB.PODR.BYTE |= 0x80U;
+    MPC.PB7PFS.BYTE = 0x0AU;
+    PORTB.PDR.BYTE |= 0x80U;
+    // PORTB.PMR.BIT.B7 = 1U; // Please set the PMR bit after TE bit is set to 1.
+
+    /* Set USB0_VBUS pin */
+    MPC.P16PFS.BYTE = 0x11U;
+    PORT1.PMR.BYTE |= 0x40U;
 
     R_BSP_RegisterProtectEnable(BSP_REG_PROTECT_MPC);
 }

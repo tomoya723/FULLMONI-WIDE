@@ -1,0 +1,162 @@
+<Window x:Class="FullmoniTerminal.Views.ParameterEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Parameter Editor - FULLMONI-WIDE"
+        Height="600" Width="500"
+        MinHeight="500" MinWidth="450"
+        Background="{StaticResource PrimaryBackgroundBrush}"
+        WindowStartupLocation="CenterOwner">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0" Text="パラメータ設定"
+                   FontSize="20" FontWeight="Bold"
+                   Foreground="{StaticResource TextBrush}"
+                   Margin="0,0,0,16"/>
+
+        <!-- Parameter Groups -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+
+                <!-- Tyre Settings -->
+                <GroupBox Header="タイヤサイズ" Style="{StaticResource ModernGroupBox}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="幅 (mm):" Style="{StaticResource ModernLabel}" Margin="0,4"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" x:Name="TyreWidthBox"
+                                 Style="{StaticResource ModernTextBox}" Margin="4" Width="100" HorizontalAlignment="Left"/>
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="例: 195" Foreground="Gray" VerticalAlignment="Center" Margin="8,0"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="扁平率 (%):" Style="{StaticResource ModernLabel}" Margin="0,4"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" x:Name="TyreAspectBox"
+                                 Style="{StaticResource ModernTextBox}" Margin="4" Width="100" HorizontalAlignment="Left"/>
+                        <TextBlock Grid.Row="1" Grid.Column="2" Text="例: 55" Foreground="Gray" VerticalAlignment="Center" Margin="8,0"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="リム (inch):" Style="{StaticResource ModernLabel}" Margin="0,4"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" x:Name="TyreRimBox"
+                                 Style="{StaticResource ModernTextBox}" Margin="4" Width="100" HorizontalAlignment="Left"/>
+                        <TextBlock Grid.Row="2" Grid.Column="2" Text="例: 16" Foreground="Gray" VerticalAlignment="Center" Margin="8,0"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" x:Name="TyreSizePreview"
+                                   Text="プレビュー: 195/55 R16" Foreground="{StaticResource AccentBrush}"
+                                   FontWeight="Bold" Margin="0,8,0,0"/>
+                    </Grid>
+                </GroupBox>
+
+                <!-- Gear Ratios -->
+                <GroupBox Header="ギア比 (x1000で入力)" Style="{StaticResource ModernGroupBox}" Margin="0,8,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="1速:" Style="{StaticResource ModernLabel}" Margin="0,4"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" x:Name="Gear1Box" Style="{StaticResource ModernTextBox}" Margin="4"/>
+
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="2速:" Style="{StaticResource ModernLabel}" Margin="8,4,0,4"/>
+                        <TextBox Grid.Row="0" Grid.Column="3" x:Name="Gear2Box" Style="{StaticResource ModernTextBox}" Margin="4"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="3速:" Style="{StaticResource ModernLabel}" Margin="0,4"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" x:Name="Gear3Box" Style="{StaticResource ModernTextBox}" Margin="4"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="2" Text="4速:" Style="{StaticResource ModernLabel}" Margin="8,4,0,4"/>
+                        <TextBox Grid.Row="1" Grid.Column="3" x:Name="Gear4Box" Style="{StaticResource ModernTextBox}" Margin="4"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="5速:" Style="{StaticResource ModernLabel}" Margin="0,4"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" x:Name="Gear5Box" Style="{StaticResource ModernTextBox}" Margin="4"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="2" Text="6速:" Style="{StaticResource ModernLabel}" Margin="8,4,0,4"/>
+                        <TextBox Grid.Row="2" Grid.Column="3" x:Name="Gear6Box" Style="{StaticResource ModernTextBox}" Margin="4"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="ファイナル:" Style="{StaticResource ModernLabel}" Margin="0,4"/>
+                        <TextBox Grid.Row="3" Grid.Column="1" x:Name="FinalGearBox" Style="{StaticResource ModernTextBox}" Margin="4"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2"
+                                   Text="例: 3.136 → 3136" Foreground="Gray" VerticalAlignment="Center" Margin="8,4"/>
+                    </Grid>
+                </GroupBox>
+
+                <!-- Warning Settings -->
+                <GroupBox Header="警告設定" Style="{StaticResource ModernGroupBox}" Margin="0,8,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="水温 低温警告:" Style="{StaticResource ModernLabel}" Margin="0,4"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" x:Name="WaterTempLowBox"
+                                 Style="{StaticResource ModernTextBox}" Margin="4" Width="80" HorizontalAlignment="Left"/>
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="°C" Style="{StaticResource ModernLabel}" Margin="4"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="水温 高温警告:" Style="{StaticResource ModernLabel}" Margin="0,4"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" x:Name="WaterTempHighBox"
+                                 Style="{StaticResource ModernTextBox}" Margin="4" Width="80" HorizontalAlignment="Left"/>
+                        <TextBlock Grid.Row="1" Grid.Column="2" Text="°C" Style="{StaticResource ModernLabel}" Margin="4"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="燃料残量警告:" Style="{StaticResource ModernLabel}" Margin="0,4"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" x:Name="FuelWarnBox"
+                                 Style="{StaticResource ModernTextBox}" Margin="4" Width="80" HorizontalAlignment="Left"/>
+                        <TextBlock Grid.Row="2" Grid.Column="2" Text="%" Style="{StaticResource ModernLabel}" Margin="4"/>
+                    </Grid>
+                </GroupBox>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Buttons -->
+        <Grid Grid.Row="2" Margin="0,16,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="1" Content="読み込み" Style="{StaticResource ModernButton}"
+                    Width="100" Margin="4" Click="ReadButton_Click"/>
+            <Button Grid.Column="2" Content="書き込み" Style="{StaticResource ModernButton}"
+                    Width="100" Margin="4" Click="WriteButton_Click"/>
+            <Button Grid.Column="3" Content="保存 (EEPROM)" Style="{StaticResource ModernButton}"
+                    Width="120" Margin="4" Click="SaveButton_Click"/>
+            <Button Grid.Column="4" Content="閉じる" Style="{StaticResource ModernButton}"
+                    Width="80" Margin="4" Click="CloseButton_Click"/>
+        </Grid>
+    </Grid>
+</Window>
