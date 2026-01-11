@@ -1,6 +1,6 @@
 /*
  * USB CDC Descriptors for FULLMONI-WIDE Firmware
- * 
+ *
  * 製品名を "FULLMONI-WIDE" に変更（Bootloaderとの区別）
  */
 #include "r_usb_basic_if.h"
@@ -18,8 +18,8 @@ const uint8_t g_device_descriptor[] =
     0x00,               /* bDeviceSubClass */
     0x00,               /* bDeviceProtocol */
     64,                 /* bMaxPacketSize0 */
-    0xBA, 0x04,         /* idVendor: 0x04BA (Renesas) */
-    0x0C, 0x00,         /* idProduct: 0x000C (Firmware用に変更) */
+    0x09, 0x12,         /* idVendor: 0x1209 (pid.codes) */
+    0x30, 0x72,         /* idProduct: 0x7230 (FULLMONI-WIDE) */
     0x00, 0x01,         /* bcdDevice: 1.00 */
     1,                  /* iManufacturer: String index 1 */
     2,                  /* iProduct: String index 2 */

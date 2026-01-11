@@ -1,0 +1,48 @@
+; FULLMONI-WIDE USB CDC Driver Installation File
+; VID: 0x1209 (pid.codes)
+; PID: 0x7230 (FULLMONI-WIDE)
+
+[Version]
+Signature="$Windows NT$"
+Class=Ports
+ClassGuid={4D36E978-E325-11CE-BFC1-08002BE10318}
+Provider=%MANUFACTURER%
+DriverVer=01/11/2026,2.0.0.0
+CatalogFile=FULLMONI-WIDE.cat
+
+[Manufacturer]
+%MANUFACTURER%=DeviceList, NTamd64, NTarm64
+
+[DeviceList.NTamd64]
+%DESCRIPTION%=DriverInstall, USB\VID_1209&PID_7230
+%DESCRIPTION%=DriverInstall, USB\VID_1209&PID_7230&MI_00
+
+[DeviceList.NTarm64]
+%DESCRIPTION%=DriverInstall, USB\VID_1209&PID_7230
+%DESCRIPTION%=DriverInstall, USB\VID_1209&PID_7230&MI_00
+
+[DriverInstall.NT]
+include=mdmcpq.inf
+CopyFiles=FakeModemCopyFileSection
+AddReg=DriverInstall.NT.AddReg
+
+[DriverInstall.NT.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,usbser.sys
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
+
+[DriverInstall.NT.Services]
+include=mdmcpq.inf
+AddService=usbser, 0x00000002, DriverService
+
+[DriverService]
+DisplayName=%SERVICE%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%12%\usbser.sys
+
+[Strings]
+MANUFACTURER="FULLMONI Project"
+DESCRIPTION="FULLMONI-WIDE"
+SERVICE="USB Serial Driver"

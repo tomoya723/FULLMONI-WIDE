@@ -2,7 +2,7 @@
  * usb_cdc.h
  *
  * USB CDC Driver for FULLMONI-WIDE Firmware
- * 
+ *
  * 設計方針:
  * - 通常動作時: USB最小監視（PARAM_ENTERのみ検出）
  * - パラメータモード時: フルCDC通信
@@ -88,5 +88,11 @@ uint16_t usb_cdc_receive(uint8_t *buf, uint16_t max_len);
  * 戻り値: 受信した文字、データなしの場合 -1
  */
 int usb_cdc_getchar(void);
+
+/*
+ * USB CDC クリーンシャットダウン
+ * リセット前にUSBペリフェラルを正常終了させる
+ */
+void usb_cdc_shutdown(void);
 
 #endif /* USB_CDC_H */

@@ -4,21 +4,28 @@ namespace FullmoniTerminal.Services;
 
 /// <summary>
 /// ファームウェアアップデートサービス
-/// XON/XOFFフロー制御でバイナリデータをBootloaderに転送
+/// Size prefix + ACK プロトコルでバイナリデータをBootloaderに転送
+/// 
+/// プロトコル:
+/// 1. Bootloaderが "READY\r\n" を送信
+/// 2. PC が Size (4byte LE) を送信
+/// 3. Bootloader が '.' (ACK) を返す
+/// 4. PC が データを送信 (64byte単位)
+/// 5. Bootloader が 128byte受信ごとに '.' (ACK) を返す
+/// 6. 完了時 Bootloader が "OK <size>\r\n" を送信して自動リセット
 /// </summary>
 public class FirmwareUpdateService
 {
     private readonly SerialPortService _serialService;
 
-    // XON/XOFFフロー制御
-    private const byte XON = 0x11;   // DC1 - Resume
-    private const byte XOFF = 0x13; // DC3 - Pause
+    // ACK文字
+    private const byte ACK_CHAR = (byte)'.';
 
     // 送信制御
-    private const int ChunkSize = 512;     // 一度に送信するバイト数
-    private const int SendDelayMs = 5;     // チャンク間の待機時間
+    private const int ChunkSize = 64;          // USB CDC パケットサイズ
+    private const int AckIntervalBytes = 128;  // ACK受信間隔 (Flash書き込み単位)
+    private const int AckTimeoutMs = 5000;     // ACK待ちタイムアウト
 
-    private volatile bool _xoffReceived;
     private volatile bool _transferCancelled;
 
     /// <summary>
@@ -79,8 +86,11 @@ public class FirmwareUpdateService
     }
 
     /// <summary>
-    /// ファームウェアを非同期で転送（ブートローダー切り替え含む）
+    /// ファームウェアを非同期で転送
     /// </summary>
+    /// <param name="firmwareData">ファームウェアデータ</param>
+    /// <param name="switchToBootloader">fwupdateコマンドでBootloaderに切り替えるか（既にBootloaderならfalse）</param>
+    /// <param name="cancellationToken">キャンセルトークン</param>
     public async Task SendFirmwareAsync(byte[] firmwareData, bool switchToBootloader = true, CancellationToken cancellationToken = default)
     {
         if (!_serialService.IsConnected)
@@ -88,28 +98,29 @@ public class FirmwareUpdateService
             throw new InvalidOperationException("シリアルポートが接続されていません");
         }
 
-        _xoffReceived = false;
         _transferCancelled = false;
+        var receivedData = new List<byte>();
+        var ackReceived = new TaskCompletionSource<bool>();
 
-        // 受信イベントを一時的にフックしてXON/XOFFを監視
+        // 受信イベントハンドラ
         void DataReceivedHandler(object? sender, string data)
         {
             foreach (var c in data)
             {
-                if (c == (char)XOFF)
+                receivedData.Add((byte)c);
+                
+                if (c == (char)ACK_CHAR)
                 {
-                    _xoffReceived = true;
-                    Log("RX: XOFF (pause)");
-                }
-                else if (c == (char)XON)
-                {
-                    _xoffReceived = false;
-                    Log("RX: XON (resume)");
+                    Log($"RX: ACK ('.')");
+                    ackReceived.TrySetResult(true);
                 }
                 else if (c >= 0x20 && c <= 0x7E)
                 {
-                    // 印字可能文字
-                    Log($"RX: '{c}' (0x{(int)c:X2})");
+                    Log($"RX: '{c}'");
+                }
+                else if (c == '\r' || c == '\n')
+                {
+                    // 改行は無視
                 }
                 else
                 {
@@ -122,60 +133,78 @@ public class FirmwareUpdateService
 
         try
         {
-            // ブートローダーモードに切り替え
+            // Bootloaderモードへ切り替え（必要な場合）
             if (switchToBootloader)
             {
-                Log("=== ブートローダーモードへ切り替え ===");
-
-                // 0. UARTの同期を取るためにダミー文字を送信（最初の1文字が欠落する問題対策）
-                Log("TX: (sync)");
-                _serialService.SendCommand("");  // 空コマンド（改行のみ）を送信
-                await Task.Delay(100, cancellationToken);
-
-                // 1. fwupdateコマンドを送信
-                Log("TX: fwupdate");
+                Log("=== Bootloaderモードへ切り替え ===");
                 UpdateStatus("fwupdateコマンド送信中...");
+                
+                // fwupdateコマンドを送信（Firmwareがリブートしてbootloaderになる）
                 _serialService.SendCommand("fwupdate");
-
-                // 2. Firmwareの応答を待つ（"Type 'yes' to confirm"）
-                Log("Firmwareの確認プロンプトを待機中...");
-                await Task.Delay(1000, cancellationToken);
-
-                // 3. "yes"を送信して確認
-                Log("TX: yes");
+                
+                // Firmwareが確認を求める場合に対応
+                await Task.Delay(500, cancellationToken);
                 _serialService.SendCommand("yes");
-
-                // 4. リブートを待つ（Firmwareがブートローダーにリブートするまで）
-                Log("デバイスのリブートを待機中...");
-                UpdateStatus("デバイスがブートローダーにリブート中...");
-                await Task.Delay(3000, cancellationToken);
+                
+                // Bootloaderの起動を待つ（Flash消去含む）
+                Log("Bootloaderの起動とFlash消去を待機中...");
+                UpdateStatus("Bootloader起動待機中（Flash消去中）...");
+                await Task.Delay(5000, cancellationToken);  // Flash消去に時間がかかる
             }
 
-            UpdateStatus($"転送開始: {firmwareData.Length:N0} bytes");
+            // "READY" を待つ
+            Log("Bootloaderからの 'READY' を待機中...");
+            UpdateStatus("Bootloader準備完了待機中...");
+            
+            var readyTimeout = DateTime.Now.AddSeconds(30);
+            while (DateTime.Now < readyTimeout)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                
+                var received = string.Join("", receivedData.Select(b => (char)b));
+                if (received.Contains("READY"))
+                {
+                    Log("RX: READY 受信");
+                    break;
+                }
+                if (received.Contains("ERASE_ERR"))
+                {
+                    throw new Exception("Bootloader: Flash消去エラー");
+                }
+                
+                await Task.Delay(100, cancellationToken);
+            }
+            
+            receivedData.Clear();
 
+            // Size を送信 (4byte, little-endian)
             var totalBytes = firmwareData.Length;
-            var sentBytes = 0;
-            var lastProgress = -1;
+            var sizeBytes = BitConverter.GetBytes((uint)totalBytes);
+            
+            Log($"TX: Size = {totalBytes} bytes (0x{totalBytes:X8})");
+            UpdateStatus($"サイズ送信中: {totalBytes:N0} bytes");
+            _serialService.SendRaw(sizeBytes);
 
-            // XONを待つ（Bootloaderが初期XONを送信する）
-            UpdateStatus("Bootloaderからの準備完了信号を待機...");
-            await WaitForXonAsync(TimeSpan.FromSeconds(10), cancellationToken);
-            UpdateStatus("転送中...");
+            // ACK を待つ
+            ackReceived = new TaskCompletionSource<bool>();
+            if (!await WaitForAckAsync(ackReceived, AckTimeoutMs, cancellationToken))
+            {
+                throw new TimeoutException("サイズACK待ちタイムアウト");
+            }
+
+            // ファームウェアデータを送信
+            UpdateStatus($"転送中: 0/{totalBytes:N0} bytes");
+            var sentBytes = 0;
+            var bytesSinceLastAck = 0;
+            var lastProgress = -1;
 
             while (sentBytes < totalBytes)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-
+                
                 if (_transferCancelled)
                 {
                     throw new OperationCanceledException("転送がキャンセルされました");
-                }
-
-                // XOFFを受信したら待機
-                while (_xoffReceived)
-                {
-                    Log("TX: 待機中 (XOFF)");
-                    await Task.Delay(10, cancellationToken);
                 }
 
                 // チャンクサイズを計算
@@ -188,6 +217,18 @@ public class FirmwareUpdateService
                 _serialService.SendRaw(chunk);
 
                 sentBytes += chunkSize;
+                bytesSinceLastAck += chunkSize;
+
+                // 128バイトごとにACKを待つ
+                if (bytesSinceLastAck >= AckIntervalBytes)
+                {
+                    ackReceived = new TaskCompletionSource<bool>();
+                    if (!await WaitForAckAsync(ackReceived, AckTimeoutMs, cancellationToken))
+                    {
+                        throw new TimeoutException($"ACK待ちタイムアウト (sent: {sentBytes})");
+                    }
+                    bytesSinceLastAck = 0;
+                }
 
                 // 進捗更新
                 var progress = (int)((sentBytes * 100L) / totalBytes);
@@ -195,24 +236,39 @@ public class FirmwareUpdateService
                 {
                     lastProgress = progress;
                     ProgressChanged?.Invoke(this, progress);
-
-                    // 10%ごとにログ出力
+                    
                     if (progress % 10 == 0)
                     {
+                        var speed = sentBytes / 1024.0;  // 簡易速度表示
                         Log($"TX: {sentBytes:N0}/{totalBytes:N0} bytes ({progress}%)");
                     }
                 }
 
-                // 少し待機（バッファオーバーフロー防止）
-                await Task.Delay(SendDelayMs, cancellationToken);
+                UpdateStatus($"転送中: {sentBytes:N0}/{totalBytes:N0} bytes ({progress}%)");
             }
 
-            UpdateStatus($"転送完了: {sentBytes:N0} bytes - 検証中...");
+            // 最終ACKを待つ（残りデータがある場合）
+            if (bytesSinceLastAck > 0)
+            {
+                ackReceived = new TaskCompletionSource<bool>();
+                await WaitForAckAsync(ackReceived, AckTimeoutMs, cancellationToken);
+            }
 
-            // 転送完了後、Bootloaderが検証・再起動するのを待つ
-            await Task.Delay(5000, cancellationToken);
+            // 完了メッセージを待つ
+            UpdateStatus("転送完了 - 検証中...");
+            await Task.Delay(2000, cancellationToken);
 
-            UpdateStatus("更新完了");
+            var finalReceived = string.Join("", receivedData.Select(b => (char)b));
+            if (finalReceived.Contains("OK"))
+            {
+                Log($"RX: {finalReceived.Trim()}");
+                UpdateStatus("更新完了！デバイスが再起動します");
+            }
+            else if (finalReceived.Contains("WRITE_ERR"))
+            {
+                throw new Exception("Bootloader: Flash書き込みエラー");
+            }
+
             UpdateCompleted?.Invoke(this, true);
         }
         catch (OperationCanceledException)
@@ -241,28 +297,26 @@ public class FirmwareUpdateService
         _transferCancelled = true;
     }
 
-    private async Task WaitForXonAsync(TimeSpan timeout, CancellationToken cancellationToken)
+    private async Task<bool> WaitForAckAsync(TaskCompletionSource<bool> ackReceived, int timeoutMs, CancellationToken cancellationToken)
     {
-        var deadline = DateTime.Now.Add(timeout);
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        cts.CancelAfter(timeoutMs);
 
-        // 最初はXOFF状態と仮定（初期XONを受信するまで待つ）
-        _xoffReceived = true;
-
-        while (DateTime.Now < deadline)
+        try
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            if (!_xoffReceived)
+            var delayTask = Task.Delay(timeoutMs, cts.Token);
+            var completedTask = await Task.WhenAny(ackReceived.Task, delayTask);
+            
+            if (completedTask == ackReceived.Task)
             {
-                return; // XON受信
+                return await ackReceived.Task;
             }
-
-            await Task.Delay(100, cancellationToken);
+            return false;  // タイムアウト
         }
-
-        // タイムアウトしても続行（Bootloaderがすでに待機中の可能性）
-        UpdateStatus("警告: XON待機タイムアウト - 転送を開始します");
-        _xoffReceived = false;
+        catch (OperationCanceledException)
+        {
+            return false;
+        }
     }
 
     private void UpdateStatus(string message)

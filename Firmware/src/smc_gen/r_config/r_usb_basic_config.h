@@ -132,11 +132,11 @@
  */
 #define USB_CFG_BUSWAIT             (USB_CFG_BUSWAIT_7)
 
-/* 
- * SET USB INTERRUPT PRIORITY; 
+/*
+ * SET USB INTERRUPT PRIORITY;
  *  1                   : lowest
  *  15                  : highest
- * 
+ *
  * FULLMONI-WIDE: 最低優先度に設定
  * CAN/GLCDC/DRW2Dより優先度を下げ、描画処理に影響を与えない
  */

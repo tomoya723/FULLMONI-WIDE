@@ -17,8 +17,8 @@ const uint8_t g_device_descriptor[] =
     0x00,               /* bDeviceSubClass */
     0x00,               /* bDeviceProtocol */
     64,                 /* bMaxPacketSize0 */
-    0xBA, 0x04,         /* idVendor: 0x04BA (Renesas) */
-    0x0B, 0x00,         /* idProduct: 0x000B */
+    0x09, 0x12,         /* idVendor: 0x1209 (pid.codes) */
+    0x30, 0x72,         /* idProduct: 0x7230 (FULLMONI-WIDE) */
     0x00, 0x01,         /* bcdDevice: 1.00 */
     1,                  /* iManufacturer: String index 1 */
     2,                  /* iProduct: String index 2 */
@@ -136,10 +136,11 @@ const uint8_t g_string1[] =
 /* String 2: Product */
 const uint8_t g_string2[] =
 {
-    32,                 /* bLength */
+    52,                 /* bLength */
     0x03,               /* bDescriptorType: STRING */
     'F', 0, 'U', 0, 'L', 0, 'L', 0, 'M', 0, 'O', 0, 'N', 0, 'I', 0,
-    '-', 0, 'W', 0, 'I', 0, 'D', 0, 'E', 0, ' ', 0, 'B', 0
+    '-', 0, 'W', 0, 'I', 0, 'D', 0, 'E', 0, ' ', 0, 'B', 0, 'o', 0,
+    'o', 0, 't', 0, 'l', 0, 'o', 0, 'a', 0, 'd', 0, 'e', 0, 'r', 0
 };
 
 /* String Descriptor Table - MUST be non-const for FIT driver */

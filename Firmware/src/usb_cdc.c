@@ -2,7 +2,7 @@
  * usb_cdc.c
  *
  * USB CDC Driver for FULLMONI-WIDE Firmware
- * 
+ *
  * 設計方針:
  * - 通常動作時: USB最小監視（PARAM_ENTERのみ検出）
  * - パラメータモード時: フルCDC通信
@@ -65,7 +65,7 @@ static uint16_t rx_ring_available(void);
 void usb_cdc_init(void)
 {
     usb_err_t err;
-    
+
     /* 状態初期化 */
     s_cdc_configured = false;
     s_tx_busy = false;
@@ -73,18 +73,18 @@ void usb_cdc_init(void)
     s_usb_mode = USB_MODE_STANDBY;
     s_rx_ring_head = 0;
     s_rx_ring_tail = 0;
-    
+
     /* USBピン設定（VBUS検出ピン） */
     R_USB_PinSet_USB0_PERI();
-    
+
     /* USB構成 */
     s_usb_ctrl.module = USB_IP0;
     s_usb_ctrl.type   = USB_PCDC;
-    
+
     s_usb_cfg.usb_mode  = USB_PERI;
     s_usb_cfg.usb_speed = USB_FS;
     s_usb_cfg.p_usb_reg = &g_usb_descriptor;
-    
+
     /* USB開始 */
     err = R_USB_Open(&s_usb_ctrl, &s_usb_cfg);
     if (USB_SUCCESS != err) {
@@ -102,15 +102,15 @@ void usb_cdc_process(void)
     static bool banner_sent = false;
     static bool rx_started = false;
     static uint32_t init_delay = 0;
-    
+
     /* 初期化後の遅延処理 */
     if (!s_cdc_configured && init_delay < 100000) {
         init_delay++;
     }
-    
+
     /* イベント取得 */
     event = R_USB_GetEvent(&s_usb_ctrl);
-    
+
     switch (event)
     {
         case USB_STS_CONFIGURED:
@@ -126,7 +126,7 @@ void usb_cdc_process(void)
                 R_USB_Write(&s_usb_ctrl, (uint8_t*)msg, strlen(msg));
             }
             break;
-            
+
         case USB_STS_WRITE_COMPLETE:
             s_tx_busy = false;
             /* バナー送信後に受信開始 */
@@ -138,7 +138,7 @@ void usb_cdc_process(void)
                 R_USB_Read(&s_usb_ctrl, s_usb_rx_buf, USB_CDC_RX_BUF_SIZE);
             }
             break;
-            
+
         case USB_STS_READ_COMPLETE:
             if (s_usb_ctrl.size > 0) {
                 usb_cdc_handle_rx(s_usb_rx_buf, s_usb_ctrl.size);
@@ -148,11 +148,11 @@ void usb_cdc_process(void)
             s_usb_ctrl.module = USB_IP0;
             R_USB_Read(&s_usb_ctrl, s_usb_rx_buf, USB_CDC_RX_BUF_SIZE);
             break;
-            
+
         case USB_STS_REQUEST:
             {
                 uint16_t request_type = s_usb_ctrl.setup.type & USB_BREQUEST;
-                
+
                 if (request_type == USB_PCDC_SET_LINE_CODING) {
                     s_usb_ctrl.type = USB_REQUEST;
                     R_USB_Read(&s_usb_ctrl, (uint8_t*)&s_line_coding, 7);
@@ -173,12 +173,12 @@ void usb_cdc_process(void)
                 }
             }
             break;
-            
+
         case USB_STS_DETACH:
             s_cdc_configured = false;
             s_tx_busy = false;
             break;
-            
+
         default:
             break;
     }
@@ -190,19 +190,23 @@ void usb_cdc_process(void)
 static void usb_cdc_handle_rx(const uint8_t *data, uint16_t len)
 {
     if (s_usb_mode == USB_MODE_STANDBY) {
-        /* 
-         * STANDBY モード: PARAM_ENTER コマンドのみチェック
-         * それ以外は完全に無視（処理負荷ゼロ）
+        /*
+         * STANDBY モード: 任意のデータ受信でパラメータモード要求
+         *
+         * 互換性のため、"PARAM_ENTER" または 任意の入力（改行など）で
+         * パラメータモードへの遷移をトリガー
+         *
+         * アプリ（FULLMONI-WIDE-Terminal）は空コマンド "" を送信して
+         * パラメータモードに入るため、この仕様が必要
          */
-        if (len >= USB_PARAM_ENTER_LEN) {
-            if (memcmp(data, USB_PARAM_ENTER_CMD, USB_PARAM_ENTER_LEN) == 0) {
-                s_param_request = true;
-            }
+        if (len > 0) {
+            /* 何らかのデータを受信したらパラメータモード要求 */
+            s_param_request = true;
         }
-        /* それ以外のデータは無視 */
+        /* 受信データ自体は無視（パラメータモード移行後に処理開始） */
         return;
     }
-    
+
     /* ACTIVE モード: リングバッファに追加 */
     for (uint16_t i = 0; i < len; i++) {
         rx_ring_push(data[i]);
@@ -215,7 +219,7 @@ static void usb_cdc_handle_rx(const uint8_t *data, uint16_t len)
 void usb_cdc_set_mode(usb_mode_t mode)
 {
     s_usb_mode = mode;
-    
+
     if (mode == USB_MODE_STANDBY) {
         /* STANDBYモードへ移行 - リングバッファクリア */
         s_rx_ring_head = 0;
@@ -259,23 +263,23 @@ void usb_cdc_send(const uint8_t *data, uint16_t len)
     if (!s_cdc_configured || s_usb_mode != USB_MODE_ACTIVE) {
         return;
     }
-    
+
     /* 前回の送信完了を待つ（タイムアウト付き） */
     uint32_t timeout = 100000;
     while (s_tx_busy && --timeout > 0) {
         usb_cdc_process();
     }
-    
+
     if (len > USB_CDC_TX_BUF_SIZE) {
         len = USB_CDC_TX_BUF_SIZE;
     }
-    
+
     memcpy(s_usb_tx_buf, data, len);
-    
+
     s_usb_ctrl.type = USB_PCDC;
     s_usb_ctrl.module = USB_IP0;
     s_tx_busy = true;
-    
+
     if (R_USB_Write(&s_usb_ctrl, s_usb_tx_buf, len) != USB_SUCCESS) {
         s_tx_busy = false;
     }
@@ -296,11 +300,11 @@ void usb_cdc_printf(const char *fmt, ...)
 {
     static char buf[256];
     va_list args;
-    
+
     va_start(args, fmt);
     int len = vsnprintf(buf, sizeof(buf), fmt, args);
     va_end(args);
-    
+
     if (len > 0) {
         usb_cdc_send((const uint8_t *)buf, len);
     }
@@ -312,13 +316,13 @@ void usb_cdc_printf(const char *fmt, ...)
 uint16_t usb_cdc_receive(uint8_t *buf, uint16_t max_len)
 {
     uint16_t count = 0;
-    
+
     while (count < max_len) {
         int c = rx_ring_pop();
         if (c < 0) break;
         buf[count++] = (uint8_t)c;
     }
-    
+
     return count;
 }
 
@@ -361,4 +365,19 @@ static uint16_t rx_ring_available(void)
     } else {
         return USB_CDC_RING_SIZE - s_rx_ring_tail + s_rx_ring_head;
     }
+}
+
+/* ============================================================
+ * USB CDC クリーンシャットダウン
+ * ============================================================ */
+void usb_cdc_shutdown(void)
+{
+    /* USB割り込みを無効化のみ（モジュール停止はしない） */
+    /* リセット後にBootloaderがUSBを再初期化するため */
+    IEN(USB0, D0FIFO0) = 0;
+    IEN(USB0, D1FIFO0) = 0;
+    IEN(USB0, USBI0) = 0;
+    
+    /* 短い待機でバッファフラッシュ */
+    R_BSP_SoftwareDelay(100, BSP_DELAY_MILLISECS);
 }

@@ -46,10 +46,9 @@
 #define WAIT_MAX_ROM_WRITE          (31200)    /* CF write timeout */
 #endif
 
-/* Force update flag (shared with Firmware via RAM2) */
-/* Address at end of RAM2 to avoid conflict with RAM2_FUNC_AREA */
-#define BL_FORCE_UPDATE_ADDR        (0x0087FFF0UL)  /* RAM2 end - 16 bytes */
-#define BL_FORCE_UPDATE_MAGIC       (0xDEADBEEFUL)
+/* 強制アップデートフラグ (RAM2領域, Firmwareと共有) */
+#define BL_FORCE_UPDATE_ADDR    (0x0087FFF0UL)
+#define BL_FORCE_UPDATE_MAGIC   (0xDEADBEEFUL)
 
 /**********************************************************************************************************************
  RAM2 Flash Write Function
@@ -610,7 +609,6 @@ void boot_loader_main(void)
 {
     flash_err_t flash_ret;
     bool force_update = false;
-    volatile uint32_t *force_flag = (volatile uint32_t *)BL_FORCE_UPDATE_ADDR;
 
     /* Enable SCI9 TX and RX for polling mode first */
     SCI9.SCR.BIT.RIE = 0U;  /* Disable RX Interrupt for polling */
@@ -631,11 +629,23 @@ void boot_loader_main(void)
     BL_LOG("  Memory: BL=128KB, App=3.875MB\r\n");
     BL_LOG("  Flash write unit: 128 bytes\r\n");
 
-    /* Check force update flag from Firmware */
+    /* Check force update flag from Firmware (RAM2) */
+    volatile uint32_t *force_flag = (volatile uint32_t *)BL_FORCE_UPDATE_ADDR;
+    
+    /* デバッグ: フラグ値を常に表示 */
+    {
+        char buf[64];
+        sprintf(buf, "DEBUG: Flag addr=0x%08lX, value=0x%08lX\r\n", 
+                (uint32_t)force_flag, *force_flag);
+        BL_LOG(buf);
+    }
+    
     if (*force_flag == BL_FORCE_UPDATE_MAGIC) {
         BL_LOG("** FORCE UPDATE FLAG DETECTED **\r\n");
         *force_flag = 0;  /* Clear flag */
         force_update = true;
+    } else {
+        BL_LOG("No force update flag\r\n");
     }
 
     /* Enable RX interrupt for ring buffer mode */

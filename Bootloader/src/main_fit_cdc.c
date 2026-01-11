@@ -26,6 +26,10 @@
 #define BL_FW_MAGIC         (0x52584657UL)   /* "RXFW" */
 #define BL_FLASH_WRITE_SIZE (128)            /* Flash write unit */
 
+/* Force update flag (shared with Firmware via RAM2) */
+#define BL_FORCE_UPDATE_ADDR    (0x0087FFF0UL)
+#define BL_FORCE_UPDATE_MAGIC   (0xDEADBEEFUL)
+
 /* FCU definitions - from boot_loader.c */
 #define FCU_CMD_AREA        ((volatile uint8_t *)0x007E0000UL)
 #define FCU_CMD_AREA_WORD   ((volatile uint16_t *)0x007E0000UL)
@@ -181,6 +185,7 @@ void main(void)
     bool rx_started = false;       /* RX started after banner */
     bool counting = false;         /* Counting delay */
     uint32_t delay_counter = 0;    /* Delay after configured */
+    bool force_update = false;     /* Force update flag */
 
     /* Enable global interrupts */
     R_BSP_InterruptsEnable();
@@ -190,11 +195,18 @@ void main(void)
         while (1);  /* Halt on Flash init error */
     }
 
+    /* Check force update flag from Firmware (RAM2) */
+    volatile uint32_t *force_flag = (volatile uint32_t *)BL_FORCE_UPDATE_ADDR;
+    if (*force_flag == BL_FORCE_UPDATE_MAGIC) {
+        *force_flag = 0;  /* Clear flag */
+        force_update = true;
+    }
+
     /*
      * ★ 起動直後にアプリチェック（USB接続不要）
-     * 有効なファームウェアがあれば即座にジャンプ
+     * 有効なファームウェアがあり、かつforce_updateフラグが無い場合のみジャンプ
      */
-    if (is_valid_image()) {
+    if (!force_update && is_valid_image()) {
         uint32_t *fw_header = (uint32_t *)BL_FW_HEADER_ADDR;
         uint32_t entry_point = fw_header[5];  /* entry_point at offset 20 */
 
@@ -206,7 +218,7 @@ void main(void)
         while (1);
     }
 
-    /* No valid firmware - initialize USB for update */
+    /* No valid firmware OR force update - initialize USB for update */
 
     /* Initialize USB configuration */
     g_usb_ctrl.module = USB_IP0;        /* Use USB0 */
@@ -566,7 +578,9 @@ void main(void)
                 counting = false;
                 banner_sent = true;
 
-                const char *banner = "\r\n=== FULLMONI Bootloader ===\r\nU=Update B=Boot R=Reset S=Status\r\n> ";
+                const char *banner = force_update ? 
+                    "\r\n=== FULLMONI Bootloader (FORCE UPDATE) ===\r\nU=Update B=Boot R=Reset S=Status\r\n> " :
+                    "\r\n=== FULLMONI Bootloader ===\r\nU=Update B=Boot R=Reset S=Status\r\n> ";
                 int len = 0;
                 while (banner[len]) {
                     g_usb_tx_buf[len] = banner[len];
@@ -584,3 +598,4 @@ void main(void)
         }
     }
 }
+

@@ -24,6 +24,11 @@
  * RTC レジスタアクセス (platform.h経由で iodefine.h を参照)
  * ============================================================ */
 
+/* 強制アップデートフラグ (RAM2領域, Bootloaderと共有) */
+/* RAM2末尾に配置 - BootloaderのFlash書き込み関数と衝突しないように */
+#define BL_FORCE_UPDATE_ADDR    (0x0087FFF0UL)  /* RAM2 end - 16 bytes */
+#define BL_FORCE_UPDATE_MAGIC   (0xDEADBEEFUL)
+
 /* コマンドラインバッファ */
 static char cmd_line[CMD_LINE_SIZE];
 static uint16_t cmd_pos = 0;
@@ -252,10 +257,9 @@ static void cmd_trip_reset(void)
  * Firmware Update (Bootloaderへの強制リブート)
  * ============================================================ */
 
-/* 強制アップデートフラグ (RAM2領域、Bootloaderと共有) */
-/* RAM2末尾に配置（BootloaderのFlash書込み関数と重複しないように） */
-#define BL_FORCE_UPDATE_ADDR    (0x0087FFF0UL)  /* RAM2 end - 16 bytes */
-#define BL_FORCE_UPDATE_MAGIC   (0xDEADBEEFUL)
+/* 強制アップデートフラグ (RSTSR2レジスタを利用、Bootloaderと共有) */
+/* RSTSR2の未使用ビット7を強制更新フラグとして使用（リセット後も保持） */
+#define BL_FORCE_UPDATE_BIT     (0x80)  /* RSTSR2 bit7 */
 
 /* 確認入力を待つ (ブロッキング) */
 static bool wait_for_confirmation(const char *expected, uint32_t timeout_sec)
@@ -268,7 +272,7 @@ static bool wait_for_confirmation(const char *expected, uint32_t timeout_sec)
     while (timeout_cnt < timeout_sec * 100) {  /* 10ms x 100 = 1sec */
         /* USB CDCポーリング */
         usb_cdc_process();
-        
+
         ch = console_getchar();
         if (ch >= 0) {
             if (ch == '\r' || ch == '\n') {
@@ -299,8 +303,11 @@ static bool wait_for_confirmation(const char *expected, uint32_t timeout_sec)
 /* ソフトウェアリセット実行 */
 static void perform_software_reset(void)
 {
-    /* 少し待機してUART出力完了を待つ */
-    R_BSP_SoftwareDelay(100, BSP_DELAY_MILLISECS);
+    /* USB送信バッファフラッシュ待機 */
+    R_BSP_SoftwareDelay(50, BSP_DELAY_MILLISECS);
+
+    /* USB周辺機能を停止 */
+    usb_cdc_shutdown();
 
     /* 割り込み禁止 */
     __builtin_rx_clrpsw('I');
@@ -336,6 +343,10 @@ static void cmd_fwupdate(void)
     param_console_print("\r\nSetting update flag...\r\n");
     volatile uint32_t *force_flag = (volatile uint32_t *)BL_FORCE_UPDATE_ADDR;
     *force_flag = BL_FORCE_UPDATE_MAGIC;
+    
+    /* デバッグ: フラグ書き込み確認 */
+    param_console_printf("DEBUG: Flag addr=0x%08lX, value=0x%08lX\r\n", 
+                        (uint32_t)force_flag, *force_flag);
 
     /* ブートローダーへリブート */
     param_console_print("Rebooting to bootloader...\r\n");
