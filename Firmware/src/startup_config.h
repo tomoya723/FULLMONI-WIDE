@@ -1,7 +1,7 @@
 /*
  * startup_config.h
  *
- *  Created on: 2026/01/11
+ *  Created on: 2025/01/11
  *      Author: FULLMONI-WIDE Project
  *
  *  Purpose: Startup screen configuration

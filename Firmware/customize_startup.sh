@@ -59,7 +59,7 @@ if [ "$EXT" != "bmp" ] && [ "$EXT" != "BMP" ]; then
 fi
 
 # スクリプトのディレクトリを取得 / Get script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 FIRMWARE_DIR="$SCRIPT_DIR"
 CUSTOM_DIR="$FIRMWARE_DIR/custom_resources/startup_images"
 TARGET_DIR="$FIRMWARE_DIR/$TARGET_AW/Resource/Image"

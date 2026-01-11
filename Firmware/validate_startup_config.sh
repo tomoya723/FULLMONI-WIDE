@@ -21,7 +21,7 @@ echo -e "${GREEN}========================================${NC}"
 echo ""
 
 # スクリプトのディレクトリを取得 / Get script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 FIRMWARE_DIR="$SCRIPT_DIR"
 
 ERRORS=0
@@ -107,8 +107,10 @@ echo ""
 echo "[7] ビルド設定 / Build Configuration"
 check_file "$FIRMWARE_DIR/src/settings.h" "設定ヘッダ / Settings header"
 if [ -f "$FIRMWARE_DIR/src/settings.h" ]; then
-    DISP_VALUE=$(grep "^#define DISP" "$FIRMWARE_DIR/src/settings.h" | awk '{print $3}' | tr -d '()')
-    if [ -n "$DISP_VALUE" ]; then
+    # より具体的なパターンで検索 / Search with more specific pattern
+    DISP_LINE=$(grep -E '^#define[[:space:]]+DISP[[:space:]]' "$FIRMWARE_DIR/src/settings.h" 2>/dev/null)
+    if [ -n "$DISP_LINE" ]; then
+        DISP_VALUE=$(echo "$DISP_LINE" | awk '{print $3}' | tr -d '()')
         echo -e "${GREEN}✓${NC} 現在の DISP 設定 / Current DISP setting: $DISP_VALUE"
         if [ "$DISP_VALUE" != "1" ] && [ "$DISP_VALUE" != "2" ]; then
             echo -e "${YELLOW}⚠${NC} DISP値が予期しない値です / Unexpected DISP value: $DISP_VALUE"

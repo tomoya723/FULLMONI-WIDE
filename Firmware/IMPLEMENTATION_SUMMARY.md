@@ -168,11 +168,6 @@ This implementation makes the following extensions easier:
 - [Firmware README](README.md)
 - [設定ヘッダ](src/startup_config.h)
 
-## 作成者 / Author
-
-- GitHub Copilot
-- Co-authored-by: tomoya723 <1127299+tomoya723@users.noreply.github.com>
-
 ## ライセンス / License
 
 このコードはプロジェクトのライセンス（MIT License）に従います。  
