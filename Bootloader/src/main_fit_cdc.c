@@ -400,19 +400,12 @@ void main(void)
                         msg = "\r\nStatus: USB OK, Flash OK\r\n> ";
                         while (msg[len]) { resp[len] = msg[len]; len++; }
                     } else if (cmd == 'U' || cmd == 'u') {
-                        /* Erase all application blocks - same as boot_loader.c */
+                        /* Erase all application blocks in one call for faster operation */
                         flash_err_t ret;
-                        bool erase_ok = true;
-                        uint32_t fail_block = 0;
+                        bool erase_ok;
 
-                        for (uint32_t i = 0; i < BL_APP_BLOCKS && erase_ok; i++) {
-                            uint32_t addr = BL_APP_START + (i * BL_FLASH_BLOCK_SIZE);
-                            ret = R_FLASH_Erase((flash_block_address_t)addr, 1);
-                            if (ret != FLASH_SUCCESS) {
-                                erase_ok = false;
-                                fail_block = i;
-                            }
-                        }
+                        ret = R_FLASH_Erase((flash_block_address_t)BL_APP_START, BL_APP_BLOCKS);
+                        erase_ok = (ret == FLASH_SUCCESS);
 
                         if (erase_ok) {
                             /* Enter update mode */
@@ -427,22 +420,9 @@ void main(void)
                             msg = "\r\nErase OK! Send size+firmware\r\n";
                             while (msg[len]) { resp[len] = msg[len]; len++; }
                         } else {
-                            /* Show which block failed */
-                            resp[len++] = '\r';
-                            resp[len++] = '\n';
-                            resp[len++] = 'F';
-                            resp[len++] = 'a';
-                            resp[len++] = 'i';
-                            resp[len++] = 'l';
-                            resp[len++] = ' ';
-                            resp[len++] = 'B';
-                            resp[len++] = '=';
-                            resp[len++] = '0' + (fail_block / 100) % 10;
-                            resp[len++] = '0' + (fail_block / 10) % 10;
-                            resp[len++] = '0' + fail_block % 10;
-                            resp[len++] = ' ';
-                            resp[len++] = 'E';
-                            resp[len++] = '=';
+                            /* Show erase failure */
+                            msg = "\r\nFail E=";
+                            while (msg[len]) { resp[len] = msg[len]; len++; }
                             resp[len++] = '0' + ret;
                             resp[len++] = '\r';
                             resp[len++] = '\n';

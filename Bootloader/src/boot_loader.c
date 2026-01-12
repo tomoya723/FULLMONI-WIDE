@@ -350,32 +350,22 @@ static void buf_init(void)
 
 /**********************************************************************************************************************
  * Function Name: erase_app_area
- * Description  : Erase application area (120 blocks x 32KB = 3.75MB)
+ * Description  : Erase application area (124 blocks x 32KB = 3.875MB)
  * Return Value : BL_SUCCESS or BL_ERR_FLASH
  *********************************************************************************************************************/
 static e_bl_err_t erase_app_area(void)
 {
     flash_err_t ret;
-    uint32_t block_addr;
 
     BL_LOG("Erasing application area...\r\n");
     BL_LOG("  Address: 0x%08lX - 0x%08lX\r\n", BL_APP_START, BL_APP_END);
     BL_LOG("  Blocks: %d x 32KB\r\n", BL_APP_BLOCKS);
 
-    /* Erase each block */
-    for (uint32_t i = 0; i < BL_APP_BLOCKS; i++) {
-        block_addr = BL_APP_START + (i * BL_FLASH_BLOCK_SIZE);
-
-        ret = R_FLASH_Erase((flash_block_address_t)block_addr, 1);
-        if (ret != FLASH_SUCCESS) {
-            BL_LOG("\r\nERROR: Erase failed at 0x%08lX (err=%d)\r\n", block_addr, ret);
-            return BL_ERR_FLASH;
-        }
-
-        /* Progress indicator */
-        if ((i % 10) == 0) {
-            BL_LOG(".");
-        }
+    /* Erase all blocks in one call for faster operation */
+    ret = R_FLASH_Erase((flash_block_address_t)BL_APP_START, BL_APP_BLOCKS);
+    if (ret != FLASH_SUCCESS) {
+        BL_LOG("\r\nERROR: Erase failed (err=%d)\r\n", ret);
+        return BL_ERR_FLASH;
     }
 
     BL_LOG("\r\nErase complete!\r\n");

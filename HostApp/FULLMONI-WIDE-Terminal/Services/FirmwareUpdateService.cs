@@ -296,9 +296,9 @@ public class FirmwareUpdateService
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                // Flash消去中の進捗を推定（約刀6秒かかる）
+                // Flash消去中の進捗を推定（約2秒かかる）
                 var eraseElapsed = (DateTime.Now - eraseStartTime).TotalSeconds;
-                var eraseProgress = Math.Min((int)(eraseElapsed / 6.0 * (PhaseFlashErase - PhaseBootloaderSwitch - 1)), PhaseFlashErase - PhaseBootloaderSwitch - 2);
+                var eraseProgress = Math.Min((int)(eraseElapsed / 2.0 * (PhaseFlashErase - PhaseBootloaderSwitch - 1)), PhaseFlashErase - PhaseBootloaderSwitch - 2);
                 ProgressChanged?.Invoke(this, PhaseBootloaderSwitch + 1 + eraseProgress);
 
                 var received = GetReceivedString(receivedData);
