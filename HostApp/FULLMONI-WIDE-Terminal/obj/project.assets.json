@@ -281,26 +281,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\tomoy\\.nuget\\packages\\": {}
+    "/home/runner/work/FULLMONI-WIDE/.codeql-scratch/dbs/csharp/working/packages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\tomoy\\git\\FULLMONI-WIDE\\HostApp\\FULLMONI-WIDE-Terminal\\FULLMONI-WIDE-Terminal.csproj",
+      "projectUniqueName": "/home/runner/work/FULLMONI-WIDE/FULLMONI-WIDE/HostApp/FULLMONI-WIDE-Terminal/FULLMONI-WIDE-Terminal.csproj",
       "projectName": "FULLMONI-WIDE-Terminal",
-      "projectPath": "C:\\Users\\tomoy\\git\\FULLMONI-WIDE\\HostApp\\FULLMONI-WIDE-Terminal\\FULLMONI-WIDE-Terminal.csproj",
-      "packagesPath": "C:\\Users\\tomoy\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\tomoy\\git\\FULLMONI-WIDE\\HostApp\\FULLMONI-WIDE-Terminal\\obj\\",
+      "projectPath": "/home/runner/work/FULLMONI-WIDE/FULLMONI-WIDE/HostApp/FULLMONI-WIDE-Terminal/FULLMONI-WIDE-Terminal.csproj",
+      "packagesPath": "/home/runner/work/FULLMONI-WIDE/.codeql-scratch/dbs/csharp/working/packages",
+      "outputPath": "/home/runner/work/FULLMONI-WIDE/FULLMONI-WIDE/HostApp/FULLMONI-WIDE-Terminal/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\tomoy\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "/home/runner/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0-windows"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -345,6 +343,24 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[8.0.22, 8.0.22]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.linux-x64",
+            "version": "[8.0.22, 8.0.22]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[8.0.22, 8.0.22]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[8.0.22, 8.0.22]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
@@ -353,7 +369,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.101/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
