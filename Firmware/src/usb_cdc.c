@@ -24,7 +24,8 @@
 #define USB_CDC_RING_SIZE       512
 
 /* USB制御構造体 */
-static usb_ctrl_t s_usb_ctrl;
+static usb_ctrl_t s_usb_ctrl;      /* 受信・イベント用 */
+static usb_ctrl_t s_usb_tx_ctrl;   /* 送信専用 */
 static usb_cfg_t  s_usb_cfg;
 
 /* USB記述子（外部定義） */
@@ -52,6 +53,11 @@ static volatile bool s_cdc_configured = false;
 static volatile bool s_tx_busy = false;
 static volatile bool s_param_request = false;
 static volatile usb_mode_t s_usb_mode = USB_MODE_STANDBY;
+
+/* デバッグ用カウンタ (imgread検証用) */
+volatile uint32_t s_usb_write_success = 0;
+volatile uint32_t s_usb_write_errors = 0;
+volatile uint32_t s_usb_write_complete_count = 0;
 
 /* 内部関数 */
 static void usb_cdc_handle_rx(const uint8_t *data, uint16_t len);
@@ -117,18 +123,19 @@ void usb_cdc_process(void)
             s_cdc_configured = true;
             banner_sent = false;
             rx_started = false;
-            /* ウェルカムメッセージ送信 */
+            /* ウェルカムメッセージ送信（送信専用構造体を使用） */
             {
                 const char *msg = "\r\n[FULLMONI-WIDE] USB CDC Ready. Send 'PARAM_ENTER' to enter parameter mode.\r\n";
-                s_usb_ctrl.type = USB_PCDC;
-                s_usb_ctrl.module = USB_IP0;
+                s_usb_tx_ctrl.type = USB_PCDC;
+                s_usb_tx_ctrl.module = USB_IP0;
                 s_tx_busy = true;
-                R_USB_Write(&s_usb_ctrl, (uint8_t*)msg, strlen(msg));
+                R_USB_Write(&s_usb_tx_ctrl, (uint8_t*)msg, strlen(msg));
             }
             break;
 
         case USB_STS_WRITE_COMPLETE:
             s_tx_busy = false;
+            s_usb_write_complete_count++;  /* 送信完了カウント */
             /* バナー送信後に受信開始 */
             if (!rx_started && s_cdc_configured) {
                 rx_started = true;
@@ -264,10 +271,18 @@ void usb_cdc_send(const uint8_t *data, uint16_t len)
         return;
     }
 
-    /* 前回の送信完了を待つ（タイムアウト付き） */
-    uint32_t timeout = 100000;
-    while (s_tx_busy && --timeout > 0) {
+    /* 前回の送信完了を待つ（タイムアウトなし - 必ず待つ） */
+    uint32_t wait_count = 0;
+    uint32_t total_wait = 0;
+    while (s_tx_busy) {
         usb_cdc_process();
+        wait_count++;
+        total_wait++;
+        if (wait_count > 10000) {
+            /* 長時間待っている場合は少し遅延を入れる */
+            R_BSP_SoftwareDelay(1, BSP_DELAY_MILLISECS);
+            wait_count = 0;
+        }
     }
 
     if (len > USB_CDC_TX_BUF_SIZE) {
@@ -276,12 +291,74 @@ void usb_cdc_send(const uint8_t *data, uint16_t len)
 
     memcpy(s_usb_tx_buf, data, len);
 
-    s_usb_ctrl.type = USB_PCDC;
-    s_usb_ctrl.module = USB_IP0;
+    /* 送信専用の制御構造体を使用（受信処理と分離） */
+    s_usb_tx_ctrl.type = USB_PCDC;
+    s_usb_tx_ctrl.module = USB_IP0;
     s_tx_busy = true;
 
-    if (R_USB_Write(&s_usb_ctrl, s_usb_tx_buf, len) != USB_SUCCESS) {
+    usb_err_t result = R_USB_Write(&s_usb_tx_ctrl, s_usb_tx_buf, len);
+    if (result != USB_SUCCESS) {
         s_tx_busy = false;
+        /* デバッグ: エラー発生時にカウント */
+        s_usb_write_errors++;
+    } else {
+        s_usb_write_success++;
+    }
+}
+
+/*
+ * USB CDC Zero-Length Packet送信 (バルク転送終端用)
+ * USBバルク転送で最後のパケットが64バイト丁度の場合、
+ * ホストは転送終了を認識できない。ZLPを送信して強制的に終端を示す。
+ */
+void usb_cdc_send_zlp(void)
+{
+    if (!s_cdc_configured || s_usb_mode != USB_MODE_ACTIVE) {
+        return;
+    }
+
+    /* 前回の送信完了を待つ */
+    uint32_t wait_count = 0;
+    while (s_tx_busy) {
+        usb_cdc_process();
+        wait_count++;
+        if (wait_count > 10000) {
+            R_BSP_SoftwareDelay(1, BSP_DELAY_MILLISECS);
+            wait_count = 0;
+        }
+    }
+
+    /* ZLP (0バイト) を送信 */
+    s_usb_tx_ctrl.type = USB_PCDC;
+    s_usb_tx_ctrl.module = USB_IP0;
+    s_tx_busy = true;
+
+    if (R_USB_Write(&s_usb_tx_ctrl, s_usb_tx_buf, 0) != USB_SUCCESS) {
+        s_tx_busy = false;
+    }
+
+    /* ZLP送信完了を待つ */
+    wait_count = 0;
+    while (s_tx_busy) {
+        usb_cdc_process();
+        wait_count++;
+        if (wait_count > 10000) {
+            R_BSP_SoftwareDelay(1, BSP_DELAY_MILLISECS);
+            wait_count = 0;
+        }
+    }
+}
+
+/*
+ * USB CDC 送信完了待ち
+ */
+void usb_cdc_flush_tx(void)
+{
+    uint32_t timeout = 100000;  /* タイムアウトカウンタ */
+
+    while (s_tx_busy && timeout > 0) {
+        usb_cdc_process();
+        timeout--;
     }
 }
 
@@ -365,6 +442,15 @@ static uint16_t rx_ring_available(void)
     } else {
         return USB_CDC_RING_SIZE - s_rx_ring_tail + s_rx_ring_head;
     }
+}
+
+/*
+ * USB CDC 受信バッファクリア
+ */
+void usb_cdc_flush_rx(void)
+{
+    s_rx_ring_head = 0;
+    s_rx_ring_tail = 0;
 }
 
 /* ============================================================

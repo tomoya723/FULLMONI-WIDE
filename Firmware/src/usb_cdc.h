@@ -68,6 +68,18 @@ bool usb_cdc_is_connected(void);
 void usb_cdc_send(const uint8_t *data, uint16_t len);
 
 /*
+ * USB CDC 送信完了待ち
+ * 現在の送信が完了するまでブロック
+ */
+void usb_cdc_flush_tx(void);
+
+/*
+ * USB CDC Zero-Length Packet送信
+ * バルク転送終了を明示的に通知する
+ */
+void usb_cdc_send_zlp(void);
+
+/*
  * USB CDC 文字列送信
  */
 void usb_cdc_print(const char *str);
@@ -88,6 +100,12 @@ uint16_t usb_cdc_receive(uint8_t *buf, uint16_t max_len);
  * 戻り値: 受信した文字、データなしの場合 -1
  */
 int usb_cdc_getchar(void);
+
+/*
+ * USB CDC 受信バッファクリア
+ * バッファに溜まっているデータを破棄
+ */
+void usb_cdc_flush_rx(void);
 
 /*
  * USB CDC クリーンシャットダウン

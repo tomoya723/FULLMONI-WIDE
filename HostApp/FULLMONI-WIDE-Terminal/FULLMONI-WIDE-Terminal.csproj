@@ -13,7 +13,14 @@
     <AssemblyName>FULLMONI-WIDE-Terminal</AssemblyName>
     <Version>1.0.0</Version>
     <ApplicationIcon>Assets\FMW.ico</ApplicationIcon>
+    <!-- デフォルトはDebugビルド -->
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
   </PropertyGroup>
+
+  <!-- Releaseビルドを禁止 -->
+  <Target Name="PreventReleaseBuild" BeforeTargets="BeforeBuild" Condition="'$(Configuration)' == 'Release'">
+    <Error Text="Releaseビルドは禁止されています。Debugビルドを使用してください: dotnet build -c Debug" />
+  </Target>
 
   <ItemGroup>
     <Resource Include="Assets\FMW.ico" />
