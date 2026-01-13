@@ -302,3 +302,13 @@ Both environments can be used interchangeably:<br>
 - The `.vscode/` directory is version-controlled for team collaboration
 - Build artifacts in `Firmware/HardwareDebug/` are shared between both IDEs
 - E2 Lite debugger can be used by only one IDE at a time
+
+***
+## 技術ドキュメント / Technical Documentation
+
+### emWinリソースとメモリ配置
+- **[emWin画像リソースの物理アドレスについて](docs/EMWIN_RESOURCE_ADDRESS.md)** - emWin画像リソースのメモリアドレス配置とコンパイル時の動作に関する詳細説明
+
+### パラメータとファームウェア更新
+- **[パラメータコンソール](docs/PARAM_CONSOLE.md)** - USB CDC経由のパラメータ設定コマンド仕様
+- **[起動画面書き込み機能](docs/STARTUP_IMAGE_WRITE.md)** - 起動画面のフラッシュ書き込みプロトコルと実装ガイド
