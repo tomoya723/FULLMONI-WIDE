@@ -1,7 +1,7 @@
 # emWin画像リソースの物理アドレスについて
 
 ## 質問
-emWinの画像リソースをコンパイル後実装される物理アドレスは、コンパイル事に変動する可能性はあるか？もしくは固定アドレスか？
+emWinの画像リソースをコンパイル後実装される物理アドレスは、コンパイルごとに変動する可能性はあるか？もしくは固定アドレスか？
 
 ## 結論
 
@@ -191,10 +191,10 @@ GUI_CONST_STORAGE unsigned char acmtc[391696UL + 1] = {
 
 ## 参考コード
 
-- **リンカスクリプト**: `Firmware/src/linker_script.ld` (60-68行目)
-- **画像リソース定義**: `Firmware/aw001/Resource/Image/mtc.c` (20行目)
-- **実行時アドレス取得**: `Firmware/src/startup_image_write.c` (576行目)
-- **アドレス情報表示**: `Firmware/src/startup_image_write.c` (369行目)
+- **リンカスクリプト**: `Firmware/src/linker_script.ld` (`.rodata`セクション定義)
+- **画像リソース定義**: `Firmware/aw001/Resource/Image/mtc.c` (`acmtc`配列宣言)
+- **実行時アドレス取得**: `Firmware/src/startup_image_write.c` (`startup_image_write_mode()`関数内)
+- **アドレス情報表示**: `Firmware/src/startup_image_write.c` (`startup_image_show_info()`関数)
 
 ## 関連ドキュメント
 
