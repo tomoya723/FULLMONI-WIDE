@@ -27,6 +27,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public SerialPortService SerialService => _serialService;
 
     /// <summary>
+    /// 起動画面書き込みViewModel
+    /// </summary>
+    public StartupImageViewModel StartupImageViewModel { get; }
+
+    /// <summary>
     /// アプリバージョン
     /// </summary>
     public string AppVersion => Assembly.GetExecutingAssembly()
@@ -44,6 +49,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         _serialService = new SerialPortService();
         _responseBuffer = new StringBuilder();
+
+        // 起動画面書き込みViewModelを初期化
+        StartupImageViewModel = new StartupImageViewModel(_serialService);
 
         // イベント登録
         _serialService.DataReceived += SerialService_DataReceived;
@@ -331,9 +339,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         var received = _responseBuffer.ToString();
 
-        // デバッグ: 受信内容をログ出力
-        System.Diagnostics.Debug.WriteLine($"[DetectConnectionMode] Received ({received.Length} chars): {received.Replace("\r", "\\r").Replace("\n", "\\n")}");
-
         // Bootloaderの特徴的な文字列をチェック
         // 実際のBootloader出力: "=== FULLMONI Bootloader ===" "U=Update B=Boot R=Reset S=Status"
         if (received.Contains("Bootloader") ||
@@ -344,12 +349,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
             IsBootloaderMode = true;
             StatusText = $"Bootloaderモード ({SelectedPort})";
             ActivityStatus = "⚠️ Bootloaderモードで接続 - ファームウェア更新タブを使用してください";
-            System.Diagnostics.Debug.WriteLine("[DetectConnectionMode] -> Bootloader mode detected!");
             return;
         }
 
         // Firmwareとして接続 - パラメータ取得
-        System.Diagnostics.Debug.WriteLine("[DetectConnectionMode] -> Firmware mode, loading parameters...");
         ActivityStatus = "✅ Firmwareモード - パラメータを取得中...";
         await LoadParametersInternal();
     }
@@ -1157,6 +1160,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 _serialService.ConnectionChanged -= SerialService_ConnectionChanged;
                 _serialService.ErrorOccurred -= SerialService_ErrorOccurred;
                 _serialService.Dispose();
+                StartupImageViewModel.Dispose();
             }
             _disposed = true;
         }

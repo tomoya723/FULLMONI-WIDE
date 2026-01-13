@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FullmoniTerminal"
         xmlns:vm="clr-namespace:FullmoniTerminal.ViewModels"
+        xmlns:views="clr-namespace:FullmoniTerminal.Views"
         mc:Ignorable="d"
         Title="FULLMONI-WIDE Terminal"
         Height="640" Width="480"
@@ -89,7 +90,7 @@
         </Border>
 
         <!-- タブコントロール -->
-        <TabControl Grid.Row="1" Margin="0,0,0,6">
+        <TabControl Grid.Row="1" Margin="0,0,0,6" SelectedIndex="4">
             <!-- タブ1: ステータス -->
             <TabItem Header="ステータス" IsEnabled="{Binding IsFirmwareMode}">
                 <Grid Margin="8">
@@ -342,7 +343,12 @@
                 </Grid>
             </TabItem>
 
-            <!-- タブ3: ファームウェア更新 -->
+            <!-- タブ3: 起動画面変更 -->
+            <TabItem Header="起動画面変更" IsEnabled="{Binding IsFirmwareMode}">
+                <views:StartupImageView DataContext="{Binding StartupImageViewModel}" />
+            </TabItem>
+
+            <!-- タブ4: ファームウェア更新 -->
             <TabItem Header="ファームウェア更新">
                 <Grid Margin="8">
                     <Grid.RowDefinitions>

@@ -15,6 +15,7 @@
 #include "usb_cdc.h"  /* USB CDC driver */
 #include "platform.h"   /* iodefine.h (RTC access, SYSTEM for software reset) */
 #include "firmware_version.h"
+#include "startup_image_write.h"  /* 起動画像書き込み */
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -90,6 +91,9 @@ static void cmd_help(void)
     param_console_print("  trip              - Show TRIP value\r\n");
     param_console_print("  trip_reset        - Reset TRIP to 0\r\n");
     param_console_print("  fwupdate          - Erase flash and reboot to bootloader\r\n");
+    param_console_print("  imgwrite          - Write startup image to flash\r\n");
+    param_console_print("  imgread           - Read startup image from flash\r\n");
+    param_console_print("  mtcinfo           - Show startup image info\r\n");
     param_console_print("  exit              - Exit parameter mode\r\n");
     param_console_print("\r\nParameter IDs:\r\n");
     param_console_print("  tyre_width, tyre_aspect, tyre_rim\r\n");
@@ -423,6 +427,15 @@ static void parse_command(const char *line)
         cmd_trip_reset();
     } else if (strcmp(cmd, "fwupdate") == 0) {
         cmd_fwupdate();
+    } else if (strcmp(cmd, "imgwrite") == 0) {
+        /* 起動画像書き込みモード */
+        startup_image_write_mode();
+    } else if (strcmp(cmd, "imgread") == 0) {
+        /* 起動画像読み出しモード */
+        startup_image_read_mode();
+    } else if (strcmp(cmd, "mtcinfo") == 0) {
+        /* 起動画像情報表示 */
+        startup_image_show_info();
     } else if (strcmp(cmd, "debug_eeprom") == 0) {
         /* レガシー領域(0x0000)の生データを表示 */
         extern void debug_dump_legacy_eeprom(void);

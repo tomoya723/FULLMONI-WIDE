@@ -105,11 +105,14 @@ public class SerialPortService : IDisposable
                 Parity = Parity.None,
                 StopBits = StopBits.One,
                 Handshake = Handshake.None,     // USB CDC ではフロー制御不要
+                DtrEnable = true,               // DTRを有効化（USB CDCで受信有効化に必要な場合がある）
+                RtsEnable = true,               // RTSも有効化
                 ReadTimeout = 500,
                 WriteTimeout = 5000,            // ファームウェア転送用に長めに設定
-                WriteBufferSize = 8192,         // 書き込みバッファを大きく
-                ReadBufferSize = 8192,          // 読み込みバッファも大きく
-                Encoding = System.Text.Encoding.ASCII,
+                WriteBufferSize = 65536,        // 書き込みバッファを大きく（64KB）
+                ReadBufferSize = 524288,        // 読み込みバッファを大きく（512KB）- 画像転送用
+                ReceivedBytesThreshold = 1,     // 1バイトでもあればイベント発火
+                Encoding = System.Text.Encoding.Latin1, // バイナリ転送対応（0x00-0xFF全て保持）
                 NewLine = "\r\n"
             };
 
@@ -191,10 +194,32 @@ public class SerialPortService : IDisposable
         try
         {
             _serialPort.Write(data, 0, data.Length);
+            _serialPort.BaseStream.Flush();  // 確実に送信
         }
         catch (Exception ex)
         {
             ErrorOccurred?.Invoke(this, $"Send error: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 受信バッファをクリア
+    /// </summary>
+    public void DiscardBuffers()
+    {
+        if (_serialPort?.IsOpen != true)
+        {
+            return;
+        }
+
+        try
+        {
+            _serialPort.DiscardInBuffer();
+            _serialPort.DiscardOutBuffer();
+        }
+        catch
+        {
+            // Ignore
         }
     }
 
@@ -215,6 +240,134 @@ public class SerialPortService : IDisposable
         catch
         {
             // Ignore
+        }
+    }
+
+    /// <summary>
+    /// 受信可能なバイト数を取得
+    /// </summary>
+    public int BytesToRead => _serialPort?.BytesToRead ?? 0;
+
+    /// <summary>
+    /// BaseStreamから直接データを読み取る（バイナリ転送用）
+    /// イベントベースよりも確実にデータを受信できる
+    /// </summary>
+    /// <param name="buffer">受信バッファ</param>
+    /// <param name="offset">バッファ内のオフセット</param>
+    /// <param name="count">読み取る最大バイト数</param>
+    /// <returns>実際に読み取ったバイト数</returns>
+    public int ReadDirect(byte[] buffer, int offset, int count)
+    {
+        if (_serialPort?.IsOpen != true)
+        {
+            return 0;
+        }
+
+        try
+        {
+            int bytesToRead = _serialPort.BytesToRead;
+            if (bytesToRead <= 0)
+            {
+                return 0;
+            }
+
+            int toRead = Math.Min(bytesToRead, count);
+            return _serialPort.Read(buffer, offset, toRead);
+        }
+        catch
+        {
+            return 0;
+        }
+    }
+
+    /// <summary>
+    /// BaseStreamから指定バイト数を読み取る（タイムアウト付き）
+    /// BytesToReadがある場合はSerialPort.Readで一括読み取り
+    /// </summary>
+    /// <param name="buffer">受信バッファ</param>
+    /// <param name="offset">バッファ内のオフセット</param>
+    /// <param name="count">読み取る最大バイト数</param>
+    /// <param name="timeoutMs">タイムアウト(ms)</param>
+    /// <returns>実際に読み取ったバイト数</returns>
+    public async Task<int> ReadDirectAsync(byte[] buffer, int offset, int count, int timeoutMs = 100)
+    {
+        if (_serialPort?.IsOpen != true)
+        {
+            return 0;
+        }
+
+        try
+        {
+            // まずBytesToReadをチェック - データがあれば即座に読み取り
+            int available = _serialPort.BytesToRead;
+            if (available > 0)
+            {
+                int toRead = Math.Min(available, count);
+                int bytesRead = _serialPort.Read(buffer, offset, toRead);
+                return bytesRead;
+            }
+
+            // データがない場合はタイムアウトまで待機
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            while (sw.ElapsedMilliseconds < timeoutMs)
+            {
+                available = _serialPort.BytesToRead;
+                if (available > 0)
+                {
+                    int toRead = Math.Min(available, count);
+                    int bytesRead = _serialPort.Read(buffer, offset, toRead);
+                    return bytesRead;
+                }
+                await Task.Delay(1);
+            }
+
+            return 0;
+        }
+        catch (Exception)
+        {
+            return 0;
+        }
+    }
+
+    /// <summary>
+    /// DataReceivedイベントを一時的に無効化（直接読み取りモード用）
+    /// </summary>
+    public void SuspendDataReceivedEvent()
+    {
+        if (_serialPort != null)
+        {
+            _serialPort.DataReceived -= SerialPort_DataReceived;
+        }
+    }
+
+    /// <summary>
+    /// ドライババッファ内のデータバイト数を取得
+    /// </summary>
+    public int GetBytesToRead()
+    {
+        if (_serialPort?.IsOpen != true)
+        {
+            return -1;
+        }
+        try
+        {
+            return _serialPort.BytesToRead;
+        }
+        catch
+        {
+            return -1;
+        }
+    }
+
+    /// <summary>
+    /// DataReceivedイベントを再開
+    /// </summary>
+    public void ResumeDataReceivedEvent()
+    {
+        if (_serialPort != null)
+        {
+            _serialPort.DataReceived -= SerialPort_DataReceived;  // 重複防止
+            _serialPort.DataReceived += SerialPort_DataReceived;
         }
     }
 

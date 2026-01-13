@@ -128,6 +128,78 @@ Set the "DISP" number appropriately.<br>
 ![image](https://github.com/user-attachments/assets/4bc4fe29-edbc-4c54-9ac6-5f0a8b6d810b)<br>
 
 ***
+## Startup Image Transfer Protocol (imgread/imgwrite)
+
+FULLMONI-WIDEは、USB CDC経由で起動画面の読み取り・書き込みをサポートしています。
+
+### コマンド一覧
+
+| コマンド | 説明 |
+|---------|------|
+| `imgwrite` | 起動画面書き込みモード開始 |
+| `imgread` | 起動画面読み取りモード開始 |
+
+### 画像フォーマット
+
+| 項目 | 値 |
+|------|-----|
+| 解像度 | 765×256 ピクセル |
+| 色深度 | RGB565 (16bit/pixel) |
+| ヘッダ | 16バイト (SEGGER AppWizard形式) |
+| 総サイズ | 391,696バイト |
+
+### 転送プロトコル（書き込み: imgwrite）
+
+1. **コマンド送信**: `imgwrite\r\n`
+2. **応答待ち**: `IMGWRITE_READY`
+3. **サイズ送信**: 4バイト (リトルエンディアン、391,696)
+4. **データ転送**: 64バイトチャンク × 3ms間隔
+5. **CRC送信**: CRC-16/CCITT-FALSE (2バイト)
+6. **終端マーカー**: `0xED 0x0F 0xAA 0x55`
+7. **完了応答**: `IMGWRITE_OK` または `IMGWRITE_FAIL`
+
+### 転送プロトコル（読み取り: imgread）
+
+1. **コマンド送信**: `imgread\r\n`
+2. **応答待ち**: `IMGREAD_READY`
+3. **サイズ受信**: 4バイト (リトルエンディアン)
+4. **データ受信**: 64バイトチャンク × 3ms間隔
+5. **CRC受信**: CRC-16/CCITT-FALSE (2バイト)
+6. **終端マーカー**: `0xED 0x0F 0xAA 0x55`
+
+### CRC計算
+
+```c
+// CRC-16/CCITT-FALSE
+// 多項式: 0x1021, 初期値: 0xFFFF
+uint16_t crc16_ccitt(const uint8_t *data, size_t len) {
+    uint16_t crc = 0xFFFF;
+    for (size_t i = 0; i < len; i++) {
+        crc ^= (uint16_t)data[i] << 8;
+        for (int j = 0; j < 8; j++) {
+            if (crc & 0x8000)
+                crc = (crc << 1) ^ 0x1021;
+            else
+                crc <<= 1;
+        }
+    }
+    return crc;
+}
+```
+
+### メモリ配置
+
+| 領域 | アドレス | サイズ |
+|------|----------|--------|
+| 起動画面データ | 0xFFE00000 (Linear Flash) | 391,696バイト |
+| RAM2 (転送バッファ) | 0x00800000 | 8KB (4KB関数 + 4KB prefix) |
+
+### 実装ファイル
+
+- `Firmware/src/startup_image_write.c` - imgwrite/imgread コマンド処理
+- `HostApp/.../Services/StartupImageService.cs` - ホスト側転送サービス
+
+***
 ## Development with Visual Studio Code
 
 This project supports development using Visual Studio Code alongside e² studio. The VSCode environment provides IntelliSense, building, and hardware debugging capabilities.

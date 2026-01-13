@@ -84,8 +84,7 @@ public class FirmwareUpdateService
             uint magic = BitConverter.ToUInt32(data, 0);
             if (magic != 0x52584657)
             {
-                // 警告のみ - マジックがなくても続行可能
-                System.Diagnostics.Debug.WriteLine($"警告: ファームウェアヘッダマジックが見つかりません (0x{magic:X8})");
+                // マジックがなくても続行可能
             }
         }
 

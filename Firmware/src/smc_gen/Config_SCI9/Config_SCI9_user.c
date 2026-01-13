@@ -152,6 +152,8 @@ void r_Config_SCI9_receiveerror_interrupt(void)
 static void r_Config_SCI9_callback_transmitend(void)
 {
     /* Start user code for r_Config_SCI9_callback_transmitend. Do not edit comment generated here */
+    extern void sci9_debug_tx_callback(void);
+    sci9_debug_tx_callback();
     /* End user code. Do not edit comment generated here */
 }
 
