@@ -64,3 +64,5 @@ Firmware/src/**/GUI/**
 # Android build files
 HostApp/FULLMONI-WIDE-Android/.gradle/
 HostApp/FULLMONI-WIDE-Android/local.properties
+# PR作成用一時ファイル
+pr_body.md
