@@ -15,6 +15,8 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
     private readonly StartupImageService _imageService;
     private CancellationTokenSource? _cancellationTokenSource;
     private bool _disposed;
+    private byte[]? _loadedBmpData;  // デバイスから読み込んだBMPデータ
+    private byte[]? _loadedAppWizardData;  // デバイスから読み込んだAppWizardデータ（書き戻し用）
 
     public StartupImageViewModel(SerialPortService serialService)
     {
@@ -58,6 +60,7 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(CanWrite));
         OnPropertyChanged(nameof(CanCancel));
         OnPropertyChanged(nameof(CanRead));
+        OnPropertyChanged(nameof(CanSave));
     }
 
     [ObservableProperty]
@@ -72,9 +75,10 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
     public bool CanSelectImage => !IsWriting;
 
     /// <summary>
-    /// 書き込み可能かどうか
+    /// 書き込み可能かどうか（ファイル選択または読み込みデータがある場合）
     /// </summary>
-    public bool CanWrite => IsConnected && !string.IsNullOrEmpty(ImageFilePath) && !IsWriting;
+    public bool CanWrite => IsConnected && !IsWriting &&
+        (!string.IsNullOrEmpty(ImageFilePath) || _loadedAppWizardData != null);
 
     /// <summary>
     /// キャンセル可能かどうか
@@ -85,6 +89,11 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
     /// 読み込み可能かどうか
     /// </summary>
     public bool CanRead => IsConnected && !IsWriting;
+
+    /// <summary>
+    /// BMP保存可能かどうか
+    /// </summary>
+    public bool CanSave => _loadedBmpData != null && !IsWriting;
 
     #endregion
 
@@ -137,7 +146,13 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private async Task WriteImage()
     {
-        if (!IsConnected || string.IsNullOrEmpty(ImageFilePath) || IsWriting)
+        if (!IsConnected || IsWriting)
+        {
+            return;
+        }
+
+        // ファイルパスもロードデータもない場合は終了
+        if (string.IsNullOrEmpty(ImageFilePath) && _loadedAppWizardData == null)
         {
             return;
         }
@@ -170,9 +185,19 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
 
         try
         {
-            // BMPデータを読み込み
-            var imageData = await Task.Run(() =>
-                StartupImageService.LoadAndValidateBmp(ImageFilePath));
+            // 画像データを準備（ロード済みデータがあればそれを使用、なければファイルから読み込み）
+            byte[] imageData;
+            if (_loadedAppWizardData != null)
+            {
+                imageData = _loadedAppWizardData;
+                AppendLog("読み込み済みデータを使用");
+            }
+            else
+            {
+                imageData = await Task.Run(() =>
+                    StartupImageService.LoadAndValidateBmp(ImageFilePath));
+                AppendLog($"ファイルから読み込み: {ImageFilePath}");
+            }
 
             // フラッシュに書き込み
             await _imageService.WriteToFlashAsync(imageData, _cancellationTokenSource.Token);
@@ -261,6 +286,45 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
+    private void SaveImage()
+    {
+        if (_loadedBmpData == null)
+        {
+            StatusMessage = "保存する画像がありません";
+            return;
+        }
+
+        var dialog = new Microsoft.Win32.SaveFileDialog
+        {
+            Filter = "BMPファイル (*.bmp)|*.bmp",
+            Title = "起動画面をBMPで保存",
+            FileName = $"startup_image_{DateTime.Now:yyyyMMdd_HHmmss}.bmp"
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            try
+            {
+                System.IO.File.WriteAllBytes(dialog.FileName, _loadedBmpData);
+                StatusMessage = $"画像を保存しました: {dialog.FileName}";
+                AppendLog($"BMPを保存: {dialog.FileName}");
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"保存エラー: {ex.Message}";
+                AppendLog($"保存エラー: {ex.Message}");
+
+                MessageBox.Show(
+                    Application.Current.MainWindow,
+                    $"画像の保存に失敗しました。\n\n{ex.Message}",
+                    "エラー",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+    }
+
+    [RelayCommand]
     private async Task ReadFromDevice()
     {
         if (!IsConnected || IsWriting)
@@ -288,6 +352,12 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
             // AppWizard形式からBMPに変換してプレビュー表示
             var bmpData = AppWizardImageConverter.ConvertAppWizardToBmp(imageData);
 
+            // データを保持（保存・書き戻し用）
+            _loadedBmpData = bmpData;
+            _loadedAppWizardData = imageData;
+            OnPropertyChanged(nameof(CanSave));
+            OnPropertyChanged(nameof(CanWrite));
+
             // BMPをプレビュー表示
             using var stream = new System.IO.MemoryStream(bmpData);
             var bitmap = new BitmapImage();
@@ -299,8 +369,8 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
 
             PreviewImage = bitmap;
             ImageFilePath = "(デバイスから読み込み)";
-            StatusMessage = "起動画面の読み込みが完了しました";
-            AppendLog("読み込み完了");
+            StatusMessage = "起動画面の読み込みが完了しました - BMPで保存できます";
+            AppendLog("読み込み完了 - BMPで保存可能");
         }
         catch (OperationCanceledException)
         {

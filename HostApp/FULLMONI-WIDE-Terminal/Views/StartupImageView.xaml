@@ -21,32 +21,39 @@
         <!-- ファイル選択 -->
         <Border Grid.Row="0" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,8">
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="0" Text="{Binding ImageFilePath}" IsReadOnly="True"
-                         Height="24" FontSize="12" Margin="0,0,6,0" VerticalContentAlignment="Center"
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBox Grid.Row="0" Text="{Binding ImageFilePath}" IsReadOnly="True"
+                         Height="24" FontSize="12" Margin="0,0,0,6" VerticalContentAlignment="Center"
                          ToolTip="選択された画像ファイルのパス"/>
-                <Button Grid.Column="1" Content="画像を選択..." Width="100" Height="24" FontSize="12"
-                        Style="{DynamicResource SecondaryButton}"
-                        Command="{Binding SelectImageCommand}"
-                        IsEnabled="{Binding CanSelectImage}"
-                        Margin="0,0,4,0"
-                        ToolTip="765×256ピクセルのBMP画像を選択"/>
-                <Button Grid.Column="2" Content="デバイスから読込" Width="110" Height="24" FontSize="12"
-                        Style="{DynamicResource SecondaryButton}"
-                        Command="{Binding ReadFromDeviceCommand}"
-                        IsEnabled="{Binding CanRead}"
-                        ToolTip="現在の起動画面をデバイスから読み込む"/>
+                <StackPanel Grid.Row="1" Orientation="Horizontal">
+                    <Button Content="画像を選択..." Width="90" Height="24" FontSize="11"
+                            Style="{DynamicResource SecondaryButton}"
+                            Command="{Binding SelectImageCommand}"
+                            IsEnabled="{Binding CanSelectImage}"
+                            Margin="0,0,4,0"
+                            ToolTip="765×256ピクセルのBMP画像を選択"/>
+                    <Button Content="デバイスから読込" Width="105" Height="24" FontSize="11"
+                            Style="{DynamicResource SecondaryButton}"
+                            Command="{Binding ReadFromDeviceCommand}"
+                            IsEnabled="{Binding CanRead}"
+                            Margin="0,0,4,0"
+                            ToolTip="現在の起動画面をデバイスから読み込む"/>
+                    <Button Content="PCに保存" Width="70" Height="24" FontSize="11"
+                            Style="{DynamicResource SecondaryButton}"
+                            Command="{Binding SaveImageCommand}"
+                            IsEnabled="{Binding CanSave}"
+                            ToolTip="読み込んだ画像をBMPファイルで保存"/>
+                </StackPanel>
             </Grid>
         </Border>
 
         <!-- 画像プレビュー -->
-        <Border Grid.Row="1" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,8">
+        <Border Grid.Row="1" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10,6,10,6" Margin="0,0,0,8">
             <StackPanel>
-                <TextBlock Text="プレビュー (765×256)" FontWeight="Bold" FontSize="12" Margin="0,0,0,6"
+                <TextBlock Text="プレビュー (765×256)" FontWeight="Bold" FontSize="12" Margin="0,0,0,4"
                            Foreground="{DynamicResource TextBrush}"/>
                 <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
                         Background="#1E1E1E" Height="140" CornerRadius="2">
@@ -76,13 +83,9 @@
         </Border>
 
         <!-- ログ表示 -->
-        <Border Grid.Row="2" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10,10,10,6" Margin="0,0,0,8">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,6">
+        <Border Grid.Row="2" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10,8,10,8" Margin="0,0,0,8">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,4">
                     <TextBlock Text="ログ" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"
                                Foreground="{DynamicResource TextBrush}"/>
                     <Button Content="クリア" Width="60" Height="20" FontSize="12" Margin="10,0,0,0"
@@ -92,21 +95,24 @@
                             Style="{DynamicResource OutlineButton}"
                             Command="{Binding CopyLogCommand}"/>
                 </StackPanel>
-                <TextBox Grid.Row="1" Text="{Binding Log, Mode=OneWay}"
-                         x:Name="LogTextBox"
-                         Height="120" FontSize="12" FontFamily="Consolas"
-                         IsReadOnly="True" TextWrapping="Wrap"
-                         VerticalScrollBarVisibility="Auto"
-                         Background="#1E1E1E" Foreground="#DCDCDC"
-                         Padding="6"
-                         TextChanged="LogTextBox_TextChanged"/>
-            </Grid>
+                <Border BorderThickness="0" Margin="0">
+                    <TextBox Text="{Binding Log, Mode=OneWay}"
+                             x:Name="LogTextBox"
+                             FontSize="11" FontFamily="Consolas"
+                             IsReadOnly="True" TextWrapping="NoWrap"
+                             VerticalScrollBarVisibility="Auto"
+                             HorizontalScrollBarVisibility="Hidden"
+                             Background="#1E1E1E" Foreground="#DCDCDC"
+                             Padding="6"
+                             TextChanged="LogTextBox_TextChanged"/>
+                </Border>
+            </DockPanel>
         </Border>
 
         <!-- 進捗表示 -->
         <Border Grid.Row="3" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,8">
             <StackPanel>
-                <TextBlock Text="書き込み進捗" FontWeight="Bold" FontSize="12" Margin="0,0,0,6"
+                <TextBlock Text="転送進捗" FontWeight="Bold" FontSize="12" Margin="0,0,0,6"
                            Foreground="{DynamicResource TextBrush}"/>
                 <ProgressBar Height="20" Value="{Binding Progress}" Maximum="100" Margin="0,0,0,4"/>
                 <TextBlock Text="{Binding StatusMessage}" FontSize="12"

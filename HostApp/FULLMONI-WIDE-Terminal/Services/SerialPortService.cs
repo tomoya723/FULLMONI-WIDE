@@ -293,7 +293,6 @@ public class SerialPortService : IDisposable
     {
         if (_serialPort?.IsOpen != true)
         {
-            System.Diagnostics.Debug.WriteLine($"[ReadDirectAsync] Port not open");
             return 0;
         }
 
@@ -305,7 +304,6 @@ public class SerialPortService : IDisposable
             {
                 int toRead = Math.Min(available, count);
                 int bytesRead = _serialPort.Read(buffer, offset, toRead);
-                System.Diagnostics.Debug.WriteLine($"[ReadDirectAsync] Direct read: {bytesRead} bytes (available={available})");
                 return bytesRead;
             }
 
@@ -318,18 +316,15 @@ public class SerialPortService : IDisposable
                 {
                     int toRead = Math.Min(available, count);
                     int bytesRead = _serialPort.Read(buffer, offset, toRead);
-                    System.Diagnostics.Debug.WriteLine($"[ReadDirectAsync] Polled read: {bytesRead} bytes after {sw.ElapsedMilliseconds}ms");
                     return bytesRead;
                 }
                 await Task.Delay(1);
             }
-            
-            System.Diagnostics.Debug.WriteLine($"[ReadDirectAsync] Timeout after {timeoutMs}ms, BytesToRead=0");
+
             return 0;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            System.Diagnostics.Debug.WriteLine($"[ReadDirectAsync] EXCEPTION: {ex.GetType().Name}: {ex.Message}");
             return 0;
         }
     }

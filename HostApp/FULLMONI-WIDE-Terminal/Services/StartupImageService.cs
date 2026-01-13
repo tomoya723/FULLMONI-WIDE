@@ -488,11 +488,11 @@ public class StartupImageService
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 loopCount++;
-                
+
                 var loopSw = System.Diagnostics.Stopwatch.StartNew();
                 int bytesRead = await _serialService.ReadDirectAsync(readBuffer, 0, readBuffer.Length, 500);
                 loopSw.Stop();
-                
+
                 // 10回ごと、または0バイト受信時にログ
                 if (loopCount % 10 == 0 || bytesRead == 0)
                 {

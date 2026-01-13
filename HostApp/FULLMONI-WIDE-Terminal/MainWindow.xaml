@@ -90,7 +90,7 @@
         </Border>
 
         <!-- タブコントロール -->
-        <TabControl Grid.Row="1" Margin="0,0,0,6">
+        <TabControl Grid.Row="1" Margin="0,0,0,6" SelectedIndex="4">
             <!-- タブ1: ステータス -->
             <TabItem Header="ステータス" IsEnabled="{Binding IsFirmwareMode}">
                 <Grid Margin="8">
@@ -343,7 +343,12 @@
                 </Grid>
             </TabItem>
 
-            <!-- タブ3: ファームウェア更新 -->
+            <!-- タブ3: 起動画面変更 -->
+            <TabItem Header="起動画面変更" IsEnabled="{Binding IsFirmwareMode}">
+                <views:StartupImageView DataContext="{Binding StartupImageViewModel}" />
+            </TabItem>
+
+            <!-- タブ4: ファームウェア更新 -->
             <TabItem Header="ファームウェア更新">
                 <Grid Margin="8">
                     <Grid.RowDefinitions>
@@ -442,11 +447,6 @@
                                 IsEnabled="{Binding CanStartFirmwareUpdate}"/>
                     </StackPanel>
                 </Grid>
-            </TabItem>
-
-            <!-- タブ4: 起動画面書き込み -->
-            <TabItem Header="起動画面書き込み">
-                <views:StartupImageView DataContext="{Binding StartupImageViewModel}" />
             </TabItem>
 
             <!-- Aboutタブ -->

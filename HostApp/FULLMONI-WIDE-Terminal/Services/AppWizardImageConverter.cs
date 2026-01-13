@@ -134,14 +134,20 @@ public static class AppWizardImageConverter
     public static byte[] ConvertAppWizardToBmp(byte[] appWizardData)
     {
         // AppWizardヘッダー確認
-        if (appWizardData.Length < 12)
+        if (appWizardData.Length < HeaderSize)
         {
             throw new ArgumentException("AppWizardデータが短すぎます");
         }
 
-        // ヘッダーからサイズ取得
-        int width = appWizardData[0] | (appWizardData[1] << 8);
-        int height = appWizardData[2] | (appWizardData[3] << 8);
+        // AppWizardヘッダ構造:
+        // [0-1]: "BM" マジック
+        // [2-3]: 圧縮タイプ
+        // [4-5]: 幅
+        // [6-7]: 高さ
+        // [8-9]: stride
+        // [10-11]: bits per pixel
+        int width = appWizardData[4] | (appWizardData[5] << 8);
+        int height = appWizardData[6] | (appWizardData[7] << 8);
 
         // デフォルト値で上書き（ヘッダーが不正な場合）
         if (width != ExpectedWidth || height != ExpectedHeight)
@@ -192,15 +198,19 @@ public static class AppWizardImageConverter
 
         // ピクセルデータ変換 (BGR565 → BGR888)
         // BMPは下から上に格納されるため、AppWizardの上から下のデータを反転
-        int appWizardOffset = 12;  // ヘッダースキップ
+        // 注意: AppWizardヘッダは12バイトだが、データは16バイト目から開始
+        // (12バイトヘッダ + 4バイトパディング)
+        int appWizardOffset = 16;  // 16バイトオフセット
+        int srcStride = width * 2;  // AppWizardの1行のバイト数 (RGB565)
 
         for (int y = height - 1; y >= 0; y--)
         {
             int bmpRowStart = 54 + y * rowSize;
+            int srcRow = height - 1 - y;  // AppWizardの対応する行
 
             for (int x = 0; x < width; x++)
             {
-                int srcOffset = appWizardOffset + ((height - 1 - y) * width + x) * 2;
+                int srcOffset = appWizardOffset + srcRow * srcStride + x * 2;
 
                 if (srcOffset + 1 < appWizardData.Length)
                 {

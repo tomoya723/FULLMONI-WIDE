@@ -90,7 +90,7 @@ static void debug_printf(const char *fmt, ...)
 
 /* RAM2領域 (フラッシュ操作関数を配置) */
 #define RAM2_FUNC_AREA          (0x00800000UL)
-#define RAM2_FUNC_SIZE          (8192)       /* 8KB確保 */
+#define RAM2_FUNC_SIZE          (4096)       /* 関数用4KB */
 
 /* 受信バッファ */
 static uint8_t rx_buffer[IMG_CHUNK_SIZE];
@@ -98,12 +98,11 @@ static uint8_t program_buffer[256] __attribute__((aligned(4)));
 
 /*
  * プレフィックス保存用:
- * RAM2領域 (0x00800000〜) は8KB。フラッシュ関数用に約2KB使用。
- * 残りの領域をプレフィックスデータの一時保存に使用。
- * プレフィックスは最大約1KB程度（acmtcオフセットは通常1KB未満）
+ * RAM2領域 (0x00800000〜) は8KB。
+ * 前半4KBをフラッシュ操作関数に、後半4KBをプレフィックスデータに使用。
  */
-#define RAM2_PREFIX_OFFSET   (2048)  /* 関数用に2KB確保 */
-#define PREFIX_SAVE_MAX      (1024)  /* 最大1KB */
+#define RAM2_PREFIX_OFFSET   (4096)  /* 関数用に4KB確保 */
+#define PREFIX_SAVE_MAX      (4096)  /* プレフィックス用に4KB */
 #define RAM2_PREFIX_AREA     (RAM2_FUNC_AREA + RAM2_PREFIX_OFFSET)
 
 /* ============================================================
@@ -496,7 +495,7 @@ void startup_image_read_mode(void)
             usb_cdc_send(&tx_chunk[chunk_sent], send_size);
             usb_cdc_flush_tx();
             usb_cdc_process();  /* USBイベント処理 */
-            R_BSP_SoftwareDelay(2, BSP_DELAY_MILLISECS);  /* 64バイトごとに2ms待機 (usbser.sys安定値) */
+            R_BSP_SoftwareDelay(3, BSP_DELAY_MILLISECS);  /* 64バイトごとに3ms待機 (安定値) */
             chunk_sent += send_size;
         }
 
@@ -614,7 +613,7 @@ void startup_image_write_mode(void)
     param_console_printf("Prefix offset: %lu bytes\r\n", prefix_size);
 
     /* プレフィックス部分のデータを保存（消去で失われるため） */
-    /* RAM2領域の後半を使用（フラッシュ操作中もアクセス可能） */
+    /* RAM2領域の後半を使用 */
     if (prefix_size > 0 && prefix_size <= PREFIX_SAVE_MAX) {
         param_console_print("Saving prefix data...\r\n");
         memcpy((void *)RAM2_PREFIX_AREA, (void *)aligned_addr, prefix_size);
