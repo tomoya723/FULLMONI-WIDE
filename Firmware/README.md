@@ -307,7 +307,8 @@ Both environments can be used interchangeably:<br>
 ## 技術ドキュメント / Technical Documentation
 
 ### emWinリソースとメモリ配置
-- **[emWin画像リソースの物理アドレスについて](docs/EMWIN_RESOURCE_ADDRESS.md)** - emWin画像リソースのメモリアドレス配置とコンパイル時の動作に関する詳細説明
+- **[emWin画像リソースの物理アドレスについて](docs/EMWIN_RESOURCE_ADDRESS.md)** - emWin画像リソースのメモリアドレス配置とコンパイル時の動作に関する詳細説明  
+  コンパイルごとにアドレスが変動する理由と、現在の実装が実行時アドレス解決を使用している適切性を説明
 
 ### パラメータとファームウェア更新
 - **[パラメータコンソール](docs/PARAM_CONSOLE.md)** - USB CDC経由のパラメータ設定コマンド仕様
