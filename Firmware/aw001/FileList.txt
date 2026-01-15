@@ -17,7 +17,7 @@ C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Source/CustomCode/ID_SCREEN_Tell
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Source/CustomCode/ID_SCREEN_01a_Slots.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Source/CustomCode/ID_SCREEN_01b_Slots.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Source/CustomCode/ID_SCREEN_01c_Slots.c
-C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Image/motec.c
+C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Image/fmw_op0.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Image/w_back.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Image/ws_masterwarning.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Image/ws_oilpresswarning.c
@@ -35,11 +35,11 @@ C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Image/Back2b.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Image/Back2c.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Image/fuel1.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Image/fuel2.c
-C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Image/mtc.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Font/51_40_Normal_EXT.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Font/SuiGenerisRg_120_Bold_EXT.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Font/51_30_Normal_EXT.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Font/51_20_Normal_EXT.c
+C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Font/51_20_Normal_EXT_AA2.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Font/Arial_19_Normal_EXT.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Font/Arial_16_Bold_EXT.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw001/Resource/Text/APPW_Language_0.c

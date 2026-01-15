@@ -17,7 +17,7 @@ C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw002/Source/CustomCode/ID_SCREEN_Tell
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw002/Source/CustomCode/ID_SCREEN_01a_Slots.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw002/Source/CustomCode/ID_SCREEN_01b_Slots.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw002/Source/CustomCode/ID_SCREEN_01c_Slots.c
-C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw002/Resource/Image/mtc.c
+C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw002/Resource/Image/fmw_op0.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw002/Resource/Image/w_back.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw002/Resource/Image/ws_masterwarning.c
 C:/Users/tomoy/git/FULLMONI-WIDE/Firmware/aw002/Resource/Image/ws_oilpresswarning.c

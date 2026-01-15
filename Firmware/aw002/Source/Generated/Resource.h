@@ -66,7 +66,7 @@ extern GUI_CONST_STORAGE unsigned char acArial_16_Bold_EXT[];
 *
 *       Images
 */
-extern GUI_CONST_STORAGE unsigned char acmtc[];
+extern GUI_CONST_STORAGE unsigned char acfmw_op0[];
 extern GUI_CONST_STORAGE unsigned char acw_back[];
 extern GUI_CONST_STORAGE unsigned char acws_masterwarning[];
 extern GUI_CONST_STORAGE unsigned char acws_oilpresswarning[];
