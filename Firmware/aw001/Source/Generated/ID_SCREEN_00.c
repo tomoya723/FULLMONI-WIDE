@@ -3,7 +3,7 @@
 *        Solutions for real time microcontroller applications        *
 **********************************************************************
 *                                                                    *
-*        (c) 1996 - 2025  SEGGER Microcontroller GmbH                *
+*        (c) 1996 - 2026  SEGGER Microcontroller GmbH                *
 *                                                                    *
 *        Internet: www.segger.com    Support:  support@segger.com    *
 *                                                                    *
@@ -68,7 +68,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
 *       _aSetup
 */
 static GUI_CONST_STORAGE APPW_SETUP_ITEM _aSetup[] = {
-  { ID_IMAGE_01,  APPW_SET_PROP_SBITMAP,      { ARG_VP(0, acmtc),
+  { ID_IMAGE_01,  APPW_SET_PROP_SBITMAP,      { ARG_VP(0, acfmw_op0),
                                                 ARG_V(587830), } },
   { ID_IMAGE_01,  APPW_SET_PROP_LQ,           { ARG_V(0) } },
   { ID_TIMER_00,  APPW_SET_PROP_PERIOD,       { ARG_V(1500) } },
