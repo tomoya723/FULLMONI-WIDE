@@ -194,6 +194,29 @@ uint16_t crc16_ccitt(const uint8_t *data, size_t len) {
 | 起動画面データ | 0xFFE00000 (Linear Flash) | 391,696バイト |
 | RAM2 (転送バッファ) | 0x00800000 | 8KB (4KB関数 + 4KB prefix) |
 
+#### 固定アドレス配置について
+
+起動画像データ(acmtc配列)は、リンカスクリプトにより固定アドレス`0xFFE00000`に配置されます。
+これにより、**ファームウェア更新後もカスタム起動画像が保持されます**。
+
+```
+フラッシュメモリ配置:
+0xFFC20000  ファームウェアヘッダ
+0xFFC20040  .text, .rodata等 (コード/データ)
+            ※ mtc.oは除外
+            :
+0xFFE00000  .startup_image セクション ← 起動画像固定領域
+            acmtc配列 (384KB)          imgwriteの書き込み先
+            :
+0xFFFFFF80  .exvectors
+```
+
+リンカスクリプト(`linker_script.ld`)の設定:
+- `EXCLUDE_FILE(*mtc.o)` で `.rodata` から除外
+- `.startup_image` セクションで `mtc.o` を固定アドレスに配置
+
+AppWizard生成の `mtc.c` は変更不要です。
+
 ### 実装ファイル
 
 - `Firmware/src/startup_image_write.c` - imgwrite/imgread コマンド処理
