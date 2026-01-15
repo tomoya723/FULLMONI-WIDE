@@ -1,6 +1,7 @@
 MEMORY
 {
 	RAM : ORIGIN = 0x00064040, LENGTH = 0x1BFC0
+	RAM2 : ORIGIN = 0x00864000, LENGTH = 0x1C000    /* 高位RAM未使用領域 (112KB) - Issue #65 CAN設定用 */
 	ECCRAM : ORIGIN = 0x00FF8000, LENGTH = 0x8000
 	FW_HEADER : ORIGIN = 0xFFC20000, LENGTH = 64
 	ROM : ORIGIN = 0xFFC20040, LENGTH = 0x3DFFC0        /* 全ROM領域（論理的に使用） */
@@ -133,6 +134,14 @@ SECTIONS
 		. = ALIGN(128);
 		_end = .;
 	} >RAM AT>RAM
+	/* Issue #65: CAN設定用の追加RAM領域 (高位RAM 0x00864000-0x0087FFFF) */
+	.bss2 :
+	{
+		_bss2 = .;
+		*(.bss2)
+		*(.bss2.*)
+		_ebss2 = .;
+	} >RAM2 AT>RAM2
 	.ofs1 0xFE7F5D00 : AT(0xFE7F5D00)
 	{
 		KEEP(*(.ofs1))

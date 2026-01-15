@@ -95,6 +95,14 @@ static void cmd_help(void)
     param_console_print("  imgread           - Read startup image from flash\r\n");
     param_console_print("  mtcinfo           - Show startup image info\r\n");
     param_console_print("  exit              - Exit parameter mode\r\n");
+    param_console_print("\r\nCAN Configuration (Issue #65):\r\n");
+    param_console_print("  can_list          - Show CAN configuration\r\n");
+    param_console_print("  can_ch <n> <id> <en> - Set CAN channel (n=1-6)\r\n");
+    param_console_print("  can_field <n> <ch> <byte> <len> <type> <end> <var> <off> <mul> <div>\r\n");
+    param_console_print("                    - Set CAN field (n=0-15)\r\n");
+    param_console_print("  can_preset <name> - Apply preset (motec/link/aem)\r\n");
+    param_console_print("  can_save          - Save CAN config to EEPROM\r\n");
+    param_console_print("  can_load          - Load CAN config from EEPROM\r\n");
     param_console_print("\r\nParameter IDs:\r\n");
     param_console_print("  tyre_width, tyre_aspect, tyre_rim\r\n");
     param_console_print("  gear1-gear6, final\r\n");
@@ -258,6 +266,109 @@ static void cmd_trip_reset(void)
 {
     param_storage_reset_trip();
     param_console_print("TRIP reset: 0.0 km\r\n");
+}
+
+/* ============================================================
+ * CAN設定コマンド (Issue #65)
+ * ============================================================ */
+
+/* ターゲット変数名テーブル */
+static const char *target_var_names[] = {
+    "REV", "AF", "NUM1", "NUM2", "NUM3", "NUM4", "NUM5", "NUM6", "SPEED"
+};
+
+/* CAN設定一覧表示 */
+static void cmd_can_list(void)
+{
+    uint8_t i;
+
+    param_console_print("\r\n=== CAN Configuration ===\r\n");
+    param_console_printf("Version: %d, Preset: %d\r\n",
+                        g_can_config.version, g_can_config.preset_id);
+
+    param_console_print("\r\n-- Channels --\r\n");
+    for (i = 0; i < CAN_CHANNEL_MAX; i++) {
+        param_console_printf("CH%d: ID=0x%03X, %s\r\n",
+                            i + 1,
+                            g_can_config.channels[i].can_id,
+                            g_can_config.channels[i].enabled ? "ON" : "OFF");
+    }
+
+    param_console_print("\r\n-- Fields --\r\n");
+    param_console_print("No CH Byte Len Type End Var    Off  Mul   Div\r\n");
+    for (i = 0; i < CAN_FIELD_MAX; i++) {
+        CAN_Field_t *f = &g_can_config.fields[i];
+        if (f->channel == 0) continue;  /* 無効なフィールドはスキップ */
+
+        const char *var_name = (f->target_var < 9) ? target_var_names[f->target_var] : "---";
+        param_console_printf("%2d %2d   %d   %d   %c    %c   %-5s %4d %5d %5d\r\n",
+                            i, f->channel, f->start_byte, f->byte_count,
+                            f->data_type ? 'S' : 'U',
+                            f->endian ? 'L' : 'B',
+                            var_name,
+                            f->offset, f->multiplier, f->divisor);
+    }
+}
+
+/* CANチャンネル設定 */
+static void cmd_can_ch(uint8_t ch, uint16_t can_id, uint8_t enabled)
+{
+    if (can_config_set_channel(ch, can_id, enabled)) {
+        param_console_printf("CH%d: ID=0x%03X, %s\r\n", ch, can_id, enabled ? "ON" : "OFF");
+    } else {
+        param_console_print("Error: Invalid parameters\r\n");
+    }
+}
+
+/* CANフィールド設定 */
+static void cmd_can_field(int argc, char *args[])
+{
+    if (argc < 10) {
+        param_console_print("Usage: can_field <n> <ch> <byte> <len> <type> <end> <var> <off> <mul> <div>\r\n");
+        return;
+    }
+
+    CAN_Field_t field;
+    uint8_t idx = (uint8_t)atoi(args[0]);
+    field.channel = (uint8_t)atoi(args[1]);
+    field.start_byte = (uint8_t)atoi(args[2]);
+    field.byte_count = (uint8_t)atoi(args[3]);
+    field.data_type = (uint8_t)atoi(args[4]);
+    field.endian = (uint8_t)atoi(args[5]);
+    field.target_var = (uint8_t)atoi(args[6]);
+    field.offset = (int16_t)atoi(args[7]);
+    field.multiplier = (uint16_t)atoi(args[8]);
+    field.divisor = (uint16_t)atoi(args[9]);
+
+    if (can_config_set_field(idx, &field)) {
+        param_console_printf("Field %d set OK\r\n", idx);
+    } else {
+        param_console_print("Error: Invalid parameters\r\n");
+    }
+}
+
+/* CANプリセット適用 */
+static void cmd_can_preset(const char *name)
+{
+    uint8_t preset_id = CAN_PRESET_CUSTOM;
+
+    if (strcmp(name, "motec") == 0 || strcmp(name, "motec_m100") == 0) {
+        preset_id = CAN_PRESET_MOTEC_M100;
+    } else if (strcmp(name, "link") == 0 || strcmp(name, "link_g4") == 0) {
+        preset_id = CAN_PRESET_LINK_G4;
+        param_console_print("Warning: LINK preset not yet implemented, using MoTeC\r\n");
+        preset_id = CAN_PRESET_MOTEC_M100;
+    } else if (strcmp(name, "aem") == 0 || strcmp(name, "aem_ems") == 0) {
+        preset_id = CAN_PRESET_AEM_EMS;
+        param_console_print("Warning: AEM preset not yet implemented, using MoTeC\r\n");
+        preset_id = CAN_PRESET_MOTEC_M100;
+    } else {
+        param_console_print("Unknown preset. Available: motec, link, aem\r\n");
+        return;
+    }
+
+    can_config_apply_preset(preset_id);
+    param_console_printf("Applied preset: %s\r\n", name);
 }
 
 /* ============================================================
@@ -444,6 +555,43 @@ static void parse_command(const char *line)
         extern void param_storage_reset_wr_cnt(void);
         param_storage_reset_wr_cnt();
         param_console_print("wr_cnt reset to 0.\r\n");
+    /* === CAN設定コマンド (Issue #65) === */
+    } else if (strcmp(cmd, "can_list") == 0) {
+        cmd_can_list();
+    } else if (strcmp(cmd, "can_ch") == 0 && argc >= 4) {
+        /* can_ch <n> <id> <en> */
+        uint8_t ch = (uint8_t)atoi(arg1);
+        uint16_t can_id = (uint16_t)strtol(arg2, NULL, 0);  /* 0x対応 */
+        uint8_t enabled = (uint8_t)atoi(arg3);
+        cmd_can_ch(ch, can_id, enabled);
+    } else if (strcmp(cmd, "can_field") == 0 && argc >= 11) {
+        /* can_field <n> <ch> <byte> <len> <type> <end> <var> <off> <mul> <div> */
+        char *args[10] = {arg1, arg2, arg3, arg4, arg5, arg6, NULL, NULL, NULL, NULL};
+        /* 残りの引数を再パース */
+        char extra_args[4][32];
+        sscanf(line, "%*s %*s %*s %*s %*s %*s %*s %31s %31s %31s %31s",
+               extra_args[0], extra_args[1], extra_args[2], extra_args[3]);
+        args[6] = extra_args[0];
+        args[7] = extra_args[1];
+        args[8] = extra_args[2];
+        args[9] = extra_args[3];
+        cmd_can_field(10, args);
+    } else if (strcmp(cmd, "can_preset") == 0 && argc >= 2) {
+        cmd_can_preset(arg1);
+    } else if (strcmp(cmd, "can_save") == 0) {
+        param_console_print("Saving CAN config to EEPROM... ");
+        if (can_config_save()) {
+            param_console_print("OK\r\n");
+        } else {
+            param_console_print("NG\r\n");
+        }
+    } else if (strcmp(cmd, "can_load") == 0) {
+        param_console_print("Loading CAN config from EEPROM... ");
+        if (can_config_load()) {
+            param_console_print("OK\r\n");
+        } else {
+            param_console_print("NG (using defaults)\r\n");
+        }
     } else if (strcmp(cmd, "exit") == 0) {
         param_console_print("Exiting parameter mode...\r\n");
         exit_flag = true;

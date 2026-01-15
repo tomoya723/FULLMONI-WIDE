@@ -190,6 +190,7 @@ static void save_legacy_eeprom(void)
 void param_storage_init(void)
 {
     memcpy(&g_param, &PARAM_DEFAULT, sizeof(PARAM_Storage_t));
+    /* Note: can_config_init()はmain.cでInit_CAN()の前に呼ばれる */
 }
 
 /* ============================================================
@@ -378,3 +379,198 @@ void debug_dump_legacy_eeprom(void)
     param_console_printf("tr_int: %lu (= %lu km)\r\n", tr_int, tr_int / PULSE_PER_KM);
     param_console_printf("g_param.odo_pulse:  %lu (= %lu km)\r\n", g_param.odo_pulse, g_param.odo_pulse / PULSE_PER_KM);
     param_console_printf("g_param.trip_pulse: %lu (= %lu km)\r\n", g_param.trip_pulse, g_param.trip_pulse / PULSE_PER_KM);}
+
+/* ============================================================
+ * CAN設定 (Issue #65)
+ * ============================================================ */
+
+/* CAN設定グローバル変数 (RAM2領域に配置) */
+CAN_Config_t g_can_config __attribute__((section(".bss2")));
+
+/* EEPROMアドレス (CAN設定用) */
+#define EEPROM_ADDR_CAN_CONFIG  0x0100  /* CAN設定領域開始 */
+
+/* MoTeC M100 プリセット (デフォルト) */
+static const CAN_Config_t CAN_PRESET_MOTEC = {
+    .version = CAN_CONFIG_VERSION,
+    .preset_id = CAN_PRESET_MOTEC_M100,
+    .reserved = 0,
+    .channels = {
+        { .can_id = 0x3E8, .enabled = 1, .reserved = 0 },  /* CH1: MoTeC #1 */
+        { .can_id = 0x3E9, .enabled = 1, .reserved = 0 },  /* CH2: MoTeC #2 */
+        { .can_id = 0x3EA, .enabled = 1, .reserved = 0 },  /* CH3: MoTeC #3 */
+        { .can_id = 0x3EB, .enabled = 1, .reserved = 0 },  /* CH4: MoTeC #4 */
+        { .can_id = 0x3EC, .enabled = 1, .reserved = 0 },  /* CH5: MoTeC #5 */
+        { .can_id = 0x3ED, .enabled = 0, .reserved = 0 },  /* CH6: 未使用 */
+    },
+    .fields = {
+        /* CH1 (0x3E8): RPM(0-1), TPS(2-3), MAP(4-5), IAT(6-7) */
+        { .channel = 1, .start_byte = 0, .byte_count = 2, .data_type = 0, .endian = 0,
+          .target_var = CAN_TARGET_REV, .offset = 0, .multiplier = 1000, .divisor = 1000 },
+        { .channel = 1, .start_byte = 4, .byte_count = 2, .data_type = 0, .endian = 0,
+          .target_var = CAN_TARGET_NUM4, .offset = 0, .multiplier = 1000, .divisor = 10000 },  /* MAP /10 */
+        { .channel = 1, .start_byte = 6, .byte_count = 2, .data_type = 1, .endian = 0,
+          .target_var = CAN_TARGET_NUM2, .offset = 0, .multiplier = 1000, .divisor = 10000 },  /* IAT /10 signed */
+        /* CH2 (0x3E9): ECT(0-1), AFR(2-3) */
+        { .channel = 2, .start_byte = 0, .byte_count = 2, .data_type = 1, .endian = 0,
+          .target_var = CAN_TARGET_NUM1, .offset = 0, .multiplier = 1000, .divisor = 10000 },  /* WaterTemp /10 signed */
+        { .channel = 2, .start_byte = 2, .byte_count = 2, .data_type = 0, .endian = 0,
+          .target_var = CAN_TARGET_AF, .offset = 0, .multiplier = 147, .divisor = 1000 },     /* A/F *0.147 */
+        /* CH3 (0x3EA): OilTemp(6-7) */
+        { .channel = 3, .start_byte = 6, .byte_count = 2, .data_type = 1, .endian = 0,
+          .target_var = CAN_TARGET_NUM3, .offset = 0, .multiplier = 1000, .divisor = 10000 },  /* OilTemp /10 signed */
+        /* CH4 (0x3EB): OilPressure(0-1), BattV(6-7) */
+        { .channel = 4, .start_byte = 0, .byte_count = 2, .data_type = 0, .endian = 0,
+          .target_var = CAN_TARGET_NUM5, .offset = 0, .multiplier = 1, .divisor = 1000 },     /* OilP *0.001 */
+        { .channel = 4, .start_byte = 6, .byte_count = 2, .data_type = 0, .endian = 0,
+          .target_var = CAN_TARGET_NUM6, .offset = 0, .multiplier = 1000, .divisor = 10000 },  /* BattV /10 */
+        /* 残りは無効 */
+        { .channel = 0, .start_byte = 0, .byte_count = 0, .data_type = 0, .endian = 0,
+          .target_var = CAN_TARGET_NONE, .offset = 0, .multiplier = 1000, .divisor = 1000 },
+        { .channel = 0, .start_byte = 0, .byte_count = 0, .data_type = 0, .endian = 0,
+          .target_var = CAN_TARGET_NONE, .offset = 0, .multiplier = 1000, .divisor = 1000 },
+        { .channel = 0, .start_byte = 0, .byte_count = 0, .data_type = 0, .endian = 0,
+          .target_var = CAN_TARGET_NONE, .offset = 0, .multiplier = 1000, .divisor = 1000 },
+        { .channel = 0, .start_byte = 0, .byte_count = 0, .data_type = 0, .endian = 0,
+          .target_var = CAN_TARGET_NONE, .offset = 0, .multiplier = 1000, .divisor = 1000 },
+        { .channel = 0, .start_byte = 0, .byte_count = 0, .data_type = 0, .endian = 0,
+          .target_var = CAN_TARGET_NONE, .offset = 0, .multiplier = 1000, .divisor = 1000 },
+        { .channel = 0, .start_byte = 0, .byte_count = 0, .data_type = 0, .endian = 0,
+          .target_var = CAN_TARGET_NONE, .offset = 0, .multiplier = 1000, .divisor = 1000 },
+        { .channel = 0, .start_byte = 0, .byte_count = 0, .data_type = 0, .endian = 0,
+          .target_var = CAN_TARGET_NONE, .offset = 0, .multiplier = 1000, .divisor = 1000 },
+    },
+    .crc16 = 0
+};
+
+/* ============================================================
+ * CAN設定初期化
+ * ============================================================ */
+void can_config_init(void)
+{
+    memcpy(&g_can_config, &CAN_PRESET_MOTEC, sizeof(CAN_Config_t));
+    /* CRCは保存時に計算 */
+}
+
+/* ============================================================
+ * EEPROMからCAN設定を読み込み
+ * ============================================================ */
+bool can_config_load(void)
+{
+    uint8_t buf[CAN_CONFIG_SIZE];
+    uint16_t crc_calc, crc_stored;
+
+    /* EEPROM読み込み */
+    if (!eeprom_read(EEPROM_ADDR_CAN_CONFIG, buf, CAN_CONFIG_SIZE)) {
+        can_config_init();
+        return false;
+    }
+
+    /* バージョンチェック */
+    if (buf[0] != CAN_CONFIG_VERSION) {
+        can_config_init();
+        return false;
+    }
+
+    /* CRCチェック */
+    crc_calc = param_calc_crc16(buf, CAN_CONFIG_SIZE - 2);
+    crc_stored = (buf[CAN_CONFIG_SIZE - 2] << 8) | buf[CAN_CONFIG_SIZE - 1];
+
+    if (crc_calc != crc_stored) {
+        can_config_init();
+        return false;
+    }
+
+    /* 設定を適用 */
+    memcpy(&g_can_config, buf, CAN_CONFIG_SIZE);
+    return true;
+}
+
+/* ============================================================
+ * EEPROMにCAN設定を保存
+ * ============================================================ */
+bool can_config_save(void)
+{
+    uint16_t crc;
+    uint8_t *buf = (uint8_t *)&g_can_config;
+
+    /* CRC計算 */
+    crc = param_calc_crc16(buf, CAN_CONFIG_SIZE - 2);
+    g_can_config.crc16 = crc;
+
+    /* EEPROM書き込み (分割して書き込み) */
+    uint16_t offset = 0;
+    uint16_t remaining = CAN_CONFIG_SIZE;
+    while (remaining > 0) {
+        uint16_t chunk = (remaining > 32) ? 32 : remaining;
+        if (!eeprom_write(EEPROM_ADDR_CAN_CONFIG + offset, buf + offset, chunk)) {
+            return false;
+        }
+        offset += chunk;
+        remaining -= chunk;
+    }
+
+    return true;
+}
+
+/* ============================================================
+ * プリセット適用
+ * ============================================================ */
+void can_config_apply_preset(uint8_t preset_id)
+{
+    switch (preset_id) {
+    case CAN_PRESET_MOTEC_M100:
+    default:
+        memcpy(&g_can_config, &CAN_PRESET_MOTEC, sizeof(CAN_Config_t));
+        break;
+    /* 将来のプリセット追加用 */
+    /*
+    case CAN_PRESET_LINK_G4:
+        memcpy(&g_can_config, &CAN_PRESET_LINK, sizeof(CAN_Config_t));
+        break;
+    */
+    }
+}
+
+/* ============================================================
+ * CANチャンネル設定
+ * ============================================================ */
+bool can_config_set_channel(uint8_t ch, uint16_t can_id, uint8_t enabled)
+{
+    if (ch < 1 || ch > CAN_CHANNEL_MAX) {
+        return false;
+    }
+    if (can_id > 0x7FF) {
+        return false;
+    }
+
+    g_can_config.channels[ch - 1].can_id = can_id;
+    g_can_config.channels[ch - 1].enabled = enabled ? 1 : 0;
+    g_can_config.preset_id = CAN_PRESET_CUSTOM;  /* カスタムに変更 */
+
+    return true;
+}
+
+/* ============================================================
+ * CANフィールド設定
+ * ============================================================ */
+bool can_config_set_field(uint8_t idx, const CAN_Field_t *field)
+{
+    if (idx >= CAN_FIELD_MAX) {
+        return false;
+    }
+    if (field->channel > CAN_CHANNEL_MAX) {
+        return false;
+    }
+    if (field->start_byte > 7) {
+        return false;
+    }
+    if (field->byte_count != 1 && field->byte_count != 2 && field->byte_count != 4 && field->byte_count != 0) {
+        return false;
+    }
+
+    memcpy(&g_can_config.fields[idx], field, sizeof(CAN_Field_t));
+    g_can_config.preset_id = CAN_PRESET_CUSTOM;  /* カスタムに変更 */
+
+    return true;
+}

@@ -108,6 +108,9 @@ void main(void)
 
 	R_Config_MTU3_Start();
 
+	// CAN設定初期化（デフォルト値セット）- Init_CAN()より前に必須
+	can_config_init();
+
 	// Init CAN
 	Init_CAN();
 
