@@ -55,7 +55,7 @@ enum app_err_enum {    APP_NO_ERR 			= 0x00,
 					   /* Add your application errors/alarms here. */
                   };
 
-/* CAN channel numbers */				  
+/* CAN channel numbers */
 enum CAN_channel_num {	CH_0 = 0,
 						CH_1 = 1,
 						CH_2 = 2
@@ -65,11 +65,11 @@ enum CAN_channel_num {	CH_0 = 0,
 enum CAN_mailbox_mode {  CANBOX_NORMAL = 0,
                          CANBOX_FIFO   = 1,
                       };
-						
+
 /***********************************************************************************************************************
 Macro definitions
 ***********************************************************************************************************************/
-/* Mailboxes used for demo. Keep mailboxes 4 apart if you want masks 
+/* Mailboxes used for demo. Keep mailboxes 4 apart if you want masks
 independent - not affecting neighboring mailboxes. */
 #define 	CANBOX_TX		    (0x00)      /* First mailbox */
 //#define 	CANBOX_RX 		    (0x04)
@@ -120,6 +120,7 @@ extern enum app_err_enum	app_err_nr;
 uint32_t reset_all_errors(uint8_t g_can_channel);
 void Init_CAN(void);
 void main_CAN(void);
+void can_update_rx_filters(void);  /* Issue #65: CAN受信フィルタ更新 */
 
 #endif //API_DEMO_H
 /* file end */
