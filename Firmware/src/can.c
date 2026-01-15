@@ -1132,10 +1132,17 @@ void can_update_rx_filters(void)
 }
 
 #define NOP __asm__ volatile("nop;");
-/* AP add */
+
+/* AP add - printf出力をSCI9経由で送信（ポーリング方式） */
 void my_sw_charput_function(char output_char)
 {
-	NOP;
+    /* 送信バッファ空きを待つ */
+    while (0 == SCI9.SSR.BIT.TDRE) {
+        /* Wait */
+    }
+
+    /* データを送信レジスタに書き込み */
+    SCI9.TDR = (uint8_t)output_char;
 }
 
 /* file end */

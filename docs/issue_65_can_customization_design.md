@@ -202,25 +202,33 @@ float can_field_to_physical(const CAN_Field_t *field, const can_frame_t *rx_data
 
 ## 4. 実装フェーズ
 
-### Phase 1: Firmware側基盤整備
-1. `param_storage.h` に CAN設定構造体追加
-2. `param_storage.c` にデフォルト値・CRC計算追加
-3. `param_console.c` にCAN設定コマンド追加
+### Phase 1: Firmware側基盤整備 ✅ **完了**
+1. ✅ `param_storage.h` に CAN設定構造体追加 (`CAN_Config_t`, `CAN_RX_Channel_t`, `CAN_Field_t`)
+2. ✅ `param_storage.c` にデフォルト値（MoTeCプリセット）・CRC計算追加
+3. ✅ `param_console.c` にCAN設定コマンド追加 (`can_list`, `can_ch`, `can_field`, `can_preset`, `can_save`)
 
-### Phase 2: CAN処理の汎用化
-1. `dataregister.c` に汎用変換関数追加
-2. `can.c` のCAN ID初期化をパラメータ参照に変更
-3. 固定記述の変換処理を汎用関数呼び出しに置換
+### Phase 2: CAN処理の汎用化 ✅ **完了**
+1. ✅ `dataregister.c` に汎用変換関数追加 (`process_can_fields_unified()`)
+2. ✅ `can.c` のCAN ID初期化をパラメータ参照に変更 (`can_update_rx_filters()`)
+3. ✅ 固定記述の変換処理を汎用関数呼び出しに置換
+4. ✅ CAN ID動的変更対応（設定保存時にフィルタ更新）
 
-### Phase 3: HostApp対応
-1. CAN設定用ViewModelプロパティ追加
-2. CAN設定UIの追加（XAML）
-3. プリセット機能実装（MoTeC, LINK, AEM等）
+### Phase 3: EEPROM永続化 ✅ **完了**
+1. ✅ CAN設定のEEPROM保存・読み込み (`can_config_save()`, `can_config_load()`)
+2. ✅ バージョン管理とCRCチェック
+3. ✅ 24C16 EEPROM対応（1バイトアドレス、16バイトページ）
+4. ✅ 電源OFF後も設定が永続化されることを確認
 
-### Phase 4: テスト・検証
-1. 既存MoTeC設定での動作確認
-2. 新規プリセット（LINK等）での動作確認
-3. カスタム設定の保存・読込テスト
+### Phase 4: HostApp対応（将来）
+1. 🔲 CAN設定用ViewModelプロパティ追加
+2. 🔲 CAN設定UIの追加（XAML）
+3. 🔲 プリセット機能実装（MoTeC, LINK, AEM等）
+
+### Phase 5: テスト・検証
+1. ✅ 既存MoTeC設定での動作確認
+2. ✅ EEPROM保存・読み込みテスト
+3. 🔲 新規プリセット（LINK等）での動作確認
+4. 🔲 カスタム設定の保存・読込テスト（HostApp経由）
 
 ---
 
@@ -285,3 +293,35 @@ float can_field_to_physical(const CAN_Field_t *field, const can_frame_t *rx_data
 | 日付 | バージョン | 内容 |
 |------|-----------|------|
 | 2026/01/15 | 1.0 | 初版作成 |
+| 2026/01/16 | 2.0 | Phase 1-3完了: Firmware側CAN設定UI、EEPROM永続化実装完了 |
+
+---
+
+## 実装詳細メモ
+
+### EEPROM (BR24A16F) アドレスマップ
+
+| 領域 | アドレス | サイズ | 用途 |
+|------|----------|--------|------|
+| Legacy ODO/Trip | 0x0000 | 12 bytes | 既存ODO/Trip（互換用） |
+| PARAM_Storage | 0x0010 | ~100 bytes | タイヤ/ギア比/警告設定等 |
+| CAN_Config | 0x0100 | 50 bytes | CAN設定（6ch + 16field + CRC） |
+
+### 24C16 EEPROM仕様
+
+- **容量**: 16Kbit = 2KB
+- **ページサイズ**: 16バイト
+- **アドレッシング**: 1バイトアドレス（上位3ビットはI2Cデバイスアドレスに埋め込み）
+  - I2C addr 0x50: EEPROM addr 0x000-0x0FF
+  - I2C addr 0x51: EEPROM addr 0x100-0x1FF
+  - ...
+
+### コンソールコマンド（Firmware）
+
+```
+can_list          - 現在のCAN設定一覧表示
+can_ch <n> <id> <en> - チャンネル設定 (例: can_ch 1 0x3E8 1)
+can_field <n> ...  - フィールド設定
+can_preset <id>    - プリセット適用 (0=MoTeC)
+can_save           - EEPROMに保存
+```

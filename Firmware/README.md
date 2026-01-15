@@ -33,6 +33,34 @@ For details, refer to `THIRD_PARTY_NOTICES.md`.
 
 ***
 ## CAN data frame setting
+
+### CAN設定のカスタマイズ（Issue #65）
+
+FULLMONI-WIDEは、CAN受信ID・データフィールドをカスタマイズ可能です。
+設定はEEPROMに保存され、電源OFF後も永続化されます。
+
+#### コンソールコマンド
+
+| コマンド | 説明 | 例 |
+|---------|------|-----|
+| `can_list` | 現在のCAN設定一覧表示 | `can_list` |
+| `can_ch <n> <id> <en>` | チャンネル設定 | `can_ch 1 0x3E8 1` |
+| `can_field <n> <ch> <byte> <size> <type> <end> <var> <mul> <div>` | フィールド設定 | |
+| `can_preset <id>` | プリセット適用 | `can_preset 0` (MoTeC) |
+| `can_save` | EEPROMに保存 | `can_save` |
+
+#### 対応プリセット
+
+| ID | ECU | CAN ID範囲 |
+|----|-----|-----------|
+| 0 | MoTeC M100/M400/M800 | 0x3E8-0x3ED |
+| (将来) | LINK G4+/G4X | TBD |
+| (将来) | AEM EMS | TBD |
+
+詳細は [docs/issue_65_can_customization_design.md](../docs/issue_65_can_customization_design.md) を参照。
+
+### デフォルトCAN設定（MoTeC M100互換）
+
 frame No1 address : 1000(dec) , 0x3E8(hex)
 |CAN Address|frame no| byte |assign|unit|multiplier(LSB)|
 |---|---|---|---|---|---|

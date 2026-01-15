@@ -595,11 +595,15 @@ public partial class MainWindow : Window
                 await Task.Delay(150);
             }
 
+            // EEPROMに保存
+            vm.SendCommandDirect("can_save");
+            await Task.Delay(300);
+
             // パラメータモードを抜ける
             vm.SendCommandDirect("exit");
             await Task.Delay(300);
 
-            UpdateCanStatus($"完了: {commands.Count}個のCAN設定を送信");
+            UpdateCanStatus($"完了: {commands.Count}個のCAN設定を送信・保存");
         }
         finally
         {
