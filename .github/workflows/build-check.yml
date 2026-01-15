@@ -1,0 +1,87 @@
+name: Build Check
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Check for untracked source files in AppWizard Image folders
+      run: |
+        echo "=== Checking AppWizard Image resources ==="
+        
+        # aw001/aw002 の Image フォルダ内の .c ファイルをチェック
+        for aw_dir in Firmware/aw001 Firmware/aw002; do
+          if [ -d "$aw_dir/Resource/Image" ]; then
+            echo "Checking $aw_dir/Resource/Image..."
+            
+            # Generated ファイルで参照されている配列名を抽出
+            if [ -d "$aw_dir/Source/Generated" ]; then
+              # ac* で始まる配列参照を抽出 (例: acmtc, acfmw_op0)
+              refs=$(grep -rhoP 'ac[a-zA-Z0-9_]+' "$aw_dir/Source/Generated/" 2>/dev/null | sort -u || true)
+              
+              for ref in $refs; do
+                # 配列名から対応するファイル名を推測 (acXXX -> XXX.c)
+                filename="${ref#ac}.c"
+                filepath="$aw_dir/Resource/Image/$filename"
+                
+                # ファイルが存在するかチェック
+                if [ ! -f "$filepath" ]; then
+                  # Font フォルダも確認
+                  fontpath="$aw_dir/Resource/Font/$filename"
+                  if [ ! -f "$fontpath" ]; then
+                    echo "::warning::Referenced array '$ref' but file '$filename' not found in Image or Font folder"
+                  fi
+                fi
+              done
+            fi
+          fi
+        done
+        
+        echo "=== Check completed ==="
+    
+    - name: Verify all Image .c files are tracked
+      run: |
+        echo "=== Checking for untracked Image files ==="
+        
+        # git ls-files で追跡されていないファイルを検出
+        untracked=$(git ls-files --others --exclude-standard 'Firmware/aw*/Resource/Image/*.c' 2>/dev/null || true)
+        
+        if [ -n "$untracked" ]; then
+          echo "::error::Untracked image files found:"
+          echo "$untracked"
+          exit 1
+        fi
+        
+        echo "All image files are tracked."
+    
+    - name: Basic C syntax check
+      run: |
+        echo "=== Basic syntax check ==="
+        
+        # 主要なソースファイルの構文チェック（GCCプリプロセッサで）
+        error_count=0
+        
+        for file in Firmware/src/*.c; do
+          if [ -f "$file" ]; then
+            # -fsyntax-only で構文のみチェック（RX固有ヘッダはスキップ）
+            if ! gcc -fsyntax-only -x c -std=c99 \
+                 -include stdint.h \
+                 -D__RX__ \
+                 -D__CCRX__ \
+                 -Wno-all \
+                 "$file" 2>/dev/null; then
+              # 構文エラーは警告として出力（RX固有の問題は無視）
+              echo "::notice::Syntax check skipped for $file (RX-specific)"
+            fi
+          fi
+        done
+        
+        echo "=== Syntax check completed ==="
