@@ -3,7 +3,7 @@
 *        Solutions for real time microcontroller applications        *
 **********************************************************************
 *                                                                    *
-*        (c) 1996 - 2025  SEGGER Microcontroller GmbH                *
+*        (c) 1996 - 2026  SEGGER Microcontroller GmbH                *
 *                                                                    *
 *        Internet: www.segger.com    Support:  support@segger.com    *
 *                                                                    *
@@ -91,6 +91,7 @@ static APPW_VAR_OBJECT _aVarList[] = {
   { ID_VAR_AD3, 0, 0, NULL },
   { ID_VAR_AD4, 0, 0, NULL },
   { ID_VAR_REV_Amax, 0, 0, NULL },
+  { ID_VAR_PRM, 0, 0, NULL },
 };
 
 /*********************************************************************

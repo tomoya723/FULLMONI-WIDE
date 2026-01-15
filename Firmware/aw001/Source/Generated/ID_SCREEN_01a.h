@@ -3,7 +3,7 @@
 *        Solutions for real time microcontroller applications        *
 **********************************************************************
 *                                                                    *
-*        (c) 1996 - 2025  SEGGER Microcontroller GmbH                *
+*        (c) 1996 - 2026  SEGGER Microcontroller GmbH                *
 *                                                                    *
 *        Internet: www.segger.com    Support:  support@segger.com    *
 *                                                                    *
@@ -32,6 +32,7 @@ Purpose     : Generated file do NOT edit!
 #define ID_NUM_RV    (GUI_ID_USER + 16)
 #define ID_NUM_TIME  (GUI_ID_USER + 2)
 #define ID_TIMER_00  (GUI_ID_USER + 6)
+#define ID_TEXT_ACC  (GUI_ID_USER + 7)
 
 /*********************************************************************
 *
@@ -53,6 +54,9 @@ void ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_GEAR__APPW_JOB_SETTEXT_
 void ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED                                        (APPW_ACTION_ITEM * pAction, WM_HWIN hScreen, WM_MESSAGE * pMsg, int * pResult);
 void ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_TIMER_00__APPW_JOB_START           (APPW_ACTION_ITEM * pAction, WM_HWIN hScreen, WM_MESSAGE * pMsg, int * pResult);
 void ID_SCREEN_01a__ID_TIMER_00__APPW_NOTIFICATION_TIMER__ID_ROTARY_01__APPW_JOB_SETVALUE(APPW_ACTION_ITEM * pAction, WM_HWIN hScreen, WM_MESSAGE * pMsg, int * pResult);
+void ID_SCREEN_01a__APPW_NOTIFICATION_INITDIALOG__ID_TEXT_ACC__APPW_JOB_SETVIS           (APPW_ACTION_ITEM * pAction, WM_HWIN hScreen, WM_MESSAGE * pMsg, int * pResult);
+void ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_TEXT_ACC__APPW_JOB_SETVIS          (APPW_ACTION_ITEM * pAction, WM_HWIN hScreen, WM_MESSAGE * pMsg, int * pResult);
+void ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_TEXT_ACC__APPW_JOB_SETVIS_0        (APPW_ACTION_ITEM * pAction, WM_HWIN hScreen, WM_MESSAGE * pMsg, int * pResult);
 
 /*********************************************************************
 *
