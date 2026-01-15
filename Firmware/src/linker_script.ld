@@ -61,8 +61,8 @@ SECTIONS
 	.rodata :
 	{
 		*(.rodata)
-		/* mtc.oのacmtcは.startup_imageセクションに配置するため除外 */
-		EXCLUDE_FILE(*mtc.o) *(.rodata.*)
+		/* fmw_op0.oのacmtcは.startup_imageセクションに配置するため除外 */
+		EXCLUDE_FILE(*fmw_op0.o) *(.rodata.*)
 		*(C_1)
 		*(C_2)
 		*(C)
@@ -70,11 +70,11 @@ SECTIONS
 	} >ROM
 	/* 起動画像用セクション (固定アドレス 0xFFE00000) */
 	/* ファームウェア更新後も画像データを保持するため、別領域に配置 */
-	/* mtc.o内のacmtc配列(.rodata.acmtc)をここに配置 */
+	/* fmw_op0.o内のacfmw_op0配列(.rodata.acfmw_op0)をここに配置 */
 	.startup_image 0xFFE00000 : AT(0xFFE00000)
 	{
 		_startup_image_start = .;
-		*mtc.o(.rodata.*)
+		*fmw_op0.o(.rodata.*)
 		_startup_image_end = .;
 	} >STARTUP_IMAGE
 	gcc_exceptions_table :

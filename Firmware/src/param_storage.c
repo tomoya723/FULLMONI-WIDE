@@ -132,17 +132,36 @@ static bool eeprom_read(uint16_t addr, uint8_t *data, uint16_t len)
 /* ============================================================
  * レガシー領域（0x0000）への保存
  * main.cの起動シーケンスで読み込まれる形式に【完全に】合わせる
- * main.cの形式: I2C_WriteData[14] で14バイト送信
- *   [0]=0x00(アドレス上位、固定), [1-4]=wr_cnt, [5-8]=sp_int, [9-12]=tr_int, [13]=0x00
+ *
+ * main.cでの読み込み:
+ *   I2C_BUF[0,1] = {0x00, 0x00} をアドレスとして送信
+ *   I2C_BUF2に12バイト読み込み
+ *   wr_cnt = I2C_BUF2[0-3], sp_int = I2C_BUF2[4-7], tr_int = I2C_BUF2[8-11]
+ *
+ * main.cでの書き込み:
+ *   I2C_WriteData[14] = {0x00, wr_cnt[4], sp_int[4], tr_int[4], 0x00}
+ *   I2C_WriteData[0] = 0x00 (固定、アドレス上位)
+ *   I2C_WriteData[1-4] = wr_cnt (※アドレス下位を上書きしている！)
+ *   I2C_WriteData[5-8] = sp_int
+ *   I2C_WriteData[9-12] = tr_int
+ *   I2C_WriteData[13] = 0x00 (固定)
+ *
+ * ★重要: main.cはI2C_WriteData[1]にwr_cnt上位バイトを入れているため、
+ *   wr_cnt < 0x01000000 の場合、実質アドレス0x0000に書き込まれ、
+ *   EEPROMには [wr_cnt>>16, wr_cnt>>8, wr_cnt, sp_int..., tr_int..., 0x00] が保存される。
+ *   これは読み込み時の解釈と一致しないバグだが、互換性のため同じ形式で保存する。
  * ============================================================ */
 static void save_legacy_eeprom(void)
 {
     uint8_t legacy_buf[14];
     extern volatile unsigned long wr_cnt;  /* main.cの書き込みカウンタを参照 */
 
-    /* main.cと【完全に同じ形式】: 14バイト送信 */
-    legacy_buf[0]  = 0x00;  /* アドレス上位 (main.cのI2C_WriteData[0]と同じ) */
-    legacy_buf[1]  = (wr_cnt >> 24) & 0xFF;
+    /*
+     * main.cと【完全に同じ形式】で14バイト送信
+     * (main.cのI2C_WriteDataと同じレイアウト)
+     */
+    legacy_buf[0]  = 0x00;  /* アドレス上位 (固定) */
+    legacy_buf[1]  = (wr_cnt >> 24) & 0xFF;  /* main.cと同じ: wr_cnt上位バイト */
     legacy_buf[2]  = (wr_cnt >> 16) & 0xFF;
     legacy_buf[3]  = (wr_cnt >>  8) & 0xFF;
     legacy_buf[4]  = (wr_cnt      ) & 0xFF;
@@ -154,7 +173,7 @@ static void save_legacy_eeprom(void)
     legacy_buf[10] = (tr_int >> 16) & 0xFF;
     legacy_buf[11] = (tr_int >>  8) & 0xFF;
     legacy_buf[12] = (tr_int      ) & 0xFF;
-    legacy_buf[13] = 0x00;  /* main.cのI2C_WriteData[13]と同じ */
+    legacy_buf[13] = 0x00;  /* 固定 */
 
     /* I2C送信 (14バイト: main.cと同じ) */
     I2C0_TX_END_FLG = 0;

@@ -109,7 +109,7 @@
       Text=1100
       Text=CANSPEED
       Text=PARAMETER MODE
-      Text=Param Access
+      Text=HOST ACCESS
     </Lang>
   </Text>
   <Content>
@@ -206,7 +206,7 @@
       <SetLQ>
       </SetLQ>
       <SetSbitmap>
-        Image=mtc.bmp
+        Image=fmw_op0.bmp
       </SetSbitmap>
     </Image>
     <Timer>
@@ -2815,8 +2815,8 @@
     </SETVALUE>
   </Interactions>
   <Selection>
-    Root=ID_SCREEN_01a
-    Object=2052
+    Root=ID_SCREEN_00
+    Object=2050
   </Selection>
   <Terms>
   </Terms>

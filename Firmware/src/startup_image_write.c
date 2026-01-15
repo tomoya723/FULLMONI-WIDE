@@ -65,8 +65,11 @@ static void debug_printf(const char *fmt, ...)
     va_end(args);
     debug_print(debug_buf);
 }
-/* AppWizardリソースヘッダ (acmtcシンボル定義) */
-#include "../aw001/Source/Generated/Resource.h"
+/* AppWizardリソースヘッダ (acfmw_op0シンボル定義) */
+#include "../aw002/Source/Generated/Resource.h"
+
+/* 起動画像シンボルのエイリアス（コード変更を最小化）*/
+#define acmtc acfmw_op0
 
 /* ============================================================
  * フラッシュ書き込み関連定義
