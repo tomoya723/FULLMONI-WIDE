@@ -25,8 +25,8 @@
 // --------------------------------------------------------------------
 volatile long			g_int10mscnt;
 volatile unsigned int	g_fps_cnt, g_fps_max, g_sp_int_flg, g_sw_cnt, g_sw_int_flg;
-volatile uint8_t I2C_WriteData[] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}; // 先頭2byteは書き込みアドレス
-volatile uint8_t I2C_BUF[] = {0x00,0x00};
+volatile uint8_t I2C_WriteData[] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}; // 先頭1byteはアドレス（24C16は1バイトアドレス）
+volatile uint8_t I2C_BUF[] = {0x00};  // 24C16用: 1バイトアドレス
 volatile uint8_t I2C_BUF2[] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 volatile unsigned long sp_int, sp_int_old, tr_int, wr_cnt;
 volatile unsigned int sp_TGRA, sch50ms_cnt, sch100ms_cnt;
@@ -58,6 +58,7 @@ void User_CallBack_transmitend1(void);
 void User_CallBack_receiveend1(void);
 void User_CallBack_receiveerror1(MD_STATUS status);
 void Neopixel_SetRGB(unsigned int LED_No, int g, int r, int b);
+extern void R_Config_SCI9_Start(void);
 void Neopixel_InitRGB(void);
 void Neopixel_TX(void);
 void sch_10ms(void);
@@ -108,7 +109,7 @@ void main(void)
 
 	R_Config_MTU3_Start();
 
-	// CAN設定初期化（デフォルト値セット）- Init_CAN()より前に必須
+	// CAN設定は仮初期化（EEPROMはI2C初期化後に読み込む）
 	can_config_init();
 
 	// Init CAN
@@ -129,9 +130,10 @@ void main(void)
 
 	R_Config_RIIC0_Start();
 	R_Config_RIIC1_Start();
+	R_Config_SCI9_Start();  // デバッグ出力用UART起動
 
-	// Read ODO/Trip pulse log from EEPROM
-	R_Config_RIIC0_Master_Send_Without_Stop(0x50,(void *) I2C_BUF,2); //I2C_BUF:Read Adress
+	// Read ODO/Trip pulse log from EEPROM (24C16: 1バイトアドレス)
+	R_Config_RIIC0_Master_Send_Without_Stop(0x50,(void *) I2C_BUF,1); //I2C_BUF:Read Adress (1byte for 24C16)
 	while(I2C0_TX_END_FLG == 0); // Wait for TX done
 	I2C0_TX_END_FLG = 0;
 	R_Config_RIIC0_Master_Receive(0x50,(void *) I2C_BUF2,12); //I2C_BUF2:Read Data
@@ -163,10 +165,17 @@ void main(void)
 	I2C0_TX_END_FLG = 0;
 	*/
 
+	// CAN設定をEEPROMから読み込み（I2C初期化後）
+	if (can_config_load()) {
+		// EEPROM読み込み成功 → CANフィルタを更新
+		can_update_rx_filters();
+	}
+	// 失敗時は既にcan_config_init()で初期化済み
+
 	// Start MTU8 (Vehicle speed　Pulse　Interupt function)
 	R_Config_MTU8_Start();
 
-	printf("FULLMONI Init Done.\n");
+	printf("FULLMONI Init Done.\r\n");
 
 	Neopixel_InitRGB();
 	g_CALC_data.AD7 = S12AD.ADDR7; // issue#4暫定対策：LPF値リセット
@@ -174,7 +183,7 @@ void main(void)
 	// パラメータストレージ初期化（EEPROM読み込み）
 	param_storage_init();
 	if (!param_storage_load()) {
-		printf("EEPROM CRC error, using defaults.\n");
+		printf("EEPROM CRC error, using defaults.\r\n");
 	}
 
 	/*

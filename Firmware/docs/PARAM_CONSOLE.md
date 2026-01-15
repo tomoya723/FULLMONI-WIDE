@@ -168,6 +168,16 @@ typedef struct {
 | `fwupdate` | Flash消去→Bootloaderリブート | ⚠️ FLASH |
 | `exit` | 通常モードへ戻る | - |
 
+#### CAN設定コマンド（Issue #65）
+
+| コマンド | 説明 | EEPROM |
+|----------|------|--------|
+| `can_list` | CAN設定一覧表示 | - |
+| `can_ch <n> <id> <en>` | CANチャンネル設定 (n=1-6, id=0x000-0x7FF, en=0/1) | - |
+| `can_field <n> ...` | CANフィールド設定 | - |
+| `can_preset <id>` | プリセット適用 (0=MoTeC) | - |
+| `can_save` | CAN設定をEEPROMに保存 | ✅ Write |
+
 ### 5.3 パラメータID一覧
 
 | ID | 対象 | 値の形式 |
@@ -433,6 +443,13 @@ void param_storage_reset_trip(void)
 - TeraTermなどでバイナリ送信してファームウェア書き込み
 
 ---
+
+## 9. 変更履歴
+
+| 日付 | バージョン | 内容 |
+|------|-----------|------|
+| 2026/01/06 | 1.0 | 初版作成 |
+| 2026/01/16 | 1.1 | CAN設定コマンド追加（Issue #65） |
 
 ## 9. 改版履歴
 

@@ -31,7 +31,7 @@ extern void LCD_FadeOUT(void);
 /* SCI9 デバッグ出力用 (USB CDCと独立) */
 extern MD_STATUS R_Config_SCI9_Serial_Send(uint8_t * const tx_buf, uint16_t tx_num);
 extern void R_Config_SCI9_Start(void);
-static volatile bool s_sci9_tx_done = false;
+volatile bool s_sci9_tx_done = false;
 
 /* USB送信カウンタ (usb_cdc.c) */
 extern volatile uint32_t s_usb_write_success;

@@ -104,6 +104,12 @@ void R_Config_SCI9_Start(void)
     ICU.GENAL0.BIT.EN4 = 1U;
     IEN(SCI9, RXI9) = 1U;
     ICU.GENAL0.BIT.EN5 = 1U;
+
+    /* Set TXD9 pin to peripheral mode */
+    PORTB.PMR.BYTE |= 0x80U;
+
+    /* Enable transmit and receive */
+    SCI9.SCR.BYTE |= 0x30U;  /* TE=1, RE=1 */
 }
 
 /***********************************************************************************************************************

@@ -83,47 +83,65 @@ uint16_t param_calc_crc16(const uint8_t *data, uint16_t len)
 
 /* ============================================================
  * I2C EEPROM 書き込み (ページ単位)
+ * 24C16: アドレスの上位3ビットはI2Cデバイスアドレスに含める
  * ============================================================ */
 static bool eeprom_write(uint16_t addr, const uint8_t *data, uint16_t len)
 {
     uint16_t i;
+    uint32_t timeout;
+    uint8_t i2c_addr;
 
-    /* 先頭2バイトはアドレス */
-    i2c_buf[0] = (addr >> 8) & 0xFF;
-    i2c_buf[1] = addr & 0xFF;
+    /* 24C16: アドレスの上位3ビットをI2Cアドレスに含める */
+    i2c_addr = EEPROM_I2C_ADDR | ((addr >> 8) & 0x07);
+
+    /* 先頭1バイトはアドレス（下位8ビットのみ） */
+    i2c_buf[0] = addr & 0xFF;
 
     /* データコピー */
-    for (i = 0; i < len && i < 62; i++) {
-        i2c_buf[2 + i] = data[i];
+    for (i = 0; i < len && i < 63; i++) {
+        i2c_buf[1 + i] = data[i];
     }
 
     /* I2C送信 */
     I2C0_TX_END_FLG = 0;
-    R_Config_RIIC0_Master_Send(EEPROM_I2C_ADDR, (void *)i2c_buf, 2 + len);
-    while (I2C0_TX_END_FLG == 0);
+    R_Config_RIIC0_Master_Send(i2c_addr, (void *)i2c_buf, 1 + len);
+    
+    /* タイムアウト付き待機 */
+    timeout = 1000000;
+    while (I2C0_TX_END_FLG == 0 && timeout > 0) {
+        timeout--;
+    }
+    if (timeout == 0) {
+        return false;
+    }
 
-    /* EEPROM書き込み待ち (約5ms) */
-    for (volatile int wait = 0; wait < 50000; wait++);
+    /* EEPROM書き込み待ち (約10ms) */
+    for (volatile int wait = 0; wait < 100000; wait++);
 
     return true;
 }
 
 /* ============================================================
  * I2C EEPROM 読み込み
+ * 24C16: アドレスの上位3ビットはI2Cデバイスアドレスに含める
  * ============================================================ */
 static bool eeprom_read(uint16_t addr, uint8_t *data, uint16_t len)
 {
-    /* アドレス送信 */
-    i2c_buf[0] = (addr >> 8) & 0xFF;
-    i2c_buf[1] = addr & 0xFF;
+    uint8_t i2c_addr;
+
+    /* 24C16: アドレスの上位3ビットをI2Cアドレスに含める */
+    i2c_addr = EEPROM_I2C_ADDR | ((addr >> 8) & 0x07);
+
+    /* アドレス送信（下位8ビットのみ） */
+    i2c_buf[0] = addr & 0xFF;
 
     I2C0_TX_END_FLG = 0;
-    R_Config_RIIC0_Master_Send_Without_Stop(EEPROM_I2C_ADDR, (void *)i2c_buf, 2);
+    R_Config_RIIC0_Master_Send_Without_Stop(i2c_addr, (void *)i2c_buf, 1);
     while (I2C0_TX_END_FLG == 0);
 
     /* データ読み込み */
     I2C0_RX_END_FLG = 0;
-    R_Config_RIIC0_Master_Receive(EEPROM_I2C_ADDR, (void *)data, len);
+    R_Config_RIIC0_Master_Receive(i2c_addr, (void *)data, len);
     while (I2C0_RX_END_FLG == 0);
 
     return true;
@@ -153,15 +171,18 @@ static bool eeprom_read(uint16_t addr, uint8_t *data, uint16_t len)
  * ============================================================ */
 static void save_legacy_eeprom(void)
 {
-    uint8_t legacy_buf[14];
+    uint8_t legacy_buf[13];  // 24C16: 1バイトアドレス + 12バイトデータ
     extern volatile unsigned long wr_cnt;  /* main.cの書き込みカウンタを参照 */
 
     /*
-     * main.cと【完全に同じ形式】で14バイト送信
-     * (main.cのI2C_WriteDataと同じレイアウト)
+     * 24C16用フォーマット:
+     * legacy_buf[0] = アドレス (0x00)
+     * legacy_buf[1-4] = wr_cnt (4バイト)
+     * legacy_buf[5-8] = sp_int (4バイト)
+     * legacy_buf[9-12] = tr_int (4バイト)
      */
-    legacy_buf[0]  = 0x00;  /* アドレス上位 (固定) */
-    legacy_buf[1]  = (wr_cnt >> 24) & 0xFF;  /* main.cと同じ: wr_cnt上位バイト */
+    legacy_buf[0]  = 0x00;  /* アドレス (24C16は1バイトアドレス) */
+    legacy_buf[1]  = (wr_cnt >> 24) & 0xFF;
     legacy_buf[2]  = (wr_cnt >> 16) & 0xFF;
     legacy_buf[3]  = (wr_cnt >>  8) & 0xFF;
     legacy_buf[4]  = (wr_cnt      ) & 0xFF;
@@ -173,11 +194,10 @@ static void save_legacy_eeprom(void)
     legacy_buf[10] = (tr_int >> 16) & 0xFF;
     legacy_buf[11] = (tr_int >>  8) & 0xFF;
     legacy_buf[12] = (tr_int      ) & 0xFF;
-    legacy_buf[13] = 0x00;  /* 固定 */
 
-    /* I2C送信 (14バイト: main.cと同じ) */
+    /* I2C送信 (13バイト: 1バイトアドレス + 12バイトデータ) */
     I2C0_TX_END_FLG = 0;
-    R_Config_RIIC0_Master_Send(EEPROM_I2C_ADDR, (void *)legacy_buf, 14);
+    R_Config_RIIC0_Master_Send(EEPROM_I2C_ADDR, (void *)legacy_buf, 13);
     while (I2C0_TX_END_FLG == 0);
 
     /* EEPROM書き込み待ち (約5ms) */
@@ -257,13 +277,13 @@ bool param_storage_save(void)
     /* バッファにコピー */
     memcpy(buf, &g_param, PARAM_STORAGE_SIZE);
 
-    /* EEPROMに書き込み (分割書き込み: 32バイト単位) */
+    /* EEPROMに書き込み (分割書き込み: 16バイト単位 - 24C16ページサイズ) */
     uint16_t offset = 0;
     uint16_t remaining = PARAM_STORAGE_SIZE;
     uint16_t chunk;
 
     while (remaining > 0) {
-        chunk = (remaining > 32) ? 32 : remaining;
+        chunk = (remaining > 16) ? 16 : remaining;
         eeprom_write(EEPROM_ADDR_PARAM + offset, buf + offset, chunk);
         offset += chunk;
         remaining -= chunk;
@@ -474,7 +494,8 @@ bool can_config_load(void)
 
     /* CRCチェック */
     crc_calc = param_calc_crc16(buf, CAN_CONFIG_SIZE - 2);
-    crc_stored = (buf[CAN_CONFIG_SIZE - 2] << 8) | buf[CAN_CONFIG_SIZE - 1];
+    /* Little Endian: 下位バイトが先 */
+    crc_stored = buf[CAN_CONFIG_SIZE - 2] | (buf[CAN_CONFIG_SIZE - 1] << 8);
 
     if (crc_calc != crc_stored) {
         can_config_init();
@@ -494,15 +515,18 @@ bool can_config_save(void)
     uint16_t crc;
     uint8_t *buf = (uint8_t *)&g_can_config;
 
+    /* バージョンを確実に設定 */
+    g_can_config.version = CAN_CONFIG_VERSION;
+
     /* CRC計算 */
     crc = param_calc_crc16(buf, CAN_CONFIG_SIZE - 2);
     g_can_config.crc16 = crc;
 
-    /* EEPROM書き込み (分割して書き込み) */
+    /* EEPROM書き込み (分割して書き込み) - 24C16のページサイズは16バイト */
     uint16_t offset = 0;
     uint16_t remaining = CAN_CONFIG_SIZE;
     while (remaining > 0) {
-        uint16_t chunk = (remaining > 32) ? 32 : remaining;
+        uint16_t chunk = (remaining > 16) ? 16 : remaining;
         if (!eeprom_write(EEPROM_ADDR_CAN_CONFIG + offset, buf + offset, chunk)) {
             return false;
         }

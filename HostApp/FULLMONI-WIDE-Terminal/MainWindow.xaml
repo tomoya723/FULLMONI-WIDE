@@ -8,7 +8,7 @@
         xmlns:views="clr-namespace:FullmoniTerminal.Views"
         mc:Ignorable="d"
         Title="FULLMONI-WIDE Terminal"
-        Height="640" Width="480"
+        Height="640" Width="530"
         ResizeMode="CanMinimize"
         FontFamily="Meiryo UI"
         Background="{DynamicResource BackgroundGradient}"
@@ -90,7 +90,7 @@
         </Border>
 
         <!-- タブコントロール -->
-        <TabControl Grid.Row="1" Margin="0,0,0,6" SelectedIndex="4">
+        <TabControl Grid.Row="1" Margin="0,0,0,6" SelectedIndex="5">
             <!-- タブ1: ステータス -->
             <TabItem Header="ステータス" IsEnabled="{Binding IsFirmwareMode}">
                 <Grid Margin="8">
@@ -343,7 +343,165 @@
                 </Grid>
             </TabItem>
 
-            <!-- タブ3: 起動画面変更 -->
+            <!-- タブ3: CAN設定 -->
+            <TabItem Header="CAN設定" IsEnabled="{Binding IsFirmwareMode}">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- CANチャンネル設定 -->
+                    <Border Grid.Row="0" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock Text="受信チャンネル設定" FontWeight="Bold" FontSize="12" Margin="0,0,0,8" Foreground="{DynamicResource TextBrush}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="35"/>
+                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="35"/>
+                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="40"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- CH1-2 -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="CH1" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBox Grid.Row="0" Grid.Column="1" x:Name="CanCh1IdBox" Text="0x3E8" Height="22" FontSize="11" Margin="2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <CheckBox Grid.Row="0" Grid.Column="2" x:Name="CanCh1EnabledBox" IsChecked="True" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <TextBlock Grid.Row="0" Grid.Column="4" Text="CH2" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBox Grid.Row="0" Grid.Column="5" x:Name="CanCh2IdBox" Text="0x3E9" Height="22" FontSize="11" Margin="2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <CheckBox Grid.Row="0" Grid.Column="6" x:Name="CanCh2EnabledBox" IsChecked="True" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
+
+                                <!-- CH3-4 -->
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="CH3" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" x:Name="CanCh3IdBox" Text="0x3EA" Height="22" FontSize="11" Margin="2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <CheckBox Grid.Row="1" Grid.Column="2" x:Name="CanCh3EnabledBox" IsChecked="True" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="4" Text="CH4" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBox Grid.Row="1" Grid.Column="5" x:Name="CanCh4IdBox" Text="0x3EB" Height="22" FontSize="11" Margin="2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <CheckBox Grid.Row="1" Grid.Column="6" x:Name="CanCh4EnabledBox" IsChecked="True" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
+
+                                <!-- CH5-6 -->
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="CH5" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBox Grid.Row="2" Grid.Column="1" x:Name="CanCh5IdBox" Text="0x3EC" Height="22" FontSize="11" Margin="2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <CheckBox Grid.Row="2" Grid.Column="2" x:Name="CanCh5EnabledBox" IsChecked="True" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <TextBlock Grid.Row="2" Grid.Column="4" Text="CH6" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBox Grid.Row="2" Grid.Column="5" x:Name="CanCh6IdBox" Text="0x3ED" Height="22" FontSize="11" Margin="2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <CheckBox Grid.Row="2" Grid.Column="6" x:Name="CanCh6EnabledBox" IsChecked="False" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- データフィールド定義 -->
+                    <Border Grid.Row="1" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="データフィールド定義 (最大8個)" FontWeight="Bold" FontSize="12" Margin="0,0,0,8" Foreground="{DynamicResource TextBrush}"/>
+
+                            <DataGrid Grid.Row="1" x:Name="CanFieldsGrid"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False"
+                                      CanUserDeleteRows="False"
+                                      HeadersVisibility="Column"
+                                      GridLinesVisibility="Horizontal"
+                                      Background="Transparent"
+                                      RowBackground="{DynamicResource CardBackgroundBrush}"
+                                      AlternatingRowBackground="{DynamicResource PrimaryBackgroundBrush}"
+                                      Foreground="{DynamicResource TextBrush}"
+                                      BorderBrush="{DynamicResource BorderBrush}"
+                                      FontSize="11"
+                                      IsEnabled="{Binding IsOperationEnabled}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="25" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="CH" Binding="{Binding Channel}" Width="35"/>
+                                    <DataGridTextColumn Header="Byte" Binding="{Binding StartByte}" Width="40"/>
+                                    <DataGridTextColumn Header="Size" Binding="{Binding ByteCount}" Width="40"/>
+                                    <DataGridComboBoxColumn Header="Type" SelectedItemBinding="{Binding DataType}" Width="45">
+                                        <DataGridComboBoxColumn.ElementStyle>
+                                            <Style TargetType="ComboBox">
+                                                <Setter Property="ItemsSource" Value="{Binding DataContext.DataTypeOptions, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                            </Style>
+                                        </DataGridComboBoxColumn.ElementStyle>
+                                        <DataGridComboBoxColumn.EditingElementStyle>
+                                            <Style TargetType="ComboBox">
+                                                <Setter Property="ItemsSource" Value="{Binding DataContext.DataTypeOptions, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                            </Style>
+                                        </DataGridComboBoxColumn.EditingElementStyle>
+                                    </DataGridComboBoxColumn>
+                                    <DataGridComboBoxColumn Header="End" SelectedItemBinding="{Binding Endian}" Width="40">
+                                        <DataGridComboBoxColumn.ElementStyle>
+                                            <Style TargetType="ComboBox">
+                                                <Setter Property="ItemsSource" Value="{Binding DataContext.EndianOptions, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                            </Style>
+                                        </DataGridComboBoxColumn.ElementStyle>
+                                        <DataGridComboBoxColumn.EditingElementStyle>
+                                            <Style TargetType="ComboBox">
+                                                <Setter Property="ItemsSource" Value="{Binding DataContext.EndianOptions, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                            </Style>
+                                        </DataGridComboBoxColumn.EditingElementStyle>
+                                    </DataGridComboBoxColumn>
+                                    <DataGridComboBoxColumn Header="Var" SelectedItemBinding="{Binding TargetVarName}" Width="55">
+                                        <DataGridComboBoxColumn.ElementStyle>
+                                            <Style TargetType="ComboBox">
+                                                <Setter Property="ItemsSource" Value="{Binding DataContext.VarOptions, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                            </Style>
+                                        </DataGridComboBoxColumn.ElementStyle>
+                                        <DataGridComboBoxColumn.EditingElementStyle>
+                                            <Style TargetType="ComboBox">
+                                                <Setter Property="ItemsSource" Value="{Binding DataContext.VarOptions, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                            </Style>
+                                        </DataGridComboBoxColumn.EditingElementStyle>
+                                    </DataGridComboBoxColumn>
+                                    <DataGridTextColumn Header="Off" Binding="{Binding Offset}" Width="40"/>
+                                    <DataGridTextColumn Header="Mul" Binding="{Binding Multiplier}" Width="50"/>
+                                    <DataGridTextColumn Header="Div" Binding="{Binding Divisor}" Width="50"/>
+                                    <DataGridCheckBoxColumn Header="EN" Binding="{Binding Enabled}" Width="35"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <TextBlock Grid.Row="2" Text="Type: U=Unsigned, S=Signed | End: B=Big, L=Little | Mul/Div: 1000=x1.0"
+                                       FontSize="10" Foreground="{DynamicResource TextMutedBrush}" Margin="0,6,0,0"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- ボタンとステータス -->
+                    <StackPanel Grid.Row="2" Margin="0,8,0,0">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Content="読込" Width="70" Height="26" FontSize="12" Margin="0,0,6,0"
+                                    Style="{DynamicResource PrimaryButton}"
+                                    Click="CanReadButton_Click"
+                                    IsEnabled="{Binding IsOperationEnabled}"/>
+                            <Button Content="書込" Width="70" Height="26" FontSize="12" Margin="0,0,6,0"
+                                    Style="{DynamicResource SuccessButton}"
+                                    Click="CanWriteButton_Click"
+                                    IsEnabled="{Binding IsOperationEnabled}"/>
+                            <Button Content="デフォルト" Width="70" Height="26" FontSize="12"
+                                    Style="{DynamicResource SecondaryButton}"
+                                    Click="CanDefaultButton_Click"
+                                    IsEnabled="{Binding IsOperationEnabled}"/>
+                        </StackPanel>
+                        <!-- ステータス表示 -->
+                        <Border Background="{DynamicResource PrimaryBackgroundBrush}" CornerRadius="3" Margin="0,8,0,0" Padding="6">
+                            <TextBlock x:Name="CanStatusText" Text="ボタンを押すとコマンドが送信されます"
+                                       FontSize="11" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap"/>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <!-- タブ4: 起動画面変更 -->
             <TabItem Header="起動画面変更" IsEnabled="{Binding IsFirmwareMode}">
                 <views:StartupImageView DataContext="{Binding StartupImageViewModel}" />
             </TabItem>
