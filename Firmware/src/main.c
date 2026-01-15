@@ -108,8 +108,10 @@ void main(void)
 
 	R_Config_MTU3_Start();
 
-	// CAN設定初期化（デフォルト値セット）- Init_CAN()より前に必須
-	can_config_init();
+	// CAN設定読み込み（EEPROMから復元、失敗時はデフォルト）- Init_CAN()より前に必須
+	if (!can_config_load()) {
+		can_config_init();  // EEPROMにデータがない場合はデフォルト値
+	}
 
 	// Init CAN
 	Init_CAN();

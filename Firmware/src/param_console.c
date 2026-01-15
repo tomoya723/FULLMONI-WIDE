@@ -16,6 +16,7 @@
 #include "platform.h"   /* iodefine.h (RTC access, SYSTEM for software reset) */
 #include "firmware_version.h"
 #include "startup_image_write.h"  /* 起動画像書き込み */
+#include "can.h"  /* Issue #65: CAN受信フィルタ更新 */
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -42,6 +43,9 @@ static char tx_buffer[UART_TX_BUFFER_SIZE];
 
 /* モード終了フラグ */
 static bool exit_flag = false;
+
+/* Issue #65: CAN設定変更フラグ（exitでフィルタ更新が必要かどうか） */
+static bool can_config_changed = false;
 
 /* ============================================================
  * 受信データ取得（USB CDCから直接取得）
@@ -313,6 +317,14 @@ static void cmd_can_list(void)
 /* CANチャンネル設定 */
 static void cmd_can_ch(uint8_t ch, uint16_t can_id, uint8_t enabled)
 {
+    /* Issue #65: 値が変わる場合のみフラグを立てる */
+    if (ch >= 1 && ch <= CAN_CHANNEL_MAX) {
+        CAN_RX_Channel_t *cur = &g_can_config.channels[ch - 1];
+        if (cur->can_id != can_id || cur->enabled != (enabled ? 1 : 0)) {
+            can_config_changed = true;
+        }
+    }
+
     if (can_config_set_channel(ch, can_id, enabled)) {
         param_console_printf("CH%d: ID=0x%03X, %s\r\n", ch, can_id, enabled ? "ON" : "OFF");
     } else {
@@ -339,6 +351,9 @@ static void cmd_can_field(int argc, char *args[])
     field.offset = (int16_t)atoi(args[7]);
     field.multiplier = (uint16_t)atoi(args[8]);
     field.divisor = (uint16_t)atoi(args[9]);
+
+    /* Issue #65: channelが変わる場合のみフラグを立てる（フィルタに影響） */
+    /* 注: フィールド設定はデータ解釈のみなのでフィルタ更新不要 */
 
     if (can_config_set_field(idx, &field)) {
         param_console_printf("Field %d set OK\r\n", idx);
@@ -564,18 +579,23 @@ static void parse_command(const char *line)
         uint16_t can_id = (uint16_t)strtol(arg2, NULL, 0);  /* 0x対応 */
         uint8_t enabled = (uint8_t)atoi(arg3);
         cmd_can_ch(ch, can_id, enabled);
-    } else if (strcmp(cmd, "can_field") == 0 && argc >= 11) {
+    } else if (strcmp(cmd, "can_field") == 0 && argc >= 7) {
         /* can_field <n> <ch> <byte> <len> <type> <end> <var> <off> <mul> <div> */
+        /* 最初の6引数はarg1-arg6、残り4引数は再パース */
         char *args[10] = {arg1, arg2, arg3, arg4, arg5, arg6, NULL, NULL, NULL, NULL};
         /* 残りの引数を再パース */
         char extra_args[4][32];
-        sscanf(line, "%*s %*s %*s %*s %*s %*s %*s %31s %31s %31s %31s",
+        int extra_argc = sscanf(line, "%*s %*s %*s %*s %*s %*s %*s %31s %31s %31s %31s",
                extra_args[0], extra_args[1], extra_args[2], extra_args[3]);
-        args[6] = extra_args[0];
-        args[7] = extra_args[1];
-        args[8] = extra_args[2];
-        args[9] = extra_args[3];
-        cmd_can_field(10, args);
+        if (extra_argc >= 4) {
+            args[6] = extra_args[0];
+            args[7] = extra_args[1];
+            args[8] = extra_args[2];
+            args[9] = extra_args[3];
+            cmd_can_field(10, args);
+        } else {
+            param_console_print("Error: Not enough arguments for can_field\r\n");
+        }
     } else if (strcmp(cmd, "can_preset") == 0 && argc >= 2) {
         cmd_can_preset(arg1);
     } else if (strcmp(cmd, "can_save") == 0) {
@@ -593,6 +613,11 @@ static void parse_command(const char *line)
             param_console_print("NG (using defaults)\r\n");
         }
     } else if (strcmp(cmd, "exit") == 0) {
+        /* Issue #65: CAN設定が変更された場合のみフィルタを更新 */
+        if (can_config_changed) {
+            can_update_rx_filters();
+            can_config_changed = false;
+        }
         param_console_print("Exiting parameter mode...\r\n");
         exit_flag = true;
     } else {
@@ -608,6 +633,7 @@ void param_console_init(void)
 {
     cmd_pos = 0;
     exit_flag = false;
+    can_config_changed = false;  /* Issue #65 */
     memset(cmd_line, 0, CMD_LINE_SIZE);
 }
 

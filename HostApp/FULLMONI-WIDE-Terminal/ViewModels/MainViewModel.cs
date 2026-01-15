@@ -18,8 +18,18 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private readonly SerialPortService _serialService;
     private readonly StringBuilder _responseBuffer;
     private bool _disposed;
-    private bool _isLoadingParameters;
     private TaskCompletionSource<string>? _responseWaiter;
+
+    /// <summary>
+    /// コマンド処理中フラグ（パラメータ読込、CAN設定等）
+    /// </summary>
+    [ObservableProperty]
+    private bool _isBusy;
+
+    partial void OnIsBusyChanged(bool value)
+    {
+        OnPropertyChanged(nameof(IsOperationEnabled));
+    }
 
     /// <summary>
     /// シリアルサービスへの公開アクセス（子ウィンドウ用）
@@ -43,6 +53,63 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public void SendCommandDirect(string command)
     {
         _serialService.SendCommand(command);
+    }
+
+    /// <summary>
+    /// コマンドを送信して応答を取得（CAN設定読込用）
+    /// プロンプト「>」が来るまで待機し、安定した読み込みを行う
+    /// </summary>
+    public async Task<string> SendCommandAndGetResponseAsync(string command, int timeoutMs = 3000)
+    {
+        _responseBuffer.Clear();
+        _serialService.SendCommand(command);
+        TxCount++;
+
+        // プロンプト「>」が来るまで待機（タイムアウト付き）
+        var startTime = DateTime.Now;
+        string lastResponse = "";
+        int stableCount = 0;
+
+        while ((DateTime.Now - startTime).TotalMilliseconds < timeoutMs)
+        {
+            await Task.Delay(100);
+            var currentResponse = _responseBuffer.ToString();
+
+            // プロンプト「>」で終わっていれば完了
+            if (currentResponse.TrimEnd().EndsWith(">"))
+            {
+                // 少し余分に待って全データ到着を確認
+                await Task.Delay(50);
+                return _responseBuffer.ToString();
+            }
+
+            // 応答が変わらなくなったらカウントアップ
+            if (currentResponse == lastResponse && currentResponse.Length > 0)
+            {
+                stableCount++;
+                // 3回（300ms）変化がなければ完了とみなす
+                if (stableCount >= 3)
+                {
+                    return currentResponse;
+                }
+            }
+            else
+            {
+                stableCount = 0;
+            }
+            lastResponse = currentResponse;
+        }
+
+        // タイムアウト時は取得できた分を返す
+        return _responseBuffer.ToString();
+    }
+
+    /// <summary>
+    /// 応答バッファをクリア
+    /// </summary>
+    public void ClearResponseBuffer()
+    {
+        _responseBuffer.Clear();
     }
 
     public MainViewModel()
@@ -263,9 +330,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public bool IsNotConnected => !IsConnected;
 
     /// <summary>
-    /// 操作が可能かどうか（接続中かFirmwareモードかつファームウェア更新中でない）
+    /// 操作が可能かどうか（接続中かFirmwareモードかつファームウェア更新中でないかつコマンド処理中でない）
     /// </summary>
-    public bool IsOperationEnabled => IsFirmwareMode && !IsFirmwareUpdating;
+    public bool IsOperationEnabled => IsFirmwareMode && !IsFirmwareUpdating && !IsBusy;
 
     /// <summary>
     /// ウィンドウを閉じられるかどうか
@@ -369,7 +436,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     /// </summary>
     private async Task LoadParametersInternal()
     {
-        _isLoadingParameters = true;
+        IsBusy = true;
         ActivityStatus = "📥 パラメータを読み込み中...";
 
         try
@@ -421,7 +488,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
         finally
         {
-            _isLoadingParameters = false;
+            IsBusy = false;
             _responseWaiter = null;
         }
     }

@@ -1098,6 +1098,39 @@ static void demo_output_ports_configure(void)
 //    SW3_PMR = 0;
 }
 
+/*****************************************************************************
+Function name:  can_update_rx_filters
+Parameters:     -
+Returns:        -
+Description:    Issue #65: g_can_config の設定を反映してCAN受信フィルタを更新
+                param_console から呼び出される
+                注意: 運用中に呼び出すため、HALT→設定→OPERATEの手順で行う
+*****************************************************************************/
+void can_update_rx_filters(void)
+{
+    uint32_t mbox_ids[6] = { CANBOX_RX1, CANBOX_RX2, CANBOX_RX3, CANBOX_RX4, CANBOX_RX5, CANBOX_RX6 };
+    uint8_t i;
+
+    /* CANモジュールをHALTモードにする（運用中の設定変更のため） */
+    R_CAN_Control(g_can_channel, HALT_CANMODE);
+
+    /* すべてのチャンネルを再設定（有効/無効に関わらず） */
+    for (i = 0; i < CAN_CHANNEL_MAX; i++) {
+        if (g_can_config.channels[i].enabled) {
+            /* 有効なチャンネル: 設定されたCAN IDで受信 */
+            R_CAN_RxSet(g_can_channel, mbox_ids[i], g_can_config.channels[i].can_id, DATA_FRAME);
+            R_CAN_RxSetMask(g_can_channel, mbox_ids[i], 0x7FF);
+        } else {
+            /* 無効なチャンネル: マスク0でどのIDにもマッチしないようにする */
+            R_CAN_RxSet(g_can_channel, mbox_ids[i], 0x7FF, DATA_FRAME);
+            R_CAN_RxSetMask(g_can_channel, mbox_ids[i], 0x000);
+        }
+    }
+
+    /* CANモジュールをOPERATEモードに戻す */
+    R_CAN_Control(g_can_channel, OPERATE_CANMODE);
+}
+
 #define NOP __asm__ volatile("nop;");
 /* AP add */
 void my_sw_charput_function(char output_char)
