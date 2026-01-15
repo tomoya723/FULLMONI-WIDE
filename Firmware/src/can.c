@@ -67,6 +67,7 @@ Includes   <System Includes> , "Project Includes"
 #include "platform.h"
 #include "r_can_rx_if.h"
 #include "r_can_rx_config.h"
+#include "param_storage.h"  /* Issue #65: CAN設定 */
 #include <stdio.h>
 //#include "cmt_dev.h"	/* AP add */
 
@@ -582,38 +583,42 @@ static uint32_t init_can_app(void)
     }
 
     /******** Init demo to receive data ********/
-    /* Use API to set one CAN mailbox for demo receive. */
-    /* Standard id. Choose value 0-0x07FF (2047). */
+    /* Issue #65: g_can_config の設定を使用 */
     if (FRAME_ID_MODE == STD_ID_MODE)
     {
-//      api_status |= R_CAN_RxSet(g_can_channel, CANBOX_RX, RX_CANID_DEMO_INIT, DATA_FRAME);
-        api_status |= R_CAN_RxSet(g_can_channel, CANBOX_RX1, RX_CANID_DEMO_INIT1, DATA_FRAME);
-        api_status |= R_CAN_RxSet(g_can_channel, CANBOX_RX2, RX_CANID_DEMO_INIT2, DATA_FRAME);
-        api_status |= R_CAN_RxSet(g_can_channel, CANBOX_RX3, RX_CANID_DEMO_INIT3, DATA_FRAME);
-        api_status |= R_CAN_RxSet(g_can_channel, CANBOX_RX4, RX_CANID_DEMO_INIT4, DATA_FRAME);
-        api_status |= R_CAN_RxSet(g_can_channel, CANBOX_RX5, RX_CANID_DEMO_INIT5, DATA_FRAME);
-        api_status |= R_CAN_RxSet(g_can_channel, CANBOX_RX6, RX_CANID_DEMO_INIT6, DATA_FRAME);
-
-        /* Mask for receive box.
-         * 0x7FF = no mask. 0x7FD = mask bit 1, for example; If receive ID is set to 1, both ID 1 and 3 should be received.
-         * 0x00 = MASK ALL = receive all frames. */
-//      R_CAN_RxSetMask(g_can_channel, CANBOX_RX, 0x7FF);
-        R_CAN_RxSetMask(g_can_channel, CANBOX_RX1, 0x7FF);
-        R_CAN_RxSetMask(g_can_channel, CANBOX_RX2, 0x7FF);
-        R_CAN_RxSetMask(g_can_channel, CANBOX_RX3, 0x7FF);
-        R_CAN_RxSetMask(g_can_channel, CANBOX_RX4, 0x7FF);
-        R_CAN_RxSetMask(g_can_channel, CANBOX_RX5, 0x7FF);
-        R_CAN_RxSetMask(g_can_channel, CANBOX_RX6, 0x7FF);
+        /* 有効なチャンネルのみ設定 */
+        if (g_can_config.channels[0].enabled) {
+            api_status |= R_CAN_RxSet(g_can_channel, CANBOX_RX1, g_can_config.channels[0].can_id, DATA_FRAME);
+            R_CAN_RxSetMask(g_can_channel, CANBOX_RX1, 0x7FF);
+        }
+        if (g_can_config.channels[1].enabled) {
+            api_status |= R_CAN_RxSet(g_can_channel, CANBOX_RX2, g_can_config.channels[1].can_id, DATA_FRAME);
+            R_CAN_RxSetMask(g_can_channel, CANBOX_RX2, 0x7FF);
+        }
+        if (g_can_config.channels[2].enabled) {
+            api_status |= R_CAN_RxSet(g_can_channel, CANBOX_RX3, g_can_config.channels[2].can_id, DATA_FRAME);
+            R_CAN_RxSetMask(g_can_channel, CANBOX_RX3, 0x7FF);
+        }
+        if (g_can_config.channels[3].enabled) {
+            api_status |= R_CAN_RxSet(g_can_channel, CANBOX_RX4, g_can_config.channels[3].can_id, DATA_FRAME);
+            R_CAN_RxSetMask(g_can_channel, CANBOX_RX4, 0x7FF);
+        }
+        if (g_can_config.channels[4].enabled) {
+            api_status |= R_CAN_RxSet(g_can_channel, CANBOX_RX5, g_can_config.channels[4].can_id, DATA_FRAME);
+            R_CAN_RxSetMask(g_can_channel, CANBOX_RX5, 0x7FF);
+        }
+        if (g_can_config.channels[5].enabled) {
+            api_status |= R_CAN_RxSet(g_can_channel, CANBOX_RX6, g_can_config.channels[5].can_id, DATA_FRAME);
+            R_CAN_RxSetMask(g_can_channel, CANBOX_RX6, 0x7FF);
+        }
     }
     else
     {
 //      api_status |= R_CAN_RxSetXid(g_can_channel, CANBOX_RX, RX_CANID_DEMO_INIT, DATA_FRAME);
-        api_status |= R_CAN_RxSetXid(g_can_channel, CANBOX_RX1, RX_CANID_DEMO_INIT1, DATA_FRAME);
-
-        /* Mask for receive box.
-         * 0x1FFFFFFF = no mask. 0x1FFFFFFD = mask bit 1, for example; If receive ID is set to 1, both
-           ID 1 and 3 should be received. */
-        R_CAN_RxSetMask( g_can_channel, CANBOX_RX1, 0x1FFFFFFF);
+        if (g_can_config.channels[0].enabled) {
+            api_status |= R_CAN_RxSetXid(g_can_channel, CANBOX_RX1, g_can_config.channels[0].can_id, DATA_FRAME);
+            R_CAN_RxSetMask(g_can_channel, CANBOX_RX1, 0x1FFFFFFF);
+        }
     }
 
     /********Init. demo Tx dataframe RAM structure********

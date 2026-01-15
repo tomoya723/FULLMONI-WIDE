@@ -161,6 +161,27 @@
             },
             "group": "build",
             "detail": "Bootloaderのビルド成果物をクリーンアップ"
+        },
+        {
+            "label": "RAM Usage Detail (GCC-RX)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy", "Bypass",
+                "-File", "${workspaceFolder}/tools/check_ram_usage.ps1",
+                "-MapFile", "Firmware.map"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/Firmware/HardwareDebug"
+            },
+            "group": "build",
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "detail": "mapファイルから正確なRAM使用量を計算して表示（rx-elf-sizeより正確）"
         }
     ]
 }

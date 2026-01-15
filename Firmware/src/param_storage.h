@@ -15,6 +15,66 @@
 #include <stdbool.h>
 
 /* ============================================================
+ * CAN設定定義 (Issue #65)
+ * ============================================================ */
+#define CAN_CHANNEL_MAX     6       /* CAN受信チャンネル数 */
+#define CAN_FIELD_MAX       16      /* CANデータフィールド数 */
+
+/* CAN受信チャンネル設定 */
+typedef struct __attribute__((packed)) {
+    uint16_t can_id;                /* 受信CAN ID (0x000-0x7FF) */
+    uint8_t  enabled;               /* 有効/無効 (0:無効, 1:有効) */
+    uint8_t  reserved;              /* 予約 (アライメント用) */
+} CAN_RX_Channel_t;
+
+/* CANデータフィールド定義 */
+typedef struct __attribute__((packed)) {
+    uint8_t  channel;               /* 使用するCANチャンネル (1-6, 0=無効) */
+    uint8_t  start_byte;            /* 開始バイト位置 (0-7) */
+    uint8_t  byte_count;            /* バイト数 (1, 2, 4) */
+    uint8_t  data_type;             /* データ型: 0=unsigned, 1=signed */
+    uint8_t  endian;                /* エンディアン: 0=Big, 1=Little */
+    uint8_t  target_var;            /* 代入先emWin変数ID (内部インデックス) */
+    int16_t  offset;                /* オフセット値 (変換前に加算) */
+    uint16_t multiplier;            /* 乗算係数 (x1000) 例: 1000=x1, 100=x0.1 */
+    uint16_t divisor;               /* 除算係数 (x1000) 例: 1000=/1, 10000=/10 */
+} CAN_Field_t;
+
+/* CAN設定全体 (RAM2領域に配置) */
+typedef struct __attribute__((packed)) {
+    uint8_t          version;                       /* 設定バージョン */
+    uint8_t          preset_id;                     /* プリセットID (0=カスタム) */
+    uint16_t         reserved;                      /* 予約 */
+    CAN_RX_Channel_t channels[CAN_CHANNEL_MAX];     /* 受信チャンネル設定 */
+    CAN_Field_t      fields[CAN_FIELD_MAX];         /* データフィールド定義 */
+    uint16_t         crc16;                         /* CRCチェックサム */
+} CAN_Config_t;
+
+/* CAN設定サイズ */
+#define CAN_CONFIG_SIZE     sizeof(CAN_Config_t)
+
+/* CAN設定バージョン */
+#define CAN_CONFIG_VERSION  1
+
+/* プリセットID */
+#define CAN_PRESET_CUSTOM       0
+#define CAN_PRESET_MOTEC_M100   1
+#define CAN_PRESET_LINK_G4      2
+#define CAN_PRESET_AEM_EMS      3
+
+/* ターゲット変数インデックス (emWin ID_VAR_xxに対応) */
+#define CAN_TARGET_REV      0       /* ID_VAR_REV: エンジン回転数 */
+#define CAN_TARGET_AF       1       /* ID_VAR_AF: A/F比 */
+#define CAN_TARGET_NUM1     2       /* ID_VAR_01: 水温 */
+#define CAN_TARGET_NUM2     3       /* ID_VAR_02: 吸気温 */
+#define CAN_TARGET_NUM3     4       /* ID_VAR_03: 油温 */
+#define CAN_TARGET_NUM4     5       /* ID_VAR_04: MAP */
+#define CAN_TARGET_NUM5     6       /* ID_VAR_05: 油圧 */
+#define CAN_TARGET_NUM6     7       /* ID_VAR_06: バッテリー電圧 */
+#define CAN_TARGET_SPEED    8       /* ID_VAR_SPEED: 車速 */
+#define CAN_TARGET_NONE     255     /* 未割当 */
+
+/* ============================================================
  * パラメータ構造体定義
  * ============================================================ */
 typedef struct __attribute__((packed)) {
@@ -116,8 +176,55 @@ uint32_t param_storage_get_trip_km10(void);
 uint16_t param_calc_crc16(const uint8_t *data, uint16_t len);
 
 /* ============================================================
+ * CAN設定関連関数 (Issue #65)
+ * ============================================================ */
+
+/**
+ * @brief CAN設定を初期化（デフォルトプリセット適用）
+ */
+void can_config_init(void);
+
+/**
+ * @brief EEPROMからCAN設定を読み込み
+ * @return true: 成功, false: CRCエラー（デフォルト値使用）
+ */
+bool can_config_load(void);
+
+/**
+ * @brief EEPROMにCAN設定を保存
+ * @return true: 成功, false: 失敗
+ */
+bool can_config_save(void);
+
+/**
+ * @brief プリセットを適用
+ * @param preset_id プリセットID (CAN_PRESET_xxx)
+ */
+void can_config_apply_preset(uint8_t preset_id);
+
+/**
+ * @brief CANチャンネル設定
+ * @param ch チャンネル番号 (1-6)
+ * @param can_id CAN ID
+ * @param enabled 有効/無効
+ * @return true: 成功, false: 無効なパラメータ
+ */
+bool can_config_set_channel(uint8_t ch, uint16_t can_id, uint8_t enabled);
+
+/**
+ * @brief CANフィールド設定
+ * @param idx フィールドインデックス (0-15)
+ * @param field フィールド定義
+ * @return true: 成功, false: 無効なパラメータ
+ */
+bool can_config_set_field(uint8_t idx, const CAN_Field_t *field);
+
+/* ============================================================
  * グローバル変数 (extern)
  * ============================================================ */
 extern PARAM_Storage_t g_param;
+
+/* CAN設定 (RAM2領域に配置) */
+extern CAN_Config_t g_can_config __attribute__((section(".bss2")));
 
 #endif /* PARAM_STORAGE_H_ */

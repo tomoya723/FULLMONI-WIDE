@@ -3,6 +3,7 @@
  *
  *  Created on: 2021/08/25
  *      Author: tomoya723
+ *  Modified: 2026/01/15 - Issue #65: CAN設定のカスタム化対応
  */
 
 #include <can.h>
@@ -10,6 +11,7 @@
 #include "dataregister.h"
 #include "lib_table.h"
 #include "lib_general.h"
+#include "param_storage.h"      /* CAN設定 (Issue #65) */
 
 #define PI 3.1415923
 
@@ -34,6 +36,143 @@ static APPW_PARA_ITEM aPara5[6] = {0};
 static APPW_PARA_ITEM aPara6[6] = {0};
 static APPW_PARA_ITEM aPara7[6] = {0};
 static APPW_PARA_ITEM aPara8[6] = {0};
+
+/* ============================================================
+ * CAN データ変換 (Issue #65)
+ * ============================================================ */
+
+/* CANフレーム配列 (can.cから参照) */
+extern can_frame_t rx_dataframe1, rx_dataframe2, rx_dataframe3,
+                   rx_dataframe4, rx_dataframe5, rx_dataframe6;
+
+/* 物理値格納配列 (ターゲット変数用) */
+static float can_values[16];
+
+/**
+ * @brief CANデータを物理値に変換（汎用処理）
+ * @param field フィールド定義
+ * @return 変換後の物理値
+ */
+static float can_field_to_physical(const CAN_Field_t *field)
+{
+    can_frame_t *frames[6] = {
+        &rx_dataframe1, &rx_dataframe2, &rx_dataframe3,
+        &rx_dataframe4, &rx_dataframe5, &rx_dataframe6
+    };
+
+    if (field->channel == 0 || field->channel > 6) {
+        return 0.0f;
+    }
+
+    can_frame_t *frame = frames[field->channel - 1];
+    uint32_t raw = 0;
+    uint8_t i;
+
+    /* バイト抽出（エンディアン対応） */
+    if (field->endian == 0) {  /* Big Endian */
+        for (i = 0; i < field->byte_count; i++) {
+            raw = (raw << 8) | frame->data[field->start_byte + i];
+        }
+    } else {  /* Little Endian */
+        for (i = 0; i < field->byte_count; i++) {
+            raw |= ((uint32_t)frame->data[field->start_byte + i]) << (i * 8);
+        }
+    }
+
+    /* 符号付き処理 */
+    float value;
+    if (field->data_type == 1) {  /* Signed */
+        if (field->byte_count == 2) {
+            if (raw > 32767) {
+                value = (float)((int32_t)raw - 65536);
+            } else {
+                value = (float)raw;
+            }
+        } else if (field->byte_count == 1) {
+            if (raw > 127) {
+                value = (float)((int32_t)raw - 256);
+            } else {
+                value = (float)raw;
+            }
+        } else {
+            value = (float)raw;
+        }
+    } else {  /* Unsigned */
+        value = (float)raw;
+    }
+
+    /* 変換計算: (value + offset) * multiplier / divisor */
+    value = value + (float)field->offset;
+    if (field->divisor != 0) {
+        value = value * (float)field->multiplier / (float)field->divisor;
+    }
+
+    return value;
+}
+
+/**
+ * @brief 全CANフィールドを処理して物理値を更新
+ */
+static void process_can_fields(void)
+{
+    uint8_t i;
+    const CAN_Field_t *field;
+    float value;
+
+    for (i = 0; i < CAN_FIELD_MAX; i++) {
+        field = &g_can_config.fields[i];
+
+        /* 無効なフィールドはスキップ */
+        if (field->channel == 0 || field->target_var == CAN_TARGET_NONE) {
+            continue;
+        }
+
+        /* チャンネルが有効か確認 */
+        if (!g_can_config.channels[field->channel - 1].enabled) {
+            continue;
+        }
+
+        /* 物理値に変換 */
+        value = can_field_to_physical(field);
+
+        /* ターゲット変数に代入 */
+        switch (field->target_var) {
+        case CAN_TARGET_REV:
+            g_CALC_data.rev = (unsigned int)value;
+            if (g_CALC_data.rev >= 9000) g_CALC_data.rev = 9000;
+            g_CALC_data.rev_angle = 3600 - g_CALC_data.rev * 0.3;
+            break;
+        case CAN_TARGET_AF:
+            g_CALC_data.af = value;
+            break;
+        case CAN_TARGET_NUM1:  /* 水温 */
+            g_CALC_data.num1 = value;
+            break;
+        case CAN_TARGET_NUM2:  /* 吸気温 */
+            g_CALC_data.num2 = value;
+            break;
+        case CAN_TARGET_NUM3:  /* 油温 */
+            g_CALC_data.num3 = value;
+            break;
+        case CAN_TARGET_NUM4:  /* MAP */
+            g_CALC_data.num4 = value;
+            smooth(g_CALC_data_sm.num4, 0.3, g_CALC_data.num4);
+            break;
+        case CAN_TARGET_NUM5:  /* 油圧 */
+            g_CALC_data.num5 = value;
+            smooth(g_CALC_data_sm.num5, 0.1, g_CALC_data.num5);
+            break;
+        case CAN_TARGET_NUM6:  /* バッテリー電圧 */
+            g_CALC_data.num6 = value;
+            break;
+        case CAN_TARGET_SPEED:
+            g_CALC_data.sp = value;
+            break;
+        default:
+            break;
+        }
+    }
+}
 
 void init_data_store(void)
 {
@@ -74,32 +213,8 @@ void data_store(void)
 //	APPW_PARA_ITEM aPara7[6] = {0};
 //	APPW_PARA_ITEM aPara8[6] = {0};
 
-	g_CALC_data.num1 = (float)((((unsigned int)rx_dataframe2.data[0]) << 8) + rx_dataframe2.data[1]) / 10.0  ; // water Temp
-	if(g_CALC_data.num1 > 32767) g_CALC_data.num1 = g_CALC_data.num1 -65534;
-	g_CALC_data.num2 = (float)((((unsigned int)rx_dataframe1.data[6]) << 8) + rx_dataframe1.data[7]) / 10.0  ; // Inlet Air Temp
-	if(g_CALC_data.num2 > 32767) g_CALC_data.num2 = g_CALC_data.num2 -65534;
-	g_CALC_data.num3 = (float)((((unsigned int)rx_dataframe3.data[6]) << 8) + rx_dataframe3.data[7]) / 10.0  ; // OIL Temp
-	if(g_CALC_data.num3 > 32767) g_CALC_data.num3 = g_CALC_data.num3 -65534;
-
-	g_CALC_data.num4 = (float)((((unsigned int)rx_dataframe1.data[4]) << 8) + rx_dataframe1.data[5]) * 0.1   ; // MAP
-	if(g_CALC_data.num4 > 32767) g_CALC_data.num4 = g_CALC_data.num4 -65534;
-	smooth(g_CALC_data_sm.num4,0.3, g_CALC_data.num4);
-
-	g_CALC_data.num5 = (float)((((unsigned int)rx_dataframe4.data[0]) << 8) + rx_dataframe4.data[1]) * 0.001 ; // OIL Pressure
-	if(g_CALC_data.num5 > 32767) g_CALC_data.num5 = g_CALC_data.num5 -65534;
-	smooth(g_CALC_data_sm.num5,0.1, g_CALC_data.num5);
-
-	g_CALC_data.num6 = (float)((((unsigned int)rx_dataframe4.data[6]) << 8) + rx_dataframe4.data[7]) * 0.1   ; // Battery Voltage
-	if(g_CALC_data.num6 > 32767) g_CALC_data.num6 = g_CALC_data.num6 -65534;
-
-	// air fuel ratio
-	g_CALC_data.af   = (float)((((unsigned int)rx_dataframe2.data[2]) << 8) + rx_dataframe2.data[3]) * 0.147 ; // A/F
-
-	// engine rpm
-	g_CALC_data.rev  =        ((((unsigned int)rx_dataframe1.data[0]) << 8) + rx_dataframe1.data[1])         ; // REV
-//	g_CALC_data.rev  =        ((((unsigned int)rx_dataframe1.data[2]) << 8) + rx_dataframe1.data[3]) * 10    ; // REV test from TPS
-	if(g_CALC_data.rev >= 9000) g_CALC_data.rev = 9000;
-	g_CALC_data.rev_angle = 3600 - g_CALC_data.rev * 0.3;
+	/* Issue #65: CAN設定に基づく汎用変換処理 */
+	process_can_fields();
 
 	// battery voltage
 //	g_CALC_data.bt = ((g_CALC_data.AD6 * 198) / 4096) / 10; // Vref = 3.3V
