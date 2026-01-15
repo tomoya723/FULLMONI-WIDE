@@ -4,6 +4,9 @@
  * 起動画面書き込み機能
  * USB CDC経由でBMP画像をフラッシュメモリに書き込む
  *
+ * 起動画像(acmtc配列)はリンカスクリプトにより固定アドレス0xFFE00000に配置される。
+ * これにより、ファームウェア更新後もカスタム起動画像が保持される。
+ *
  *  Created on: 2026/01/13
  *      Author: FULLMONI-WIDE Project
  */
@@ -18,6 +21,9 @@
 #define STARTUP_IMAGE_WIDTH     765
 #define STARTUP_IMAGE_HEIGHT    256
 #define STARTUP_IMAGE_MAX_SIZE  (391696UL)  /* acmtc配列の実サイズ */
+
+/* 起動画像の固定配置アドレス (linker_script.ldで定義) */
+#define STARTUP_IMAGE_ADDR      0xFFE00000UL
 
 /* 通信プロトコル */
 #define IMG_ACK_CHAR            0x06    /* ASCII ACK制御文字（ログの'.'と衝突防止）*/

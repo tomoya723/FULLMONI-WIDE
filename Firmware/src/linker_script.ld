@@ -3,7 +3,8 @@ MEMORY
 	RAM : ORIGIN = 0x00064040, LENGTH = 0x1BFC0
 	ECCRAM : ORIGIN = 0x00FF8000, LENGTH = 0x8000
 	FW_HEADER : ORIGIN = 0xFFC20000, LENGTH = 64
-	ROM : ORIGIN = 0xFFC20040, LENGTH = 0x3DFFC0
+	ROM : ORIGIN = 0xFFC20040, LENGTH = 0x3DFFC0        /* 全ROM領域（論理的に使用） */
+	STARTUP_IMAGE : ORIGIN = 0xFFE00000, LENGTH = 0x60000   /* 起動画像用固定領域 (384KB, acmtc配置用) */
 	OFS : ORIGIN = 0xFE7F5D00, LENGTH = 128
 }
 SECTIONS
@@ -60,12 +61,22 @@ SECTIONS
 	.rodata :
 	{
 		*(.rodata)
-		*(.rodata.*)
+		/* mtc.oのacmtcは.startup_imageセクションに配置するため除外 */
+		EXCLUDE_FILE(*mtc.o) *(.rodata.*)
 		*(C_1)
 		*(C_2)
 		*(C)
 		_erodata = .;
 	} >ROM
+	/* 起動画像用セクション (固定アドレス 0xFFE00000) */
+	/* ファームウェア更新後も画像データを保持するため、別領域に配置 */
+	/* mtc.o内のacmtc配列(.rodata.acmtc)をここに配置 */
+	.startup_image 0xFFE00000 : AT(0xFFE00000)
+	{
+		_startup_image_start = .;
+		*mtc.o(.rodata.*)
+		_startup_image_end = .;
+	} >STARTUP_IMAGE
 	gcc_exceptions_table :
 	{
 		KEEP(*(.gcc_except_table))
