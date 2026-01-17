@@ -131,4 +131,10 @@ bool speaker_is_playing(void);
  */
 void speaker_tpu0_isr(void);
 
+/**
+ * @brief 警告音（PCM）再生
+ * @note 非ブロッキング。再生完了はspeaker_is_playing()で確認可能
+ */
+void speaker_play_warning(void);
+
 #endif /* SPEAKER_H_ */

@@ -55,7 +55,7 @@ void R_Config_TPU0_Create_UserInit(void)
 
 void r_Config_TPU0_tgi0a_interrupt(void)
 {
-    
+
     /* Start user code for r_Config_TPU0_tgi0a_interrupt. Do not edit comment generated here */
     speaker_tpu0_isr();
     /* End user code. Do not edit comment generated here */

@@ -21,8 +21,12 @@
 #define USE_PCM_STARTUP_SOUND  1
 
 #if USE_PCM_STARTUP_SOUND
-#include "startup_sound.h"  /* PCMデータ（Windows tada.wav） */
+#include "startup_sound.h"  /* 起動音PCMデータ */
+#include "warning_sound.h"   /* 警告音PCMデータ */
+
 static volatile uint32_t s_pcm_index = 0;
+static volatile const uint8_t *s_pcm_data_ptr = NULL;  /* 再生中のPCMデータ */
+static volatile uint32_t s_pcm_data_size = 0;           /* 再生中のPCMサイズ */
 #endif
 
 /* ============================================================
@@ -126,40 +130,42 @@ void speaker_init(void)
     speaker_setup_da();
 
     /* ===== TPU0割り込み方式（軽量） ===== */
-    
+
     /* モジュールストップ解除 */
     SYSTEM.PRCR.WORD = 0xA502U;
     MSTP(TPU0) = 0U;
     SYSTEM.PRCR.WORD = 0xA500U;
-    
+
     /* TPU0停止 */
     TPUA.TSTR.BIT.CST0 = 0U;
-    
+
     /* TPU0設定 */
     TPU0.TCR.BYTE = 0x20U;  /* PCLK/1, TGRAコンペアマッチでクリア */
     TPU0.TIER.BYTE = 0x01U; /* TGIEA有効 */
 #if USE_PCM_STARTUP_SOUND
     TPU0.TGRA = (60000000UL / PCM_SAMPLE_RATE) - 1;   /* PCM再生用（startup_sound.hの定義に従う） */
+    s_pcm_data_ptr = s_pcm_data;    /* 起動音データ設定 */
+    s_pcm_data_size = PCM_DATA_SIZE;
     s_pcm_index = 0;
 #else
     TPU0.TGRA = 1562 - 1;   /* 38.4kHz (60MHz/38400) → 1200Hz正弦波 */
     s_sample_index = 0;
 #endif
     TPU0.TCNT = 0U;
-    
+
     /* 割り込み優先度設定 */
     IPR(PERIB, INTB130) = 14;  /* 高優先度 */
     IR(PERIB, INTB130) = 0U;   /* フラグクリア */
     IEN(PERIB, INTB130) = 1U;  /* 割り込み許可 */
-    
+
     /* スピーカ有効化 */
     s_speaker_active = true;
-    
+
     /* TPU0開始 */
     TPUA.TSTR.BIT.CST0 = 1U;
-    
+
 #if USE_PCM_STARTUP_SOUND
-    /* PCM再生完了まで待機（約1.6秒） */
+    /* PCM再生完了まで待機 */
     while (s_speaker_active) {
         __asm("nop");
     }
@@ -167,7 +173,7 @@ void speaker_init(void)
     /* 150ms待ち */
     for (volatile uint32_t d = 0; d < 3600000; d++) { __asm("nop"); }
 #endif
-    
+
     /* 停止 */
     s_speaker_active = false;
     TPUA.TSTR.BIT.CST0 = 0U;
@@ -186,13 +192,10 @@ void speaker_tpu0_isr(void)
 {
     if (s_speaker_active) {
 #if USE_PCM_STARTUP_SOUND
-        /* PCM再生モード: 8bit→12bitに変換して出力（ゲイン2倍） */
-        if (s_pcm_index < PCM_DATA_SIZE) {
-            int16_t sample = (int16_t)s_pcm_data[s_pcm_index] - 128;  /* 中心を0に */
-            sample *= 2;  /* ゲイン2倍 */
-            if (sample > 127) sample = 127;
-            if (sample < -128) sample = -128;
-            DA.DADR1 = (uint16_t)((sample + 128) << 4);  /* 12bitに変換 */
+        /* PCM再生モード: 8bit→12bitに変換して出力 */
+        if (s_pcm_data_ptr != NULL && s_pcm_index < s_pcm_data_size) {
+            /* 8bit(0-255) → 12bit(0-4095) に単純変換 */
+            DA.DADR1 = (uint16_t)s_pcm_data_ptr[s_pcm_index] << 4;
             s_pcm_index++;
         } else {
             /* 再生終了 */
@@ -544,3 +547,31 @@ static void speaker_pattern_process(void)
         }
     }
 }
+
+#if USE_PCM_STARTUP_SOUND
+/**
+ * @brief 警告音（PCM）再生
+ * @note 非ブロッキング。再生完了はspeaker_is_playing()で確認可能
+ */
+void speaker_play_warning(void)
+{
+    /* 再生中なら停止 */
+    if (s_speaker_active) {
+        s_speaker_active = false;
+        TPUA.TSTR.BIT.CST0 = 0U;
+    }
+
+    /* 警告音データ設定 */
+    s_pcm_data_ptr = s_warning_data;
+    s_pcm_data_size = WARNING_DATA_SIZE;
+    s_pcm_index = 0;
+
+    /* TPU0設定（サンプルレートが異なる場合に対応） */
+    TPU0.TGRA = (60000000UL / WARNING_SAMPLE_RATE) - 1;
+    TPU0.TCNT = 0U;
+
+    /* 再生開始 */
+    s_speaker_active = true;
+    TPUA.TSTR.BIT.CST0 = 1U;
+}
+#endif
