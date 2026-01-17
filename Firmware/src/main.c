@@ -19,6 +19,7 @@
 #include "param_console.h"
 #include "param_storage.h"
 #include "usb_cdc.h"  /* USB CDC for parameter mode */
+#include "speaker.h"  /* Speaker output (DA1 + LM4861M) */
 
 // --------------------------------------------------------------------
 // グローバル変数宣言
@@ -174,6 +175,10 @@ void main(void)
 
 	// Start MTU8 (Vehicle speed　Pulse　Interupt function)
 	R_Config_MTU8_Start();
+
+	// スピーカ初期化
+	speaker_init();
+	// speaker_play_pattern(SPEAKER_PATTERN_STARTUP);  // 起動音（テスト中無効）
 
 	printf("FULLMONI Init Done.\r\n");
 
@@ -408,6 +413,7 @@ void sch_10ms(void)
 {
 	//10ms , 50ms , 100ms scheduler here
 	ap_10ms();
+	speaker_process();  // スピーカ波形生成
 	sch50ms_cnt += 1;
 	sch100ms_cnt += 1;
 	if(sch50ms_cnt >= 5)

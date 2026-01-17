@@ -5,49 +5,45 @@
 */
 
 /***********************************************************************************************************************
-* File Name        : r_smc_entry.h
-* Version          : 1.0.200
+* File Name        : Config_DA_user.c
+* Component Version: 1.11.0
 * Device(s)        : R5F572NNDxFP
-* Description      : SMC platform header file.
+* Description      : This file implements device driver for Config_DA.
 ***********************************************************************************************************************/
 
-#ifndef SMC_ENTRY_H
-#define SMC_ENTRY_H
+/***********************************************************************************************************************
+Pragma directive
+***********************************************************************************************************************/
+/* Start user code for pragma. Do not edit comment generated here */
+/* End user code. Do not edit comment generated here */
 
 /***********************************************************************************************************************
 Includes
 ***********************************************************************************************************************/
 #include "r_cg_macrodriver.h"
-#include "Pin.h"
-#include "Config_S12AD0.h"
-#include "Config_RIIC0.h"
-#include "Config_RIIC1.h"
-#include "Config_MTU0.h"
-#include "Config_MTU1.h"
-#include "Config_MTU3.h"
-#include "Config_RTC.h"
-#include "Config_MTU8.h"
-#include "Config_PORT.h"
-#include "Config_SCI9.h"
 #include "Config_DA.h"
-#include "Config_TPU0.h"
-
-/***********************************************************************************************************************
-Macro definitions (Register bit)
-***********************************************************************************************************************/
-
-/***********************************************************************************************************************
-Macro definitions
-***********************************************************************************************************************/
-
-/***********************************************************************************************************************
-Typedef definitions
-***********************************************************************************************************************/
-
-/***********************************************************************************************************************
-Global functions
-***********************************************************************************************************************/
-/* Start user code for function. Do not edit comment generated here */
+/* Start user code for include. Do not edit comment generated here */
 /* End user code. Do not edit comment generated here */
-#endif
+#include "r_cg_userdefine.h"
 
+/***********************************************************************************************************************
+Global variables and functions
+***********************************************************************************************************************/
+/* Start user code for global. Do not edit comment generated here */
+/* End user code. Do not edit comment generated here */
+
+/***********************************************************************************************************************
+* Function Name: R_Config_DA_Create_UserInit
+* Description  : This function adds user code after initializing DA module
+* Arguments    : None
+* Return Value : None
+***********************************************************************************************************************/
+
+void R_Config_DA_Create_UserInit(void)
+{
+    /* Start user code for user init. Do not edit comment generated here */
+    /* End user code. Do not edit comment generated here */
+}
+
+/* Start user code for adding. Do not edit comment generated here */
+/* End user code. Do not edit comment generated here */

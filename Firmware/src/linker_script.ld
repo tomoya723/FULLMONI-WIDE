@@ -1,11 +1,11 @@
 MEMORY
 {
 	RAM : ORIGIN = 0x00064040, LENGTH = 0x1BFC0
-	RAM2 : ORIGIN = 0x00864000, LENGTH = 0x1C000    /* 高位RAM未使用領域 (112KB) - Issue #65 CAN設定用 */
+	RAM2 : ORIGIN = 0x00864000, LENGTH = 0x1C000 /* 高位RAM未使用領域 (112KB) - Issue #65 CAN設定用 */
 	ECCRAM : ORIGIN = 0x00FF8000, LENGTH = 0x8000
 	FW_HEADER : ORIGIN = 0xFFC20000, LENGTH = 64
-	ROM : ORIGIN = 0xFFC20040, LENGTH = 0x3DFFC0        /* 全ROM領域（論理的に使用） */
-	STARTUP_IMAGE : ORIGIN = 0xFFE00000, LENGTH = 0x60000   /* 起動画像用固定領域 (384KB, acmtc配置用) */
+	ROM : ORIGIN = 0xFFC20040, LENGTH = 0x3DFFC0 /* 全ROM領域（論理的に使用） */
+	STARTUP_IMAGE : ORIGIN = 0xFFE00000, LENGTH = 0x60000 /* 起動画像用固定領域 (384KB, acmtc配置用) */
 	OFS : ORIGIN = 0xFE7F5D00, LENGTH = 128
 }
 SECTIONS
@@ -63,7 +63,7 @@ SECTIONS
 	{
 		*(.rodata)
 		/* fmw_op0.oのacmtcは.startup_imageセクションに配置するため除外 */
-		EXCLUDE_FILE(*fmw_op0.o) *(.rodata.*)
+		EXCLUDE_FILE(* fmw_op0.o) *(.rodata.*)
 		*(C_1)
 		*(C_2)
 		*(C)
