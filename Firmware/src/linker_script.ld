@@ -63,7 +63,7 @@ SECTIONS
 	{
 		*(.rodata)
 		/* fmw_op0.oのacmtcは.startup_imageセクションに配置するため除外 */
-		EXCLUDE_FILE(* fmw_op0.o) *(.rodata.*)
+		EXCLUDE_FILE(*fmw_op0.o) *(.rodata.*)
 		*(C_1)
 		*(C_2)
 		*(C)
