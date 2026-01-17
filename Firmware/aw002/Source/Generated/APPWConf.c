@@ -92,6 +92,7 @@ static APPW_VAR_OBJECT _aVarList[] = {
   { ID_VAR_AD4, 0, 0, NULL },
   { ID_VAR_SPEED_CAN, 0, 0, NULL },
   { ID_VAR_PRM, 0, 0, NULL },
+  { ID_VAR_WARNING, 0, 0, NULL },
 };
 
 /*********************************************************************

@@ -35,6 +35,7 @@ Purpose     : Generated file do NOT edit!
 #define ID_PROGBAR_AFR      (GUI_ID_USER + 37)
 #define ID_TIMER_00         (GUI_ID_USER + 6)
 #define ID_TEXT_ACC         (GUI_ID_USER + 7)
+#define ID_TEXT_WARNING     (GUI_ID_USER + 8)
 
 /*********************************************************************
 *
@@ -61,6 +62,9 @@ void ID_SCREEN_01a__ID_TIMER_00__APPW_NOTIFICATION_TIMER__ID_ROTARY_01__APPW_JOB
 void ID_SCREEN_01a__APPW_NOTIFICATION_INITDIALOG__ID_TEXT_ACC__APPW_JOB_SETVIS              (APPW_ACTION_ITEM * pAction, WM_HWIN hScreen, WM_MESSAGE * pMsg, int * pResult);
 void ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_TEXT_ACC__APPW_JOB_SETVIS             (APPW_ACTION_ITEM * pAction, WM_HWIN hScreen, WM_MESSAGE * pMsg, int * pResult);
 void ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_TEXT_ACC__APPW_JOB_SETVIS_0           (APPW_ACTION_ITEM * pAction, WM_HWIN hScreen, WM_MESSAGE * pMsg, int * pResult);
+void ID_SCREEN_01a__APPW_NOTIFICATION_INITDIALOG__ID_TEXT_ACC__APPW_JOB_SETVIS_0            (APPW_ACTION_ITEM * pAction, WM_HWIN hScreen, WM_MESSAGE * pMsg, int * pResult);
+void ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_TEXT_WARNING__APPW_JOB_SETVIS         (APPW_ACTION_ITEM * pAction, WM_HWIN hScreen, WM_MESSAGE * pMsg, int * pResult);
+void ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_TEXT_WARNING__APPW_JOB_SETVIS_0       (APPW_ACTION_ITEM * pAction, WM_HWIN hScreen, WM_MESSAGE * pMsg, int * pResult);
 
 /*********************************************************************
 *

@@ -355,6 +355,7 @@ void data_setLCD100ms(void)
 	/* Issue #50: マスターワーニングチェックと表示更新 */
 	master_warning_check();
 	master_warning_update_display();
+	APPW_SetVarData(ID_VAR_WARNING, master_warning_is_active() ? 1 : 0);
 
 	APPW_SetVarData(ID_VAR_01, g_CALC_data.num1); //WaterTemp
 	APPW_SetVarData(ID_VAR_02, g_CALC_data.num2); //IAT

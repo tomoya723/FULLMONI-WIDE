@@ -24,7 +24,7 @@ extern volatile uint8_t g_param_mode_active;
 /* g_uart_rx_trigger は USB CDC化により削除 */
 
 // emwin display resource number select
-#define DISP (1)  // 1-2
+#define DISP (2)  // 1-2
 
 #if (DISP == 1)
 	#include "../aw001/Source/Generated/Resource.h"

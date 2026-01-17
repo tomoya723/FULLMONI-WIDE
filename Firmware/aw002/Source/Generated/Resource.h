@@ -45,6 +45,7 @@ Purpose     : Generated file do NOT edit!
 #define ID_RTEXT_6 19
 #define ID_RTEXT_PRM 20
 #define ID_RTEXT_ACC 21
+#define ID_RTEXT_7 22
 
 #define APPW_MANAGE_TEXT APPW_MANAGE_TEXT_EXT
 extern GUI_CONST_STORAGE unsigned char acAPPW_Language_0[];
@@ -115,6 +116,7 @@ extern GUI_CONST_STORAGE unsigned char acfuel2[];
 #define ID_VAR_AD4 (GUI_ID_USER + 2071)
 #define ID_VAR_SPEED_CAN (GUI_ID_USER + 2079)
 #define ID_VAR_PRM (GUI_ID_USER + 2072)
+#define ID_VAR_WARNING (GUI_ID_USER + 2073)
 
 /*********************************************************************
 *
