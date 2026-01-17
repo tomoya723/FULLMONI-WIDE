@@ -63,7 +63,7 @@ SECTIONS
 	{
 		*(.rodata)
 		/* fmw_op0.oのacmtcは.startup_imageセクションに配置するため除外 */
-		EXCLUDE_FILE(*fmw_op0.o) *(.rodata.*)
+		EXCLUDE_FILE(* fmw_op0.o) *(.rodata.*)
 		*(C_1)
 		*(C_2)
 		*(C)
@@ -124,8 +124,9 @@ SECTIONS
 	.bss :
 	{
 		_bss = .;
-		*(.bss)
-		*(.bss.**)
+		/* GUIConf.o はRAM2(.bss2)に配置するため除外 */
+		EXCLUDE_FILE(*GUIConf.o) *(.bss)
+		EXCLUDE_FILE(*GUIConf.o) *(.bss.**)
 		*(COMMON)
 		*(B)
 		*(B_1)
@@ -135,11 +136,14 @@ SECTIONS
 		_end = .;
 	} >RAM AT>RAM
 	/* Issue #65: CAN設定用の追加RAM領域 (高位RAM 0x00864000-0x0087FFFF) */
+	/* GUIConf.o (emWin設定、約80KB) もRAM2に配置してLow RAMの空きを確保 */
 	.bss2 :
 	{
 		_bss2 = .;
 		*(.bss2)
 		*(.bss2.*)
+		*GUIConf.o(.bss)
+		*GUIConf.o(.bss.*)
 		_ebss2 = .;
 	} >RAM2 AT>RAM2
 	.ofs1 0xFE7F5D00 : AT(0xFE7F5D00)
