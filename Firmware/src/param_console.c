@@ -103,6 +103,7 @@ static void cmd_help(void)
     param_console_print("  can_list          - Show CAN configuration\r\n");
     param_console_print("  can_ch <n> <id> <en> - Set CAN channel (n=1-6)\r\n");
     param_console_print("  can_field <n> <ch> <byte> <len> <type> <end> <var> <off> <mul> <div>\r\n");
+    param_console_print("            <name> <unit> <warn_en> <warn_lo> <warn_hi>\r\n");
     param_console_print("                    - Set CAN field (n=0-15)\r\n");
     param_console_print("  can_preset <name> - Apply preset (motec/link/aem)\r\n");
     param_console_print("  can_save          - Save CAN config to EEPROM\r\n");
@@ -299,18 +300,35 @@ static void cmd_can_list(void)
     }
 
     param_console_print("\r\n-- Fields --\r\n");
-    param_console_print("No CH Byte Len Type End Var    Off  Mul   Div\r\n");
+    param_console_print("No CH Byte Len Type End Var    Off  Mul   Div   Name    Unit WE WarnLo WarnHi\r\n");
     for (i = 0; i < CAN_FIELD_MAX; i++) {
         CAN_Field_t *f = &g_can_config.fields[i];
         if (f->channel == 0) continue;  /* 無効なフィールドはスキップ */
 
         const char *var_name = (f->target_var < 9) ? target_var_names[f->target_var] : "---";
-        param_console_printf("%2d %2d   %d   %d   %c    %c   %-5s %4d %5d %5d\r\n",
+        
+        /* 閾値表示用文字列を準備 */
+        char lo_str[8], hi_str[8];
+        if (f->warn_low == CAN_WARN_DISABLED) {
+            strcpy(lo_str, "---");
+        } else {
+            snprintf(lo_str, sizeof(lo_str), "%d", f->warn_low);
+        }
+        if (f->warn_high == CAN_WARN_DISABLED) {
+            strcpy(hi_str, "---");
+        } else {
+            snprintf(hi_str, sizeof(hi_str), "%d", f->warn_high);
+        }
+        
+        param_console_printf("%2d %2d   %d   %d   %c    %c   %-5s %4d %5d %5d %-7s %-4s %c  %6s %6s\r\n",
                             i, f->channel, f->start_byte, f->byte_count,
                             f->data_type ? 'S' : 'U',
                             f->endian ? 'L' : 'B',
                             var_name,
-                            f->offset, f->multiplier, f->divisor);
+                            f->offset, f->multiplier, f->divisor,
+                            f->name, f->unit,
+                            f->warn_enabled ? 'Y' : 'N',
+                            lo_str, hi_str);
     }
 }
 
@@ -337,10 +355,13 @@ static void cmd_can_field(int argc, char *args[])
 {
     if (argc < 10) {
         param_console_print("Usage: can_field <n> <ch> <byte> <len> <type> <end> <var> <off> <mul> <div>\r\n");
+        param_console_print("                <name> <unit> <warn_en> <warn_lo> <warn_hi>\r\n");
         return;
     }
 
     CAN_Field_t field;
+    memset(&field, 0, sizeof(field));  /* 全フィールドをゼロ初期化 */
+    
     uint8_t idx = (uint8_t)atoi(args[0]);
     field.channel = (uint8_t)atoi(args[1]);
     field.start_byte = (uint8_t)atoi(args[2]);
@@ -351,6 +372,29 @@ static void cmd_can_field(int argc, char *args[])
     field.offset = (int16_t)atoi(args[7]);
     field.multiplier = (uint16_t)atoi(args[8]);
     field.divisor = (uint16_t)atoi(args[9]);
+    
+    /* Issue #50: 新規フィールド (name, unit, warn_*) */
+    if (argc >= 11) {
+        strncpy(field.name, args[10], CAN_FIELD_NAME_MAX - 1);
+        field.name[CAN_FIELD_NAME_MAX - 1] = '\0';
+    }
+    if (argc >= 12) {
+        strncpy(field.unit, args[11], CAN_FIELD_UNIT_MAX - 1);
+        field.unit[CAN_FIELD_UNIT_MAX - 1] = '\0';
+    }
+    if (argc >= 13) {
+        field.warn_enabled = (uint8_t)atoi(args[12]);
+    }
+    if (argc >= 14) {
+        field.warn_low = (int16_t)atoi(args[13]);
+    } else {
+        field.warn_low = CAN_WARN_DISABLED;
+    }
+    if (argc >= 15) {
+        field.warn_high = (int16_t)atoi(args[14]);
+    } else {
+        field.warn_high = CAN_WARN_DISABLED;
+    }
 
     /* Issue #65: channelが変わる場合のみフラグを立てる（フィルタに影響） */
     /* 注: フィールド設定はデータ解釈のみなのでフィルタ更新不要 */
@@ -580,19 +624,20 @@ static void parse_command(const char *line)
         uint8_t enabled = (uint8_t)atoi(arg3);
         cmd_can_ch(ch, can_id, enabled);
     } else if (strcmp(cmd, "can_field") == 0 && argc >= 7) {
-        /* can_field <n> <ch> <byte> <len> <type> <end> <var> <off> <mul> <div> */
-        /* 最初の6引数はarg1-arg6、残り4引数は再パース */
-        char *args[10] = {arg1, arg2, arg3, arg4, arg5, arg6, NULL, NULL, NULL, NULL};
+        /* can_field <n> <ch> <byte> <len> <type> <end> <var> <off> <mul> <div> <name> <unit> <warn_en> <warn_lo> <warn_hi> */
+        /* 最大15引数をパース */
+        char *args[15] = {arg1, arg2, arg3, arg4, arg5, arg6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
         /* 残りの引数を再パース */
-        char extra_args[4][32];
-        int extra_argc = sscanf(line, "%*s %*s %*s %*s %*s %*s %*s %31s %31s %31s %31s",
-               extra_args[0], extra_args[1], extra_args[2], extra_args[3]);
+        char extra_args[9][32];
+        int extra_argc = sscanf(line, "%*s %*s %*s %*s %*s %*s %*s %31s %31s %31s %31s %31s %31s %31s %31s %31s",
+               extra_args[0], extra_args[1], extra_args[2], extra_args[3],
+               extra_args[4], extra_args[5], extra_args[6], extra_args[7], extra_args[8]);
         if (extra_argc >= 4) {
-            args[6] = extra_args[0];
-            args[7] = extra_args[1];
-            args[8] = extra_args[2];
-            args[9] = extra_args[3];
-            cmd_can_field(10, args);
+            int i;
+            for (i = 0; i < extra_argc && i < 9; i++) {
+                args[6 + i] = extra_args[i];
+            }
+            cmd_can_field(6 + extra_argc, args);
         } else {
             param_console_print("Error: Not enough arguments for can_field\r\n");
         }

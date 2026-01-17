@@ -20,6 +20,11 @@
 #define CAN_CHANNEL_MAX     6       /* CAN受信チャンネル数 */
 #define CAN_FIELD_MAX       16      /* CANデータフィールド数 */
 
+/* Issue #50: マスターワーニング用定数 */
+#define CAN_FIELD_NAME_MAX  8       /* 名前文字列最大長 (7文字+NULL) */
+#define CAN_FIELD_UNIT_MAX  4       /* 単位文字列最大長 (3文字+NULL) */
+#define CAN_WARN_DISABLED   (-32768) /* 閾値無効値: INT16_MIN */
+
 /* CAN受信チャンネル設定 */
 typedef struct __attribute__((packed)) {
     uint16_t can_id;                /* 受信CAN ID (0x000-0x7FF) */
@@ -29,6 +34,7 @@ typedef struct __attribute__((packed)) {
 
 /* CANデータフィールド定義 */
 typedef struct __attribute__((packed)) {
+    /* === 既存フィールド (12 bytes) === */
     uint8_t  channel;               /* 使用するCANチャンネル (1-6, 0=無効) */
     uint8_t  start_byte;            /* 開始バイト位置 (0-7) */
     uint8_t  byte_count;            /* バイト数 (1, 2, 4) */
@@ -38,7 +44,14 @@ typedef struct __attribute__((packed)) {
     int16_t  offset;                /* オフセット値 (変換前に加算) */
     uint16_t multiplier;            /* 乗算係数 (x1000) 例: 1000=x1, 100=x0.1 */
     uint16_t divisor;               /* 除算係数 (x1000) 例: 1000=/1, 10000=/10 */
-} CAN_Field_t;
+    /* === 新規追加フィールド (Issue #50: 18 bytes) === */
+    char     name[CAN_FIELD_NAME_MAX];  /* 名前文字列 (例: "WATER", "OIL") */
+    char     unit[CAN_FIELD_UNIT_MAX];  /* 単位文字列 (例: "C", "kPa", "rpm") */
+    uint8_t  warn_enabled;          /* ワーニング有効: 0=無効, 1=有効 */
+    uint8_t  reserved;              /* 予約 (アライメント用) */
+    int16_t  warn_low;              /* 下限閾値 (これを下回るとワーニング) */
+    int16_t  warn_high;             /* 上限閾値 (これを超えるとワーニング) */
+} CAN_Field_t;  /* 合計: 30 bytes */
 
 /* CAN設定全体 (RAM2領域に配置) */
 typedef struct __attribute__((packed)) {
@@ -54,7 +67,7 @@ typedef struct __attribute__((packed)) {
 #define CAN_CONFIG_SIZE     sizeof(CAN_Config_t)
 
 /* CAN設定バージョン */
-#define CAN_CONFIG_VERSION  1
+#define CAN_CONFIG_VERSION  2       /* Issue #50: name, unit, warningフィールド追加 */
 
 /* プリセットID */
 #define CAN_PRESET_CUSTOM       0
