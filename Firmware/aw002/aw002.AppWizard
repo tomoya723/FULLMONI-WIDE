@@ -85,7 +85,7 @@
       Id=ID_RTEXT_6
       Id=ID_RTEXT_PRM
       Id=ID_RTEXT_ACC
-      Id=ID_RTEXT_7
+      Id=ID_RTEXT_WARNING
     </Id>
     <Lang>
       Name=JP
@@ -2890,10 +2890,6 @@
       </Para>
     </SETVALUE>
   </Interactions>
-  <Selection>
-    Root=ID_SCREEN_01a
-    Object=2048
-  </Selection>
   <Terms>
   </Terms>
   <AnimItems>

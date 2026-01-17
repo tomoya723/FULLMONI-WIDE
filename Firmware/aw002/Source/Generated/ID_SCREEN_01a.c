@@ -270,7 +270,7 @@ static GUI_CONST_STORAGE APPW_SETUP_ITEM _aSetup[] = {
   { ID_TEXT_WARNING,     APPW_SET_PROP_ALIGNTEXT,    { ARG_V(GUI_ALIGN_HCENTER | GUI_ALIGN_VCENTER),
                                                        ARG_V(0),
                                                        ARG_V(0) } },
-  { ID_TEXT_WARNING,     APPW_SET_PROP_TEXTID,       { ARG_V(ID_RTEXT_7) } },
+  { ID_TEXT_WARNING,     APPW_SET_PROP_TEXTID,       { ARG_V(ID_RTEXT_WARNING) } },
   { ID_TEXT_WARNING,     APPW_SET_PROP_BKCOLOR,      { ARG_V(GUI_RED) } },
   { ID_TEXT_WARNING,     APPW_SET_PROP_FONT,         { ARG_VP(0, ac51_20_Normal_EXT_AA2) } },
 };

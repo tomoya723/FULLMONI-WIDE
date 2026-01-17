@@ -356,6 +356,7 @@ void data_setLCD100ms(void)
 	master_warning_check();
 	master_warning_update_display();
 	APPW_SetVarData(ID_VAR_WARNING, master_warning_is_active() ? 1 : 0);
+	APPW_SetText(ID_SCREEN_01a, ID_RTEXT_WARNING, (char *)master_warning_get_message());
 
 	APPW_SetVarData(ID_VAR_01, g_CALC_data.num1); //WaterTemp
 	APPW_SetVarData(ID_VAR_02, g_CALC_data.num2); //IAT

@@ -94,6 +94,25 @@ void master_warning_init(void)
 }
 
 /**
+ * @brief ヒステリシス付き解除閾値を計算
+ * @param threshold 元の閾値
+ * @param is_high_limit true=上限, false=下限
+ * @return 解除閾値
+ * @note 上限: 5%少ない値で解除, 下限: 5%多い値で解除
+ */
+static int32_t calc_release_threshold(int16_t threshold, bool is_high_limit)
+{
+    int32_t th = (int32_t)threshold;
+    if (is_high_limit) {
+        /* 上限: 5%少ない値で解除 (例: 8000 → 7600) */
+        return (th * 95) / 100;
+    } else {
+        /* 下限: 5%多い値で解除 (例: 60 → 63) */
+        return (th * 105) / 100;
+    }
+}
+
+/**
  * @brief マスターワーニングの状態を更新（毎フレーム呼び出し）
  */
 void master_warning_check(void)
@@ -103,7 +122,33 @@ void master_warning_check(void)
     int32_t current_value;
     bool found_warning = false;
     
-    /* 全フィールドをスキャン */
+    /* 現在警告中のフィールドがある場合、まずそれをチェック（ヒステリシス適用）*/
+    if (s_warning_active && s_warning_field_idx >= 0) {
+        field = &g_can_config.fields[s_warning_field_idx];
+        current_value = get_field_current_value(field->target_var);
+        
+        /* 現在の警告タイプに応じた解除判定 */
+        if (s_warning_type == WARN_TYPE_HIGH) {
+            /* 上限警告中: 5%少ない値を下回ったら解除 */
+            int32_t release_th = calc_release_threshold(field->warn_high, true);
+            if (current_value > release_th) {
+                found_warning = true;  /* まだ警告継続 */
+            }
+        } else if (s_warning_type == WARN_TYPE_LOW) {
+            /* 下限警告中: 5%多い値を上回ったら解除 */
+            int32_t release_th = calc_release_threshold(field->warn_low, false);
+            if (current_value < release_th) {
+                found_warning = true;  /* まだ警告継続 */
+            }
+        }
+        
+        /* 警告継続なら他のフィールドはチェックしない */
+        if (found_warning) {
+            return;
+        }
+    }
+    
+    /* 全フィールドをスキャン（新規警告検出）*/
     for (i = 0; i < CAN_FIELD_MAX; i++) {
         field = &g_can_config.fields[i];
         
