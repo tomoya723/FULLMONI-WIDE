@@ -4,6 +4,7 @@
  * スピーカ出力モジュール（TPU0 + DTC + DA1 + LM4861M）
  * - 正弦波による単音出力（ハードウェア生成、CPU負荷ゼロ）
  * - 警告音パターン再生
+ * - PCM再生（テスト用）
  *
  *  Created on: 2026/01/17
  *      Author: FULLMONI-WIDE Project
@@ -13,6 +14,16 @@
 #include "platform.h"  /* iodefine.h経由でレジスタ定義を取得 */
 #include "Config_TPU0.h"
 #include "r_dtc_rx_if.h"
+
+/* ============================================================
+ * テスト用PCM再生モード（1=PCM, 0=正弦波）
+ * ============================================================ */
+#define USE_PCM_STARTUP_SOUND  1
+
+#if USE_PCM_STARTUP_SOUND
+#include "startup_sound.h"  /* PCMデータ（Windows tada.wav） */
+static volatile uint32_t s_pcm_index = 0;
+#endif
 
 /* ============================================================
  * 内部定数
@@ -127,7 +138,13 @@ void speaker_init(void)
     /* TPU0設定 */
     TPU0.TCR.BYTE = 0x20U;  /* PCLK/1, TGRAコンペアマッチでクリア */
     TPU0.TIER.BYTE = 0x01U; /* TGIEA有効 */
+#if USE_PCM_STARTUP_SOUND
+    TPU0.TGRA = (60000000UL / PCM_SAMPLE_RATE) - 1;   /* PCM再生用（startup_sound.hの定義に従う） */
+    s_pcm_index = 0;
+#else
     TPU0.TGRA = 1562 - 1;   /* 38.4kHz (60MHz/38400) → 1200Hz正弦波 */
+    s_sample_index = 0;
+#endif
     TPU0.TCNT = 0U;
     
     /* 割り込み優先度設定 */
@@ -136,14 +153,20 @@ void speaker_init(void)
     IEN(PERIB, INTB130) = 1U;  /* 割り込み許可 */
     
     /* スピーカ有効化 */
-    s_sample_index = 0;
     s_speaker_active = true;
     
     /* TPU0開始 */
     TPUA.TSTR.BIT.CST0 = 1U;
     
+#if USE_PCM_STARTUP_SOUND
+    /* PCM再生完了まで待機（約1.6秒） */
+    while (s_speaker_active) {
+        __asm("nop");
+    }
+#else
     /* 150ms待ち */
     for (volatile uint32_t d = 0; d < 3600000; d++) { __asm("nop"); }
+#endif
     
     /* 停止 */
     s_speaker_active = false;
@@ -162,8 +185,25 @@ void speaker_init(void)
 void speaker_tpu0_isr(void)
 {
     if (s_speaker_active) {
+#if USE_PCM_STARTUP_SOUND
+        /* PCM再生モード: 8bit→12bitに変換して出力（ゲイン2倍） */
+        if (s_pcm_index < PCM_DATA_SIZE) {
+            int16_t sample = (int16_t)s_pcm_data[s_pcm_index] - 128;  /* 中心を0に */
+            sample *= 2;  /* ゲイン2倍 */
+            if (sample > 127) sample = 127;
+            if (sample < -128) sample = -128;
+            DA.DADR1 = (uint16_t)((sample + 128) << 4);  /* 12bitに変換 */
+            s_pcm_index++;
+        } else {
+            /* 再生終了 */
+            s_speaker_active = false;
+            DA.DADR1 = SPEAKER_DA_CENTER;
+        }
+#else
+        /* 正弦波モード */
         DA.DADR1 = s_sine_table[s_sample_index];
         s_sample_index = (s_sample_index + 1) & 0x1F;  /* 0-31 循環 */
+#endif
     }
 }
 
