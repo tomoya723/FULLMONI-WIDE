@@ -12,6 +12,7 @@
 #include "lib_table.h"
 #include "lib_general.h"
 #include "param_storage.h"      /* CAN設定 (Issue #65) */
+#include "master_warning.h"    /* Issue #50: マスターワーニング */
 
 #define PI 3.1415923
 
@@ -351,6 +352,9 @@ void data_setLCD50ms(void)
 
 void data_setLCD100ms(void)
 {
+	/* Issue #50: マスターワーニングチェックと表示更新 */
+	master_warning_check();
+	master_warning_update_display();
 
 	APPW_SetVarData(ID_VAR_01, g_CALC_data.num1); //WaterTemp
 	APPW_SetVarData(ID_VAR_02, g_CALC_data.num2); //IAT

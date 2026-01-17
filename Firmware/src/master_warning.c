@@ -15,10 +15,6 @@
 #include "dataregister.h"
 #include "speaker.h"
 
-/* AppWizard includes */
-#include "Application.h"
-#include "Resource.h"
-
 /* ============================================================
  * 内部変数
  * ============================================================ */
@@ -180,10 +176,7 @@ void master_warning_update_display(void)
     /* 前回状態を更新 */
     s_warning_prev = s_warning_active;
     
-    /* AppWizard変数の更新は、ID_VAR_WARNINGが定義されていれば有効化 */
-#ifdef ID_VAR_WARNING
-    APPW_SetVarData(ID_VAR_WARNING, s_warning_active ? 1 : 0);
-#endif
+    /* Note: AppWizard変数の更新はdataregister.cから行う */
 }
 
 /**

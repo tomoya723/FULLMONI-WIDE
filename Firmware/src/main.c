@@ -20,6 +20,7 @@
 #include "param_storage.h"
 #include "usb_cdc.h"  /* USB CDC for parameter mode */
 #include "speaker.h"  /* Speaker output (DA1 + LM4861M) */
+#include "master_warning.h"  /* Issue #50: マスターワーニング */
 
 // --------------------------------------------------------------------
 // グローバル変数宣言
@@ -112,6 +113,9 @@ void main(void)
 
 	// CAN設定は仮初期化（EEPROMはI2C初期化後に読み込む）
 	can_config_init();
+
+	// Issue #50: マスターワーニング初期化
+	master_warning_init();
 
 	// Init CAN
 	Init_CAN();
