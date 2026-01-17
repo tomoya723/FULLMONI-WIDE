@@ -5,32 +5,19 @@
 */
 
 /***********************************************************************************************************************
-* File Name        : r_smc_entry.h
-* Version          : 1.0.200
+* File Name        : Config_DA.h
+* Component Version: 1.11.0
 * Device(s)        : R5F572NNDxFP
-* Description      : SMC platform header file.
+* Description      : This file implements device driver for Config_DA.
 ***********************************************************************************************************************/
 
-#ifndef SMC_ENTRY_H
-#define SMC_ENTRY_H
+#ifndef CFG_Config_DA_H
+#define CFG_Config_DA_H
 
 /***********************************************************************************************************************
 Includes
 ***********************************************************************************************************************/
-#include "r_cg_macrodriver.h"
-#include "Pin.h"
-#include "Config_S12AD0.h"
-#include "Config_RIIC0.h"
-#include "Config_RIIC1.h"
-#include "Config_MTU0.h"
-#include "Config_MTU1.h"
-#include "Config_MTU3.h"
-#include "Config_RTC.h"
-#include "Config_MTU8.h"
-#include "Config_PORT.h"
-#include "Config_SCI9.h"
-#include "Config_DA.h"
-#include "Config_TPU0.h"
+#include "r_cg_r12da.h"
 
 /***********************************************************************************************************************
 Macro definitions (Register bit)
@@ -47,7 +34,11 @@ Typedef definitions
 /***********************************************************************************************************************
 Global functions
 ***********************************************************************************************************************/
+void R_Config_DA_Create(void);
+void R_Config_DA_Create_UserInit(void);
+void R_Config_DA1_Start(void);
+void R_Config_DA1_Stop(void);
+void R_Config_DA1_Set_ConversionValue(uint16_t reg_value);
 /* Start user code for function. Do not edit comment generated here */
 /* End user code. Do not edit comment generated here */
 #endif
-

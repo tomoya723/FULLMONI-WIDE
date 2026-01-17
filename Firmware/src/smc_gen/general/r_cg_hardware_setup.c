@@ -31,6 +31,8 @@ Includes
 #include "Config_MTU8.h"
 #include "Config_PORT.h"
 #include "Config_SCI9.h"
+#include "Config_DA.h"
+#include "Config_TPU0.h"
 #include "r_smc_cgc.h"
 #include "r_smc_interrupt.h"
 /* Start user code for include. Do not edit comment generated here */
@@ -95,6 +97,8 @@ void R_Systeminit(void)
     R_Config_RTC_Create();
     R_Config_MTU8_Create();
     R_Config_SCI9_Create();
+    R_Config_DA_Create();
+    R_Config_TPU0_Create();
 
     /* Set interrupt settings */
     R_Interrupt_Create();

@@ -5,32 +5,19 @@
 */
 
 /***********************************************************************************************************************
-* File Name        : r_smc_entry.h
-* Version          : 1.0.200
+* File Name        : Config_TPU0.h
+* Component Version: 1.12.0
 * Device(s)        : R5F572NNDxFP
-* Description      : SMC platform header file.
+* Description      : This file implements device driver for Config_TPU0.
 ***********************************************************************************************************************/
 
-#ifndef SMC_ENTRY_H
-#define SMC_ENTRY_H
+#ifndef CFG_Config_TPU0_H
+#define CFG_Config_TPU0_H
 
 /***********************************************************************************************************************
 Includes
 ***********************************************************************************************************************/
-#include "r_cg_macrodriver.h"
-#include "Pin.h"
-#include "Config_S12AD0.h"
-#include "Config_RIIC0.h"
-#include "Config_RIIC1.h"
-#include "Config_MTU0.h"
-#include "Config_MTU1.h"
-#include "Config_MTU3.h"
-#include "Config_RTC.h"
-#include "Config_MTU8.h"
-#include "Config_PORT.h"
-#include "Config_SCI9.h"
-#include "Config_DA.h"
-#include "Config_TPU0.h"
+#include "r_cg_tpu.h"
 
 /***********************************************************************************************************************
 Macro definitions (Register bit)
@@ -39,6 +26,11 @@ Macro definitions (Register bit)
 /***********************************************************************************************************************
 Macro definitions
 ***********************************************************************************************************************/
+#define TPU0_PCLK_COUNTER_DIVISION         (1)
+#define _176F_TGRA0_VALUE                  (0x176FU) /* TGRA0 value */
+#define _176F_TGRB0_VALUE                  (0x176FU) /* TGRB0 value */
+#define _176F_TGRC0_VALUE                  (0x176FU) /* TGRC0 value */
+#define _176F_TGRD0_VALUE                  (0x176FU) /* TGRD0 value */
 
 /***********************************************************************************************************************
 Typedef definitions
@@ -47,7 +39,10 @@ Typedef definitions
 /***********************************************************************************************************************
 Global functions
 ***********************************************************************************************************************/
+void R_Config_TPU0_Create(void);
+void R_Config_TPU0_Create_UserInit(void);
+void R_Config_TPU0_Start(void);
+void R_Config_TPU0_Stop(void);
 /* Start user code for function. Do not edit comment generated here */
 /* End user code. Do not edit comment generated here */
 #endif
-

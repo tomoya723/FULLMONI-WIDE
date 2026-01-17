@@ -90,6 +90,11 @@ void R_Pins_Create(void)
     MPC.P32PFS.BYTE = 0x10U;
     PORT3.PMR.BYTE |= 0x04U;
 
+    /* Set DA1 pin */
+    PORT0.PMR.BYTE &= 0xDFU;
+    PORT0.PDR.BYTE &= 0xDFU;
+    MPC.P05PFS.BYTE = 0x80U;
+
     /* Set LCD_CLK pin */
     MPC.PB5PFS.BYTE = 0x25U;
     PORTB.PMR.BYTE |= 0x20U;
