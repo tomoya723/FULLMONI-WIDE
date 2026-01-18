@@ -361,23 +361,44 @@ static uint8_t s_warning_displayed = 0;
 void data_setLCD100ms(void)
 {
 	/* Issue #50: マスターワーニング処理 */
-	/* ID_TEXT_ACC（パラメータモード表示用）を再利用 */
-	/* 警告時：警告メッセージ表示、通常時：非表示（パラメータモード時は緑で表示） */
 	master_warning_check();
 	
 	if (master_warning_is_active()) {
-		/* 警告発報中 */
-		APPW_SetVarData(ID_VAR_PRM, 1);  /* 表示ON */
-		APPW_SetText(ID_SCREEN_01a, ID_TEXT_ACC, (char *)master_warning_get_message());
-		s_warning_displayed = 1;
+		/* 警告発報中は表示ON */
+		if (!s_warning_displayed) {
+			/* テキストと背景色を先に設定してから表示ONにする */
+			WM_HWIN hWin = WM_GetDialogItem(ID_SCREEN_01a_RootInfo.hWin, ID_TEXT_ACC);
+			if (hWin) {
+				const char *msg = master_warning_get_message();
+				if (msg != NULL && msg[0] != '\0') {
+					TEXT_SetText(hWin, msg);
+				}
+				TEXT_SetBkColor(hWin, 0xFFFF0000);  /* 赤背景 (ARGB) */
+			}
+			APPW_SetVarData(ID_VAR_PRM, 1);
+			s_warning_displayed = 1;
+		} else if (master_warning_message_changed()) {
+			/* 複数警告時の表示切り替え */
+			WM_HWIN hWin = WM_GetDialogItem(ID_SCREEN_01a_RootInfo.hWin, ID_TEXT_ACC);
+			if (hWin) {
+				const char *msg = master_warning_get_message();
+				if (msg != NULL && msg[0] != '\0') {
+					TEXT_SetText(hWin, msg);
+				}
+			}
+		}
 	} else {
 		/* 警告解除 */
 		if (s_warning_displayed) {
-			s_warning_displayed = 0;
-			/* パラメータモードでなければ非表示に */
-			if (g_system_mode == MODE_NORMAL) {
-				APPW_SetVarData(ID_VAR_PRM, 0);
+			/* 背景色を緑に戻す（パラメータモード用）*/
+			WM_HWIN hWin = WM_GetDialogItem(ID_SCREEN_01a_RootInfo.hWin, ID_TEXT_ACC);
+			if (hWin) {
+				TEXT_SetBkColor(hWin, 0xFF00AA00);  /* 緑背景 (ARGB) */
 			}
+			s_warning_displayed = 0;
+		}
+		if (g_system_mode == MODE_NORMAL) {
+			APPW_SetVarData(ID_VAR_PRM, 0);
 		}
 	}
 

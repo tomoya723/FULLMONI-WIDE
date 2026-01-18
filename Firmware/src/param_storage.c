@@ -455,7 +455,7 @@ static const CAN_Config_t CAN_PRESET_MOTEC = {
         { .channel = 4, .start_byte = 0, .byte_count = 2, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_NUM5, .offset = 0, .multiplier = 1, .divisor = 1000,
           .name = "PRESS", .unit = "kPa", .warn_enabled = 1, .reserved = 0,
-          .warn_low = 100, .warn_high = CAN_WARN_DISABLED },     /* OilP *0.001 */
+          .warn_low = 1, .warn_high = CAN_WARN_DISABLED },     /* OilP *0.001, warn: 1=100kPa */
         { .channel = 4, .start_byte = 6, .byte_count = 2, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_NUM6, .offset = 0, .multiplier = 1000, .divisor = 10000,
           .name = "BATT", .unit = "V", .warn_enabled = 1, .reserved = 0,

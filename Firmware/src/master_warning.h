@@ -65,4 +65,16 @@ int8_t master_warning_get_field_index(void);
  */
 MasterWarningType_t master_warning_get_type(void);
 
+/**
+ * @brief 警告メッセージが変更されたかチェック
+ * @return true: メッセージが変更された（表示更新が必要）
+ */
+bool master_warning_message_changed(void);
+
+/**
+ * @brief アクティブな警告数を取得
+ * @return 警告数
+ */
+uint8_t master_warning_get_count(void);
+
 #endif /* MASTER_WARNING_H_ */

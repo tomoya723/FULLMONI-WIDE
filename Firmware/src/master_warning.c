@@ -16,13 +16,37 @@
 #include "speaker.h"
 
 /* ============================================================
+ * 内部定数
+ * ============================================================ */
+/* 起動後の警告抑制期間（100ms単位、30 = 3秒）*/
+#define STARTUP_DELAY_COUNT   30
+
+/* 下限警告を有効にする最小エンジン回転数 */
+#define MIN_RPM_FOR_LOW_WARNING  500
+
+/* 複数警告表示切り替え間隔（100ms単位、5 = 0.5秒）*/
+#define WARNING_ROTATE_INTERVAL  5
+
+/* 最大同時警告数 */
+#define MAX_ACTIVE_WARNINGS  8
+
+/* ============================================================
  * 内部変数
  * ============================================================ */
 static bool s_warning_active = false;       /* 現在のワーニング状態 */
 static bool s_warning_prev = false;         /* 前回のワーニング状態（立ち上がり検出用）*/
-static int8_t s_warning_field_idx = -1;     /* 警告中のフィールドインデックス */
-static MasterWarningType_t s_warning_type = WARN_TYPE_NONE;  /* 警告タイプ */
+static int8_t s_warning_field_idx = -1;     /* 表示中のフィールドインデックス */
+static MasterWarningType_t s_warning_type = WARN_TYPE_NONE;  /* 表示中の警告タイプ */
 static char s_warning_message[MASTER_WARNING_MSG_MAX] = "";  /* 警告メッセージ */
+static uint8_t s_startup_delay = STARTUP_DELAY_COUNT;  /* 起動後遅延カウンタ */
+
+/* 複数警告管理用 */
+static uint8_t s_active_warning_count = 0;  /* アクティブな警告数 */
+static int8_t s_active_warnings[MAX_ACTIVE_WARNINGS];  /* 警告中のフィールドインデックス配列 */
+static MasterWarningType_t s_active_warning_types[MAX_ACTIVE_WARNINGS];  /* 各警告のタイプ */
+static uint8_t s_display_index = 0;         /* 現在表示中の警告インデックス */
+static uint8_t s_rotate_counter = 0;        /* 表示切り替えカウンタ */
+static bool s_message_changed = false;      /* メッセージ変更フラグ */
 
 /* ============================================================
  * 内部関数
@@ -39,8 +63,8 @@ static int32_t get_field_current_value(uint8_t target_var)
     case CAN_TARGET_REV:
         return (int32_t)g_CALC_data.rev;
     case CAN_TARGET_AF:
-        /* A/F値は10倍して整数化 (例: 14.7 -> 147) */
-        return (int32_t)(g_CALC_data.af * 10.0f);
+        /* A/F値は既に10倍値 (例: 14.7 -> 147) */
+        return (int32_t)g_CALC_data.af;
     case CAN_TARGET_NUM1:
         return (int32_t)g_CALC_data.num1;
     case CAN_TARGET_NUM2:
@@ -52,8 +76,8 @@ static int32_t get_field_current_value(uint8_t target_var)
     case CAN_TARGET_NUM5:
         return (int32_t)g_CALC_data.num5;
     case CAN_TARGET_NUM6:
-        /* バッテリー電圧は10倍して整数化 (例: 14.2V -> 142) */
-        return (int32_t)(g_CALC_data.num6 * 10.0f);
+        /* バッテリー電圧は既に10倍値 (例: 14.2V -> 142) */
+        return (int32_t)g_CALC_data.num6;
     case CAN_TARGET_SPEED:
         return (int32_t)g_CALC_data.sp;
     default:
@@ -91,6 +115,14 @@ void master_warning_init(void)
     s_warning_field_idx = -1;
     s_warning_type = WARN_TYPE_NONE;
     s_warning_message[0] = '\0';
+    s_startup_delay = STARTUP_DELAY_COUNT;  /* 起動後遅延をリセット */
+    
+    /* 複数警告管理の初期化 */
+    s_active_warning_count = 0;
+    s_display_index = 0;
+    s_rotate_counter = 0;
+    s_message_changed = false;
+    memset(s_active_warnings, -1, sizeof(s_active_warnings));
 }
 
 /**
@@ -120,40 +152,37 @@ void master_warning_check(void)
     uint8_t i;
     const CAN_Field_t *field;
     int32_t current_value;
-    bool found_warning = false;
+    int32_t current_rpm;
+    bool check_low_warning;
+    uint8_t new_warning_count = 0;
+    int8_t new_warnings[MAX_ACTIVE_WARNINGS];
+    MasterWarningType_t new_warning_types[MAX_ACTIVE_WARNINGS];
+    
+    s_message_changed = false;  /* メッセージ変更フラグをリセット */
+    
+    /* 起動後遅延中は警告チェックをスキップ（CANデータ安定待ち）*/
+    if (s_startup_delay > 0) {
+        s_startup_delay--;
+        s_warning_active = false;
+        s_active_warning_count = 0;
+        return;
+    }
     
     /* CAN設定が有効か確認（バージョンが正しいか）*/
     if (g_can_config.version != CAN_CONFIG_VERSION) {
         /* 未初期化または不正なデータ - 警告チェックをスキップ */
         s_warning_active = false;
+        s_active_warning_count = 0;
         return;
     }
     
-    /* 現在警告中のフィールドがある場合、まずそれをチェック（ヒステリシス適用）*/
-    if (s_warning_active && s_warning_field_idx >= 0) {
-        field = &g_can_config.fields[s_warning_field_idx];
-        current_value = get_field_current_value(field->target_var);
-        
-        /* 現在の警告タイプに応じた解除判定 */
-        if (s_warning_type == WARN_TYPE_HIGH) {
-            /* 上限警告中: 5%少ない値を下回ったら解除 */
-            int32_t release_th = calc_release_threshold(field->warn_high, true);
-            if (current_value > release_th) {
-                found_warning = true;  /* まだ警告継続 */
-            }
-        } else if (s_warning_type == WARN_TYPE_LOW) {
-            /* 下限警告中: 5%多い値を上回ったら解除 */
-            int32_t release_th = calc_release_threshold(field->warn_low, false);
-            if (current_value < release_th) {
-                found_warning = true;  /* まだ警告継続 */
-            }
-        }
-    }
+    /* エンジン回転数を取得（下限警告の有効化判定用）*/
+    current_rpm = get_field_current_value(CAN_TARGET_REV);
+    check_low_warning = (current_rpm >= MIN_RPM_FOR_LOW_WARNING);
     
-    /* 警告継続中でなければ、全フィールドをスキャン（新規警告検出）*/
-    if (!found_warning) {
-        for (i = 0; i < CAN_FIELD_MAX; i++) {
-            field = &g_can_config.fields[i];
+    /* 全フィールドをスキャンして、警告中のものをすべて収集 */
+    for (i = 0; i < CAN_FIELD_MAX && new_warning_count < MAX_ACTIVE_WARNINGS; i++) {
+        field = &g_can_config.fields[i];
         
         /* 無効なフィールドはスキップ */
         if (field->channel == 0) {
@@ -168,38 +197,83 @@ void master_warning_check(void)
         /* 現在値を取得 */
         current_value = get_field_current_value(field->target_var);
         
-        /* 上限チェック */
+        /* 上限チェック（常に有効）*/
         if (field->warn_high != CAN_WARN_DISABLED) {
             if (current_value > field->warn_high) {
-                found_warning = true;
-                s_warning_field_idx = (int8_t)i;
-                s_warning_type = WARN_TYPE_HIGH;
-                build_warning_message(field, WARN_TYPE_HIGH);
-                break;  /* 最初の警告で抜ける */
+                new_warnings[new_warning_count] = (int8_t)i;
+                new_warning_types[new_warning_count] = WARN_TYPE_HIGH;
+                new_warning_count++;
+                continue;  /* 1フィールドにつき1警告まで（上限優先）*/
             }
         }
         
-        /* 下限チェック */
-        if (field->warn_low != CAN_WARN_DISABLED) {
+        /* 下限チェック（エンジン回転中のみ）*/
+        if (check_low_warning && field->warn_low != CAN_WARN_DISABLED) {
             if (current_value < field->warn_low) {
-                found_warning = true;
-                s_warning_field_idx = (int8_t)i;
-                s_warning_type = WARN_TYPE_LOW;
-                build_warning_message(field, WARN_TYPE_LOW);
-                break;  /* 最初の警告で抜ける */
+                new_warnings[new_warning_count] = (int8_t)i;
+                new_warning_types[new_warning_count] = WARN_TYPE_LOW;
+                new_warning_count++;
             }
-        }
         }
     }
     
     /* 警告状態を更新 */
-    if (found_warning) {
+    if (new_warning_count > 0) {
+        /* 警告数が変わった場合、表示インデックスをリセット */
+        if (new_warning_count != s_active_warning_count) {
+            s_display_index = 0;
+            s_rotate_counter = 0;
+        }
+        
+        /* 警告リストをコピー */
+        s_active_warning_count = new_warning_count;
+        for (i = 0; i < new_warning_count; i++) {
+            s_active_warnings[i] = new_warnings[i];
+            s_active_warning_types[i] = new_warning_types[i];
+        }
+        
+        /* 表示切り替えタイマー処理（複数警告時のみ）*/
+        if (s_active_warning_count > 1) {
+            s_rotate_counter++;
+            if (s_rotate_counter >= WARNING_ROTATE_INTERVAL) {
+                s_rotate_counter = 0;
+                s_display_index++;
+                if (s_display_index >= s_active_warning_count) {
+                    s_display_index = 0;
+                }
+                s_message_changed = true;  /* 表示切り替え時にフラグを立てる */
+            }
+        }
+        
+        /* 現在表示する警告のメッセージを生成 */
+        int8_t disp_idx = s_active_warnings[s_display_index];
+        MasterWarningType_t disp_type = s_active_warning_types[s_display_index];
+        
+        /* 前回と違う警告を表示する場合、または最初の警告の場合のみメッセージを更新 */
+        if (!s_warning_active) {
+            /* 新規警告発生時のみメッセージ生成 */
+            field = &g_can_config.fields[disp_idx];
+            build_warning_message(field, disp_type);
+            s_warning_field_idx = disp_idx;
+            s_warning_type = disp_type;
+            s_message_changed = true;
+        } else if (s_message_changed) {
+            /* 複数警告の切り替え時のみメッセージ更新 */
+            field = &g_can_config.fields[disp_idx];
+            build_warning_message(field, disp_type);
+            s_warning_field_idx = disp_idx;
+            s_warning_type = disp_type;
+        }
+        
         s_warning_active = true;
     } else {
         s_warning_active = false;
         s_warning_field_idx = -1;
         s_warning_type = WARN_TYPE_NONE;
         s_warning_message[0] = '\0';
+        s_active_warning_count = 0;
+        s_display_index = 0;
+        s_rotate_counter = 0;
     }
 }
 
@@ -250,4 +324,20 @@ int8_t master_warning_get_field_index(void)
 MasterWarningType_t master_warning_get_type(void)
 {
     return s_warning_type;
+}
+
+/**
+ * @brief 警告メッセージが変更されたかチェック
+ */
+bool master_warning_message_changed(void)
+{
+    return s_message_changed;
+}
+
+/**
+ * @brief アクティブな警告数を取得
+ */
+uint8_t master_warning_get_count(void)
+{
+    return s_active_warning_count;
 }

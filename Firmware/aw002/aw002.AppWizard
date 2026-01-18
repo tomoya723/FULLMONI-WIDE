@@ -908,7 +908,7 @@
       IdPrev=0
       IdPost=0
       <Dispose>
-        xSize=256
+        xSize=253
         ySize=32
         <X0>
           Mode=2
@@ -929,9 +929,6 @@
         xOff=0
         yOff=0
       </SetTextAlign>
-      <SetTextId>
-        Id=21
-      </SetTextId>
       <SetBkColor>
         BkColor=ff00aa00
       </SetBkColor>

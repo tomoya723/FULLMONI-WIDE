@@ -70,8 +70,15 @@ SendMsg(sMsgStruct_Frame4);
 SendMsg(sMsgStruct_Frame5);
 SendMsg(sMsgStruct_Frame6);
 
-
-
+MAP = 1000;
+LA1 = 1235;
+THW = 1200;
+THA = 1000;
+OT = 1290;
+OP = 1100;
+BATTV = 1450;
+	
+/*
 MAP = MAP +0.4;
 LA1 = LA1+0.2;
 THW = THW +0.1;
@@ -79,7 +86,7 @@ THA = THA +0.2;
 OT = OT + 0.3;
 OP = OP +1;
 BATTV = BATTV +0.15;
-
+*/
 if(i == 0){
 	RPM =RPM + 100;
 	if(RPM >= 7000){
