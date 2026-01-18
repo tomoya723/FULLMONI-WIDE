@@ -290,16 +290,10 @@ bool master_warning_is_active(void)
  */
 void master_warning_update_display(void)
 {
-    /* 立ち上がり検出（OFF→ON） */
-    if (s_warning_active && !s_warning_prev) {
-        /* 警告音を1回再生 */
-        speaker_play_warning();
-    }
-    
-    /* 前回状態を更新 */
+    /* 前回状態を更新（立ち上がり検出用に保持）*/
     s_warning_prev = s_warning_active;
     
-    /* Note: AppWizard変数の更新はdataregister.cから行う */
+    /* Note: 警告音再生はdataregister.cで直接呼び出し */
 }
 
 /**

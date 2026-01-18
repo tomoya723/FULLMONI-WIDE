@@ -13,6 +13,7 @@
 #include "lib_general.h"
 #include "param_storage.h"      /* CAN設定 (Issue #65) */
 #include "master_warning.h"    /* Issue #50: マスターワーニング */
+#include "speaker.h"           /* 警告音再生 */
 #include "GUI.h"               /* emWin GUI関数 */
 #include "TEXT.h"              /* TEXT Widget関数 */
 #include "WM.h"                /* Window Manager関数 */
@@ -362,10 +363,14 @@ void data_setLCD100ms(void)
 {
 	/* Issue #50: マスターワーニング処理 */
 	master_warning_check();
+	master_warning_update_display();  /* 警告音再生（立ち上がり検出）*/
 	
 	if (master_warning_is_active()) {
 		/* 警告発報中は表示ON */
 		if (!s_warning_displayed) {
+			/* 警告音を再生（最初の1回だけ）*/
+			speaker_play_warning();
+			
 			/* テキストと背景色を先に設定してから表示ONにする */
 			WM_HWIN hWin = WM_GetDialogItem(ID_SCREEN_01a_RootInfo.hWin, ID_TEXT_ACC);
 			if (hWin) {
@@ -378,7 +383,7 @@ void data_setLCD100ms(void)
 			APPW_SetVarData(ID_VAR_PRM, 1);
 			s_warning_displayed = 1;
 		} else if (master_warning_message_changed()) {
-			/* 複数警告時の表示切り替え */
+			/* 複数警告時の表示切り替え（音は鳴らさない）*/
 			WM_HWIN hWin = WM_GetDialogItem(ID_SCREEN_01a_RootInfo.hWin, ID_TEXT_ACC);
 			if (hWin) {
 				const char *msg = master_warning_get_message();
