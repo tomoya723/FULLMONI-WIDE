@@ -1534,7 +1534,7 @@
             <Setting id="EMWIN_USE_LCD_CS_PIN" value="1"/>
             <Setting id="EMWIN_LCD_BAUDRATE" value="1000000"/>
             <Setting id="EMWIN_SELECT_DMAC_DTC" value="2"/>
-            <Setting id="EMWIN_GUI_NUM_BYTES" value="102400"/>
+            <Setting id="EMWIN_GUI_NUM_BYTES" value="112640"/>
             <Setting id="EMWIN_XSIZE_PHYS" value="800"/>
             <Setting id="EMWIN_GUI_USE_CACHE" value="0"/>
             <Setting id="EMWIN_USE_TOUCH" value="1"/>

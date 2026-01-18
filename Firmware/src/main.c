@@ -68,7 +68,12 @@ void ap_10ms(void);
 void ap_50ms(void);
 void ap_100ms(void);
 
+#include <string.h>  /* memset */
+
 extern void LCD_FadeIN(void);
+
+/* bss2セクションの初期化用シンボル（linker_script.ldで定義） */
+extern char __attribute__((section(".bss2"))) _bss2_dummy;
 
 void main(void)
  {

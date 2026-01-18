@@ -13,6 +13,11 @@
 #include "lib_general.h"
 #include "param_storage.h"      /* CAN設定 (Issue #65) */
 #include "master_warning.h"    /* Issue #50: マスターワーニング */
+#include "GUI.h"               /* emWin GUI関数 */
+#include "TEXT.h"              /* TEXT Widget関数 */
+#include "WM.h"                /* Window Manager関数 */
+#include "../aw002/Source/Generated/Resource.h"  /* AppWizard リソース定義 */
+#include "../aw002/Source/Generated/ID_SCREEN_01a.h"  /* ID_TEXT_ACC 定義 */
 
 #define PI 3.1415923
 
@@ -350,13 +355,31 @@ void data_setLCD50ms(void)
 	APPW_SetVarData(ID_VAR_04, g_CALC_data_sm.num4); // MAP
 }
 
+/* Issue #50: マスターワーニング表示状態 */
+static uint8_t s_warning_displayed = 0;
+
 void data_setLCD100ms(void)
 {
-	/* Issue #50: マスターワーニングチェックと表示更新 */
+	/* Issue #50: マスターワーニング処理 */
+	/* ID_TEXT_ACC（パラメータモード表示用）を再利用 */
+	/* 警告時：警告メッセージ表示、通常時：非表示（パラメータモード時は緑で表示） */
 	master_warning_check();
-	master_warning_update_display();
-	APPW_SetVarData(ID_VAR_WARNING, master_warning_is_active() ? 1 : 0);
-	APPW_SetText(ID_SCREEN_01a, ID_RTEXT_WARNING, (char *)master_warning_get_message());
+	
+	if (master_warning_is_active()) {
+		/* 警告発報中 */
+		APPW_SetVarData(ID_VAR_PRM, 1);  /* 表示ON */
+		APPW_SetText(ID_SCREEN_01a, ID_TEXT_ACC, (char *)master_warning_get_message());
+		s_warning_displayed = 1;
+	} else {
+		/* 警告解除 */
+		if (s_warning_displayed) {
+			s_warning_displayed = 0;
+			/* パラメータモードでなければ非表示に */
+			if (g_system_mode == MODE_NORMAL) {
+				APPW_SetVarData(ID_VAR_PRM, 0);
+			}
+		}
+	}
 
 	APPW_SetVarData(ID_VAR_01, g_CALC_data.num1); //WaterTemp
 	APPW_SetVarData(ID_VAR_02, g_CALC_data.num2); //IAT

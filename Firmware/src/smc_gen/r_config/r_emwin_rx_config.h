@@ -81,7 +81,7 @@ Configuration Options
 ***********************************************************************************************************************/
 
 /* Basic */
-#define EMWIN_GUI_NUM_BYTES           (102400)
+#define EMWIN_GUI_NUM_BYTES           (112640)
 
 #define EMWIN_XSIZE_PHYS              (800)
 #define EMWIN_YSIZE_PHYS              (256)

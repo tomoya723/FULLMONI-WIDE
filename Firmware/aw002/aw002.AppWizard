@@ -85,7 +85,6 @@
       Id=ID_RTEXT_6
       Id=ID_RTEXT_PRM
       Id=ID_RTEXT_ACC
-      Id=ID_RTEXT_WARNING
     </Id>
     <Lang>
       Name=JP
@@ -111,7 +110,6 @@
       Text=CANSPEED
       Text=PARAMETER MODE
       Text=HOST ACCESS
-      Text=xxxxx HIGH
     </Lang>
   </Text>
   <Content>
@@ -936,44 +934,6 @@
       </SetTextId>
       <SetBkColor>
         BkColor=ff00aa00
-      </SetBkColor>
-      <SetFont>
-        Font=51_20_Normal_EXT_AA2.xbf
-      </SetFont>
-    </Text>
-    <Text>
-      ParentId=2048
-      IdString=ID_TEXT_WARNING
-      Id=2056
-      IdPrev=0
-      IdPost=0
-      <Dispose>
-        xSize=256
-        ySize=32
-        <X0>
-          Mode=2
-          Off=0
-          Id=0
-        </X0>
-        <Y0>
-          Mode=2
-          Off=224
-          Id=0
-        </Y0>
-      </Dispose>
-      <SetColor>
-        Color=ffffffff
-      </SetColor>
-      <SetTextAlign>
-        Alignment=14
-        xOff=0
-        yOff=0
-      </SetTextAlign>
-      <SetTextId>
-        Id=22
-      </SetTextId>
-      <SetBkColor>
-        BkColor=ffff0000
       </SetBkColor>
       <SetFont>
         Font=51_20_Normal_EXT_AA2.xbf
@@ -2465,41 +2425,6 @@
       Slot=ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_TEXT_ACC__APPW_JOB_SETVIS_0
       Flags=65536
       Condition=A,1,IS_VAR,ID_VAR_PRM,==,IS_VAL,0
-      <Para>
-        OnOff=0
-      </Para>
-    </SETVIS>
-    <SETVIS>
-      RootId=6145
-      IdSrc=ID_SCREEN_01a
-      NCode=APPW_NOTIFICATION_INITDIALOG
-      IdDst=ID_TEXT_WARNING
-      Slot=ID_SCREEN_01a__APPW_NOTIFICATION_INITDIALOG__ID_TEXT_ACC__APPW_JOB_SETVIS_0
-      Flags=0
-      <Para>
-        OnOff=0
-      </Para>
-    </SETVIS>
-    <SETVIS>
-      RootId=6145
-      IdSrc=ID_VAR_WARNING
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_TEXT_WARNING
-      Slot=ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_TEXT_WARNING__APPW_JOB_SETVIS
-      Flags=65536
-      Condition=A,1,IS_VAR,ID_VAR_WARNING,==,IS_VAL,1
-      <Para>
-        OnOff=1
-      </Para>
-    </SETVIS>
-    <SETVIS>
-      RootId=6145
-      IdSrc=ID_VAR_WARNING
-      NCode=WM_NOTIFICATION_VALUE_CHANGED
-      IdDst=ID_TEXT_WARNING
-      Slot=ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_TEXT_WARNING__APPW_JOB_SETVIS_0
-      Flags=65536
-      Condition=A,1,IS_VAR,ID_VAR_WARNING,==,IS_VAL,0
       <Para>
         OnOff=0
       </Para>

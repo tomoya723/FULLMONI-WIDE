@@ -122,6 +122,13 @@ void master_warning_check(void)
     int32_t current_value;
     bool found_warning = false;
     
+    /* CAN設定が有効か確認（バージョンが正しいか）*/
+    if (g_can_config.version != CAN_CONFIG_VERSION) {
+        /* 未初期化または不正なデータ - 警告チェックをスキップ */
+        s_warning_active = false;
+        return;
+    }
+    
     /* 現在警告中のフィールドがある場合、まずそれをチェック（ヒステリシス適用）*/
     if (s_warning_active && s_warning_field_idx >= 0) {
         field = &g_can_config.fields[s_warning_field_idx];
@@ -141,16 +148,12 @@ void master_warning_check(void)
                 found_warning = true;  /* まだ警告継続 */
             }
         }
-        
-        /* 警告継続なら他のフィールドはチェックしない */
-        if (found_warning) {
-            return;
-        }
     }
     
-    /* 全フィールドをスキャン（新規警告検出）*/
-    for (i = 0; i < CAN_FIELD_MAX; i++) {
-        field = &g_can_config.fields[i];
+    /* 警告継続中でなければ、全フィールドをスキャン（新規警告検出）*/
+    if (!found_warning) {
+        for (i = 0; i < CAN_FIELD_MAX; i++) {
+            field = &g_can_config.fields[i];
         
         /* 無効なフィールドはスキップ */
         if (field->channel == 0) {
@@ -185,6 +188,7 @@ void master_warning_check(void)
                 build_warning_message(field, WARN_TYPE_LOW);
                 break;  /* 最初の警告で抜ける */
             }
+        }
         }
     }
     
