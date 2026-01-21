@@ -408,7 +408,7 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" Text="データフィールド定義 (最大8個)" FontWeight="Bold" FontSize="12" Margin="0,0,0,8" Foreground="{DynamicResource TextBrush}"/>
+                            <TextBlock Grid.Row="0" Text="データフィールド定義 (最大16個) - Issue #50: 警告設定対応" FontWeight="Bold" FontSize="12" Margin="0,0,0,8" Foreground="{DynamicResource TextBrush}"/>
 
                             <DataGrid Grid.Row="1" x:Name="CanFieldsGrid"
                                       AutoGenerateColumns="False"
@@ -424,11 +424,11 @@
                                       FontSize="11"
                                       IsEnabled="{Binding IsOperationEnabled}">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="25" IsReadOnly="True"/>
-                                    <DataGridTextColumn Header="CH" Binding="{Binding Channel}" Width="35"/>
-                                    <DataGridTextColumn Header="Byte" Binding="{Binding StartByte}" Width="40"/>
-                                    <DataGridTextColumn Header="Size" Binding="{Binding ByteCount}" Width="40"/>
-                                    <DataGridComboBoxColumn Header="Type" SelectedItemBinding="{Binding DataType}" Width="45">
+                                    <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="22" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="CH" Binding="{Binding Channel}" Width="28"/>
+                                    <DataGridTextColumn Header="Byte" Binding="{Binding StartByte}" Width="35"/>
+                                    <DataGridTextColumn Header="Len" Binding="{Binding ByteCount}" Width="30"/>
+                                    <DataGridComboBoxColumn Header="Type" SelectedItemBinding="{Binding DataType}" Width="42">
                                         <DataGridComboBoxColumn.ElementStyle>
                                             <Style TargetType="ComboBox">
                                                 <Setter Property="ItemsSource" Value="{Binding DataContext.DataTypeOptions, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
@@ -440,7 +440,7 @@
                                             </Style>
                                         </DataGridComboBoxColumn.EditingElementStyle>
                                     </DataGridComboBoxColumn>
-                                    <DataGridComboBoxColumn Header="End" SelectedItemBinding="{Binding Endian}" Width="40">
+                                    <DataGridComboBoxColumn Header="End" SelectedItemBinding="{Binding Endian}" Width="38">
                                         <DataGridComboBoxColumn.ElementStyle>
                                             <Style TargetType="ComboBox">
                                                 <Setter Property="ItemsSource" Value="{Binding DataContext.EndianOptions, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
@@ -452,7 +452,7 @@
                                             </Style>
                                         </DataGridComboBoxColumn.EditingElementStyle>
                                     </DataGridComboBoxColumn>
-                                    <DataGridComboBoxColumn Header="Var" SelectedItemBinding="{Binding TargetVarName}" Width="55">
+                                    <DataGridComboBoxColumn Header="Var" SelectedItemBinding="{Binding TargetVarName}" Width="52">
                                         <DataGridComboBoxColumn.ElementStyle>
                                             <Style TargetType="ComboBox">
                                                 <Setter Property="ItemsSource" Value="{Binding DataContext.VarOptions, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
@@ -464,14 +464,19 @@
                                             </Style>
                                         </DataGridComboBoxColumn.EditingElementStyle>
                                     </DataGridComboBoxColumn>
-                                    <DataGridTextColumn Header="Off" Binding="{Binding Offset}" Width="40"/>
-                                    <DataGridTextColumn Header="Mul" Binding="{Binding Multiplier}" Width="50"/>
-                                    <DataGridTextColumn Header="Div" Binding="{Binding Divisor}" Width="50"/>
-                                    <DataGridCheckBoxColumn Header="EN" Binding="{Binding Enabled}" Width="35"/>
+                                    <DataGridTextColumn Header="Off" Binding="{Binding Offset}" Width="32"/>
+                                    <DataGridTextColumn Header="Mul" Binding="{Binding Multiplier}" Width="42"/>
+                                    <DataGridTextColumn Header="Div" Binding="{Binding Divisor}" Width="45"/>
+                                    <DataGridTextColumn Header="名前" Binding="{Binding Name}" Width="50"/>
+                                    <DataGridTextColumn Header="単位" Binding="{Binding Unit}" Width="35"/>
+                                    <DataGridCheckBoxColumn Header="Warn" Binding="{Binding WarnEnabled}" Width="38"/>
+                                    <DataGridTextColumn Header="Lo" Binding="{Binding WarnLow}" Width="50"/>
+                                    <DataGridTextColumn Header="Hi" Binding="{Binding WarnHigh}" Width="50"/>
+                                    <DataGridCheckBoxColumn Header="EN" Binding="{Binding Enabled}" Width="32"/>
                                 </DataGrid.Columns>
                             </DataGrid>
 
-                            <TextBlock Grid.Row="2" Text="Type: U=Unsigned, S=Signed | End: B=Big, L=Little | Mul/Div: 1000=x1.0"
+                            <TextBlock Grid.Row="2" Text="Type: U=Unsigned, S=Signed | End: B=Big, L=Little | 警告閾値: -32768=無効"
                                        FontSize="10" Foreground="{DynamicResource TextMutedBrush}" Margin="0,6,0,0"/>
                         </Grid>
                     </Border>

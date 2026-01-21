@@ -21,6 +21,10 @@
 #include "usb_cdc.h"  /* USB CDC for parameter mode */
 #include "speaker.h"  /* Speaker output (DA1 + LM4861M) */
 #include "master_warning.h"  /* Issue #50: マスターワーニング */
+#include "GUI.h"               /* emWin GUI関数 */
+#include "TEXT.h"              /* TEXT Widget関数 */
+#include "WM.h"                /* Window Manager関数 */
+#include "../aw002/Source/Generated/ID_SCREEN_01a.h"  /* ID_TEXT_ACC 定義 */
 
 // --------------------------------------------------------------------
 // グローバル変数宣言
@@ -227,6 +231,14 @@ void main(void)
 				g_system_mode = MODE_PARAM;
 				g_param_mode_active = 1;
 				usb_cdc_set_mode(USB_MODE_ACTIVE);  /* フル通信モードへ */
+				
+				/* 緑背景表示に "HOST ACCESS" を表示 */
+				WM_HWIN hWin = WM_GetDialogItem(ID_SCREEN_01a_RootInfo.hWin, ID_TEXT_ACC);
+				if (hWin) {
+					TEXT_SetText(hWin, "HOST ACCESS");
+					TEXT_SetBkColor(hWin, 0xFF00AA00);  /* 緑背景 (ARGB) */
+				}
+				
 				APPW_SetVarData(ID_VAR_PRM, 1);     /* パラメータモード画面表示 */
 				param_console_enter();
 				continue;

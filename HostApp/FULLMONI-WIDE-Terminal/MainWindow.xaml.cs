@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -22,6 +23,7 @@ public class CanFieldsContext
 
 /// <summary>
 /// CANフィールド定義のデータモデル
+/// Issue #50: 警告設定（Name, Unit, WarnEnabled, WarnLow, WarnHigh）を追加
 /// </summary>
 public class CanFieldItem : INotifyPropertyChanged
 {
@@ -36,6 +38,12 @@ public class CanFieldItem : INotifyPropertyChanged
     private int _multiplier = 1000;
     private int _divisor = 1000;
     private bool _enabled = false;
+    // Issue #50: 警告設定用フィールド
+    private string _name = "";
+    private string _unit = "";
+    private bool _warnEnabled = false;
+    private int _warnLow = -32768;   // CAN_WARN_DISABLED
+    private int _warnHigh = -32768;  // CAN_WARN_DISABLED
 
     // 変数名リスト（TargetVarNameプロパティで使用）
     private static readonly string[] VarNames = { "REV", "AF", "NUM1", "NUM2", "NUM3", "NUM4", "NUM5", "NUM6", "SPEED" };
@@ -70,6 +78,12 @@ public class CanFieldItem : INotifyPropertyChanged
     public int Multiplier { get => _multiplier; set { _multiplier = value; OnPropertyChanged(nameof(Multiplier)); } }
     public int Divisor { get => _divisor; set { _divisor = value; OnPropertyChanged(nameof(Divisor)); } }
     public bool Enabled { get => _enabled; set { _enabled = value; OnPropertyChanged(nameof(Enabled)); } }
+    // Issue #50: 警告設定用プロパティ
+    public string Name { get => _name; set { _name = value; OnPropertyChanged(nameof(Name)); } }
+    public string Unit { get => _unit; set { _unit = value; OnPropertyChanged(nameof(Unit)); } }
+    public bool WarnEnabled { get => _warnEnabled; set { _warnEnabled = value; OnPropertyChanged(nameof(WarnEnabled)); } }
+    public int WarnLow { get => _warnLow; set { _warnLow = value; OnPropertyChanged(nameof(WarnLow)); } }
+    public int WarnHigh { get => _warnHigh; set { _warnHigh = value; OnPropertyChanged(nameof(WarnHigh)); } }
 
     public event PropertyChangedEventHandler? PropertyChanged;
     protected void OnPropertyChanged(string propertyName)
@@ -90,6 +104,69 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         InitializeCanFields();
+        
+        // ViewModelのParametersLoadedイベントを購読して、CAN設定も読み込む
+        Loaded += MainWindow_Loaded;
+    }
+
+    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is ViewModels.MainViewModel vm)
+        {
+            vm.ParametersLoaded += ViewModel_ParametersLoaded;
+        }
+    }
+    
+    private async void ViewModel_ParametersLoaded(object? sender, EventArgs e)
+    {
+        // パラメータ読込完了後にCAN設定も読み込む
+        await LoadCanConfigurationAsync();
+    }
+    
+    /// <summary>
+    /// CAN設定をデバイスから読み込む (Issue #50: 接続時自動読込対応)
+    /// </summary>
+    private async Task LoadCanConfigurationAsync()
+    {
+        if (DataContext is not ViewModels.MainViewModel vm || !vm.IsConnected)
+            return;
+
+        UpdateCanStatus("CAN設定を読み込み中...");
+
+        try
+        {
+            // パラメータモードに入る
+            vm.ClearResponseBuffer();
+            vm.SendCommandDirect("");
+            await Task.Delay(300);
+
+            // バッファをクリアして安定するまで待つ
+            vm.ClearResponseBuffer();
+            await Task.Delay(100);
+
+            // can_listを送信
+            var response = await vm.SendCommandAndGetResponseAsync("can_list", 5000);
+
+            // 応答を解析してUIに反映
+            int chCount = ParseCanConfigResponse(response);
+
+            // パラメータモードを抜ける
+            vm.ClearResponseBuffer();
+            vm.SendCommandDirect("exit");
+            await Task.Delay(200);
+
+            if (string.IsNullOrWhiteSpace(response))
+            {
+                UpdateCanStatus("CAN設定: 応答なし");
+                return;
+            }
+
+            UpdateCanStatus($"CAN設定: {chCount}件読込完了");
+        }
+        catch (Exception ex)
+        {
+            UpdateCanStatus($"CAN設定読込エラー: {ex.Message}");
+        }
     }
 
     // 変数名 → 数値インデックス変換テーブル
@@ -115,25 +192,34 @@ public partial class MainWindow : Window
         _canFields = new ObservableCollection<CanFieldItem>();
         _canFieldsContext = new CanFieldsContext { Fields = _canFields };
 
-        // MoTeC M100デフォルト設定 (ファームウェアのCAN_PRESET_MOTECと同じ)
+        // Issue #50: MoTeC M100デフォルト設定 (Firmware側CAN_PRESET_MOTECと一致)
         // Var: 0=REV, 1=AF, 2=NUM1(水温), 3=NUM2(吸気温), 4=NUM3(油温), 5=NUM4(MAP), 6=NUM5(油圧), 7=NUM6(電圧), 8=SPEED
+        // WarnLow/WarnHigh: -32768 = 無効 (CAN_WARN_DISABLED)
         var defaults = new[]
         {
             // CH1 (0x3E8): RPM(0-1), MAP(4-5), IAT(6-7)
-            new { Ch = 1, Byte = 0, Size = 2, Type = "U", End = "B", Var = 0, Mul = 1000, Div = 1000, En = true },    // REV
-            new { Ch = 1, Byte = 4, Size = 2, Type = "U", End = "B", Var = 5, Mul = 1000, Div = 10000, En = true },   // NUM4 (MAP)
-            new { Ch = 1, Byte = 6, Size = 2, Type = "S", End = "B", Var = 3, Mul = 1000, Div = 10000, En = true },   // NUM2 (IAT)
+            new { Ch = 1, Byte = 0, Size = 2, Type = "U", End = "B", Var = 0, Off = 0, Mul = 1000, Div = 1000, En = true,
+                  Name = "REV", Unit = "rpm", WarnEn = true, WarnLo = -32768, WarnHi = 8000 },
+            new { Ch = 1, Byte = 4, Size = 2, Type = "U", End = "B", Var = 5, Off = 0, Mul = 1000, Div = 10000, En = true,
+                  Name = "MAP", Unit = "kPa", WarnEn = false, WarnLo = -32768, WarnHi = -32768 },
+            new { Ch = 1, Byte = 6, Size = 2, Type = "S", End = "B", Var = 3, Off = 0, Mul = 1000, Div = 10000, En = true,
+                  Name = "INTAKE", Unit = "C", WarnEn = true, WarnLo = -40, WarnHi = 80 },
             // CH2 (0x3E9): ECT(0-1), AFR(2-3)
-            new { Ch = 2, Byte = 0, Size = 2, Type = "S", End = "B", Var = 2, Mul = 1000, Div = 10000, En = true },   // NUM1 (WaterTemp)
-            new { Ch = 2, Byte = 2, Size = 2, Type = "U", End = "B", Var = 1, Mul = 147, Div = 1000, En = true },     // AF
+            new { Ch = 2, Byte = 0, Size = 2, Type = "S", End = "B", Var = 2, Off = 0, Mul = 1000, Div = 10000, En = true,
+                  Name = "WATER", Unit = "C", WarnEn = true, WarnLo = 60, WarnHi = 110 },
+            new { Ch = 2, Byte = 2, Size = 2, Type = "U", End = "B", Var = 1, Off = 0, Mul = 147, Div = 1000, En = true,
+                  Name = "A/F", Unit = "afr", WarnEn = true, WarnLo = 100, WarnHi = 180 },
             // CH3 (0x3EA): OilTemp(6-7)
-            new { Ch = 3, Byte = 6, Size = 2, Type = "S", End = "B", Var = 4, Mul = 1000, Div = 10000, En = true },   // NUM3 (OilTemp)
+            new { Ch = 3, Byte = 6, Size = 2, Type = "S", End = "B", Var = 4, Off = 0, Mul = 1000, Div = 10000, En = true,
+                  Name = "OIL", Unit = "C", WarnEn = true, WarnLo = 60, WarnHi = 130 },
             // CH4 (0x3EB): OilPressure(0-1), BattV(6-7)
-            new { Ch = 4, Byte = 0, Size = 2, Type = "U", End = "B", Var = 6, Mul = 1, Div = 1000, En = true },       // NUM5 (OilP)
-            new { Ch = 4, Byte = 6, Size = 2, Type = "U", End = "B", Var = 7, Mul = 1000, Div = 10000, En = true },   // NUM6 (BattV)
+            new { Ch = 4, Byte = 0, Size = 2, Type = "U", End = "B", Var = 6, Off = 0, Mul = 1, Div = 1000, En = true,
+                  Name = "PRESS", Unit = "kPa", WarnEn = true, WarnLo = 1, WarnHi = -32768 },
+            new { Ch = 4, Byte = 6, Size = 2, Type = "U", End = "B", Var = 7, Off = 0, Mul = 1000, Div = 10000, En = true,
+                  Name = "BATT", Unit = "V", WarnEn = true, WarnLo = 110, WarnHi = 160 },
         };
 
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < defaults.Length; i++)
         {
             var d = defaults[i];
             _canFields.Add(new CanFieldItem
@@ -145,9 +231,15 @@ public partial class MainWindow : Window
                 DataType = d.Type,
                 Endian = d.End,
                 TargetVar = d.Var,
+                Offset = d.Off,
                 Multiplier = d.Mul,
                 Divisor = d.Div,
-                Enabled = d.En
+                Enabled = d.En,
+                Name = d.Name,
+                Unit = d.Unit,
+                WarnEnabled = d.WarnEn,
+                WarnLow = d.WarnLo,
+                WarnHigh = d.WarnHi
             });
         }
 
@@ -369,6 +461,7 @@ public partial class MainWindow : Window
 
     /// <summary>
     /// can_listの応答を解析してUIに反映
+    /// Issue #50: Name, Unit, WarnEnabled, WarnLow, WarnHigh対応
     /// </summary>
     private int ParseCanConfigResponse(string response)
     {
@@ -401,11 +494,11 @@ public partial class MainWindow : Window
             }
         }
 
-        // フィールド設定を解析
-        // ファームウェア出力: "%2d %2d   %d   %d   %c    %c   %-5s %4d %5d %5d"
-        // 例: " 3  2   0   2   S    B   NUM1     0  1000 10000"
-        // より緩い正規表現で対応（複数空白OK）
-        var fieldRegex = new Regex(@"(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([US])\s+([BL])\s+(\S+)\s+(\d+)\s+(\d+)\s+(\d+)", RegexOptions.IgnoreCase);
+        // フィールド設定を解析 (Issue #50: 警告設定対応)
+        // ファームウェア出力: "%2d %2d   %d   %d   %c    %c   %-5s %4d %5d %5d %-7s %-4s %c  %6s %6s"
+        // 例: " 3  2   0   2   S    B   NUM1     0  1000 10000 WATER   C    Y      60    100"
+        // グループ: Index, CH, Byte, Len, Type, End, Var, Off, Mul, Div, Name, Unit, WE, WarnLo, WarnHi
+        var fieldRegex = new Regex(@"(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([US])\s+([BL])\s+(\S+)\s+(-?\d+)\s+(\d+)\s+(\d+)\s+(\S+)\s+(\S*)\s+([YN])\s+(-?\d+|---)\s+(-?\d+|---)", RegexOptions.IgnoreCase);
         var fieldMatches = fieldRegex.Matches(response);
 
         // 一旦全フィールドを無効化
@@ -423,8 +516,8 @@ public partial class MainWindow : Window
                 field.Channel = int.Parse(match.Groups[2].Value);
                 field.StartByte = int.Parse(match.Groups[3].Value);
                 field.ByteCount = int.Parse(match.Groups[4].Value);
-                field.DataType = match.Groups[5].Value;
-                field.Endian = match.Groups[6].Value;
+                field.DataType = match.Groups[5].Value.ToUpper();
+                field.Endian = match.Groups[6].Value.ToUpper();
                 // Groups[7] = Var名 → 数値に変換
                 string varName = match.Groups[7].Value;
                 field.TargetVar = VarNameToIndex.TryGetValue(varName, out int varIdx) ? varIdx : 255;
@@ -432,7 +525,18 @@ public partial class MainWindow : Window
                 field.Offset = int.Parse(match.Groups[8].Value);
                 field.Multiplier = int.Parse(match.Groups[9].Value);
                 field.Divisor = int.Parse(match.Groups[10].Value);
-                // channel > 0 なら有効（ファームウェアはchannel=0のフィールドは出力しないが念のため）
+                
+                // Issue #50: 警告設定
+                field.Name = match.Groups[11].Value.Trim();
+                field.Unit = match.Groups[12].Value.Trim();
+                field.WarnEnabled = match.Groups[13].Value.Equals("Y", StringComparison.OrdinalIgnoreCase);
+                // WarnLo/WarnHi: "---" は -32768 (CAN_WARN_DISABLED)
+                string warnLoStr = match.Groups[14].Value;
+                string warnHiStr = match.Groups[15].Value;
+                field.WarnLow = warnLoStr == "---" ? -32768 : int.Parse(warnLoStr);
+                field.WarnHigh = warnHiStr == "---" ? -32768 : int.Parse(warnHiStr);
+                
+                // channel > 0 なら有効
                 field.Enabled = field.Channel > 0;
                 matchCount++;
             }
@@ -624,32 +728,54 @@ public partial class MainWindow : Window
             CanCh5IdBox.Text = "0x3EC"; CanCh5EnabledBox.IsChecked = true;
             CanCh6IdBox.Text = "0x3ED"; CanCh6EnabledBox.IsChecked = false;
 
-            // フィールド設定を再初期化 (ファームウェアのCAN_PRESET_MOTECと同じ)
+            // フィールド設定を再初期化 (Issue #50: Firmware側CAN_PRESET_MOTECと完全一致)
             _canFields.Clear();
+            // Var: 0=REV, 1=AF, 2=NUM1(水温), 3=NUM2(吸気温), 4=NUM3(油温), 5=NUM4(MAP), 6=NUM5(油圧), 7=NUM6(電圧), 8=SPEED
             var defaults = new[]
             {
                 // CH1 (0x3E8): RPM(0-1), MAP(4-5), IAT(6-7)
-                new { Ch = 1, Byte = 0, Size = 2, Type = "U", End = "B", Var = 10, Mul = 1000, Div = 1000, En = true },   // REV
-                new { Ch = 1, Byte = 4, Size = 2, Type = "U", End = "B", Var = 4, Mul = 1000, Div = 10000, En = true },   // NUM4 (MAP)
-                new { Ch = 1, Byte = 6, Size = 2, Type = "S", End = "B", Var = 2, Mul = 1000, Div = 10000, En = true },   // NUM2 (IAT)
+                new { Ch = 1, Byte = 0, Size = 2, Type = "U", End = "B", Var = 0, Off = 0, Mul = 1000, Div = 1000, En = true,
+                      Name = "REV", Unit = "rpm", WarnEn = true, WarnLo = -32768, WarnHi = 8000 },
+                new { Ch = 1, Byte = 4, Size = 2, Type = "U", End = "B", Var = 5, Off = 0, Mul = 1000, Div = 10000, En = true,
+                      Name = "MAP", Unit = "kPa", WarnEn = false, WarnLo = -32768, WarnHi = -32768 },
+                new { Ch = 1, Byte = 6, Size = 2, Type = "S", End = "B", Var = 3, Off = 0, Mul = 1000, Div = 10000, En = true,
+                      Name = "INTAKE", Unit = "C", WarnEn = true, WarnLo = -40, WarnHi = 80 },
                 // CH2 (0x3E9): ECT(0-1), AFR(2-3)
-                new { Ch = 2, Byte = 0, Size = 2, Type = "S", End = "B", Var = 1, Mul = 1000, Div = 10000, En = true },   // NUM1 (WaterTemp)
-                new { Ch = 2, Byte = 2, Size = 2, Type = "U", End = "B", Var = 11, Mul = 147, Div = 1000, En = true },    // AF
+                new { Ch = 2, Byte = 0, Size = 2, Type = "S", End = "B", Var = 2, Off = 0, Mul = 1000, Div = 10000, En = true,
+                      Name = "WATER", Unit = "C", WarnEn = true, WarnLo = 60, WarnHi = 110 },
+                new { Ch = 2, Byte = 2, Size = 2, Type = "U", End = "B", Var = 1, Off = 0, Mul = 147, Div = 1000, En = true,
+                      Name = "A/F", Unit = "afr", WarnEn = true, WarnLo = 100, WarnHi = 180 },
                 // CH3 (0x3EA): OilTemp(6-7)
-                new { Ch = 3, Byte = 6, Size = 2, Type = "S", End = "B", Var = 3, Mul = 1000, Div = 10000, En = true },   // NUM3 (OilTemp)
+                new { Ch = 3, Byte = 6, Size = 2, Type = "S", End = "B", Var = 4, Off = 0, Mul = 1000, Div = 10000, En = true,
+                      Name = "OIL", Unit = "C", WarnEn = true, WarnLo = 60, WarnHi = 130 },
                 // CH4 (0x3EB): OilPressure(0-1), BattV(6-7)
-                new { Ch = 4, Byte = 0, Size = 2, Type = "U", End = "B", Var = 12, Mul = 1, Div = 1000, En = true },      // NUM5 (OilP)
-                new { Ch = 4, Byte = 6, Size = 2, Type = "U", End = "B", Var = 13, Mul = 1000, Div = 10000, En = true },  // NUM6 (BattV)
+                new { Ch = 4, Byte = 0, Size = 2, Type = "U", End = "B", Var = 6, Off = 0, Mul = 1, Div = 1000, En = true,
+                      Name = "PRESS", Unit = "kPa", WarnEn = true, WarnLo = 1, WarnHi = -32768 },
+                new { Ch = 4, Byte = 6, Size = 2, Type = "U", End = "B", Var = 7, Off = 0, Mul = 1000, Div = 10000, En = true,
+                      Name = "BATT", Unit = "V", WarnEn = true, WarnLo = 110, WarnHi = 160 },
             };
 
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < defaults.Length; i++)
             {
                 var d = defaults[i];
                 _canFields.Add(new CanFieldItem
                 {
-                    Index = i, Channel = d.Ch, StartByte = d.Byte, ByteCount = d.Size,
-                    DataType = d.Type, Endian = d.End, TargetVar = d.Var,
-                    Multiplier = d.Mul, Divisor = d.Div, Enabled = d.En
+                    Index = i,
+                    Channel = d.Ch,
+                    StartByte = d.Byte,
+                    ByteCount = d.Size,
+                    DataType = d.Type,
+                    Endian = d.End,
+                    TargetVar = d.Var,
+                    Offset = d.Off,
+                    Multiplier = d.Mul,
+                    Divisor = d.Div,
+                    Enabled = d.En,
+                    Name = d.Name,
+                    Unit = d.Unit,
+                    WarnEnabled = d.WarnEn,
+                    WarnLow = d.WarnLo,
+                    WarnHigh = d.WarnHi
                 });
             }
 

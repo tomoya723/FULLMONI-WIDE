@@ -21,6 +21,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private TaskCompletionSource<string>? _responseWaiter;
 
     /// <summary>
+    /// パラメータ読込完了時に発火するイベント
+    /// MainWindowでこれを購読してCAN設定も読み込む
+    /// </summary>
+    public event EventHandler? ParametersLoaded;
+
+    /// <summary>
     /// コマンド処理中フラグ（パラメータ読込、CAN設定等）
     /// </summary>
     [ObservableProperty]
@@ -481,6 +487,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
             await Task.Delay(100);
 
             ActivityStatus = "✅ パラメータを読み込みました";
+            
+            // パラメータ読込完了イベントを発火（CAN設定もこのタイミングで読み込む）
+            ParametersLoaded?.Invoke(this, EventArgs.Empty);
         }
         catch (Exception ex)
         {

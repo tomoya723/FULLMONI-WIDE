@@ -4,9 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Parameter Editor - FULLMONI-WIDE"
-        Height="700" Width="650"
-        MinHeight="600" MinWidth="600"
+        Title="Parameter Editor - FULLMONI-WIDE (Issue #50: 警告設定対応)"
+        Height="750" Width="900"
+        MinHeight="650" MinWidth="850"
         Background="{StaticResource PrimaryBackgroundBrush}"
         WindowStartupLocation="CenterOwner">
 
@@ -152,7 +152,7 @@
                     <StackPanel>
 
                         <!-- CAN Channels -->
-                        <GroupBox Header="受信チャンネル設定" Style="{StaticResource ModernGroupBox}">
+                        <GroupBox Header="受信チャンネル設定" Style="{StaticResource ModernGroupBox}" Margin="0,0,0,8">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="50"/>
@@ -204,9 +204,9 @@
                         </GroupBox>
 
                         <!-- CAN Fields -->
-                        <GroupBox Header="データフィールド定義" Style="{StaticResource ModernGroupBox}" Margin="0,8,0,0">
+                        <GroupBox Header="データフィールド定義 (Issue #50: 警告設定対応)" Style="{StaticResource ModernGroupBox}" Margin="0,8,0,0">
                             <StackPanel>
-                                <TextBlock Text="フィールド設定 (最大8個)" Foreground="Gray" Margin="4,0,0,8"/>
+                                <TextBlock Text="フィールド設定 (最大16個) - 警告閾値: -32768=無効, その他=有効" Foreground="Gray" Margin="4,0,0,8"/>
 
                                 <!-- DataGrid for Fields -->
                                 <DataGrid x:Name="CanFieldsGrid"
@@ -219,22 +219,28 @@
                                           RowBackground="#2D2D30"
                                           AlternatingRowBackground="#252526"
                                           BorderBrush="{StaticResource BorderBrush}"
-                                          Height="250">
+                                          Height="300">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="30" IsReadOnly="True"/>
-                                        <DataGridTextColumn Header="CH" Binding="{Binding Channel}" Width="40"/>
-                                        <DataGridTextColumn Header="Byte" Binding="{Binding StartByte}" Width="45"/>
-                                        <DataGridTextColumn Header="Size" Binding="{Binding ByteCount}" Width="45"/>
-                                        <DataGridTextColumn Header="Type" Binding="{Binding DataType}" Width="50"/>
-                                        <DataGridTextColumn Header="Endian" Binding="{Binding Endian}" Width="55"/>
-                                        <DataGridTextColumn Header="変数" Binding="{Binding TargetVar}" Width="45"/>
-                                        <DataGridTextColumn Header="係数" Binding="{Binding Multiplier}" Width="55"/>
-                                        <DataGridTextColumn Header="除数" Binding="{Binding Divisor}" Width="55"/>
+                                        <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="25" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="CH" Binding="{Binding Channel}" Width="30"/>
+                                        <DataGridTextColumn Header="Byte" Binding="{Binding StartByte}" Width="35"/>
+                                        <DataGridTextColumn Header="Len" Binding="{Binding ByteCount}" Width="30"/>
+                                        <DataGridTextColumn Header="Type" Binding="{Binding DataType}" Width="40"/>
+                                        <DataGridTextColumn Header="End" Binding="{Binding Endian}" Width="35"/>
+                                        <DataGridTextColumn Header="変数" Binding="{Binding TargetVar}" Width="35"/>
+                                        <DataGridTextColumn Header="Off" Binding="{Binding Offset}" Width="35"/>
+                                        <DataGridTextColumn Header="Mul" Binding="{Binding Multiplier}" Width="45"/>
+                                        <DataGridTextColumn Header="Div" Binding="{Binding Divisor}" Width="45"/>
+                                        <DataGridTextColumn Header="名前" Binding="{Binding Name}" Width="55"/>
+                                        <DataGridTextColumn Header="単位" Binding="{Binding Unit}" Width="35"/>
+                                        <DataGridCheckBoxColumn Header="Warn" Binding="{Binding WarnEnabled}" Width="40"/>
+                                        <DataGridTextColumn Header="Lo" Binding="{Binding WarnLow}" Width="45"/>
+                                        <DataGridTextColumn Header="Hi" Binding="{Binding WarnHigh}" Width="45"/>
                                         <DataGridCheckBoxColumn Header="有効" Binding="{Binding Enabled}" Width="40"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
 
-                                <TextBlock Text="係数/除数: 1000=x1.0, 100=x0.1, 10000=x10.0  |  Type: U=Unsigned, S=Signed  |  Endian: B=Big, L=Little"
+                                <TextBlock Text="Type: U=Unsigned, S=Signed  |  End: B=Big, L=Little  |  Mul/Div: 1000=x1.0"
                                            Foreground="Gray" Margin="4,8,0,0" FontSize="11"/>
                             </StackPanel>
                         </GroupBox>
@@ -245,6 +251,8 @@
                                     Width="100" Margin="4" Click="CanReadButton_Click"/>
                             <Button Content="CAN設定書込" Style="{StaticResource ModernButton}"
                                     Width="100" Margin="4" Click="CanWriteButton_Click"/>
+                            <Button Content="CAN保存(EEPROM)" Style="{StaticResource ModernButton}"
+                                    Width="120" Margin="4" Click="CanSaveButton_Click"/>
                         </StackPanel>
 
                     </StackPanel>
