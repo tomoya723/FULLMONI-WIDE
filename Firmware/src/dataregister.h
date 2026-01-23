@@ -17,6 +17,7 @@ void data_store(void);
 void data_setLCD10ms(void);
 void data_setLCD50ms(void);
 void data_setLCD100ms(void);
+void master_warning_gui_update(void);  /* Issue #50: メインループから呼ぶこと */
 
 #pragma pack()
 // --------------------------------------------------------------------

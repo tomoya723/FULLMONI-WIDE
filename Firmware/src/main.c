@@ -284,6 +284,9 @@ void main(void)
 
 		GUI_Exec1();
 		APPW_Exec();
+		
+		/* Issue #50: マスターワーニングGUI更新（メインループから呼ぶこと！）*/
+		master_warning_gui_update();
 
 		main_CAN();
 

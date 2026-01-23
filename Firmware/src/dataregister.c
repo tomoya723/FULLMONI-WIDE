@@ -358,41 +358,34 @@ void data_setLCD50ms(void)
 
 /* Issue #50: マスターワーニング表示状態 */
 static uint8_t s_warning_displayed = 0;
+static uint8_t s_warning_gui_update_needed = 0;  /* GUI更新要求フラグ */
 
-void data_setLCD100ms(void)
+/**
+ * @brief マスターワーニングGUI更新（メインループから呼び出し）
+ * 
+ * emWinはリエントラントではないため、タイマー割り込みからではなく
+ * メインループから呼び出す必要がある
+ */
+void master_warning_gui_update(void)
 {
-	/* Issue #50: マスターワーニング処理 */
-	master_warning_check();
-	master_warning_update_display();  /* 警告音再生（立ち上がり検出）*/
+	if (!s_warning_gui_update_needed) {
+		return;
+	}
+	s_warning_gui_update_needed = 0;
 	
 	if (master_warning_is_active()) {
-		/* 警告発報中は表示ON */
-		if (!s_warning_displayed) {
-			/* 警告音を再生（最初の1回だけ）*/
-			speaker_play_warning();
-			
-			/* テキストと背景色を先に設定してから表示ONにする */
-			WM_HWIN hWin = WM_GetDialogItem(ID_SCREEN_01a_RootInfo.hWin, ID_TEXT_ACC);
-			if (hWin) {
-				const char *msg = master_warning_get_message();
-				if (msg != NULL && msg[0] != '\0') {
-					TEXT_SetText(hWin, msg);
-				}
-				TEXT_SetBkColor(hWin, 0xFFFF0000);  /* 赤背景 (ARGB) */
+		WM_HWIN hWin = WM_GetDialogItem(ID_SCREEN_01a_RootInfo.hWin, ID_TEXT_ACC);
+		if (hWin) {
+			const char *msg = master_warning_get_message();
+			if (msg != NULL && msg[0] != '\0') {
+				TEXT_SetText(hWin, msg);
 			}
-			APPW_SetVarData(ID_VAR_PRM, 1);
-			s_warning_displayed = 1;
+			TEXT_SetBkColor(hWin, 0xFFFF0000);  /* 赤背景 (ARGB) */
 		}
-		/* 
-		 * Note: 複数警告の表示切り替えは廃止
-		 * emWinはリエントラントでないため、タイマー割り込みから
-		 * TEXT_SetTextを繰り返し呼ぶとGUIが破壊される
-		 * 将来的にはメインループでGUI更新を行う設計に変更が必要
-		 */
+		APPW_SetVarData(ID_VAR_PRM, 1);
+		s_warning_displayed = 1;
 	} else {
-		/* 警告解除 */
 		if (s_warning_displayed) {
-			/* 背景色を緑に戻す（パラメータモード用）*/
 			WM_HWIN hWin = WM_GetDialogItem(ID_SCREEN_01a_RootInfo.hWin, ID_TEXT_ACC);
 			if (hWin) {
 				TEXT_SetBkColor(hWin, 0xFF00AA00);  /* 緑背景 (ARGB) */
@@ -401,6 +394,29 @@ void data_setLCD100ms(void)
 		}
 		if (g_system_mode == MODE_NORMAL) {
 			APPW_SetVarData(ID_VAR_PRM, 0);
+		}
+	}
+}
+
+void data_setLCD100ms(void)
+{
+	/* Issue #50: マスターワーニング処理（タイマー割り込みコンテキスト）*/
+	master_warning_check();
+	
+	if (master_warning_is_active()) {
+		/* 警告発報開始時、または複数警告の表示切り替え時 */
+		if (!s_warning_displayed || master_warning_message_changed()) {
+			if (!s_warning_displayed) {
+				/* 最初の警告時のみ警告音を再生 */
+				speaker_play_warning();
+			}
+			/* GUI更新はメインループで行う（フラグを立てるだけ）*/
+			s_warning_gui_update_needed = 1;
+		}
+	} else {
+		/* 警告解除 */
+		if (s_warning_displayed) {
+			s_warning_gui_update_needed = 1;
 		}
 	}
 
