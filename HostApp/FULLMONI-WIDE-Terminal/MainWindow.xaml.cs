@@ -199,24 +199,24 @@ public partial class MainWindow : Window
         {
             // CH1 (0x3E8): RPM(0-1), MAP(4-5), IAT(6-7)
             new { Ch = 1, Byte = 0, Size = 2, Type = "U", End = "B", Var = 0, Off = 0, Mul = 1000, Div = 1000, En = true,
-                  Name = "REV", Unit = "rpm", WarnEn = true, WarnLo = -32768, WarnHi = 8000 },
+                  Name = "REV", Unit = "rpm", WarnEn = true, WarnLo = 200, WarnHi = 9000 },
             new { Ch = 1, Byte = 4, Size = 2, Type = "U", End = "B", Var = 5, Off = 0, Mul = 1000, Div = 10000, En = true,
-                  Name = "MAP", Unit = "kPa", WarnEn = false, WarnLo = -32768, WarnHi = -32768 },
+                  Name = "MAP", Unit = "kPa", WarnEn = true, WarnLo = 0, WarnHi = 150 },
             new { Ch = 1, Byte = 6, Size = 2, Type = "S", End = "B", Var = 3, Off = 0, Mul = 1000, Div = 10000, En = true,
-                  Name = "INTAKE", Unit = "C", WarnEn = true, WarnLo = -40, WarnHi = 80 },
+                  Name = "IAT", Unit = "deg", WarnEn = true, WarnLo = -40, WarnHi = 80 },
             // CH2 (0x3E9): ECT(0-1), AFR(2-3)
             new { Ch = 2, Byte = 0, Size = 2, Type = "S", End = "B", Var = 2, Off = 0, Mul = 1000, Div = 10000, En = true,
-                  Name = "WATER", Unit = "C", WarnEn = true, WarnLo = 60, WarnHi = 110 },
+                  Name = "WATER", Unit = "deg", WarnEn = true, WarnLo = 60, WarnHi = 110 },
             new { Ch = 2, Byte = 2, Size = 2, Type = "U", End = "B", Var = 1, Off = 0, Mul = 147, Div = 1000, En = true,
                   Name = "A/F", Unit = "afr", WarnEn = true, WarnLo = 100, WarnHi = 180 },
             // CH3 (0x3EA): OilTemp(6-7)
             new { Ch = 3, Byte = 6, Size = 2, Type = "S", End = "B", Var = 4, Off = 0, Mul = 1000, Div = 10000, En = true,
-                  Name = "OIL", Unit = "C", WarnEn = true, WarnLo = 60, WarnHi = 130 },
+                  Name = "OIL-T", Unit = "deg", WarnEn = true, WarnLo = 60, WarnHi = 130 },
             // CH4 (0x3EB): OilPressure(0-1), BattV(6-7)
             new { Ch = 4, Byte = 0, Size = 2, Type = "U", End = "B", Var = 6, Off = 0, Mul = 1, Div = 1000, En = true,
-                  Name = "PRESS", Unit = "kPa", WarnEn = true, WarnLo = 1, WarnHi = -32768 },
+                  Name = "OIL_P", Unit = "kPa", WarnEn = true, WarnLo = 1500, WarnHi = 9000 },
             new { Ch = 4, Byte = 6, Size = 2, Type = "U", End = "B", Var = 7, Off = 0, Mul = 1000, Div = 10000, En = true,
-                  Name = "BATT", Unit = "V", WarnEn = true, WarnLo = 110, WarnHi = 160 },
+                  Name = "BATT", Unit = "V", WarnEn = false, WarnLo = 9, WarnHi = 160 },
         };
 
         for (int i = 0; i < defaults.Length; i++)
@@ -761,24 +761,24 @@ public partial class MainWindow : Window
             {
                 // CH1 (0x3E8): RPM(0-1), MAP(4-5), IAT(6-7)
                 new { Ch = 1, Byte = 0, Size = 2, Type = "U", End = "B", Var = 0, Off = 0, Mul = 1000, Div = 1000, En = true,
-                      Name = "REV", Unit = "rpm", WarnEn = true, WarnLo = -32768, WarnHi = 8000 },
+                      Name = "REV", Unit = "rpm", WarnEn = true, WarnLo = 200, WarnHi = 9000 },
                 new { Ch = 1, Byte = 4, Size = 2, Type = "U", End = "B", Var = 5, Off = 0, Mul = 1000, Div = 10000, En = true,
-                      Name = "MAP", Unit = "kPa", WarnEn = false, WarnLo = -32768, WarnHi = -32768 },
+                      Name = "MAP", Unit = "kPa", WarnEn = true, WarnLo = 0, WarnHi = 150 },
                 new { Ch = 1, Byte = 6, Size = 2, Type = "S", End = "B", Var = 3, Off = 0, Mul = 1000, Div = 10000, En = true,
-                      Name = "INTAKE", Unit = "C", WarnEn = true, WarnLo = -40, WarnHi = 80 },
+                      Name = "IAT", Unit = "deg", WarnEn = true, WarnLo = -40, WarnHi = 80 },
                 // CH2 (0x3E9): ECT(0-1), AFR(2-3)
                 new { Ch = 2, Byte = 0, Size = 2, Type = "S", End = "B", Var = 2, Off = 0, Mul = 1000, Div = 10000, En = true,
-                      Name = "WATER", Unit = "C", WarnEn = true, WarnLo = 60, WarnHi = 110 },
+                      Name = "WATER", Unit = "deg", WarnEn = true, WarnLo = 60, WarnHi = 110 },
                 new { Ch = 2, Byte = 2, Size = 2, Type = "U", End = "B", Var = 1, Off = 0, Mul = 147, Div = 1000, En = true,
                       Name = "A/F", Unit = "afr", WarnEn = true, WarnLo = 100, WarnHi = 180 },
                 // CH3 (0x3EA): OilTemp(6-7)
                 new { Ch = 3, Byte = 6, Size = 2, Type = "S", End = "B", Var = 4, Off = 0, Mul = 1000, Div = 10000, En = true,
-                      Name = "OIL", Unit = "C", WarnEn = true, WarnLo = 60, WarnHi = 130 },
+                      Name = "OIL-T", Unit = "deg", WarnEn = true, WarnLo = 60, WarnHi = 130 },
                 // CH4 (0x3EB): OilPressure(0-1), BattV(6-7)
                 new { Ch = 4, Byte = 0, Size = 2, Type = "U", End = "B", Var = 6, Off = 0, Mul = 1, Div = 1000, En = true,
-                      Name = "PRESS", Unit = "kPa", WarnEn = true, WarnLo = 1, WarnHi = -32768 },
+                      Name = "OIL_P", Unit = "kPa", WarnEn = true, WarnLo = 1500, WarnHi = 9000 },
                 new { Ch = 4, Byte = 6, Size = 2, Type = "U", End = "B", Var = 7, Off = 0, Mul = 1000, Div = 10000, En = true,
-                      Name = "BATT", Unit = "V", WarnEn = true, WarnLo = 110, WarnHi = 160 },
+                      Name = "BATT", Unit = "V", WarnEn = false, WarnLo = 9, WarnHi = 160 },
             };
 
             for (int i = 0; i < defaults.Length; i++)

@@ -428,19 +428,19 @@ static const CAN_Config_t CAN_PRESET_MOTEC = {
         { .channel = 1, .start_byte = 0, .byte_count = 2, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_REV, .offset = 0, .multiplier = 1000, .divisor = 1000,
           .name = "REV", .unit = "rpm", .warn_enabled = 1, .reserved = 0,
-          .warn_low = CAN_WARN_DISABLED, .warn_high = 8000 },
+          .warn_low = 200, .warn_high = 9000 },
         { .channel = 1, .start_byte = 4, .byte_count = 2, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_NUM4, .offset = 0, .multiplier = 1000, .divisor = 10000,
-          .name = "MAP", .unit = "kPa", .warn_enabled = 0, .reserved = 0,
-          .warn_low = CAN_WARN_DISABLED, .warn_high = CAN_WARN_DISABLED },  /* MAP /10 */
+          .name = "MAP", .unit = "kPa", .warn_enabled = 1, .reserved = 0,
+          .warn_low = 0, .warn_high = 150 },  /* MAP /10 */
         { .channel = 1, .start_byte = 6, .byte_count = 2, .data_type = 1, .endian = 0,
           .target_var = CAN_TARGET_NUM2, .offset = 0, .multiplier = 1000, .divisor = 10000,
-          .name = "INTAKE", .unit = "C", .warn_enabled = 1, .reserved = 0,
+          .name = "IAT", .unit = "deg", .warn_enabled = 1, .reserved = 0,
           .warn_low = -40, .warn_high = 80 },  /* IAT /10 signed */
         /* CH2 (0x3E9): ECT(0-1), AFR(2-3) */
         { .channel = 2, .start_byte = 0, .byte_count = 2, .data_type = 1, .endian = 0,
           .target_var = CAN_TARGET_NUM1, .offset = 0, .multiplier = 1000, .divisor = 10000,
-          .name = "WATER", .unit = "C", .warn_enabled = 1, .reserved = 0,
+          .name = "WATER", .unit = "deg", .warn_enabled = 1, .reserved = 0,
           .warn_low = 60, .warn_high = 110 },  /* WaterTemp /10 signed */
         { .channel = 2, .start_byte = 2, .byte_count = 2, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_AF, .offset = 0, .multiplier = 147, .divisor = 1000,
@@ -449,17 +449,17 @@ static const CAN_Config_t CAN_PRESET_MOTEC = {
         /* CH3 (0x3EA): OilTemp(6-7) */
         { .channel = 3, .start_byte = 6, .byte_count = 2, .data_type = 1, .endian = 0,
           .target_var = CAN_TARGET_NUM3, .offset = 0, .multiplier = 1000, .divisor = 10000,
-          .name = "OIL", .unit = "C", .warn_enabled = 1, .reserved = 0,
+          .name = "OIL-T", .unit = "deg", .warn_enabled = 1, .reserved = 0,
           .warn_low = 60, .warn_high = 130 },  /* OilTemp /10 signed */
         /* CH4 (0x3EB): OilPressure(0-1), BattV(6-7) */
         { .channel = 4, .start_byte = 0, .byte_count = 2, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_NUM5, .offset = 0, .multiplier = 1, .divisor = 1000,
-          .name = "PRESS", .unit = "kPa", .warn_enabled = 1, .reserved = 0,
-          .warn_low = 1, .warn_high = CAN_WARN_DISABLED },     /* OilP *0.001, warn: 1=100kPa */
+          .name = "OIL_P", .unit = "kPa", .warn_enabled = 1, .reserved = 0,
+          .warn_low = 1500, .warn_high = 9000 },     /* OilP *0.001 */
         { .channel = 4, .start_byte = 6, .byte_count = 2, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_NUM6, .offset = 0, .multiplier = 1000, .divisor = 10000,
-          .name = "BATT", .unit = "V", .warn_enabled = 1, .reserved = 0,
-          .warn_low = 110, .warn_high = 160 },  /* BattV /10 */
+          .name = "BATT", .unit = "V", .warn_enabled = 0, .reserved = 0,
+          .warn_low = 9, .warn_high = 160 },  /* BattV /10 */
         /* 残りは無効 */
         { .channel = 0, .start_byte = 0, .byte_count = 0, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_NONE, .offset = 0, .multiplier = 1000, .divisor = 1000,
