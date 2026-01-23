@@ -82,6 +82,7 @@ extern char __attribute__((section(".bss2"))) _bss2_dummy;
 void main(void)
  {
 	unsigned int shift_rev_cnt;
+	unsigned int warning_led_phase = 0;  /* Issue #50: ワーニングLED明滅フェーズ (0-99) */
 
 	/* USB CDC初期化（SCI9の代わり） */
 	usb_cdc_init();
@@ -312,7 +313,27 @@ void main(void)
 			wr_cnt ++;
 		}
 
-		if((g_CALC_data.rev >= g_param.shift_rpm1) && (g_CALC_data.rev < g_param.shift_rpm2))
+		/* Issue #50: マスターワーニング発報中はワーニングLED表示（赤色じわじわ明滅） */
+		if(master_warning_is_active())
+		{
+			/* 3秒周期（100ms×30ステップ）のサイン波明滅 */
+			/* フェーズ0-149: フェードイン, 150-299: フェードアウト */
+			int brightness;
+			if(warning_led_phase < 150) {
+				/* フェードイン: 0→255 */
+				brightness = (warning_led_phase * 255) / 150;
+			} else {
+				/* フェードアウト: 255→0 */
+				brightness = ((300 - warning_led_phase) * 255) / 150;
+			}
+			warning_led_phase = (warning_led_phase + 10) % 300;  /* 100ms毎に10進む、3秒で1周期 */
+			
+			/* 8つのLED全て赤色で明滅 */
+			for(int i = 0; i < 8; i++) {
+				Neopixel_SetRGB(i, brightness, 0, 0);  /* G=brightness換算で赤 */
+			}
+		}
+		else if((g_CALC_data.rev >= g_param.shift_rpm1) && (g_CALC_data.rev < g_param.shift_rpm2))
 		{
 			Neopixel_SetRGB(0, 0, 0, 255);
 			Neopixel_SetRGB(1, 0, 0, 0);
@@ -394,6 +415,7 @@ void main(void)
 			Neopixel_SetRGB(6, 0, 0, 0);
 			Neopixel_SetRGB(7, 0, 0, 0);
 			shift_rev_cnt = 0;
+			warning_led_phase = 0;  /* Issue #50: ワーニングLEDフェーズリセット */
 		}
 		Neopixel_TX();
 
