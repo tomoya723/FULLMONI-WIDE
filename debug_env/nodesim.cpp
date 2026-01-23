@@ -71,8 +71,8 @@ SendMsg(sMsgStruct_Frame5);
 SendMsg(sMsgStruct_Frame6);
 
 MAP = 1000;
-LA1 = 1235;//LA1 = 1235;
-THW = 1200;//THW = 1200;
+LA1 = 1000;//LA1 = 1235;
+THW = 1000;//THW = 1200;
 THA = 400;//THA = 1000;
 OT = 1000;//OT = 1290;
 OP = 1100;

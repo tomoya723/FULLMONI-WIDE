@@ -432,6 +432,13 @@ public partial class MainWindow : Window
                 // can_listを送信（プロンプトが来るまで待機）
                 var response = await vm.SendCommandAndGetResponseAsync("can_list", 5000);
 
+                // デバッグ: 応答をファイルに保存
+                try
+                {
+                    System.IO.File.WriteAllText("can_list_response.txt", response ?? "(null)");
+                }
+                catch { }
+
                 // 応答を解析してUIに反映
                 int chCount = ParseCanConfigResponse(response);
 
@@ -446,7 +453,15 @@ public partial class MainWindow : Window
                     return;
                 }
 
-                UpdateCanStatus($"読み込み完了: {chCount}件のデータを反映");
+                // フィールドが読み込めなかった場合は警告
+                if (chCount <= 6)
+                {
+                    UpdateCanStatus($"警告: フィールドが読み込めませんでした（{chCount}件はチャンネルのみ）");
+                }
+                else
+                {
+                    UpdateCanStatus($"読み込み完了: {chCount}件のデータを反映");
+                }
             }
             finally
             {
@@ -498,13 +513,18 @@ public partial class MainWindow : Window
         // ファームウェア出力: "%2d %2d   %d   %d   %c    %c   %-5s %4d %5d %5d %-7s %-4s %c  %6s %6s"
         // 例: " 3  2   0   2   S    B   NUM1     0  1000 10000 WATER   C    Y      60    100"
         // グループ: Index, CH, Byte, Len, Type, End, Var, Off, Mul, Div, Name, Unit, WE, WarnLo, WarnHi
-        var fieldRegex = new Regex(@"(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([US])\s+([BL])\s+(\S+)\s+(-?\d+)\s+(\d+)\s+(\d+)\s+(\S+)\s+(\S*)\s+([YN])\s+(-?\d+|---)\s+(-?\d+|---)", RegexOptions.IgnoreCase);
+        // 空のName/Unitはファームウェアが "-" を出力する
+        var fieldRegex = new Regex(@"^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([US])\s+([BL])\s+(\S+)\s+(-?\d+)\s+(\d+)\s+(\d+)\s+(\S+)\s+(\S+)\s+([YN])\s+(-?\d+|---)\s+(-?\d+|---)", RegexOptions.IgnoreCase | RegexOptions.Multiline);
         var fieldMatches = fieldRegex.Matches(response);
 
-        // 一旦全フィールドを無効化
-        foreach (var field in _canFields)
+        // フィールドがマッチした場合のみ更新（読込み失敗時は既存設定を保持）
+        if (fieldMatches.Count > 0)
         {
-            field.Enabled = false;
+            // 一旦全フィールドを無効化
+            foreach (var field in _canFields)
+            {
+                field.Enabled = false;
+            }
         }
 
         foreach (Match match in fieldMatches)
@@ -526,9 +546,11 @@ public partial class MainWindow : Window
                 field.Multiplier = int.Parse(match.Groups[9].Value);
                 field.Divisor = int.Parse(match.Groups[10].Value);
                 
-                // Issue #50: 警告設定
-                field.Name = match.Groups[11].Value.Trim();
-                field.Unit = match.Groups[12].Value.Trim();
+                // Issue #50: 警告設定 ("-" は空として扱う)
+                string nameVal = match.Groups[11].Value.Trim();
+                string unitVal = match.Groups[12].Value.Trim();
+                field.Name = (nameVal == "-") ? "" : nameVal;
+                field.Unit = (unitVal == "-") ? "" : unitVal;
                 field.WarnEnabled = match.Groups[13].Value.Equals("Y", StringComparison.OrdinalIgnoreCase);
                 // WarnLo/WarnHi: "---" は -32768 (CAN_WARN_DISABLED)
                 string warnLoStr = match.Groups[14].Value;
@@ -676,8 +698,12 @@ public partial class MainWindow : Window
                 var endian = field.Endian == "L" ? 1 : 0;
                 // ENオフの場合はchannel=0で無効化
                 var channel = field.Enabled ? field.Channel : 0;
-                // can_field <n> <ch> <byte> <len> <type> <end> <var> <off> <mul> <div>
-                commands.Add($"can_field {field.Index} {channel} {field.StartByte} {field.ByteCount} {dataType} {endian} {field.TargetVar} {field.Offset} {field.Multiplier} {field.Divisor}");
+                var warnEn = field.WarnEnabled ? 1 : 0;
+                // 名前と単位（空の場合は "-" を送信）
+                var name = string.IsNullOrWhiteSpace(field.Name) ? "-" : field.Name.Replace(" ", "_");
+                var unit = string.IsNullOrWhiteSpace(field.Unit) ? "-" : field.Unit.Replace(" ", "_");
+                // can_field <n> <ch> <byte> <len> <type> <end> <var> <off> <mul> <div> <name> <unit> <warn_en> <warn_lo> <warn_hi>
+                commands.Add($"can_field {field.Index} {channel} {field.StartByte} {field.ByteCount} {dataType} {endian} {field.TargetVar} {field.Offset} {field.Multiplier} {field.Divisor} {name} {unit} {warnEn} {field.WarnLow} {field.WarnHigh}");
             }
 
             if (commands.Count == 0)
@@ -699,9 +725,9 @@ public partial class MainWindow : Window
                 await Task.Delay(150);
             }
 
-            // EEPROMに保存
+            // EEPROMに保存（E2PROM書き込みは時間がかかるため長めに待機）
             vm.SendCommandDirect("can_save");
-            await Task.Delay(300);
+            await Task.Delay(1000);
 
             // パラメータモードを抜ける
             vm.SendCommandDirect("exit");

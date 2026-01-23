@@ -359,6 +359,10 @@ void data_setLCD50ms(void)
 /* Issue #50: マスターワーニング表示状態 */
 static uint8_t s_warning_displayed = 0;
 static uint8_t s_warning_gui_update_needed = 0;  /* GUI更新要求フラグ */
+static uint8_t s_warning_sound_cooldown = 0;     /* 警告音クールダウン（100ms単位）*/
+
+/* 警告音の最小間隔（100ms単位、30 = 3秒）*/
+#define WARNING_SOUND_COOLDOWN  30
 
 /**
  * @brief マスターワーニングGUI更新（メインループから呼び出し）
@@ -380,7 +384,12 @@ void master_warning_gui_update(void)
 			if (msg != NULL && msg[0] != '\0') {
 				TEXT_SetText(hWin, msg);
 			}
-			TEXT_SetBkColor(hWin, 0xFFFF0000);  /* 赤背景 (ARGB) */
+			/* 警告タイプに応じた背景色 */
+			if (master_warning_get_type() == WARN_TYPE_HIGH) {
+				TEXT_SetBkColor(hWin, 0xFFFF0000);  /* HIGH: 赤背景 (ARGB) */
+			} else {
+				TEXT_SetBkColor(hWin, 0xFF0055FF);  /* LOW: 青背景 (ARGB) */
+			}
 		}
 		APPW_SetVarData(ID_VAR_PRM, 1);
 		s_warning_displayed = 1;
@@ -400,15 +409,26 @@ void master_warning_gui_update(void)
 
 void data_setLCD100ms(void)
 {
+	/* 警告音クールダウン処理 */
+	if (s_warning_sound_cooldown > 0) {
+		s_warning_sound_cooldown--;
+	}
+	
+	/* パラメータモード中は警告チェックをスキップ */
+	if (g_system_mode == MODE_PARAM) {
+		return;
+	}
+	
 	/* Issue #50: マスターワーニング処理（タイマー割り込みコンテキスト）*/
 	master_warning_check();
 	
 	if (master_warning_is_active()) {
 		/* 警告発報開始時、または複数警告の表示切り替え時 */
 		if (!s_warning_displayed || master_warning_message_changed()) {
-			if (!s_warning_displayed) {
-				/* 最初の警告時のみ警告音を再生 */
+			if (!s_warning_displayed && s_warning_sound_cooldown == 0) {
+				/* 最初の警告時のみ警告音を再生（クールダウン中は抑制）*/
 				speaker_play_warning();
+				s_warning_sound_cooldown = WARNING_SOUND_COOLDOWN;
 			}
 			/* GUI更新はメインループで行う（フラグを立てるだけ）*/
 			s_warning_gui_update_needed = 1;

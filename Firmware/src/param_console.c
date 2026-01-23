@@ -320,19 +320,21 @@ static void cmd_can_list(void)
             snprintf(hi_str, sizeof(hi_str), "%d", f->warn_high);
         }
         
+        /* 空のName/Unitは "-" を出力（パース用） */
+        const char *name_out = (f->name[0] != '\0') ? f->name : "-";
+        const char *unit_out = (f->unit[0] != '\0') ? f->unit : "-";
+        
         param_console_printf("%2d %2d   %d   %d   %c    %c   %-5s %4d %5d %5d %-7s %-4s %c  %6s %6s\r\n",
                             i, f->channel, f->start_byte, f->byte_count,
                             f->data_type ? 'S' : 'U',
                             f->endian ? 'L' : 'B',
                             var_name,
                             f->offset, f->multiplier, f->divisor,
-                            f->name, f->unit,
+                            name_out, unit_out,
                             f->warn_enabled ? 'Y' : 'N',
                             lo_str, hi_str);
     }
 }
-
-/* CANチャンネル設定 */
 static void cmd_can_ch(uint8_t ch, uint16_t can_id, uint8_t enabled)
 {
     /* Issue #65: 値が変わる場合のみフラグを立てる */
@@ -400,7 +402,8 @@ static void cmd_can_field(int argc, char *args[])
     /* 注: フィールド設定はデータ解釈のみなのでフィルタ更新不要 */
 
     if (can_config_set_field(idx, &field)) {
-        param_console_printf("Field %d set OK\r\n", idx);
+        param_console_printf("Field %d set: ch=%d warn_en=%d lo=%d hi=%d\r\n", 
+            idx, field.channel, field.warn_enabled, field.warn_low, field.warn_high);
     } else {
         param_console_print("Error: Invalid parameters\r\n");
     }
