@@ -382,16 +382,13 @@ void data_setLCD100ms(void)
 			}
 			APPW_SetVarData(ID_VAR_PRM, 1);
 			s_warning_displayed = 1;
-		} else if (master_warning_message_changed()) {
-			/* 複数警告時の表示切り替え（音は鳴らさない）*/
-			WM_HWIN hWin = WM_GetDialogItem(ID_SCREEN_01a_RootInfo.hWin, ID_TEXT_ACC);
-			if (hWin) {
-				const char *msg = master_warning_get_message();
-				if (msg != NULL && msg[0] != '\0') {
-					TEXT_SetText(hWin, msg);
-				}
-			}
 		}
+		/* 
+		 * Note: 複数警告の表示切り替えは廃止
+		 * emWinはリエントラントでないため、タイマー割り込みから
+		 * TEXT_SetTextを繰り返し呼ぶとGUIが破壊される
+		 * 将来的にはメインループでGUI更新を行う設計に変更が必要
+		 */
 	} else {
 		/* 警告解除 */
 		if (s_warning_displayed) {

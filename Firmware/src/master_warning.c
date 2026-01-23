@@ -9,7 +9,6 @@
  */
 
 #include <string.h>
-#include <stdio.h>
 #include "master_warning.h"
 #include "param_storage.h"
 #include "dataregister.h"
@@ -89,16 +88,37 @@ static int32_t get_field_current_value(uint8_t target_var)
  * @brief 警告メッセージを生成
  * @param field 対象フィールド
  * @param type 警告タイプ
+ * @note snprintfは非リエントラントのため、手動で文字列を構築
  */
 static void build_warning_message(const CAN_Field_t *field, MasterWarningType_t type)
 {
     const char *type_str = (type == WARN_TYPE_HIGH) ? "HIGH" : "LOW";
+    int pos = 0;
     
+    /* 名前をコピー（最大7文字）*/
     if (field->name[0] != '\0') {
-        snprintf(s_warning_message, MASTER_WARNING_MSG_MAX, "%s %s", field->name, type_str);
+        const char *src = field->name;
+        while (*src && pos < MASTER_WARNING_MSG_MAX - 6) {  /* " HIGH\0" 用に6バイト確保 */
+            s_warning_message[pos++] = *src++;
+        }
     } else {
-        snprintf(s_warning_message, MASTER_WARNING_MSG_MAX, "WARN %s", type_str);
+        /* デフォルト名 "WARN" */
+        const char *src = "WARN";
+        while (*src) {
+            s_warning_message[pos++] = *src++;
+        }
     }
+    
+    /* スペース追加 */
+    s_warning_message[pos++] = ' ';
+    
+    /* タイプ文字列をコピー */
+    while (*type_str && pos < MASTER_WARNING_MSG_MAX - 1) {
+        s_warning_message[pos++] = *type_str++;
+    }
+    
+    /* NULL終端 */
+    s_warning_message[pos] = '\0';
 }
 
 /* ============================================================
@@ -225,6 +245,11 @@ void master_warning_check(void)
             s_rotate_counter = 0;
         }
         
+        /* 表示インデックスの範囲チェック（安全対策）*/
+        if (s_display_index >= new_warning_count) {
+            s_display_index = 0;
+        }
+        
         /* 警告リストをコピー */
         s_active_warning_count = new_warning_count;
         for (i = 0; i < new_warning_count; i++) {
@@ -246,8 +271,20 @@ void master_warning_check(void)
         }
         
         /* 現在表示する警告のメッセージを生成 */
+        /* 範囲チェックを再度実施（競合状態対策）*/
+        if (s_display_index >= s_active_warning_count) {
+            s_display_index = 0;
+        }
         int8_t disp_idx = s_active_warnings[s_display_index];
         MasterWarningType_t disp_type = s_active_warning_types[s_display_index];
+        
+        /* フィールドインデックスの範囲チェック */
+        if (disp_idx < 0 || disp_idx >= CAN_FIELD_MAX) {
+            /* 不正なインデックス - 警告をスキップ */
+            s_warning_active = false;
+            s_active_warning_count = 0;
+            return;
+        }
         
         /* 前回と違う警告を表示する場合、または最初の警告の場合のみメッセージを更新 */
         if (!s_warning_active) {
