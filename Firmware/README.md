@@ -1,6 +1,20 @@
 ## FULLMONI-WIDE：Firmware
 Renesas e2Studio + GNU GCC-RX + SEGGER emWIN<br>
 順次更新予定
+
+***
+## 開発環境構築 / Development Environment Setup
+
+開発環境のセットアップ手順は **[開発環境構築ガイド](docs/DEVELOPMENT_ENVIRONMENT.md)** を参照してください。
+
+For development environment setup instructions, refer to **[Development Environment Setup Guide](docs/DEVELOPMENT_ENVIRONMENT.md)**.
+
+| ツール | 動作確認済みバージョン |
+|--------|----------------------|
+| Renesas e² studio | 2024-04 (24.4.0) |
+| GCC for Renesas RX | 8.3.0.202405 |
+| SEGGER AppWizard | V136a_632a |
+
 ***
 ## サードパーティライセンスについて
 - 本プロジェクトの**オリジナルコード**（例: `Firmware/src` の自作 `.c/.h` 等）は **MIT License** です。
