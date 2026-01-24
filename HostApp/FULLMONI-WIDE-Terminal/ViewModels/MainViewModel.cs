@@ -487,7 +487,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             await Task.Delay(100);
 
             ActivityStatus = "✅ パラメータを読み込みました";
-            
+
             // パラメータ読込完了イベントを発火（CAN設定もこのタイミングで読み込む）
             ParametersLoaded?.Invoke(this, EventArgs.Empty);
         }

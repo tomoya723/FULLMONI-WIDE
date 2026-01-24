@@ -174,9 +174,46 @@ typedef struct {
 |----------|------|--------|
 | `can_list` | CAN設定一覧表示 | - |
 | `can_ch <n> <id> <en>` | CANチャンネル設定 (n=1-6, id=0x000-0x7FF, en=0/1) | - |
-| `can_field <n> ...` | CANフィールド設定 | - |
+| `can_field <n> <ch> <byte> <len> <type> <end> <var> <off> <mul> <div> <dec> <name> <unit> <wlo_en> <wlo> <whi_en> <whi>` | CANフィールド設定 | - |
 | `can_preset <id>` | プリセット適用 (0=MoTeC) | - |
 | `can_save` | CAN設定をEEPROMに保存 | ✅ Write |
+
+#### can_fieldパラメータ詳細
+
+| パラメータ | 説明 | 値の例 |
+|-------------|------|--------|
+| n | フィールド番号 (0-15) | 0 |
+| ch | CANチャンネル (1-6, 0=無効) | 1 |
+| byte | 開始バイト位置 (0-7) | 0 |
+| len | バイト数 (1, 2, 4) | 2 |
+| type | データ型 (0=Unsigned, 1=Signed) | 0 |
+| end | エンディアン (0=Big, 1=Little) | 0 |
+| var | 代入先変数 (0=REV, 1=AF, 2=NUM1, ... 8=SPEED, 255=無効) | 0 |
+| off | オフセット値 | 0 |
+| mul | 乗算係数 (x1000, 例: 1000=x1.0) | 1000 |
+| div | 除算係数 (x1000, 例: 10000=÷10) | 1000 |
+| dec | 小数シフト (0=整数, 1=÷10, 2=÷100) | 0 |
+| name | 警告名 ("-"で空) | A/F |
+| unit | 単位 ("-"で空) | afr |
+| wlo_en | Lo警告有効 (0/1) | 1 |
+| wlo | Lo閾値 (表示単位, float) | 10.0 |
+| whi_en | Hi警告有効 (0/1) | 1 |
+| whi | Hi閾値 (表示単位, float) | 18.0 |
+
+**例**: `can_field 4 2 2 2 0 0 1 0 147 1000 1 A/F afr 1 10.0 1 18.0`
+
+#### decimal_shift (dec) について
+
+AppWizardのMask設定（例: "###.#"）で表示時に小数点をシフトする場合、
+内部値と表示値の変換に使用します：
+
+| dec値 | 変換 | 用途例 |
+|--------|------|----------|
+| 0 | そのまま | RPM, 温度（整数表示） |
+| 1 | ÷10 | A/F, OIL-P, BATT（"###.#"形式） |
+| 2 | ÷100 | 将来用 |
+
+警告閾値は表示単位で指定します（例: A/F=14.7, OIL-P=3.5kg/cm²）。
 
 ### 5.3 パラメータID一覧
 
@@ -459,3 +496,4 @@ void param_storage_reset_trip(void)
 | 2026/01/06 | 1.1 | fwupdateコマンド追加（onboardflash-integration）|
 | 2026/01/06 | 1.2 | フラグアドレス修正、Magic検証によるアプリ有効性判定追加 |
 | 2026/01/06 | 1.3 | FWヘッダーを0xFFC20000に移動、エントリポイント0xFFC20040、実機テスト完了 |
+| 2026/01/25 | 1.4 | CAN_CONFIG_VERSION 5: decimal_shift追加、can_fieldコマンド17引数対応 |

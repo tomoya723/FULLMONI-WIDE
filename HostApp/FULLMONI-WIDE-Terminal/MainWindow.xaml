@@ -408,7 +408,7 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" Text="データフィールド定義 (最大16個) - Issue #50: 警告設定対応" FontWeight="Bold" FontSize="12" Margin="0,0,0,8" Foreground="{DynamicResource TextBrush}"/>
+                            <TextBlock Grid.Row="0" Text="データフィールド定義 (最大16個)" FontWeight="Bold" FontSize="12" Margin="0,0,0,8" Foreground="{DynamicResource TextBrush}"/>
 
                             <DataGrid Grid.Row="1" x:Name="CanFieldsGrid"
                                       AutoGenerateColumns="False"
@@ -424,7 +424,15 @@
                                       FontSize="11"
                                       IsEnabled="{Binding IsOperationEnabled}">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="22" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="22" IsReadOnly="True">
+                                        <DataGridTextColumn.CellStyle>
+                                            <Style TargetType="DataGridCell">
+                                                <Setter Property="Background" Value="#E0E0E0"/>
+                                                <Setter Property="IsEnabled" Value="False"/>
+                                            </Style>
+                                        </DataGridTextColumn.CellStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridCheckBoxColumn Header="EN" Binding="{Binding Enabled}" Width="32"/>
                                     <DataGridTextColumn Header="CH" Binding="{Binding Channel}" Width="28"/>
                                     <DataGridTextColumn Header="Byte" Binding="{Binding StartByte}" Width="35"/>
                                     <DataGridTextColumn Header="Len" Binding="{Binding ByteCount}" Width="30"/>
@@ -467,16 +475,35 @@
                                     <DataGridTextColumn Header="Off" Binding="{Binding Offset}" Width="32"/>
                                     <DataGridTextColumn Header="Mul" Binding="{Binding Multiplier}" Width="42"/>
                                     <DataGridTextColumn Header="Div" Binding="{Binding Divisor}" Width="45"/>
+                                    <DataGridTextColumn Header="Dec" Binding="{Binding DecimalShift}" Width="30"/>
                                     <DataGridTextColumn Header="名前" Binding="{Binding Name}" Width="50"/>
                                     <DataGridTextColumn Header="単位" Binding="{Binding Unit}" Width="35"/>
-                                    <DataGridCheckBoxColumn Header="Warn" Binding="{Binding WarnEnabled}" Width="38"/>
-                                    <DataGridTextColumn Header="Lo" Binding="{Binding WarnLow}" Width="50"/>
-                                    <DataGridTextColumn Header="Hi" Binding="{Binding WarnHigh}" Width="50"/>
-                                    <DataGridCheckBoxColumn Header="EN" Binding="{Binding Enabled}" Width="32"/>
+                                    <!-- Lo列: チェックボックス + 閾値 -->
+                                    <DataGridTemplateColumn Header="Warn Lo" Width="72">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <CheckBox IsChecked="{Binding WarnLowEnabled, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Margin="2,0"/>
+                                                    <TextBox Text="{Binding WarnLow, UpdateSourceTrigger=LostFocus}" Width="40" Margin="2,0"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <!-- Hi列: チェックボックス + 閾値 -->
+                                    <DataGridTemplateColumn Header="Warn Hi" Width="72">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <CheckBox IsChecked="{Binding WarnHighEnabled, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Margin="2,0"/>
+                                                    <TextBox Text="{Binding WarnHigh, UpdateSourceTrigger=LostFocus}" Width="40" Margin="2,0"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
 
-                            <TextBlock Grid.Row="2" Text="Type: U=Unsigned, S=Signed | End: B=Big, L=Little | 警告閾値: -32768=無効"
+                            <TextBlock Grid.Row="2" Text="Type: U=Unsigned, S=Signed | End: B=Big, L=Little"
                                        FontSize="10" Foreground="{DynamicResource TextMutedBrush}" Margin="0,6,0,0"/>
                         </Grid>
                     </Border>

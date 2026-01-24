@@ -17,8 +17,8 @@
 /* ============================================================
  * 内部定数
  * ============================================================ */
-/* 起動後の警告抑制期間（100ms単位、30 = 3秒）*/
-#define STARTUP_DELAY_COUNT   30
+/* 起動後の警告抑制期間（100ms単位、50 = 5秒）*/
+#define STARTUP_DELAY_COUNT   50
 
 /* 下限警告を有効にする最小エンジン回転数 */
 #define MIN_RPM_FOR_LOW_WARNING  500
@@ -52,36 +52,48 @@ static bool s_message_changed = false;      /* メッセージ変更フラグ */
  * ============================================================ */
 
 /**
- * @brief CANフィールドの現在値を取得
- * @param target_var ターゲット変数インデックス
- * @return 現在値（整数）
+ * @brief 10のべき乗を計算（小数点シフト用）
+ * @param n べき指数 (0-3)
+ * @return 10^n
  */
-static int32_t get_field_current_value(uint8_t target_var)
+static float pow10_table[] = { 1.0f, 10.0f, 100.0f, 1000.0f };
+
+/**
+ * @brief CANフィールドの内部値を取得
+ * @param target_var ターゲット変数インデックス
+ * @return 内部値（g_CALC_dataから取得）
+ */
+static float get_field_internal_value(uint8_t target_var)
 {
     switch (target_var) {
-    case CAN_TARGET_REV:
-        return (int32_t)g_CALC_data.rev;
-    case CAN_TARGET_AF:
-        /* A/F値は既に10倍値 (例: 14.7 -> 147) */
-        return (int32_t)g_CALC_data.af;
-    case CAN_TARGET_NUM1:
-        return (int32_t)g_CALC_data.num1;
-    case CAN_TARGET_NUM2:
-        return (int32_t)g_CALC_data.num2;
-    case CAN_TARGET_NUM3:
-        return (int32_t)g_CALC_data.num3;
-    case CAN_TARGET_NUM4:
-        return (int32_t)g_CALC_data.num4;
-    case CAN_TARGET_NUM5:
-        return (int32_t)g_CALC_data.num5;
-    case CAN_TARGET_NUM6:
-        /* バッテリー電圧は既に10倍値 (例: 14.2V -> 142) */
-        return (int32_t)g_CALC_data.num6;
-    case CAN_TARGET_SPEED:
-        return (int32_t)g_CALC_data.sp;
-    default:
-        return 0;
+    case CAN_TARGET_REV:   return g_CALC_data.rev;
+    case CAN_TARGET_AF:    return g_CALC_data.af;
+    case CAN_TARGET_NUM1:  return g_CALC_data.num1;
+    case CAN_TARGET_NUM2:  return g_CALC_data.num2;
+    case CAN_TARGET_NUM3:  return g_CALC_data.num3;
+    case CAN_TARGET_NUM4:  return g_CALC_data.num4;
+    case CAN_TARGET_NUM5:  return g_CALC_data.num5;
+    case CAN_TARGET_NUM6:  return g_CALC_data.num6;
+    case CAN_TARGET_SPEED: return g_CALC_data.sp;
+    default:               return 0.0f;
     }
+}
+
+/**
+ * @brief CANフィールドの現在値を取得（表示単位）
+ * @param field CANフィールド設定
+ * @return 現在値（表示単位、閾値比較用）
+ * @note decimal_shiftに基づいて内部値を表示単位に変換
+ */
+static float get_field_display_value(const CAN_Field_t *field)
+{
+    float internal = get_field_internal_value(field->target_var);
+    
+    /* decimal_shiftに応じて変換 (0:そのまま, 1:÷10, 2:÷100) */
+    if (field->decimal_shift > 0 && field->decimal_shift < 4) {
+        return internal / pow10_table[field->decimal_shift];
+    }
+    return internal;
 }
 
 /**
@@ -94,7 +106,7 @@ static void build_warning_message(const CAN_Field_t *field, MasterWarningType_t 
 {
     const char *type_str = (type == WARN_TYPE_HIGH) ? "HIGH" : "LOW";
     int pos = 0;
-    
+
     /* 名前をコピー（最大7文字）*/
     if (field->name[0] != '\0') {
         const char *src = field->name;
@@ -108,15 +120,15 @@ static void build_warning_message(const CAN_Field_t *field, MasterWarningType_t 
             s_warning_message[pos++] = *src++;
         }
     }
-    
+
     /* スペース追加 */
     s_warning_message[pos++] = ' ';
-    
+
     /* タイプ文字列をコピー */
     while (*type_str && pos < MASTER_WARNING_MSG_MAX - 1) {
         s_warning_message[pos++] = *type_str++;
     }
-    
+
     /* NULL終端 */
     s_warning_message[pos] = '\0';
 }
@@ -136,7 +148,7 @@ void master_warning_init(void)
     s_warning_type = WARN_TYPE_NONE;
     s_warning_message[0] = '\0';
     s_startup_delay = STARTUP_DELAY_COUNT;  /* 起動後遅延をリセット */
-    
+
     /* 複数警告管理の初期化 */
     s_active_warning_count = 0;
     s_display_index = 0;
@@ -171,15 +183,15 @@ void master_warning_check(void)
 {
     uint8_t i;
     const CAN_Field_t *field;
-    int32_t current_value;
-    int32_t current_rpm;
+    float current_value;
+    float current_rpm;
     bool check_low_warning;
     uint8_t new_warning_count = 0;
     int8_t new_warnings[MAX_ACTIVE_WARNINGS];
     MasterWarningType_t new_warning_types[MAX_ACTIVE_WARNINGS];
-    
+
     s_message_changed = false;  /* メッセージ変更フラグをリセット */
-    
+
     /* 起動後遅延中は警告チェックをスキップ（CANデータ安定待ち）*/
     if (s_startup_delay > 0) {
         s_startup_delay--;
@@ -187,7 +199,7 @@ void master_warning_check(void)
         s_active_warning_count = 0;
         return;
     }
-    
+
     /* CAN設定が有効か確認（バージョンが正しいか）*/
     if (g_can_config.version != CAN_CONFIG_VERSION) {
         /* 未初期化または不正なデータ - 警告チェックをスキップ */
@@ -195,30 +207,25 @@ void master_warning_check(void)
         s_active_warning_count = 0;
         return;
     }
-    
+
     /* エンジン回転数を取得（下限警告の有効化判定用）*/
-    current_rpm = get_field_current_value(CAN_TARGET_REV);
+    current_rpm = get_field_internal_value(CAN_TARGET_REV);
     check_low_warning = (current_rpm >= MIN_RPM_FOR_LOW_WARNING);
-    
+
     /* 全フィールドをスキャンして、警告中のものをすべて収集 */
     for (i = 0; i < CAN_FIELD_MAX && new_warning_count < MAX_ACTIVE_WARNINGS; i++) {
         field = &g_can_config.fields[i];
-        
+
         /* 無効なフィールドはスキップ */
         if (field->channel == 0) {
             continue;
         }
-        
-        /* ワーニングが無効なフィールドはスキップ */
-        if (!field->warn_enabled) {
-            continue;
-        }
-        
-        /* 現在値を取得 */
-        current_value = get_field_current_value(field->target_var);
-        
-        /* 上限チェック（常に有効）*/
-        if (field->warn_high != CAN_WARN_DISABLED) {
+
+        /* 現在値を取得（表示単位に変換）*/
+        current_value = get_field_display_value(field);
+
+        /* 上限チェック（warn_high_enabled が有効な場合のみ）*/
+        if (field->warn_high_enabled && field->warn_high > CAN_WARN_DISABLED) {
             if (current_value > field->warn_high) {
                 new_warnings[new_warning_count] = (int8_t)i;
                 new_warning_types[new_warning_count] = WARN_TYPE_HIGH;
@@ -226,9 +233,9 @@ void master_warning_check(void)
                 continue;  /* 1フィールドにつき1警告まで（上限優先）*/
             }
         }
-        
-        /* 下限チェック（エンジン回転中のみ）*/
-        if (check_low_warning && field->warn_low != CAN_WARN_DISABLED) {
+
+        /* 下限チェック（warn_low_enabled が有効 かつ エンジン回転中のみ）*/
+        if (field->warn_low_enabled && check_low_warning && field->warn_low > CAN_WARN_DISABLED) {
             if (current_value < field->warn_low) {
                 new_warnings[new_warning_count] = (int8_t)i;
                 new_warning_types[new_warning_count] = WARN_TYPE_LOW;
@@ -236,7 +243,7 @@ void master_warning_check(void)
             }
         }
     }
-    
+
     /* 警告状態を更新 */
     if (new_warning_count > 0) {
         /* 警告数が変わった場合、表示インデックスをリセット */
@@ -244,19 +251,19 @@ void master_warning_check(void)
             s_display_index = 0;
             s_rotate_counter = 0;
         }
-        
+
         /* 表示インデックスの範囲チェック（安全対策）*/
         if (s_display_index >= new_warning_count) {
             s_display_index = 0;
         }
-        
+
         /* 警告リストをコピー */
         s_active_warning_count = new_warning_count;
         for (i = 0; i < new_warning_count; i++) {
             s_active_warnings[i] = new_warnings[i];
             s_active_warning_types[i] = new_warning_types[i];
         }
-        
+
         /* 表示切り替えタイマー処理（複数警告時のみ）*/
         if (s_active_warning_count > 1) {
             s_rotate_counter++;
@@ -269,7 +276,7 @@ void master_warning_check(void)
                 s_message_changed = true;  /* 表示切り替え時にフラグを立てる */
             }
         }
-        
+
         /* 現在表示する警告のメッセージを生成 */
         /* 範囲チェックを再度実施（競合状態対策）*/
         if (s_display_index >= s_active_warning_count) {
@@ -277,7 +284,7 @@ void master_warning_check(void)
         }
         int8_t disp_idx = s_active_warnings[s_display_index];
         MasterWarningType_t disp_type = s_active_warning_types[s_display_index];
-        
+
         /* フィールドインデックスの範囲チェック */
         if (disp_idx < 0 || disp_idx >= CAN_FIELD_MAX) {
             /* 不正なインデックス - 警告をスキップ */
@@ -285,7 +292,7 @@ void master_warning_check(void)
             s_active_warning_count = 0;
             return;
         }
-        
+
         /* 前回と違う警告を表示する場合、または最初の警告の場合のみメッセージを更新 */
         if (!s_warning_active) {
             /* 新規警告発生時のみメッセージ生成 */
@@ -301,7 +308,7 @@ void master_warning_check(void)
             s_warning_field_idx = disp_idx;
             s_warning_type = disp_type;
         }
-        
+
         s_warning_active = true;
     } else {
         s_warning_active = false;
@@ -329,7 +336,7 @@ void master_warning_update_display(void)
 {
     /* 前回状態を更新（立ち上がり検出用に保持）*/
     s_warning_prev = s_warning_active;
-    
+
     /* Note: 警告音再生はdataregister.cで直接呼び出し */
 }
 

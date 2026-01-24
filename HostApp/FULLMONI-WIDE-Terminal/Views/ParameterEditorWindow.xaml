@@ -231,6 +231,7 @@
                                         <DataGridTextColumn Header="Off" Binding="{Binding Offset}" Width="35"/>
                                         <DataGridTextColumn Header="Mul" Binding="{Binding Multiplier}" Width="45"/>
                                         <DataGridTextColumn Header="Div" Binding="{Binding Divisor}" Width="45"/>
+                                        <DataGridTextColumn Header="Dec" Binding="{Binding DecimalShift}" Width="30"/>
                                         <DataGridTextColumn Header="名前" Binding="{Binding Name}" Width="55"/>
                                         <DataGridTextColumn Header="単位" Binding="{Binding Unit}" Width="35"/>
                                         <DataGridCheckBoxColumn Header="Warn" Binding="{Binding WarnEnabled}" Width="40"/>

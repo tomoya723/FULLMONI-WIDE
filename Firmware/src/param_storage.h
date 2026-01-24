@@ -23,7 +23,7 @@
 /* Issue #50: マスターワーニング用定数 */
 #define CAN_FIELD_NAME_MAX  8       /* 名前文字列最大長 (7文字+NULL) */
 #define CAN_FIELD_UNIT_MAX  4       /* 単位文字列最大長 (3文字+NULL) */
-#define CAN_WARN_DISABLED   (-32768) /* 閾値無効値: INT16_MIN */
+#define CAN_WARN_DISABLED   (-1e30f) /* 閾値無効値: float用 */
 
 /* CAN受信チャンネル設定 */
 typedef struct __attribute__((packed)) {
@@ -44,14 +44,16 @@ typedef struct __attribute__((packed)) {
     int16_t  offset;                /* オフセット値 (変換前に加算) */
     uint16_t multiplier;            /* 乗算係数 (x1000) 例: 1000=x1, 100=x0.1 */
     uint16_t divisor;               /* 除算係数 (x1000) 例: 1000=/1, 10000=/10 */
-    /* === 新規追加フィールド (Issue #50: 18 bytes) === */
+    /* === 新規追加フィールド (Issue #50: 24 bytes) === */
     char     name[CAN_FIELD_NAME_MAX];  /* 名前文字列 (例: "WATER", "OIL") */
     char     unit[CAN_FIELD_UNIT_MAX];  /* 単位文字列 (例: "C", "kPa", "rpm") */
-    uint8_t  warn_enabled;          /* ワーニング有効: 0=無効, 1=有効 */
+    uint8_t  decimal_shift;         /* 小数点シフト量 (0=整数, 1=÷10, 2=÷100) AppWizard Maskに対応 */
+    uint8_t  warn_low_enabled;      /* 下限ワーニング有効: 0=無効, 1=有効 */
+    uint8_t  warn_high_enabled;     /* 上限ワーニング有効: 0=無効, 1=有効 */
     uint8_t  reserved;              /* 予約 (アライメント用) */
-    int16_t  warn_low;              /* 下限閾値 (これを下回るとワーニング) */
-    int16_t  warn_high;             /* 上限閾値 (これを超えるとワーニング) */
-} CAN_Field_t;  /* 合計: 30 bytes */
+    float    warn_low;              /* 下限閾値 (表示単位、これを下回るとワーニング) */
+    float    warn_high;             /* 上限閾値 (表示単位、これを超えるとワーニング) */
+} CAN_Field_t;  /* 合計: 36 bytes */
 
 /* CAN設定全体 (RAM2領域に配置) */
 typedef struct __attribute__((packed)) {
@@ -67,7 +69,7 @@ typedef struct __attribute__((packed)) {
 #define CAN_CONFIG_SIZE     sizeof(CAN_Config_t)
 
 /* CAN設定バージョン */
-#define CAN_CONFIG_VERSION  2       /* Issue #50: name, unit, warningフィールド追加 */
+#define CAN_CONFIG_VERSION  5       /* Issue #50: decimal_shift フィールド追加 */
 
 /* プリセットID */
 #define CAN_PRESET_CUSTOM       0

@@ -103,8 +103,8 @@ static void cmd_help(void)
     param_console_print("  can_list          - Show CAN configuration\r\n");
     param_console_print("  can_ch <n> <id> <en> - Set CAN channel (n=1-6)\r\n");
     param_console_print("  can_field <n> <ch> <byte> <len> <type> <end> <var> <off> <mul> <div>\r\n");
-    param_console_print("            <name> <unit> <warn_en> <warn_lo> <warn_hi>\r\n");
-    param_console_print("                    - Set CAN field (n=0-15)\r\n");
+    param_console_print("            <name> <unit> <dec_shift> <warn_lo_en> <warn_lo> <warn_hi_en> <warn_hi>\r\n");
+    param_console_print("                    - Set CAN field (n=0-15, dec_shift=AppWizard decimal)\r\n");
     param_console_print("  can_preset <name> - Apply preset (motec/link/aem)\r\n");
     param_console_print("  can_save          - Save CAN config to EEPROM\r\n");
     param_console_print("  can_load          - Load CAN config from EEPROM\r\n");
@@ -299,40 +299,40 @@ static void cmd_can_list(void)
                             g_can_config.channels[i].enabled ? "ON" : "OFF");
     }
 
-    param_console_print("\r\n-- Fields --\r\n");
-    param_console_print("No CH Byte Len Type End Var    Off  Mul   Div   Name    Unit WE WarnLo WarnHi\r\n");
+    param_console_print("\r\n-- Fields (16) --\r\n");
+    param_console_print("No CH Byte Len Type End Var    Off  Mul   Div  Dsh Name    Unit WLo  Lo WHi    Hi\r\n");
     for (i = 0; i < CAN_FIELD_MAX; i++) {
         CAN_Field_t *f = &g_can_config.fields[i];
-        if (f->channel == 0) continue;  /* 無効なフィールドはスキップ */
 
         const char *var_name = (f->target_var < 9) ? target_var_names[f->target_var] : "---";
-        
-        /* 閾値表示用文字列を準備 */
-        char lo_str[8], hi_str[8];
-        if (f->warn_low == CAN_WARN_DISABLED) {
+
+        /* 閾値表示用文字列を準備 (float対応) */
+        char lo_str[12], hi_str[12];
+        if (f->warn_low <= CAN_WARN_DISABLED) {
             strcpy(lo_str, "---");
         } else {
-            snprintf(lo_str, sizeof(lo_str), "%d", f->warn_low);
+            snprintf(lo_str, sizeof(lo_str), "%.2f", f->warn_low);
         }
-        if (f->warn_high == CAN_WARN_DISABLED) {
+        if (f->warn_high <= CAN_WARN_DISABLED) {
             strcpy(hi_str, "---");
         } else {
-            snprintf(hi_str, sizeof(hi_str), "%d", f->warn_high);
+            snprintf(hi_str, sizeof(hi_str), "%.2f", f->warn_high);
         }
-        
+
         /* 空のName/Unitは "-" を出力（パース用） */
         const char *name_out = (f->name[0] != '\0') ? f->name : "-";
         const char *unit_out = (f->unit[0] != '\0') ? f->unit : "-";
-        
-        param_console_printf("%2d %2d   %d   %d   %c    %c   %-5s %4d %5d %5d %-7s %-4s %c  %6s %6s\r\n",
+
+        param_console_printf("%2d %2d   %d   %d   %c    %c   %-5s %4d %5d %5d  %d  %-7s %-4s %c %6s %c %6s\r\n",
                             i, f->channel, f->start_byte, f->byte_count,
                             f->data_type ? 'S' : 'U',
                             f->endian ? 'L' : 'B',
                             var_name,
                             f->offset, f->multiplier, f->divisor,
+                            f->decimal_shift,
                             name_out, unit_out,
-                            f->warn_enabled ? 'Y' : 'N',
-                            lo_str, hi_str);
+                            f->warn_low_enabled ? 'Y' : 'N', lo_str,
+                            f->warn_high_enabled ? 'Y' : 'N', hi_str);
     }
 }
 static void cmd_can_ch(uint8_t ch, uint16_t can_id, uint8_t enabled)
@@ -357,13 +357,13 @@ static void cmd_can_field(int argc, char *args[])
 {
     if (argc < 10) {
         param_console_print("Usage: can_field <n> <ch> <byte> <len> <type> <end> <var> <off> <mul> <div>\r\n");
-        param_console_print("                <name> <unit> <warn_en> <warn_lo> <warn_hi>\r\n");
+        param_console_print("                <name> <unit> <dec_shift> <warn_lo_en> <warn_lo> <warn_hi_en> <warn_hi>\r\n");
         return;
     }
 
     CAN_Field_t field;
     memset(&field, 0, sizeof(field));  /* 全フィールドをゼロ初期化 */
-    
+
     uint8_t idx = (uint8_t)atoi(args[0]);
     field.channel = (uint8_t)atoi(args[1]);
     field.start_byte = (uint8_t)atoi(args[2]);
@@ -374,8 +374,8 @@ static void cmd_can_field(int argc, char *args[])
     field.offset = (int16_t)atoi(args[7]);
     field.multiplier = (uint16_t)atoi(args[8]);
     field.divisor = (uint16_t)atoi(args[9]);
-    
-    /* Issue #50: 新規フィールド (name, unit, warn_*) */
+
+    /* Issue #50: 拡張フィールド */
     if (argc >= 11) {
         strncpy(field.name, args[10], CAN_FIELD_NAME_MAX - 1);
         field.name[CAN_FIELD_NAME_MAX - 1] = '\0';
@@ -385,15 +385,21 @@ static void cmd_can_field(int argc, char *args[])
         field.unit[CAN_FIELD_UNIT_MAX - 1] = '\0';
     }
     if (argc >= 13) {
-        field.warn_enabled = (uint8_t)atoi(args[12]);
+        field.decimal_shift = (uint8_t)atoi(args[12]);
     }
     if (argc >= 14) {
-        field.warn_low = (int16_t)atoi(args[13]);
+        field.warn_low_enabled = (uint8_t)atoi(args[13]);
+    }
+    if (argc >= 15) {
+        field.warn_low = (float)atof(args[14]);
     } else {
         field.warn_low = CAN_WARN_DISABLED;
     }
-    if (argc >= 15) {
-        field.warn_high = (int16_t)atoi(args[14]);
+    if (argc >= 16) {
+        field.warn_high_enabled = (uint8_t)atoi(args[15]);
+    }
+    if (argc >= 17) {
+        field.warn_high = (float)atof(args[16]);
     } else {
         field.warn_high = CAN_WARN_DISABLED;
     }
@@ -402,8 +408,9 @@ static void cmd_can_field(int argc, char *args[])
     /* 注: フィールド設定はデータ解釈のみなのでフィルタ更新不要 */
 
     if (can_config_set_field(idx, &field)) {
-        param_console_printf("Field %d set: ch=%d warn_en=%d lo=%d hi=%d\r\n", 
-            idx, field.channel, field.warn_enabled, field.warn_low, field.warn_high);
+        param_console_printf("Field %d set: ch=%d dec=%d wlo_en=%d lo=%.2f whi_en=%d hi=%.2f\r\n",
+            idx, field.channel, field.decimal_shift, field.warn_low_enabled, field.warn_low,
+            field.warn_high_enabled, field.warn_high);
     } else {
         param_console_print("Error: Invalid parameters\r\n");
     }
@@ -627,17 +634,17 @@ static void parse_command(const char *line)
         uint8_t enabled = (uint8_t)atoi(arg3);
         cmd_can_ch(ch, can_id, enabled);
     } else if (strcmp(cmd, "can_field") == 0 && argc >= 7) {
-        /* can_field <n> <ch> <byte> <len> <type> <end> <var> <off> <mul> <div> <name> <unit> <warn_en> <warn_lo> <warn_hi> */
-        /* 最大15引数をパース */
-        char *args[15] = {arg1, arg2, arg3, arg4, arg5, arg6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+        /* can_field <n> <ch> <byte> <len> <type> <end> <var> <off> <mul> <div> <name> <unit> <dec_shift> <wlo_en> <warn_lo> <whi_en> <warn_hi> */
+        /* 最大17引数をパース */
+        char *args[17] = {arg1, arg2, arg3, arg4, arg5, arg6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
         /* 残りの引数を再パース */
-        char extra_args[9][32];
-        int extra_argc = sscanf(line, "%*s %*s %*s %*s %*s %*s %*s %31s %31s %31s %31s %31s %31s %31s %31s %31s",
+        char extra_args[11][32];
+        int extra_argc = sscanf(line, "%*s %*s %*s %*s %*s %*s %*s %31s %31s %31s %31s %31s %31s %31s %31s %31s %31s %31s",
                extra_args[0], extra_args[1], extra_args[2], extra_args[3],
-               extra_args[4], extra_args[5], extra_args[6], extra_args[7], extra_args[8]);
+               extra_args[4], extra_args[5], extra_args[6], extra_args[7], extra_args[8], extra_args[9], extra_args[10]);
         if (extra_argc >= 4) {
             int i;
-            for (i = 0; i < extra_argc && i < 9; i++) {
+            for (i = 0; i < extra_argc && i < 11; i++) {
                 args[6 + i] = extra_args[i];
             }
             cmd_can_field(6 + extra_argc, args);
@@ -660,6 +667,8 @@ static void parse_command(const char *line)
         } else {
             param_console_print("NG (using defaults)\r\n");
         }
+        /* 設定が変わったのでフィルタを更新 */
+        can_update_rx_filters();
     } else if (strcmp(cmd, "exit") == 0) {
         /* Issue #65: CAN設定が変更された場合のみフィルタを更新 */
         if (can_config_changed) {

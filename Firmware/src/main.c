@@ -182,10 +182,10 @@ void main(void)
 
 	// CAN設定をEEPROMから読み込み（I2C初期化後）
 	if (can_config_load()) {
-		// EEPROM読み込み成功 → CANフィルタを更新
-		can_update_rx_filters();
+		// EEPROM読み込み成功
 	}
-	// 失敗時は既にcan_config_init()で初期化済み
+	// 成功・失敗に関わらずCANフィルタを更新（デフォルト値使用時も必要）
+	can_update_rx_filters();
 
 	// Start MTU8 (Vehicle speed　Pulse　Interupt function)
 	R_Config_MTU8_Start();
@@ -232,14 +232,14 @@ void main(void)
 				g_system_mode = MODE_PARAM;
 				g_param_mode_active = 1;
 				usb_cdc_set_mode(USB_MODE_ACTIVE);  /* フル通信モードへ */
-				
+
 				/* 緑背景表示に "HOST ACCESS" を表示 */
 				WM_HWIN hWin = WM_GetDialogItem(ID_SCREEN_01a_RootInfo.hWin, ID_TEXT_ACC);
 				if (hWin) {
 					TEXT_SetText(hWin, "HOST ACCESS");
 					TEXT_SetBkColor(hWin, 0xFF00AA00);  /* 緑背景 (ARGB) */
 				}
-				
+
 				APPW_SetVarData(ID_VAR_PRM, 1);     /* パラメータモード画面表示 */
 				param_console_enter();
 				continue;
@@ -285,7 +285,7 @@ void main(void)
 
 		GUI_Exec1();
 		APPW_Exec();
-		
+
 		/* Issue #50: マスターワーニングGUI更新（メインループから呼ぶこと！）*/
 		master_warning_gui_update();
 
@@ -327,7 +327,7 @@ void main(void)
 				brightness = ((300 - warning_led_phase) * 255) / 150;
 			}
 			warning_led_phase = (warning_led_phase + 10) % 300;  /* 100ms毎に10進む、3秒で1周期 */
-			
+
 			/* 8つのLED全て赤色で明滅 */
 			for(int i = 0; i < 8; i++) {
 				Neopixel_SetRGB(i, brightness, 0, 0);  /* G=brightness換算で赤 */

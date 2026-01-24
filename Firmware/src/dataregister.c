@@ -366,7 +366,7 @@ static uint8_t s_warning_sound_cooldown = 0;     /* 警告音クールダウン�
 
 /**
  * @brief マスターワーニングGUI更新（メインループから呼び出し）
- * 
+ *
  * emWinはリエントラントではないため、タイマー割り込みからではなく
  * メインループから呼び出す必要がある
  */
@@ -376,7 +376,7 @@ void master_warning_gui_update(void)
 		return;
 	}
 	s_warning_gui_update_needed = 0;
-	
+
 	if (master_warning_is_active()) {
 		WM_HWIN hWin = WM_GetDialogItem(ID_SCREEN_01a_RootInfo.hWin, ID_TEXT_ACC);
 		if (hWin) {
@@ -413,15 +413,15 @@ void data_setLCD100ms(void)
 	if (s_warning_sound_cooldown > 0) {
 		s_warning_sound_cooldown--;
 	}
-	
+
 	/* パラメータモード中は警告チェックをスキップ */
 	if (g_system_mode == MODE_PARAM) {
 		return;
 	}
-	
+
 	/* Issue #50: マスターワーニング処理（タイマー割り込みコンテキスト）*/
 	master_warning_check();
-	
+
 	if (master_warning_is_active()) {
 		/* 警告発報開始時、または複数警告の表示切り替え時 */
 		if (!s_warning_displayed || master_warning_message_changed()) {

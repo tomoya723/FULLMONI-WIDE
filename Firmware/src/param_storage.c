@@ -105,7 +105,7 @@ static bool eeprom_write(uint16_t addr, const uint8_t *data, uint16_t len)
     /* I2C送信 */
     I2C0_TX_END_FLG = 0;
     R_Config_RIIC0_Master_Send(i2c_addr, (void *)i2c_buf, 1 + len);
-    
+
     /* タイムアウト付き待機 */
     timeout = 1000000;
     while (I2C0_TX_END_FLG == 0 && timeout > 0) {
@@ -427,67 +427,82 @@ static const CAN_Config_t CAN_PRESET_MOTEC = {
         /* CH1 (0x3E8): RPM(0-1), TPS(2-3), MAP(4-5), IAT(6-7) */
         { .channel = 1, .start_byte = 0, .byte_count = 2, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_REV, .offset = 0, .multiplier = 1000, .divisor = 1000,
-          .name = "REV", .unit = "rpm", .warn_enabled = 1, .reserved = 0,
-          .warn_low = 200, .warn_high = 9000 },
+          .name = "REV", .unit = "rpm", .decimal_shift = 0,
+          .warn_low_enabled = 0, .warn_high_enabled = 1, .reserved = 0,
+          .warn_low = 200.0f, .warn_high = 9000.0f },
         { .channel = 1, .start_byte = 4, .byte_count = 2, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_NUM4, .offset = 0, .multiplier = 1000, .divisor = 10000,
-          .name = "MAP", .unit = "kPa", .warn_enabled = 1, .reserved = 0,
-          .warn_low = 0, .warn_high = 150 },  /* MAP /10 */
+          .name = "MAP", .unit = "kPa", .decimal_shift = 0,
+          .warn_low_enabled = 0, .warn_high_enabled = 0, .reserved = 0,
+          .warn_low = 0.0f, .warn_high = 150.0f },  /* MAP /10 → 整数表示 */
         { .channel = 1, .start_byte = 6, .byte_count = 2, .data_type = 1, .endian = 0,
           .target_var = CAN_TARGET_NUM2, .offset = 0, .multiplier = 1000, .divisor = 10000,
-          .name = "IAT", .unit = "deg", .warn_enabled = 1, .reserved = 0,
-          .warn_low = -40, .warn_high = 80 },  /* IAT /10 signed */
+          .name = "IAT", .unit = "deg", .decimal_shift = 0,
+          .warn_low_enabled = 0, .warn_high_enabled = 1, .reserved = 0,
+          .warn_low = -40.0f, .warn_high = 80.0f },  /* IAT /10 signed → 整数表示 */
         /* CH2 (0x3E9): ECT(0-1), AFR(2-3) */
         { .channel = 2, .start_byte = 0, .byte_count = 2, .data_type = 1, .endian = 0,
           .target_var = CAN_TARGET_NUM1, .offset = 0, .multiplier = 1000, .divisor = 10000,
-          .name = "WATER", .unit = "deg", .warn_enabled = 1, .reserved = 0,
-          .warn_low = 60, .warn_high = 110 },  /* WaterTemp /10 signed */
+          .name = "WATER", .unit = "deg", .decimal_shift = 0,
+          .warn_low_enabled = 0, .warn_high_enabled = 1, .reserved = 0,
+          .warn_low = -40.0f, .warn_high = 110.0f },  /* WaterTemp /10 signed → 整数表示 */
         { .channel = 2, .start_byte = 2, .byte_count = 2, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_AF, .offset = 0, .multiplier = 147, .divisor = 1000,
-          .name = "A/F", .unit = "afr", .warn_enabled = 1, .reserved = 0,
-          .warn_low = 100, .warn_high = 180 },     /* A/F *0.147 */
+          .name = "A/F", .unit = "afr", .decimal_shift = 1,
+          .warn_low_enabled = 1, .warn_high_enabled = 1, .reserved = 0,
+          .warn_low = 10.0f, .warn_high = 18.0f },     /* A/F: 内部147→表示14.7 */
         /* CH3 (0x3EA): OilTemp(6-7) */
         { .channel = 3, .start_byte = 6, .byte_count = 2, .data_type = 1, .endian = 0,
           .target_var = CAN_TARGET_NUM3, .offset = 0, .multiplier = 1000, .divisor = 10000,
-          .name = "OIL-T", .unit = "deg", .warn_enabled = 1, .reserved = 0,
-          .warn_low = 60, .warn_high = 130 },  /* OilTemp /10 signed */
+          .name = "OIL-T", .unit = "deg", .decimal_shift = 0,
+          .warn_low_enabled = 0, .warn_high_enabled = 1, .reserved = 0,
+          .warn_low = -40.0f, .warn_high = 130.0f },  /* OilTemp /10 signed → 整数表示 */
         /* CH4 (0x3EB): OilPressure(0-1), BattV(6-7) */
         { .channel = 4, .start_byte = 0, .byte_count = 2, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_NUM5, .offset = 0, .multiplier = 1, .divisor = 1000,
-          .name = "OIL_P", .unit = "kPa", .warn_enabled = 1, .reserved = 0,
-          .warn_low = 1500, .warn_high = 9000 },     /* OilP *0.001 */
+          .name = "OIL-P", .unit = "x100", .decimal_shift = 1,
+          .warn_low_enabled = 1, .warn_high_enabled = 1, .reserved = 0,
+          .warn_low = 1.5f, .warn_high = 9.0f },     /* OIL-P: 内部40→表示4.0 */
         { .channel = 4, .start_byte = 6, .byte_count = 2, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_NUM6, .offset = 0, .multiplier = 1000, .divisor = 10000,
-          .name = "BATT", .unit = "V", .warn_enabled = 0, .reserved = 0,
-          .warn_low = 9, .warn_high = 160 },  /* BattV /10 */
+          .name = "BATT", .unit = "V", .decimal_shift = 1,
+          .warn_low_enabled = 0, .warn_high_enabled = 0, .reserved = 0,
+          .warn_low = 9.0f, .warn_high = 16.0f },  /* BATT: 内部142→表示14.2 */
         /* 残りは無効 */
         { .channel = 0, .start_byte = 0, .byte_count = 0, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_NONE, .offset = 0, .multiplier = 1000, .divisor = 1000,
-          .name = "", .unit = "", .warn_enabled = 0, .reserved = 0,
+          .name = "", .unit = "", .decimal_shift = 0,
+          .warn_low_enabled = 0, .warn_high_enabled = 0, .reserved = 0,
           .warn_low = CAN_WARN_DISABLED, .warn_high = CAN_WARN_DISABLED },
         { .channel = 0, .start_byte = 0, .byte_count = 0, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_NONE, .offset = 0, .multiplier = 1000, .divisor = 1000,
-          .name = "", .unit = "", .warn_enabled = 0, .reserved = 0,
+          .name = "", .unit = "", .decimal_shift = 0,
+          .warn_low_enabled = 0, .warn_high_enabled = 0, .reserved = 0,
           .warn_low = CAN_WARN_DISABLED, .warn_high = CAN_WARN_DISABLED },
         { .channel = 0, .start_byte = 0, .byte_count = 0, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_NONE, .offset = 0, .multiplier = 1000, .divisor = 1000,
-          .name = "", .unit = "", .warn_enabled = 0, .reserved = 0,
+          .name = "", .unit = "", .decimal_shift = 0,
+          .warn_low_enabled = 0, .warn_high_enabled = 0, .reserved = 0,
           .warn_low = CAN_WARN_DISABLED, .warn_high = CAN_WARN_DISABLED },
         { .channel = 0, .start_byte = 0, .byte_count = 0, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_NONE, .offset = 0, .multiplier = 1000, .divisor = 1000,
-          .name = "", .unit = "", .warn_enabled = 0, .reserved = 0,
+          .name = "", .unit = "", .decimal_shift = 0,
+          .warn_low_enabled = 0, .warn_high_enabled = 0, .reserved = 0,
           .warn_low = CAN_WARN_DISABLED, .warn_high = CAN_WARN_DISABLED },
         { .channel = 0, .start_byte = 0, .byte_count = 0, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_NONE, .offset = 0, .multiplier = 1000, .divisor = 1000,
-          .name = "", .unit = "", .warn_enabled = 0, .reserved = 0,
+          .name = "", .unit = "", .decimal_shift = 0,
+          .warn_low_enabled = 0, .warn_high_enabled = 0, .reserved = 0,
           .warn_low = CAN_WARN_DISABLED, .warn_high = CAN_WARN_DISABLED },
         { .channel = 0, .start_byte = 0, .byte_count = 0, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_NONE, .offset = 0, .multiplier = 1000, .divisor = 1000,
-          .name = "", .unit = "", .warn_enabled = 0, .reserved = 0,
+          .name = "", .unit = "", .decimal_shift = 0,
+          .warn_low_enabled = 0, .warn_high_enabled = 0, .reserved = 0,
           .warn_low = CAN_WARN_DISABLED, .warn_high = CAN_WARN_DISABLED },
         { .channel = 0, .start_byte = 0, .byte_count = 0, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_NONE, .offset = 0, .multiplier = 1000, .divisor = 1000,
-          .name = "", .unit = "", .warn_enabled = 0, .reserved = 0,
+          .name = "", .unit = "", .decimal_shift = 0,
+          .warn_low_enabled = 0, .warn_high_enabled = 0, .reserved = 0,
           .warn_low = CAN_WARN_DISABLED, .warn_high = CAN_WARN_DISABLED },
     },
     .crc16 = 0
