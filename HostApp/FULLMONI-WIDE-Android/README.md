@@ -4,21 +4,47 @@ FULLMONI-WIDEファームウェアとUSB通信するためのAndroidアプリケ
 
 ## 概要
 
-Windows版 FULLMONI-WIDE-Terminal のAndroid移植版として、USB OTGケーブル経由でファームウェアと直接通信します。
+Windows版 FULLMONI-WIDE-Terminal と同等の機能を持つAndroid版アプリです。  
+USB OTGケーブル経由でファームウェアと直接通信し、パラメータ設定やファームウェア更新が可能です。
 
 ## 機能
 
-### ターミナル機能
-- **USB CDC ACM通信**: USB-UARTブリッジ経由で115200bps（8N1, XON/XOFF）で接続
-- **ターミナル表示**: ファームウェアからの応答をリアルタイム表示
-- **コマンド入力**: テキストボックスからコマンドを送信
-- **クイックコマンド**: よく使うコマンドをワンタップで送信
+### 🏠 Home（ダッシュボード）
+- ヒーローバナーによる接続状態表示
+- クイックアクセスカードで各機能に素早くアクセス
+- 接続デバイス情報の表示
 
-### パラメータ設定GUI
-- **タイヤサイズ設定**: 幅/扁平率/リム径を入力
-- **ギア比設定**: 1〜6速およびファイナルギア
+### 📊 Status（ステータス）
+- ODO/TRIP/DateTime のリアルタイム表示
+- TRIP リセット機能
+- RTC 同期機能（スマートフォンの時刻で同期）
+
+### ⚙️ Settings（車両設定）
+- **タイヤサイズ**: 幅/扁平率/リム径
+- **ギア比**: 1〜6速およびファイナルギア（プリセット選択可能）
 - **警告設定**: 水温低温/高温、燃料警告閾値
-- **シフトインジケータ設定**: 5段階のシフトアップRPM設定
+- **シフトインジケータ**: 5段階のシフトアップRPM設定
+
+### 🔌 CAN Config（CAN設定）
+- Master Warning設定（有効/サウンド）
+- 6チャンネルの受信ID設定
+- 16フィールドのデータ定義（変数割り当て、係数設定、警告閾値）
+
+### 🖼️ Boot Screen（起動画面）
+- 765×256ピクセルの画像選択とプレビュー
+- デバイスへの書き込み/読み込み
+- ファイルへの保存
+
+### 📥 FW Update（ファームウェア更新）
+- .motファイル選択
+- 転送進捗表示
+- 通信ログ表示
+
+### ℹ️ About（情報）
+- アプリバージョン情報
+- ハードウェア情報
+- ライセンス情報
+- GitHubリンク
 
 ## 動作環境
 
@@ -29,9 +55,10 @@ Windows版 FULLMONI-WIDE-Terminal のAndroid移植版として、USB OTGケー�
 ## 技術スタック
 
 - **言語**: Kotlin
-- **UI**: Jetpack Compose
+- **UI**: Jetpack Compose + Material 3
 - **USB通信**: usb-serial-for-android ライブラリ
 - **アーキテクチャ**: MVVM
+- **テーマ**: Windows版と統一されたダークテーマ（Cyan/Tealアクセント）
 
 ## プロジェクト構成
 
@@ -42,10 +69,21 @@ app/
 │   │   ├── MainActivity.kt
 │   │   ├── ui/
 │   │   │   ├── theme/
+│   │   │   │   ├── Color.kt
+│   │   │   │   ├── Theme.kt
+│   │   │   │   └── Type.kt
 │   │   │   ├── screens/
-│   │   │   │   ├── TerminalScreen.kt
-│   │   │   │   └── ParameterScreen.kt
+│   │   │   │   ├── MainScreen.kt
+│   │   │   │   ├── HomeScreen.kt
+│   │   │   │   ├── StatusScreen.kt
+│   │   │   │   ├── SettingsScreen.kt
+│   │   │   │   ├── CanConfigScreen.kt
+│   │   │   │   ├── BootScreenScreen.kt
+│   │   │   │   ├── FirmwareUpdateScreen.kt
+│   │   │   │   ├── AboutScreen.kt
+│   │   │   │   └── TerminalScreen.kt
 │   │   │   └── components/
+│   │   │       └── SharedComponents.kt
 │   │   ├── viewmodel/
 │   │   │   └── MainViewModel.kt
 │   │   └── service/
@@ -77,8 +115,9 @@ app/
 1. USB OTGケーブルでFULLMONI-WIDEデバイスとスマートフォンを接続
 2. アプリを起動
 3. USB接続許可ダイアログで「許可」をタップ
-4. 「接続」ボタンをタップ
-5. ターミナル画面でコマンドを入力して通信
+4. ナビゲーションドロワーを開き「Connect」ボタンをタップ
+5. 接続状態がグリーンに変わったらHomeを選択
+6. 各機能カードをタップして必要な画面に移動
 
 ## 対応コマンド
 
@@ -94,6 +133,19 @@ Windows版と同一のコマンドセットに対応しています。
 | `load` | EEPROMから読込 |
 | `default` | デフォルト値にリセット |
 
+## Windows版との対応
+
+| Windows機能 | Android対応 |
+|------------|------------|
+| Home | ✅ 実装済み |
+| Status | ✅ 実装済み |
+| Settings | ✅ 実装済み |
+| CAN Config | ✅ 実装済み |
+| Boot Screen | ✅ 実装済み |
+| FW Update | ✅ 実装済み |
+| About | ✅ 実装済み |
+| Terminal | ✅ 実装済み |
+
 ## ライセンス
 
 MIT License
@@ -101,3 +153,5 @@ MIT License
 ## 依存ライブラリ
 
 - [usb-serial-for-android](https://github.com/mik3y/usb-serial-for-android) - Apache License 2.0
+- Jetpack Compose - Apache License 2.0
+- Material 3 - Apache License 2.0

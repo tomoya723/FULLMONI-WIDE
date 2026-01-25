@@ -12,23 +12,40 @@ import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
     primary = FullmoniPrimary,
+    onPrimary = TextPrimary,
+    primaryContainer = FullmoniPrimaryDark,
+    onPrimaryContainer = TextPrimary,
     secondary = FullmoniAccent,
-    tertiary = Pink80,
-    background = TerminalBackground,
-    surface = TerminalBackground
+    onSecondary = TextPrimary,
+    secondaryContainer = CardBackground,
+    onSecondaryContainer = TextPrimary,
+    tertiary = FullmoniPrimaryLight,
+    onTertiary = TextPrimary,
+    background = BackgroundDark,
+    onBackground = TextPrimary,
+    surface = BackgroundMedium,
+    onSurface = TextPrimary,
+    surfaceVariant = CardBackground,
+    onSurfaceVariant = TextSecondary,
+    outline = TextMuted
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = FullmoniPrimary,
+    onPrimary = TextPrimary,
+    primaryContainer = FullmoniPrimaryLight,
+    onPrimaryContainer = BackgroundDark,
     secondary = FullmoniAccent,
-    tertiary = Pink40,
-    background = androidx.compose.ui.graphics.Color.White,
-    surface = androidx.compose.ui.graphics.Color.White
+    onSecondary = TextPrimary,
+    background = androidx.compose.ui.graphics.Color(0xFFF5F5F5),
+    onBackground = BackgroundDark,
+    surface = androidx.compose.ui.graphics.Color.White,
+    onSurface = BackgroundDark
 )
 
 @Composable
 fun FullmoniTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = true, // Default to dark theme like Windows app
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
