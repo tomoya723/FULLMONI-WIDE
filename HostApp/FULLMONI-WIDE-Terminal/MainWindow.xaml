@@ -1,765 +1,907 @@
-﻿<Window x:Class="FullmoniTerminal.MainWindow"
+﻿<ui:FluentWindow x:Class="FullmoniTerminal.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:local="clr-namespace:FullmoniTerminal"
         xmlns:vm="clr-namespace:FullmoniTerminal.ViewModels"
         xmlns:views="clr-namespace:FullmoniTerminal.Views"
         mc:Ignorable="d"
         Title="FULLMONI-WIDE Terminal"
-        Height="640" Width="530"
-        ResizeMode="CanMinimize"
-        FontFamily="Meiryo UI"
-        Background="{DynamicResource BackgroundGradient}"
+        Height="700" Width="900"
+        MinHeight="600" MinWidth="800"
+        WindowStartupLocation="CenterScreen"
+        ExtendsContentIntoTitleBar="True"
+        WindowBackdropType="Acrylic"
         Icon="Assets/FMW.ico"
         Closing="Window_Closing">
 
-    <Window.Resources>
+    <ui:FluentWindow.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
-    </Window.Resources>
 
-    <Window.DataContext>
+        <!-- アクセントカラー -->
+        <SolidColorBrush x:Key="AccentBrush" Color="#0078D4"/>
+        <SolidColorBrush x:Key="AccentBrushLight" Color="#1E90FF"/>
+        <SolidColorBrush x:Key="SidebarBrush" Color="#1A1A2E"/>
+        <SolidColorBrush x:Key="CardBorderBrush" Color="#2D2D44"/>
+    </ui:FluentWindow.Resources>
+
+    <ui:FluentWindow.DataContext>
         <vm:MainViewModel/>
-    </Window.DataContext>
+    </ui:FluentWindow.DataContext>
 
-    <Grid Margin="8">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- 接続バー -->
-        <Border Grid.Row="0" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="6" Margin="0,0,0,6">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+        <!-- タイトルバー -->
+        <ui:TitleBar Grid.Row="0" Title="FULLMONI-WIDE Terminal" ShowMaximize="True"/>
 
-                <ComboBox Grid.Column="0" ItemsSource="{Binding AvailablePorts}"
-                          SelectedItem="{Binding SelectedPort}"
-                          Style="{DynamicResource ModernComboBox}"
-                          Width="80" Height="24" FontSize="12" IsEnabled="{Binding IsNotConnected}"/>
+        <!-- メインコンテンツ -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="220"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-                <!-- COMポート更新ボタン -->
-                <Button Grid.Column="1" Content="更新" Width="40" Height="24" Margin="4,0,0,0" FontSize="11"
-                        Command="{Binding RefreshPortsCommand}"
-                        ToolTip="COMポート一覧を更新"
-                        Style="{DynamicResource SecondaryButton}"
-                        IsEnabled="{Binding IsNotConnected}"/>
-
-                <Button Grid.Column="2" Content="{Binding ConnectionButtonText}" Width="60" Height="24" Margin="4,0,0,0" FontSize="12"
-                        Command="{Binding ConnectCommand}"
-                        Style="{DynamicResource PrimaryButton}"
-                        IsEnabled="{Binding CanCloseWindow}"/>
-
-                <!-- 接続状態インジケータ（中央） -->
-                <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <Ellipse Width="8" Height="8" Margin="0,0,4,0">
-                        <Ellipse.Style>
-                            <Style TargetType="Ellipse">
-                                <Setter Property="Fill" Value="#E74C3C"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsConnected}" Value="True">
-                                        <Setter Property="Fill" Value="{DynamicResource SuccessBrush}"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Ellipse.Style>
-                    </Ellipse>
-                    <TextBlock Text="{Binding StatusText}" FontSize="12" Foreground="{DynamicResource TextBrush}"/>
-                    <TextBlock Text=" | " FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
-                               Visibility="{Binding IsConnected, Converter={StaticResource BoolToVisibility}}"/>
-                    <TextBlock Text="{Binding FirmwareVersion, StringFormat=v{0}}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
-                               Visibility="{Binding IsConnected, Converter={StaticResource BoolToVisibility}}"/>
-                </StackPanel>
-
-                <!-- テーマ切り替え（右側） -->
-                <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
-                    <TextBlock Text="☀" FontSize="12" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="{DynamicResource TextMutedBrush}"/>
-                    <ToggleButton Style="{DynamicResource ThemeToggleButton}"
-                                  IsChecked="{Binding IsDarkTheme}"/>
-                    <TextBlock Text="🌙" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
-                </StackPanel>
-            </Grid>
-        </Border>
-
-        <!-- タブコントロール -->
-        <TabControl Grid.Row="1" Margin="0,0,0,6" SelectedIndex="5">
-            <!-- タブ1: ステータス -->
-            <TabItem Header="ステータス" IsEnabled="{Binding IsFirmwareMode}">
-                <Grid Margin="8">
+            <!-- サイドバー -->
+            <Border Grid.Column="0" Padding="12">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#1A1A2E" Offset="0"/>
+                        <GradientStop Color="#16213E" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- ODO/TRIP/RTC -->
-                    <Border Grid.Row="0" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10">
+                    <!-- Connection -->
+                    <StackPanel Grid.Row="0" Margin="0,0,0,16">
+                        <TextBlock Text="Connection" FontWeight="SemiBold" Margin="4,0,0,8" Foreground="#0078D4"/>
+                        <ComboBox ItemsSource="{Binding AvailablePorts}"
+                                  SelectedItem="{Binding SelectedPort}"
+                                  Margin="0,0,0,8"
+                                  IsEnabled="{Binding IsNotConnected}"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="30"/>
-                                <RowDefinition Height="30"/>
-                                <RowDefinition Height="30"/>
-                            </Grid.RowDefinitions>
-
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="ODO" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" Margin="0,3,0,3"/>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding OdoValue, StringFormat={}{0} km}" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" Margin="0,3,0,3"/>
-                            <Border Grid.Row="0" Grid.Column="2" Width="90" Height="24"/>
-
-                            <TextBlock Grid.Row="1" Grid.Column="0" Text="TRIP" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" Margin="0,3,0,3"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TripValue, StringFormat={}{0} km}" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" Margin="0,3,0,3"/>
-                            <Button Grid.Row="1" Grid.Column="2" Content="RESET" Width="90" Height="24" FontSize="12"
-                                    Style="{DynamicResource OutlineButton}"
-                                    Command="{Binding ResetTripCommand}"
-                                    IsEnabled="{Binding IsOperationEnabled}"/>
-
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="日時" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" Margin="0,3,0,3"/>
-                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding RtcValue}" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" Margin="0,3,0,3"/>
-                            <Button Grid.Row="2" Grid.Column="2" Content="PC時刻と同期" Width="90" Height="24" FontSize="12"
-                                    Style="{DynamicResource OutlineButton}"
-                                    Command="{Binding SyncRtcCommand}"
-                                    IsEnabled="{Binding IsOperationEnabled}"/>
+                            <ui:Button Grid.Column="0" Content="Refresh" Margin="0,0,4,0"
+                                       Command="{Binding RefreshPortsCommand}"
+                                       IsEnabled="{Binding IsNotConnected}"
+                                       HorizontalAlignment="Stretch"/>
+                            <ui:Button Grid.Column="1" Content="{Binding ConnectionButtonText}" Margin="4,0,0,0"
+                                       Appearance="Primary"
+                                       Command="{Binding ConnectCommand}"
+                                       IsEnabled="{Binding CanCloseWindow}"
+                                       HorizontalAlignment="Stretch"/>
                         </Grid>
-                    </Border>
 
-                    <!-- 再読込ボタン -->
-                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
-                        <Button Content="再読込" Width="80" Height="28" FontSize="12"
-                                Style="{DynamicResource PrimaryButton}"
-                                Command="{Binding LoadParametersCommand}"
-                                IsEnabled="{Binding IsOperationEnabled}"/>
+                        <!-- 接続状態 -->
+                        <StackPanel Orientation="Horizontal" Margin="4,12,0,0">
+                            <Ellipse Width="10" Height="10" Margin="0,0,8,0">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Fill" Value="#E74C3C"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                                <Setter Property="Fill" Value="#4CAF50"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
+                            <TextBlock Text="{Binding StatusText}" FontSize="12"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding FirmwareVersion, StringFormat=FW: v{0}}" FontSize="11" Opacity="0.5" Margin="22,4,0,0"
+                                   Visibility="{Binding IsConnected, Converter={StaticResource BoolToVisibility}}"/>
                     </StackPanel>
+
+                    <Separator Grid.Row="1" Margin="0,0,0,12"/>
+
+                    <!-- Navigation Menu -->
+                    <StackPanel Grid.Row="2">
+                        <ui:Button x:Name="NavHome" HorizontalAlignment="Stretch"
+                                   HorizontalContentAlignment="Left" Margin="0,2" Padding="12,10" Click="NavButton_Click"
+                                   Tag="home" Appearance="Primary" Icon="{ui:SymbolIcon Home24}" Content="Home"/>
+                        <ui:Button x:Name="NavStatus" HorizontalAlignment="Stretch"
+                                   HorizontalContentAlignment="Left" Margin="0,2" Padding="12,10" Click="NavButton_Click"
+                                   Tag="status" IsEnabled="{Binding IsFirmwareMode}" Icon="{ui:SymbolIcon Gauge24}" Content="Status"/>
+                        <ui:Button x:Name="NavSettings" HorizontalAlignment="Stretch"
+                                   HorizontalContentAlignment="Left" Margin="0,2" Padding="12,10" Click="NavButton_Click"
+                                   Tag="settings" IsEnabled="{Binding IsFirmwareMode}" Icon="{ui:SymbolIcon Settings24}" Content="Settings"/>
+                        <ui:Button x:Name="NavCan" HorizontalAlignment="Stretch"
+                                   HorizontalContentAlignment="Left" Margin="0,2" Padding="12,10" Click="NavButton_Click"
+                                   Tag="can" IsEnabled="{Binding IsFirmwareMode}" Icon="{ui:SymbolIcon PlugConnected24}" Content="CAN Config"/>
+                        <ui:Button x:Name="NavStartup" HorizontalAlignment="Stretch"
+                                   HorizontalContentAlignment="Left" Margin="0,2" Padding="12,10" Click="NavButton_Click"
+                                   Tag="startup" IsEnabled="{Binding IsFirmwareMode}" Icon="{ui:SymbolIcon Image24}" Content="Boot Screen"/>
+                        <ui:Button x:Name="NavFirmware" HorizontalAlignment="Stretch"
+                                   HorizontalContentAlignment="Left" Margin="0,2" Padding="12,10" Click="NavButton_Click"
+                                   Tag="firmware" Icon="{ui:SymbolIcon ArrowDownload24}" Content="FW Update"/>
+                    </StackPanel>
+
+                    <!-- About -->
+                    <ui:Button Grid.Row="3" x:Name="NavAbout" HorizontalAlignment="Stretch"
+                               HorizontalContentAlignment="Left" Margin="0,8,0,0" Padding="12,10" Click="NavButton_Click"
+                               Tag="about" Icon="{ui:SymbolIcon Info24}" Content="About"/>
                 </Grid>
-            </TabItem>
+            </Border>
 
-            <!-- タブ2: 設定項目 -->
-            <TabItem Header="設定項目" IsEnabled="{Binding IsFirmwareMode}">
-                <Grid Margin="8">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="8"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
+            <!-- コンテンツエリア -->
+            <Border Grid.Column="1">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#0D1B2A" Offset="0"/>
+                        <GradientStop Color="#1B263B" Offset="0.5"/>
+                        <GradientStop Color="#0D1B2A" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <Grid x:Name="ContentArea" Margin="24">
 
-                            <!-- 左カラム: タイヤ設定 -->
-                            <StackPanel Grid.Column="0">
-                            <Border Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="8" Margin="0,0,0,6">
-                                <StackPanel>
-                                    <TextBlock Text="タイヤサイズ" FontWeight="Bold" FontSize="12" Margin="0,0,0,6" Foreground="{DynamicResource TextBrush}"/>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="50"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="30"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
+                    <!-- ホームページ（グラフィカルなダッシュボード） -->
+                    <StackPanel x:Name="HomePage" Visibility="Visible">
+                        <!-- ヒーローバナー -->
+                        <Border CornerRadius="16" Margin="0,0,0,24" ClipToBounds="True">
+                            <Grid Height="280">
+                                <!-- CAD背景画像 (FM3.png) -->
+                                <Image x:Name="HeroImage1" Source="Assets/FM3.png" Stretch="UniformToFill" Opacity="0.35"
+                                       HorizontalAlignment="Right" Margin="0,0,-100,0"/>
+                                
+                                <!-- 実機画像 (FM2.png) -->
+                                <Image x:Name="HeroImage2" Source="Assets/FM2.png" Stretch="UniformToFill" Opacity="0"
+                                       HorizontalAlignment="Right" Margin="0,0,-100,0"/>
+                                
+                                <!-- グラデーションオーバーレイ -->
+                                <Border>
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0.3">
+                                            <GradientStop Color="#0891B2" Offset="0"/>
+                                            <GradientStop Color="#0891B2" Offset="0.3"/>
+                                            <GradientStop Color="#0E7490" Offset="0.6"/>
+                                            <GradientStop Color="#06475F" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <Border.OpacityMask>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="#FF000000" Offset="0"/>
+                                            <GradientStop Color="#FF000000" Offset="0.4"/>
+                                            <GradientStop Color="#80000000" Offset="0.7"/>
+                                            <GradientStop Color="#00000000" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.OpacityMask>
+                                </Border>
 
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="幅" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding TyreWidth}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
-                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="mm" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
-
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="扁平率" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding TyreAspect}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
-                                        <TextBlock Grid.Row="1" Grid.Column="2" Text="%" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
-
-                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="径" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding WheelDia}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
-                                        <TextBlock Grid.Row="2" Grid.Column="2" Text="inch" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
-                                    </Grid>
+                                <!-- メインコンテンツ -->
+                                <StackPanel VerticalAlignment="Center" Margin="40,0,0,0">
+                                    <TextBlock Text="RX72N Multimeter" FontSize="14" Foreground="#E0F2FE" Opacity="0.9"/>
+                                    <TextBlock Text="FULLMONI-WIDE" FontSize="42" FontWeight="Bold" Foreground="White" Margin="0,4,0,8"/>
+                                    <TextBlock Text="Build your custom automotive display with CAN bus integration."
+                                               FontSize="16" Foreground="#E0F2FE" Opacity="0.9" Margin="0,0,0,20"/>
+                                    <ui:Button x:Name="HeroConnectButton" Content="{Binding HeroButtonText}"
+                                               Appearance="Light" Icon="{ui:SymbolIcon PlugConnected24}"
+                                               Padding="20,12" FontSize="14"
+                                               Click="HeroConnectButton_Click"/>
                                 </StackPanel>
-                            </Border>
 
-                            <Border Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="8">
-                                <StackPanel>
-                                    <TextBlock Text="ギア比" FontWeight="Bold" FontSize="12" Margin="0,0,0,6" Foreground="{DynamicResource TextBrush}"/>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="50"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
-
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="プリセット" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                        <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding GearPresets}" SelectedItem="{Binding SelectedGearPreset}"
-                                                  Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}">
-                                            <ComboBox.ItemContainerStyle>
-                                                <Style TargetType="ComboBoxItem" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
+                                <!-- ステータスバッジ -->
+                                <Border CornerRadius="8" Background="#0E7490" Padding="12,8"
+                                        HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,20,20,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Ellipse Width="10" Height="10" Margin="0,0,8,0">
+                                            <Ellipse.Style>
+                                                <Style TargetType="Ellipse">
+                                                    <Setter Property="Fill" Value="#EF4444"/>
                                                     <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding}" Value="-- 選択 --">
-                                                            <Setter Property="IsEnabled" Value="False"/>
+                                                        <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                                            <Setter Property="Fill" Value="#22C55E"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
-                                            </ComboBox.ItemContainerStyle>
-                                        </ComboBox>
+                                            </Ellipse.Style>
+                                        </Ellipse>
+                                        <TextBlock Text="{Binding StatusText}" Foreground="White" FontWeight="Medium"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Border>
 
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="1速" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Gear1}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
+                        <!-- Feature Cards -->
+                        <ui:TextBlock Text="Quick Access" FontTypography="Subtitle" Margin="0,0,0,16"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="2速" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Gear2}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
-
-                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="3速" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Gear3}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
-
-                                        <TextBlock Grid.Row="4" Grid.Column="0" Text="4速" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Gear4}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
-
-                                        <TextBlock Grid.Row="5" Grid.Column="0" Text="5速" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                        <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Gear5}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
-
-                                        <TextBlock Grid.Row="6" Grid.Column="0" Text="6速" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                        <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding Gear6}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
-
-                                        <TextBlock Grid.Row="7" Grid.Column="0" Text="ファイナル" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                        <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding FinalGear}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
-                                    </Grid>
-                                </StackPanel>
-                            </Border>
-                        </StackPanel>
-
-                        <!-- 右カラム: 警告設定 + シフトインジケータ -->
-                        <StackPanel Grid.Column="2">
-                        <Border Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="8" Margin="0,0,0,6">
-                            <StackPanel>
-                                <TextBlock Text="警告設定" FontWeight="Bold" FontSize="12" Margin="0,0,0,6" Foreground="{DynamicResource TextBrush}"/>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="70"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="30"/>
-                                    </Grid.ColumnDefinitions>
+                            <!-- ステータスカード -->
+                            <ui:CardAction Grid.Column="0" Margin="0,0,8,0" Click="NavCard_Click" Tag="status"
+                                           IsEnabled="{Binding IsFirmwareMode}">
+                                <Grid Margin="8">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
-
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="水温低温" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding WaterTempLow}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
-                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="°C" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
-
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="水温高温" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding WaterTempHigh}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
-                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="°C" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
-
-                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="燃料警告" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding FuelWarn}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
-                                    <TextBlock Grid.Row="2" Grid.Column="2" Text="L" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
+                                    <Border Grid.Row="0" Width="48" Height="48" CornerRadius="12" Background="#3B82F6" HorizontalAlignment="Left" Margin="0,0,0,12">
+                                        <ui:SymbolIcon Symbol="Gauge24" FontSize="24" Foreground="White"/>
+                                    </Border>
+                                    <ui:TextBlock Grid.Row="1" Text="Status" FontTypography="BodyStrong"/>
+                                    <ui:TextBlock Grid.Row="2" Text="ODO/TRIP/Clock" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
                                 </Grid>
-                            </StackPanel>
-                        </Border>
+                            </ui:CardAction>
 
-                        <!-- シフトインジケータ設定 -->
-                        <Border Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="8">
-                            <StackPanel>
-                                <TextBlock Text="シフトインジケータ" FontWeight="Bold" FontSize="12" Margin="0,0,0,6" Foreground="{DynamicResource TextBrush}"/>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="70"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="30"/>
-                                    </Grid.ColumnDefinitions>
+                            <!-- 設定カード -->
+                            <ui:CardAction Grid.Column="1" Margin="4,0" Click="NavCard_Click" Tag="settings"
+                                           IsEnabled="{Binding IsFirmwareMode}">
+                                <Grid Margin="8">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Border Grid.Row="0" Width="48" Height="48" CornerRadius="12" Background="#10B981" HorizontalAlignment="Left" Margin="0,0,0,12">
+                                        <ui:SymbolIcon Symbol="Settings24" FontSize="24" Foreground="White"/>
+                                    </Border>
+                                    <ui:TextBlock Grid.Row="1" Text="Settings" FontTypography="BodyStrong"/>
+                                    <ui:TextBlock Grid.Row="2" Text="Tire/Gear/Warnings" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+                                </Grid>
+                            </ui:CardAction>
+
+                            <!-- CANカード -->
+                            <ui:CardAction Grid.Column="2" Margin="4,0" Click="NavCard_Click" Tag="can"
+                                           IsEnabled="{Binding IsFirmwareMode}">
+                                <Grid Margin="8">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
-
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="青2灯" FontSize="12" VerticalAlignment="Center" Foreground="#3498DB"/>
-                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ShiftRpm1}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
-                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="rpm" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
-
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="青4灯" FontSize="12" VerticalAlignment="Center" Foreground="#3498DB"/>
-                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ShiftRpm2}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
-                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="rpm" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
-
-                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="緑6灯" FontSize="12" VerticalAlignment="Center" Foreground="#2ECC71"/>
-                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ShiftRpm3}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
-                                    <TextBlock Grid.Row="2" Grid.Column="2" Text="rpm" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
-
-                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="赤8灯" FontSize="12" VerticalAlignment="Center" Foreground="#E74C3C"/>
-                                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding ShiftRpm4}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
-                                    <TextBlock Grid.Row="3" Grid.Column="2" Text="rpm" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
-
-                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="白点滅" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                    <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding ShiftRpm5}" Height="22" FontSize="12" Margin="0,2" IsEnabled="{Binding IsOperationEnabled}"/>
-                                    <TextBlock Grid.Row="4" Grid.Column="2" Text="rpm" FontSize="12" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextMutedBrush}"/>
+                                    <Border Grid.Row="0" Width="48" Height="48" CornerRadius="12" Background="#F59E0B" HorizontalAlignment="Left" Margin="0,0,0,12">
+                                        <ui:SymbolIcon Symbol="PlugConnected24" FontSize="24" Foreground="White"/>
+                                    </Border>
+                                    <ui:TextBlock Grid.Row="1" Text="CAN Config" FontTypography="BodyStrong"/>
+                                    <ui:TextBlock Grid.Row="2" Text="Channels/Fields" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
                                 </Grid>
-                            </StackPanel>
-                        </Border>
-                        </StackPanel>
-                    </Grid>
-                </ScrollViewer>
+                            </ui:CardAction>
 
-                <!-- 下部ボタン -->
-                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
-                    <Button Content="再読込" Width="70" Height="26" FontSize="12" Margin="0,0,6,0"
-                            Style="{DynamicResource PrimaryButton}"
-                            Command="{Binding LoadParametersCommand}"
-                            IsEnabled="{Binding IsOperationEnabled}"/>
-                    <Button Content="書込" Width="70" Height="26" FontSize="12" Margin="0,0,6,0"
-                            Style="{DynamicResource SuccessButton}"
-                            Command="{Binding SaveParametersCommand}"
-                            IsEnabled="{Binding IsOperationEnabled}"/>
-                    <Button Content="デフォルト" Width="70" Height="26" FontSize="12"
-                            Style="{DynamicResource SecondaryButton}"
-                            Command="{Binding ResetDefaultCommand}"
-                            IsEnabled="{Binding IsOperationEnabled}"/>
-                </StackPanel>
-                </Grid>
-            </TabItem>
+                            <!-- 起動画面カード -->
+                            <ui:CardAction Grid.Column="3" Margin="8,0,0,0" Click="NavCard_Click" Tag="startup"
+                                           IsEnabled="{Binding IsFirmwareMode}">
+                                <Grid Margin="8">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Border Grid.Row="0" Width="48" Height="48" CornerRadius="12" Background="#8B5CF6" HorizontalAlignment="Left" Margin="0,0,0,12">
+                                        <ui:SymbolIcon Symbol="Image24" FontSize="24" Foreground="White"/>
+                                    </Border>
+                                    <ui:TextBlock Grid.Row="1" Text="Boot Screen" FontTypography="BodyStrong"/>
+                                    <ui:TextBlock Grid.Row="2" Text="Custom Image" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+                                </Grid>
+                            </ui:CardAction>
+                        </Grid>
 
-            <!-- タブ3: CAN設定 -->
-            <TabItem Header="CAN設定" IsEnabled="{Binding IsFirmwareMode}">
-                <Grid Margin="8">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
+                        <!-- 下段カード -->
+                        <Grid Margin="0,12,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-                    <!-- マスターワーニング設定 -->
-                    <Border Grid.Row="0" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,8">
-                        <StackPanel>
-                            <TextBlock Text="マスターワーニング設定" FontWeight="Bold" FontSize="12" Margin="0,0,0,8" Foreground="{DynamicResource TextBrush}"/>
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox x:Name="WarningEnabledBox" IsChecked="True" VerticalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
-                                <TextBlock Text="ON/OFF" FontSize="11" VerticalAlignment="Center" Margin="4,0,20,0" Foreground="{DynamicResource TextBrush}"/>
-                                <CheckBox x:Name="SoundEnabledBox" IsChecked="True" VerticalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
-                                <TextBlock Text="警告音" FontSize="11" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextBrush}"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </Border>
+                            <!-- FW更新カード -->
+                            <ui:CardAction Grid.Column="0" Margin="0,0,6,0" Click="NavCard_Click" Tag="firmware">
+                                <Grid Margin="8">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Border Grid.Row="0" Width="48" Height="48" CornerRadius="12" Background="#EF4444" HorizontalAlignment="Left" Margin="0,0,0,12">
+                                        <ui:SymbolIcon Symbol="ArrowDownload24" FontSize="24" Foreground="White"/>
+                                    </Border>
+                                    <ui:TextBlock Grid.Row="1" Text="FW Update" FontTypography="BodyStrong"/>
+                                    <ui:TextBlock Grid.Row="2" Text="Update device firmware" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+                                </Grid>
+                            </ui:CardAction>
 
-                    <!-- CANチャンネル設定 -->
-                    <Border Grid.Row="1" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,8">
-                        <StackPanel>
-                            <TextBlock Text="受信チャンネル設定" FontWeight="Bold" FontSize="12" Margin="0,0,0,8" Foreground="{DynamicResource TextBrush}"/>
+                            <!-- Aboutカード -->
+                            <ui:CardAction Grid.Column="1" Margin="6,0,0,0" Click="NavCard_Click" Tag="about">
+                                <Grid Margin="8">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Border Grid.Row="0" Width="48" Height="48" CornerRadius="12" Background="#6366F1" HorizontalAlignment="Left" Margin="0,0,0,12">
+                                        <ui:SymbolIcon Symbol="Info24" FontSize="24" Foreground="White"/>
+                                    </Border>
+                                    <ui:TextBlock Grid.Row="1" Text="About" FontTypography="BodyStrong"/>
+                                    <ui:TextBlock Grid.Row="2" Text="Version info &amp; License" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+                                </Grid>
+                            </ui:CardAction>
+                        </Grid>
+
+                        <!-- Footer Info -->
+                        <Border Margin="0,24,0,0" Padding="16" CornerRadius="8" Background="#1E293B">
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="28"/>
-                                    <ColumnDefinition Width="55"/>
-                                    <ColumnDefinition Width="24"/>
-                                    <ColumnDefinition Width="10"/>
-                                    <ColumnDefinition Width="28"/>
-                                    <ColumnDefinition Width="55"/>
-                                    <ColumnDefinition Width="24"/>
-                                    <ColumnDefinition Width="10"/>
-                                    <ColumnDefinition Width="28"/>
-                                    <ColumnDefinition Width="55"/>
-                                    <ColumnDefinition Width="24"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <ui:TextBlock Text="Connected Device" FontTypography="BodyStrong" Margin="0,0,0,4"/>
+                                    <TextBlock Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}">
+                                        <Run Text="Port: "/><Run Text="{Binding ConnectedPort, FallbackValue=Not connected}"/>
+                                        <Run Text="  |  FW: "/><Run Text="{Binding FirmwareVersion, FallbackValue=---}"/>
+                                    </TextBlock>
+                                </StackPanel>
+                                <ui:Button Grid.Column="1" Content="View Details" Click="NavCard_Click" Tag="status"
+                                           IsEnabled="{Binding IsFirmwareMode}"/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Status Page -->
+                    <StackPanel x:Name="StatusPage" Visibility="Collapsed">
+                        <ui:TextBlock Text="Status" FontTypography="Subtitle" Margin="0,0,0,16"/>
+
+                        <ui:CardExpander Icon="{ui:SymbolIcon Gauge24}" IsExpanded="True" Margin="0,0,0,8">
+                            <ui:CardExpander.Header>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <ui:TextBlock Grid.Row="0" Text="Meter Info" FontTypography="Body"/>
+                                    <ui:TextBlock Grid.Row="1" Text="View and configure ODO/TRIP/DateTime" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+                                </Grid>
+                            </ui:CardExpander.Header>
+                            <Grid Margin="16,8,16,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="48"/>
+                                    <RowDefinition Height="48"/>
+                                    <RowDefinition Height="48"/>
+                                </Grid.RowDefinitions>
+
+                                <ui:TextBlock Grid.Row="0" Grid.Column="0" Text="ODO" FontWeight="SemiBold" VerticalAlignment="Center" FontSize="16"/>
+                                <ui:TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding OdoValue, StringFormat={}{0} km}" VerticalAlignment="Center" FontSize="16" FontWeight="Medium"/>
+
+                                <ui:TextBlock Grid.Row="1" Grid.Column="0" Text="TRIP" FontWeight="SemiBold" VerticalAlignment="Center" FontSize="16"/>
+                                <ui:TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TripValue, StringFormat={}{0} km}" VerticalAlignment="Center" FontSize="16" FontWeight="Medium"/>
+                                <ui:Button Grid.Row="1" Grid.Column="2" Content="RESET"
+                                           Command="{Binding ResetTripCommand}"
+                                           IsEnabled="{Binding IsOperationEnabled}"/>
+
+                                <ui:TextBlock Grid.Row="2" Grid.Column="0" Text="DateTime" FontWeight="SemiBold" VerticalAlignment="Center" FontSize="16"/>
+                                <ui:TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding RtcValue}" VerticalAlignment="Center" FontSize="16" FontWeight="Medium"/>
+                                <ui:Button Grid.Row="2" Grid.Column="2" Content="Sync with PC"
+                                           Command="{Binding SyncRtcCommand}"
+                                           IsEnabled="{Binding IsOperationEnabled}"/>
+                            </Grid>
+                        </ui:CardExpander>
+
+                        <ui:Button Content="Reload" Appearance="Primary" Icon="{ui:SymbolIcon ArrowSync24}"
+                                   Command="{Binding LoadParametersCommand}"
+                                   IsEnabled="{Binding IsOperationEnabled}"
+                                   HorizontalAlignment="Center" Margin="0,16,0,0"/>
+                    </StackPanel>
+
+                    <!-- Settings Page -->
+                    <StackPanel x:Name="SettingsPage" Visibility="Collapsed">
+                        <ui:TextBlock Text="Vehicle Settings" FontTypography="BodyStrong" Margin="0,0,0,12"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- 左カラム -->
+                            <StackPanel Grid.Column="0">
+                                <ui:CardExpander Icon="{ui:SymbolIcon Circle24}" IsExpanded="True" Margin="0,0,0,8">
+                                    <ui:CardExpander.Header>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <ui:TextBlock Grid.Row="0" Text="Tire Size" FontTypography="Body"/>
+                                            <ui:TextBlock Grid.Row="1" Text="Tire diameter for speed calculation" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+                                        </Grid>
+                                    </ui:CardExpander.Header>
+                                    <Grid Margin="16,8,16,16">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="80"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="50"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <ui:TextBlock Grid.Row="0" Grid.Column="0" Text="Width" VerticalAlignment="Center"/>
+                                        <ui:TextBox Grid.Row="0" Grid.Column="1" Text="{Binding TyreWidth}" Margin="0,4" IsEnabled="{Binding IsOperationEnabled}"/>
+                                        <ui:TextBlock Grid.Row="0" Grid.Column="2" Text="mm" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+
+                                        <ui:TextBlock Grid.Row="1" Grid.Column="0" Text="Aspect" VerticalAlignment="Center"/>
+                                        <ui:TextBox Grid.Row="1" Grid.Column="1" Text="{Binding TyreAspect}" Margin="0,4" IsEnabled="{Binding IsOperationEnabled}"/>
+                                        <ui:TextBlock Grid.Row="1" Grid.Column="2" Text="%" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+
+                                        <ui:TextBlock Grid.Row="2" Grid.Column="0" Text="Diameter" VerticalAlignment="Center"/>
+                                        <ui:TextBox Grid.Row="2" Grid.Column="1" Text="{Binding WheelDia}" Margin="0,4" IsEnabled="{Binding IsOperationEnabled}"/>
+                                        <ui:TextBlock Grid.Row="2" Grid.Column="2" Text="inch" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+                                    </Grid>
+                                </ui:CardExpander>
+
+                                <ui:CardExpander Icon="{ui:SymbolIcon VehicleCarProfileLtr24}" IsExpanded="True">
+                                    <ui:CardExpander.Header>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <ui:TextBlock Grid.Row="0" Text="Gear Ratio" FontTypography="Body"/>
+                                            <ui:TextBlock Grid.Row="1" Text="Used for gear position calculation" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+                                        </Grid>
+                                    </ui:CardExpander.Header>
+                                    <StackPanel Margin="16,8,16,16">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="80"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <ui:TextBlock Text="Preset" VerticalAlignment="Center"/>
+                                            <ComboBox Grid.Column="1" ItemsSource="{Binding GearPresets}" SelectedItem="{Binding SelectedGearPreset}" IsEnabled="{Binding IsOperationEnabled}"/>
+                                        </Grid>
+                                        <Grid Margin="0,12,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="80"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+
+                                            <ui:TextBlock Grid.Row="0" Grid.Column="0" Text="1st" VerticalAlignment="Center"/>
+                                            <ui:TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Gear1}" Margin="0,3" IsEnabled="{Binding IsOperationEnabled}"/>
+
+                                            <ui:TextBlock Grid.Row="1" Grid.Column="0" Text="2nd" VerticalAlignment="Center"/>
+                                            <ui:TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Gear2}" Margin="0,3" IsEnabled="{Binding IsOperationEnabled}"/>
+
+                                            <ui:TextBlock Grid.Row="2" Grid.Column="0" Text="3rd" VerticalAlignment="Center"/>
+                                            <ui:TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Gear3}" Margin="0,3" IsEnabled="{Binding IsOperationEnabled}"/>
+
+                                            <ui:TextBlock Grid.Row="3" Grid.Column="0" Text="4th" VerticalAlignment="Center"/>
+                                            <ui:TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Gear4}" Margin="0,3" IsEnabled="{Binding IsOperationEnabled}"/>
+
+                                            <ui:TextBlock Grid.Row="4" Grid.Column="0" Text="5th" VerticalAlignment="Center"/>
+                                            <ui:TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Gear5}" Margin="0,3" IsEnabled="{Binding IsOperationEnabled}"/>
+
+                                            <ui:TextBlock Grid.Row="5" Grid.Column="0" Text="6th" VerticalAlignment="Center"/>
+                                            <ui:TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Gear6}" Margin="0,3" IsEnabled="{Binding IsOperationEnabled}"/>
+
+                                            <ui:TextBlock Grid.Row="6" Grid.Column="0" Text="Final" VerticalAlignment="Center" Foreground="#FFD54F" FontWeight="SemiBold"/>
+                                            <ui:TextBox Grid.Row="6" Grid.Column="1" Text="{Binding FinalGear}" Margin="0,3" IsEnabled="{Binding IsOperationEnabled}"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </ui:CardExpander>
+                            </StackPanel>
+
+                            <!-- 右カラム -->
+                            <StackPanel Grid.Column="2">
+                                <ui:CardExpander Icon="{ui:SymbolIcon Warning24}" IsExpanded="True" Margin="0,0,0,8">
+                                    <ui:CardExpander.Header>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <ui:TextBlock Grid.Row="0" Text="Warning Settings" FontTypography="Body"/>
+                                            <ui:TextBlock Grid.Row="1" Text="Water temp &amp; fuel warning thresholds" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+                                        </Grid>
+                                    </ui:CardExpander.Header>
+                                    <Grid Margin="16,8,16,16">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="90"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="40"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <ui:TextBlock Grid.Row="0" Grid.Column="0" Text="Water Low" VerticalAlignment="Center" Foreground="#64B5F6"/>
+                                        <ui:TextBox Grid.Row="0" Grid.Column="1" Text="{Binding WaterTempLow}" Margin="0,4" IsEnabled="{Binding IsOperationEnabled}"/>
+                                        <ui:TextBlock Grid.Row="0" Grid.Column="2" Text="°C" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+
+                                        <ui:TextBlock Grid.Row="1" Grid.Column="0" Text="Water High" VerticalAlignment="Center" Foreground="#E57373"/>
+                                        <ui:TextBox Grid.Row="1" Grid.Column="1" Text="{Binding WaterTempHigh}" Margin="0,4" IsEnabled="{Binding IsOperationEnabled}"/>
+                                        <ui:TextBlock Grid.Row="1" Grid.Column="2" Text="°C" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+
+                                        <ui:TextBlock Grid.Row="2" Grid.Column="0" Text="Fuel Warn" VerticalAlignment="Center" Foreground="#FFD54F"/>
+                                        <ui:TextBox Grid.Row="2" Grid.Column="1" Text="{Binding FuelWarn}" Margin="0,4" IsEnabled="{Binding IsOperationEnabled}"/>
+                                        <ui:TextBlock Grid.Row="2" Grid.Column="2" Text="L" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+                                    </Grid>
+                                </ui:CardExpander>
+
+                                <ui:CardExpander Icon="{ui:SymbolIcon TopSpeed24}" IsExpanded="True">
+                                    <ui:CardExpander.Header>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <ui:TextBlock Grid.Row="0" Text="Shift Indicator" FontTypography="Body"/>
+                                            <ui:TextBlock Grid.Row="1" Text="Shift lamp activation RPM" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+                                        </Grid>
+                                    </ui:CardExpander.Header>
+                                    <Grid Margin="16,8,16,16">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="90"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="40"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <ui:TextBlock Grid.Row="0" Grid.Column="0" Text="Stage 1" VerticalAlignment="Center" Foreground="#64B5F6" FontWeight="SemiBold"/>
+                                        <ui:TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ShiftRpm1}" Margin="0,4" IsEnabled="{Binding IsOperationEnabled}"/>
+                                        <ui:TextBlock Grid.Row="0" Grid.Column="2" Text="rpm" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+
+                                        <ui:TextBlock Grid.Row="1" Grid.Column="0" Text="Stage 2" VerticalAlignment="Center" Foreground="#64B5F6" FontWeight="SemiBold"/>
+                                        <ui:TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ShiftRpm2}" Margin="0,4" IsEnabled="{Binding IsOperationEnabled}"/>
+                                        <ui:TextBlock Grid.Row="1" Grid.Column="2" Text="rpm" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+
+                                        <ui:TextBlock Grid.Row="2" Grid.Column="0" Text="Stage 3" VerticalAlignment="Center" Foreground="#81C784" FontWeight="SemiBold"/>
+                                        <ui:TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ShiftRpm3}" Margin="0,4" IsEnabled="{Binding IsOperationEnabled}"/>
+                                        <ui:TextBlock Grid.Row="2" Grid.Column="2" Text="rpm" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+
+                                        <ui:TextBlock Grid.Row="3" Grid.Column="0" Text="Stage 4" VerticalAlignment="Center" Foreground="#E57373" FontWeight="SemiBold"/>
+                                        <ui:TextBox Grid.Row="3" Grid.Column="1" Text="{Binding ShiftRpm4}" Margin="0,4" IsEnabled="{Binding IsOperationEnabled}"/>
+                                        <ui:TextBlock Grid.Row="3" Grid.Column="2" Text="rpm" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+
+                                        <ui:TextBlock Grid.Row="4" Grid.Column="0" Text="Flash" VerticalAlignment="Center" Foreground="#FFFFFF" FontWeight="SemiBold"/>
+                                        <ui:TextBox Grid.Row="4" Grid.Column="1" Text="{Binding ShiftRpm5}" Margin="0,4" IsEnabled="{Binding IsOperationEnabled}"/>
+                                        <ui:TextBlock Grid.Row="4" Grid.Column="2" Text="rpm" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+                                    </Grid>
+                                </ui:CardExpander>
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,24,0,0">
+                            <ui:Button Content="Reload" Margin="0,0,8,0" Icon="{ui:SymbolIcon ArrowSync24}"
+                                       Command="{Binding LoadParametersCommand}"
+                                       IsEnabled="{Binding IsOperationEnabled}"/>
+                            <ui:Button Content="Save" Appearance="Primary" Margin="0,0,8,0" Icon="{ui:SymbolIcon Save24}"
+                                       Command="{Binding SaveParametersCommand}"
+                                       IsEnabled="{Binding IsOperationEnabled}"/>
+                            <ui:Button Content="Default" Icon="{ui:SymbolIcon ArrowReset24}"
+                                       Command="{Binding DefaultParametersCommand}"
+                                       IsEnabled="{Binding IsOperationEnabled}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- CAN Config Page -->
+                    <StackPanel x:Name="CanPage" Visibility="Collapsed">
+                        <ui:TextBlock Text="CAN Communication Settings" FontTypography="BodyStrong" Margin="0,0,0,12"/>
+
+                        <ui:CardExpander Icon="{ui:SymbolIcon Warning24}" IsExpanded="True" Margin="0,0,0,8">
+                            <ui:CardExpander.Header>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <ui:TextBlock Grid.Row="0" Text="Master Warning Settings" FontTypography="Body"/>
+                                    <ui:TextBlock Grid.Row="1" Text="Enable warning display based on CAN values" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+                                </Grid>
+                            </ui:CardExpander.Header>
+                            <StackPanel Orientation="Horizontal" Margin="16,8,16,16">
+                                <CheckBox x:Name="WarningEnabledBox" Content="Enable" Margin="0,0,24,0"/>
+                                <CheckBox x:Name="SoundEnabledBox" Content="Sound"/>
+                            </StackPanel>
+                        </ui:CardExpander>
+
+                        <ui:CardExpander Icon="{ui:SymbolIcon Channel24}" IsExpanded="True" Margin="0,0,0,8">
+                            <ui:CardExpander.Header>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <ui:TextBlock Grid.Row="0" Text="Receive Channel Settings" FontTypography="Body"/>
+                                    <ui:TextBlock Grid.Row="1" Text="Configure up to 6 CAN IDs" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+                                </Grid>
+                            </ui:CardExpander.Header>
+                            <Grid Margin="16,8,16,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
 
-                                <!-- CH1-2-3 -->
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="CH1" FontSize="10" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                <TextBox Grid.Row="0" Grid.Column="1" x:Name="CanCh1IdBox" Text="0x3E8" Height="20" FontSize="10" Margin="1" IsEnabled="{Binding IsOperationEnabled}"/>
-                                <CheckBox Grid.Row="0" Grid.Column="2" x:Name="CanCh1EnabledBox" IsChecked="True" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
-                                <TextBlock Grid.Row="0" Grid.Column="4" Text="CH2" FontSize="10" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                <TextBox Grid.Row="0" Grid.Column="5" x:Name="CanCh2IdBox" Text="0x3E9" Height="20" FontSize="10" Margin="1" IsEnabled="{Binding IsOperationEnabled}"/>
-                                <CheckBox Grid.Row="0" Grid.Column="6" x:Name="CanCh2EnabledBox" IsChecked="True" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
-                                <TextBlock Grid.Row="0" Grid.Column="8" Text="CH3" FontSize="10" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                <TextBox Grid.Row="0" Grid.Column="9" x:Name="CanCh3IdBox" Text="0x3EA" Height="20" FontSize="10" Margin="1" IsEnabled="{Binding IsOperationEnabled}"/>
-                                <CheckBox Grid.Row="0" Grid.Column="10" x:Name="CanCh3EnabledBox" IsChecked="True" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
-
-                                <!-- CH4-5-6 -->
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="CH4" FontSize="10" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                <TextBox Grid.Row="1" Grid.Column="1" x:Name="CanCh4IdBox" Text="0x3EB" Height="20" FontSize="10" Margin="1" IsEnabled="{Binding IsOperationEnabled}"/>
-                                <CheckBox Grid.Row="1" Grid.Column="2" x:Name="CanCh4EnabledBox" IsChecked="True" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
-                                <TextBlock Grid.Row="1" Grid.Column="4" Text="CH5" FontSize="10" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                <TextBox Grid.Row="1" Grid.Column="5" x:Name="CanCh5IdBox" Text="0x3EC" Height="20" FontSize="10" Margin="1" IsEnabled="{Binding IsOperationEnabled}"/>
-                                <CheckBox Grid.Row="1" Grid.Column="6" x:Name="CanCh5EnabledBox" IsChecked="True" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
-                                <TextBlock Grid.Row="1" Grid.Column="8" Text="CH6" FontSize="10" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                <TextBox Grid.Row="1" Grid.Column="9" x:Name="CanCh6IdBox" Text="0x3ED" Height="20" FontSize="10" Margin="1" IsEnabled="{Binding IsOperationEnabled}"/>
-                                <CheckBox Grid.Row="1" Grid.Column="10" x:Name="CanCh6EnabledBox" IsChecked="False" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="0,4">
+                                    <ui:TextBlock Text="CH1" Width="40" VerticalAlignment="Center" Foreground="#64B5F6" FontWeight="SemiBold"/>
+                                    <ui:TextBox x:Name="CanCh1IdBox" Width="80" Margin="4,0" PlaceholderText="0x000"/>
+                                    <CheckBox x:Name="CanCh1EnabledBox" ToolTip="Enable/Disable"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Margin="0,4">
+                                    <ui:TextBlock Text="CH2" Width="40" VerticalAlignment="Center" Foreground="#64B5F6" FontWeight="SemiBold"/>
+                                    <ui:TextBox x:Name="CanCh2IdBox" Width="80" Margin="4,0" PlaceholderText="0x000"/>
+                                    <CheckBox x:Name="CanCh2EnabledBox" ToolTip="Enable/Disable"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal" Margin="0,4">
+                                    <ui:TextBlock Text="CH3" Width="40" VerticalAlignment="Center" Foreground="#64B5F6" FontWeight="SemiBold"/>
+                                    <ui:TextBox x:Name="CanCh3IdBox" Width="80" Margin="4,0" PlaceholderText="0x000"/>
+                                    <CheckBox x:Name="CanCh3EnabledBox" ToolTip="Enable/Disable"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="0,4">
+                                    <ui:TextBlock Text="CH4" Width="40" VerticalAlignment="Center" Foreground="#81C784" FontWeight="SemiBold"/>
+                                    <ui:TextBox x:Name="CanCh4IdBox" Width="80" Margin="4,0" PlaceholderText="0x000"/>
+                                    <CheckBox x:Name="CanCh4EnabledBox" ToolTip="Enable/Disable"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0,4">
+                                    <ui:TextBlock Text="CH5" Width="40" VerticalAlignment="Center" Foreground="#81C784" FontWeight="SemiBold"/>
+                                    <ui:TextBox x:Name="CanCh5IdBox" Width="80" Margin="4,0" PlaceholderText="0x000"/>
+                                    <CheckBox x:Name="CanCh5EnabledBox" ToolTip="Enable/Disable"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" Margin="0,4">
+                                    <ui:TextBlock Text="CH6" Width="40" VerticalAlignment="Center" Foreground="#81C784" FontWeight="SemiBold"/>
+                                    <ui:TextBox x:Name="CanCh6IdBox" Width="80" Margin="4,0" PlaceholderText="0x000"/>
+                                    <CheckBox x:Name="CanCh6EnabledBox" ToolTip="Enable/Disable"/>
+                                </StackPanel>
                             </Grid>
-                        </StackPanel>
-                    </Border>
+                        </ui:CardExpander>
 
-                    <!-- データフィールド定義 -->
-                    <Border Grid.Row="2" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <TextBlock Grid.Row="0" Text="データフィールド定義 (最大16個)" FontWeight="Bold" FontSize="12" Margin="0,0,0,8" Foreground="{DynamicResource TextBrush}"/>
-
-                            <DataGrid Grid.Row="1" x:Name="CanFieldsGrid"
-                                      AutoGenerateColumns="False"
-                                      CanUserAddRows="False"
-                                      CanUserDeleteRows="False"
-                                      HeadersVisibility="Column"
-                                      GridLinesVisibility="Horizontal"
-                                      Background="Transparent"
-                                      RowBackground="{DynamicResource CardBackgroundBrush}"
-                                      AlternatingRowBackground="{DynamicResource PrimaryBackgroundBrush}"
-                                      Foreground="{DynamicResource TextBrush}"
-                                      BorderBrush="{DynamicResource BorderBrush}"
-                                      FontSize="11"
-                                      IsEnabled="{Binding IsOperationEnabled}">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="22" IsReadOnly="True">
-                                        <DataGridTextColumn.CellStyle>
-                                            <Style TargetType="DataGridCell">
-                                                <Setter Property="Background" Value="#E0E0E0"/>
-                                                <Setter Property="IsEnabled" Value="False"/>
-                                            </Style>
-                                        </DataGridTextColumn.CellStyle>
-                                    </DataGridTextColumn>
-                                    <DataGridCheckBoxColumn Header="EN" Binding="{Binding Enabled}" Width="32"/>
-                                    <DataGridTextColumn Header="CH" Binding="{Binding Channel}" Width="28"/>
-                                    <DataGridTextColumn Header="Byte" Binding="{Binding StartByte}" Width="35"/>
-                                    <DataGridTextColumn Header="Len" Binding="{Binding ByteCount}" Width="30"/>
-                                    <DataGridComboBoxColumn Header="Type" SelectedItemBinding="{Binding DataType}" Width="42">
-                                        <DataGridComboBoxColumn.ElementStyle>
-                                            <Style TargetType="ComboBox">
-                                                <Setter Property="ItemsSource" Value="{Binding DataContext.DataTypeOptions, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
-                                            </Style>
-                                        </DataGridComboBoxColumn.ElementStyle>
-                                        <DataGridComboBoxColumn.EditingElementStyle>
-                                            <Style TargetType="ComboBox">
-                                                <Setter Property="ItemsSource" Value="{Binding DataContext.DataTypeOptions, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
-                                            </Style>
-                                        </DataGridComboBoxColumn.EditingElementStyle>
-                                    </DataGridComboBoxColumn>
-                                    <DataGridComboBoxColumn Header="End" SelectedItemBinding="{Binding Endian}" Width="38">
-                                        <DataGridComboBoxColumn.ElementStyle>
-                                            <Style TargetType="ComboBox">
-                                                <Setter Property="ItemsSource" Value="{Binding DataContext.EndianOptions, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
-                                            </Style>
-                                        </DataGridComboBoxColumn.ElementStyle>
-                                        <DataGridComboBoxColumn.EditingElementStyle>
-                                            <Style TargetType="ComboBox">
-                                                <Setter Property="ItemsSource" Value="{Binding DataContext.EndianOptions, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
-                                            </Style>
-                                        </DataGridComboBoxColumn.EditingElementStyle>
-                                    </DataGridComboBoxColumn>
-                                    <DataGridComboBoxColumn Header="Var" SelectedItemBinding="{Binding TargetVarName}" Width="52">
-                                        <DataGridComboBoxColumn.ElementStyle>
-                                            <Style TargetType="ComboBox">
-                                                <Setter Property="ItemsSource" Value="{Binding DataContext.VarOptions, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
-                                            </Style>
-                                        </DataGridComboBoxColumn.ElementStyle>
-                                        <DataGridComboBoxColumn.EditingElementStyle>
-                                            <Style TargetType="ComboBox">
-                                                <Setter Property="ItemsSource" Value="{Binding DataContext.VarOptions, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
-                                            </Style>
-                                        </DataGridComboBoxColumn.EditingElementStyle>
-                                    </DataGridComboBoxColumn>
-                                    <DataGridTextColumn Header="Off" Binding="{Binding Offset}" Width="32"/>
-                                    <DataGridTextColumn Header="Mul" Binding="{Binding Multiplier}" Width="42"/>
-                                    <DataGridTextColumn Header="Div" Binding="{Binding Divisor}" Width="45"/>
-                                    <DataGridTextColumn Header="Dec" Binding="{Binding DecimalShift}" Width="30"/>
-                                    <DataGridTextColumn Header="名前" Binding="{Binding Name}" Width="50"/>
-                                    <DataGridTextColumn Header="単位" Binding="{Binding Unit}" Width="35"/>
-                                    <!-- Lo列: チェックボックス + 閾値 -->
-                                    <DataGridTemplateColumn Header="Warn Lo" Width="72">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <CheckBox IsChecked="{Binding WarnLowEnabled, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Margin="2,0"/>
-                                                    <TextBox Text="{Binding WarnLow, UpdateSourceTrigger=LostFocus}" Width="40" Margin="2,0"/>
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                    <!-- Hi列: チェックボックス + 閾値 -->
-                                    <DataGridTemplateColumn Header="Warn Hi" Width="72">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <CheckBox IsChecked="{Binding WarnHighEnabled, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Margin="2,0"/>
-                                                    <TextBox Text="{Binding WarnHigh, UpdateSourceTrigger=LostFocus}" Width="40" Margin="2,0"/>
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                </DataGrid.Columns>
-                            </DataGrid>
-
-                            <TextBlock Grid.Row="2" Text="Type: U=Unsigned, S=Signed | End: B=Big, L=Little"
-                                       FontSize="10" Foreground="{DynamicResource TextMutedBrush}" Margin="0,6,0,0"/>
-                        </Grid>
-                    </Border>
-
-                    <!-- ボタンとステータス -->
-                    <StackPanel Grid.Row="3" Margin="0,8,0,0">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button Content="読込" Width="70" Height="26" FontSize="12" Margin="0,0,6,0"
-                                    Style="{DynamicResource PrimaryButton}"
-                                    Click="CanReadButton_Click"
-                                    IsEnabled="{Binding IsOperationEnabled}"/>
-                            <Button Content="書込" Width="70" Height="26" FontSize="12" Margin="0,0,6,0"
-                                    Style="{DynamicResource SuccessButton}"
-                                    Click="CanWriteButton_Click"
-                                    IsEnabled="{Binding IsOperationEnabled}"/>
-                            <Button Content="デフォルト" Width="70" Height="26" FontSize="12"
-                                    Style="{DynamicResource SecondaryButton}"
-                                    Click="CanDefaultButton_Click"
-                                    IsEnabled="{Binding IsOperationEnabled}"/>
-                        </StackPanel>
-                        <!-- ステータス表示 -->
-                        <Border Background="{DynamicResource PrimaryBackgroundBrush}" CornerRadius="3" Margin="0,8,0,0" Padding="6">
-                            <TextBlock x:Name="CanStatusText" Text="ボタンを押すとコマンドが送信されます"
-                                       FontSize="11" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap"/>
-                        </Border>
-                    </StackPanel>
-                </Grid>
-            </TabItem>
-
-            <!-- タブ4: 起動画面変更 -->
-            <TabItem Header="起動画面変更" IsEnabled="{Binding IsFirmwareMode}">
-                <views:StartupImageView DataContext="{Binding StartupImageViewModel}" />
-            </TabItem>
-
-            <!-- タブ4: ファームウェア更新 -->
-            <TabItem Header="ファームウェア更新">
-                <Grid Margin="8">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <!-- 現在のバージョン -->
-                    <Border Grid.Row="0" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,8">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="現在のファームウェア:" FontWeight="Bold" FontSize="12"
-                                       VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                            <TextBlock Grid.Column="1" FontSize="14" FontWeight="Bold" Margin="8,0,0,0" VerticalAlignment="Center"
-                                       Foreground="#2ECC71">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Text" Value="{Binding FirmwareVersion, StringFormat=v{0}}"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding FirmwareVersion}" Value="">
-                                                <Setter Property="Text" Value="未取得"/>
-                                                <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </Grid>
-                    </Border>
-
-                    <!-- ファイル選択 -->
-                    <Border Grid.Row="1" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,8">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Text="{Binding FirmwareFilePath}" IsReadOnly="True"
-                                     Height="24" FontSize="12" Margin="0,0,6,0" VerticalContentAlignment="Center"/>
-                            <Button Grid.Column="1" Content="参照..." Width="60" Height="24" FontSize="12"
-                                    Style="{DynamicResource SecondaryButton}"
-                                    Command="{Binding BrowseFirmwareCommand}"
-                                    IsEnabled="{Binding IsConnected}"/>
-                        </Grid>
-                    </Border>
-
-                    <!-- 進捗表示 -->
-                    <Border Grid.Row="2" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,8">
-                        <StackPanel>
-                            <TextBlock Text="転送進捗" FontWeight="Bold" FontSize="12" Margin="0,0,0,6" Foreground="{DynamicResource TextBrush}"/>
-                            <ProgressBar Height="20" Value="{Binding FirmwareProgress}" Maximum="100" Margin="0,0,0,4"/>
-                            <TextBlock Text="{Binding FirmwareStatus}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
-                        </StackPanel>
-                    </Border>
-
-                    <!-- 通信ログ -->
-                    <Border Grid.Row="3" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10,10,10,6" Margin="0,0,0,8">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,6">
-                                <TextBlock Text="通信ログ" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                <Button Content="クリア" Width="60" Height="20" FontSize="12" Margin="10,0,0,0"
-                                        Style="{DynamicResource OutlineButton}"
-                                        Command="{Binding ClearFirmwareLogCommand}"
-                                        IsEnabled="{Binding IsConnected}"/>
-                                <Button Content="コピー" Width="60" Height="20" FontSize="12" Margin="6,0,0,0"
-                                        Style="{DynamicResource OutlineButton}"
-                                        Command="{Binding CopyFirmwareLogCommand}"
-                                        IsEnabled="{Binding IsConnected}"/>
-                            </StackPanel>
-                            <TextBox Grid.Row="1" Text="{Binding FirmwareLog, Mode=OneWay}"
-                                     x:Name="FirmwareLogTextBox"
-                                     Height="140" FontSize="12" FontFamily="Consolas"
-                                     IsReadOnly="True" TextWrapping="Wrap"
-                                     VerticalScrollBarVisibility="Auto"
-                                     Background="#1E1E1E" Foreground="#DCDCDC"
-                                     Padding="6"
-                                     TextChanged="FirmwareLogTextBox_TextChanged"/>
-                        </Grid>
-                    </Border>
-
-                    <!-- 更新ボタン -->
-                    <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,0">
-                        <Button Content="ファームウェア更新開始" Width="160" Height="32" FontSize="12"
-                                Style="{DynamicResource WarningButton}"
-                                Command="{Binding StartFirmwareUpdateCommand}"
-                                IsEnabled="{Binding CanStartFirmwareUpdate}"/>
-                    </StackPanel>
-                </Grid>
-            </TabItem>
-
-            <!-- Aboutタブ -->
-            <TabItem Header="About">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Loaded="AboutScrollViewer_Loaded">
-                    <StackPanel Margin="16">
-                        <!-- ロゴ -->
-                        <Image Source="Assets/FM1.png" Width="200" Height="200" Margin="0,0,0,16"
-                               RenderOptions.BitmapScalingMode="HighQuality"/>
-
-                        <!-- アプリ名 -->
-                        <TextBlock Text="FULLMONI-WIDE Terminal" FontSize="20" FontWeight="Bold"
-                                   Foreground="{DynamicResource TextPrimaryBrush}"
-                                   HorizontalAlignment="Center" Margin="0,0,0,4"/>
-
-                        <!-- バージョン -->
-                        <TextBlock Text="{Binding AppVersion, StringFormat=Version {0}}" FontSize="12"
-                                   Foreground="{DynamicResource TextMutedBrush}"
-                                   HorizontalAlignment="Center" Margin="0,0,0,16"/>
-
-                        <!-- 説明 -->
-                        <Border Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="12" Margin="0,0,0,12">
-                            <StackPanel>
-                                <TextBlock Text="概要" FontSize="14" FontWeight="Bold"
-                                           Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8"/>
-                                <TextBlock TextWrapping="Wrap" FontSize="12"
-                                           Foreground="{DynamicResource TextSecondaryBrush}">
-                                    FULLMONI-WIDEファームウェアとUART通信するためのWindowsホストアプリケーションです。
-                                    パラメータの設定・保存、ファームウェアの更新などが行えます。
-                                </TextBlock>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- 開発情報 -->
-                        <Border Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="12" Margin="0,0,0,12">
-                            <StackPanel>
-                                <TextBlock Text="開発情報" FontSize="14" FontWeight="Bold"
-                                           Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8"/>
+                        <ui:CardExpander Icon="{ui:SymbolIcon DataPie24}" IsExpanded="True" Margin="0,0,0,8">
+                            <ui:CardExpander.Header>
                                 <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="100"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
-
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="フレームワーク" FontSize="12"
-                                               Foreground="{DynamicResource TextMutedBrush}"/>
-                                    <TextBlock Grid.Row="0" Grid.Column="1" Text=".NET 8.0 WPF" FontSize="12"
-                                               Foreground="{DynamicResource TextSecondaryBrush}"/>
-
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="アーキテクチャ" FontSize="12"
-                                               Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0"/>
-                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="MVVM (CommunityToolkit.Mvvm)" FontSize="12"
-                                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
-
-                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="通信設定" FontSize="12"
-                                               Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0"/>
-                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="115200bps, 8N1, XON/XOFF" FontSize="12"
-                                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
-
-                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="ライセンス" FontSize="12"
-                                               Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0"/>
-                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="MIT License" FontSize="12"
-                                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+                                    <ui:TextBlock Grid.Row="0" Text="Data Field Definitions (Max 16)" FontTypography="Body"/>
+                                    <ui:TextBlock Grid.Row="1" Text="Define how to parse CAN data" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
                                 </Grid>
+                            </ui:CardExpander.Header>
+                            <StackPanel Margin="16,8,16,16">
+                                <DataGrid x:Name="CanFieldsGrid"
+                                          AutoGenerateColumns="False"
+                                          CanUserAddRows="False"
+                                          CanUserDeleteRows="False"
+                                          Height="280"
+                                          Background="#1A2332"
+                                          RowBackground="#1E2A3A"
+                                          AlternatingRowBackground="#243040"
+                                          GridLinesVisibility="All"
+                                          HorizontalGridLinesBrush="#3A4A5A"
+                                          VerticalGridLinesBrush="#3A4A5A"
+                                          BorderBrush="#4A5A6A"
+                                          BorderThickness="1"
+                                          HeadersVisibility="Column">
+                                    <DataGrid.ColumnHeaderStyle>
+                                        <Style TargetType="DataGridColumnHeader">
+                                            <Setter Property="Background" Value="#2A3A4A"/>
+                                            <Setter Property="Foreground" Value="#E0E0E0"/>
+                                            <Setter Property="Padding" Value="6,4"/>
+                                            <Setter Property="BorderBrush" Value="#4A5A6A"/>
+                                            <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                                        </Style>
+                                    </DataGrid.ColumnHeaderStyle>
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="30" IsReadOnly="True"/>
+                                        <DataGridCheckBoxColumn Header="EN" Binding="{Binding Enabled}" Width="35"/>
+                                        <DataGridTextColumn Header="CH" Binding="{Binding Channel}" Width="35"/>
+                                        <DataGridTextColumn Header="Byte" Binding="{Binding StartByte}" Width="40"/>
+                                        <DataGridTextColumn Header="Size" Binding="{Binding ByteCount}" Width="40"/>
+                                        <DataGridTextColumn Header="Type" Binding="{Binding DataType}" Width="40"/>
+                                        <DataGridTextColumn Header="End" Binding="{Binding Endian}" Width="35"/>
+                                        <DataGridTextColumn Header="Var" Binding="{Binding TargetVarName}" Width="55"/>
+                                        <DataGridTextColumn Header="Off" Binding="{Binding Offset}" Width="45"/>
+                                        <DataGridTextColumn Header="Mul" Binding="{Binding Multiplier}" Width="50"/>
+                                        <DataGridTextColumn Header="Div" Binding="{Binding Divisor}" Width="50"/>
+                                        <DataGridTextColumn Header="Dec" Binding="{Binding Decimals}" Width="35"/>
+                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="70"/>
+                                        <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="45"/>
+                                        <DataGridCheckBoxColumn Header="WLo" Binding="{Binding WarnLowEnabled}" Width="40"/>
+                                        <DataGridTextColumn Header="Lo" Binding="{Binding WarnLow}" Width="55"/>
+                                        <DataGridCheckBoxColumn Header="WHi" Binding="{Binding WarnHighEnabled}" Width="40"/>
+                                        <DataGridTextColumn Header="Hi" Binding="{Binding WarnHigh}" Width="55"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <TextBlock Text="Type: U=Unsigned, S=Signed | End: B=Big, L=Little" Opacity="0.5" Margin="0,8,0,0" FontSize="11"/>
                             </StackPanel>
-                        </Border>
+                        </ui:CardExpander>
 
-                        <!-- リンク -->
-                        <Border Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="12">
-                            <StackPanel>
-                                <TextBlock Text="リンク" FontSize="14" FontWeight="Bold"
-                                           Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <ui:Button x:Name="CanReadButton" Content="Read" Margin="0,0,8,0" Icon="{ui:SymbolIcon ArrowDownload24}" Click="CanReadButton_Click"/>
+                            <ui:Button x:Name="CanWriteButton" Content="Save" Appearance="Primary" Margin="0,0,8,0" Icon="{ui:SymbolIcon Save24}" Click="CanWriteButton_Click"/>
+                            <ui:Button x:Name="CanDefaultButton" Content="Default" Icon="{ui:SymbolIcon ArrowReset24}" Click="CanDefaultButton_Click"/>
+                        </StackPanel>
 
-                                <Button Content="🔗 GitHub リポジトリ"
-                                        Style="{DynamicResource LinkButton}"
-                                        Click="OpenGitHubLink_Click"
-                                        HorizontalAlignment="Left" Margin="0,0,0,4"/>
-
-                                <Button Content="📖 ドキュメント"
-                                        Style="{DynamicResource LinkButton}"
-                                        Click="OpenDocsLink_Click"
-                                        HorizontalAlignment="Left" Margin="0,0,0,4"/>
-
-                                <Button Content="🐛 Issue報告"
-                                        Style="{DynamicResource LinkButton}"
-                                        Click="OpenIssuesLink_Click"
-                                        HorizontalAlignment="Left"/>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- コピーライト -->
-                        <TextBlock Text="© 2024-2026 FULLMONI-WIDE Project" FontSize="11"
-                                   Foreground="{DynamicResource TextMutedBrush}"
-                                   HorizontalAlignment="Center" Margin="0,16,0,0"/>
+                        <TextBlock x:Name="CanStatusText" Text="" Margin="0,12,0,0" HorizontalAlignment="Center" Opacity="0.7"/>
                     </StackPanel>
-                </ScrollViewer>
-            </TabItem>
-        </TabControl>
 
-        <!-- ステータス -->
-        <TextBlock Grid.Row="2" Text="{Binding ActivityStatus}" FontSize="12"
-                   Foreground="{DynamicResource TextMutedBrush}"
-                   HorizontalAlignment="Center"/>
+                    <!-- Boot Screen Page -->
+                    <StackPanel x:Name="StartupPage" Visibility="Collapsed">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                            <Border Width="4" Background="#0078D4" CornerRadius="2" Margin="0,0,12,0"/>
+                            <TextBlock Text="Boot Screen" FontSize="28" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <views:StartupImageView x:Name="StartupImageViewControl"/>
+                    </StackPanel>
+
+                    <!-- Firmware Update Page -->
+                    <StackPanel x:Name="FirmwarePage" Visibility="Collapsed">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                            <Border Width="4" Background="#0078D4" CornerRadius="2" Margin="0,0,12,0"/>
+                            <TextBlock Text="Firmware Update" FontSize="28" FontWeight="SemiBold"/>
+                        </StackPanel>
+
+                        <ui:CardExpander Header="Current Version" IsExpanded="True" Margin="0,0,0,12">
+                            <TextBlock Text="{Binding FirmwareVersion, StringFormat=Firmware: v{0}}"
+                                       FontWeight="SemiBold" FontSize="16" Foreground="#4CAF50" Margin="8"/>
+                        </ui:CardExpander>
+
+                        <ui:CardExpander Header="Select Firmware File" IsExpanded="True" Margin="0,0,0,12">
+                            <Grid Margin="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ui:TextBox Grid.Column="0" Text="{Binding SelectedFirmwarePath}" IsReadOnly="True" Margin="0,0,8,0"/>
+                                <ui:Button Grid.Column="1" Content="Browse..." Icon="{ui:SymbolIcon FolderOpen24}" Command="{Binding BrowseFirmwareCommand}"/>
+                            </Grid>
+                        </ui:CardExpander>
+
+                        <ui:CardExpander Header="Transfer Progress" IsExpanded="True" Margin="0,0,0,12">
+                            <StackPanel Margin="8">
+                                <ProgressBar Value="{Binding FirmwareProgress}" Height="24" Margin="0,0,0,8"/>
+                                <TextBlock Text="{Binding FirmwareProgressText}"/>
+                            </StackPanel>
+                        </ui:CardExpander>
+
+                        <ui:CardExpander Header="Communication Log" IsExpanded="True" Margin="0,0,0,12">
+                            <StackPanel Margin="8">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <ui:Button Content="Clear" Margin="0,0,8,0" Icon="{ui:SymbolIcon Delete24}" Command="{Binding ClearFirmwareLogCommand}"/>
+                                    <ui:Button Content="Copy" Icon="{ui:SymbolIcon Copy24}" Command="{Binding CopyFirmwareLogCommand}"/>
+                                </StackPanel>
+                                <TextBox x:Name="FirmwareLogTextBox"
+                                         Text="{Binding FirmwareLog}"
+                                         IsReadOnly="True"
+                                         Height="180"
+                                         VerticalScrollBarVisibility="Auto"
+                                         HorizontalScrollBarVisibility="Auto"
+                                         FontFamily="Cascadia Code, Consolas"
+                                         Background="#0C0C0C"
+                                         Foreground="#4EC9B0"
+                                         TextChanged="FirmwareLogTextBox_TextChanged"/>
+                            </StackPanel>
+                        </ui:CardExpander>
+
+                        <ui:Button Content="Start Firmware Update"
+                                   HorizontalAlignment="Center"
+                                   Appearance="Primary"
+                                   Icon="{ui:SymbolIcon ArrowUpload24}"
+                                   Command="{Binding StartFirmwareUpdateCommand}"
+                                   IsEnabled="{Binding CanStartFirmwareUpdate}"/>
+                    </StackPanel>
+
+                    <!-- About Page -->
+                    <StackPanel x:Name="AboutPage" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="600">
+                        <!-- Logo -->
+                        <Image Source="Assets/FM1.png" Width="280" Margin="0,0,0,32"/>
+                        
+                        <!-- Title -->
+                        <TextBlock Text="FULLMONI-WIDE Terminal" FontSize="32" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Version 1.0.0" FontSize="14" Opacity="0.7" HorizontalAlignment="Center" Margin="0,8,0,0"/>
+                        
+                        <!-- Description -->
+                        <Border Background="{DynamicResource CardBackgroundBrush}" CornerRadius="8" Padding="20" Margin="0,32,0,0">
+                            <StackPanel>
+                                <TextBlock Text="About This Tool" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12"/>
+                                <TextBlock TextWrapping="Wrap" FontSize="13" LineHeight="22" Opacity="0.85">
+                                    Configuration tool for FULLMONI-WIDE digital meter.
+                                    Connect via USB to configure parameters and update firmware.
+                                </TextBlock>
+                                
+                                <TextBlock Text="Features" FontSize="14" FontWeight="SemiBold" Margin="0,20,0,8"/>
+                                <StackPanel Margin="8,0,0,0">
+                                    <TextBlock Text="• Real-time status monitoring (RPM, Speed, Temp, etc.)" FontSize="12" Opacity="0.8" Margin="0,2"/>
+                                    <TextBlock Text="• Parameter settings (Tire size, Gear ratio, Warnings)" FontSize="12" Opacity="0.8" Margin="0,2"/>
+                                    <TextBlock Text="• CAN configuration (ECU presets, Custom IDs)" FontSize="12" Opacity="0.8" Margin="0,2"/>
+                                    <TextBlock Text="• Boot screen customization (765×256 BMP)" FontSize="12" Opacity="0.8" Margin="0,2"/>
+                                    <TextBlock Text="• Firmware update via USB (~268KB/s)" FontSize="12" Opacity="0.8" Margin="0,2"/>
+                                </StackPanel>
+                                
+                                <TextBlock Text="Hardware" FontSize="14" FontWeight="SemiBold" Margin="0,20,0,8"/>
+                                <TextBlock Text="Renesas RX72N MCU • 800×256 TFT LCD • CAN Bus • Neopixel LEDs" 
+                                           FontSize="12" Opacity="0.8" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <!-- Copyright & Links -->
+                        <TextBlock Text="© 2024-2026 FULLMONI-WIDE Project" FontSize="12" Opacity="0.5" 
+                                   HorizontalAlignment="Center" Margin="0,24,0,0"/>
+                        <TextBlock Text="Open Source Hardware &amp; Software (MIT License)" FontSize="11" Opacity="0.4" 
+                                   HorizontalAlignment="Center" Margin="0,4,0,0"/>
+
+                        <ui:HyperlinkButton Content="🔗 GitHub" NavigateUri="https://github.com/tomoya723/FULLMONI-WIDE"
+                                            HorizontalAlignment="Center" Margin="0,16,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- ステータスバー -->
+        <Border Grid.Row="2" Padding="16,10">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#1A1A2E" Offset="0"/>
+                    <GradientStop Color="#0D1B2A" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <Grid>
+                <TextBlock Text="{Binding ActivityStatus}" Opacity="0.7" VerticalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Ellipse Width="8" Height="8" Margin="0,0,8,0">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="#555"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsParametersLoaded}" Value="True">
+                                        <Setter Property="Fill" Value="#4CAF50"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                    <TextBlock Text="Parameters Loaded" Opacity="0.7"
+                               Visibility="{Binding IsParametersLoaded, Converter={StaticResource BoolToVisibility}}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
-</Window>
+</ui:FluentWindow>

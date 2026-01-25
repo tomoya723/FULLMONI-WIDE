@@ -175,16 +175,17 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         OnPropertyChanged(nameof(IsNotConnected));
         OnPropertyChanged(nameof(ConnectionButtonText));
+        OnPropertyChanged(nameof(HeroButtonText));
         OnPropertyChanged(nameof(CanStartFirmwareUpdate));
         OnPropertyChanged(nameof(IsOperationEnabled));
         OnPropertyChanged(nameof(IsFirmwareMode));
     }
 
     [ObservableProperty]
-    private string _statusText = "未接続";
+    private string _statusText = "Not Connected";
 
     [ObservableProperty]
-    private string _activityStatus = "準備完了";
+    private string _activityStatus = "Ready";
 
     [ObservableProperty]
     private bool _isDarkTheme;
@@ -233,14 +234,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private string _finalGear = "";
 
     // ギア比プリセット
-    public string[] GearPresets { get; } = ["-- 選択 --", "NA/NB5速", "NB6速"];
+    public string[] GearPresets { get; } = ["-- Select --", "NA/NB 5-speed", "NB 6-speed"];
 
     [ObservableProperty]
-    private string? _selectedGearPreset = "-- 選択 --";
+    private string? _selectedGearPreset = "-- Select --";
 
     partial void OnSelectedGearPresetChanged(string? value)
     {
-        if (string.IsNullOrEmpty(value) || value == "-- 選択 --") return;
+        if (string.IsNullOrEmpty(value) || value == "-- Select --") return;
 
         if (value == "NA/NB5速")
         {
@@ -345,7 +346,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
     /// </summary>
     public bool CanCloseWindow => !IsFirmwareUpdating;
 
-    public string ConnectionButtonText => IsConnected ? "切断" : "接続";
+    public string ConnectionButtonText => IsConnected ? "Disconnect" : "Connect";
+
+    public string HeroButtonText => IsConnected ? "Disconnect" : "Connect to Device";
 
     #endregion
 
@@ -366,7 +369,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             SelectedPort = AvailablePorts[0];
         }
 
-        ActivityStatus = $"{ports.Length} 個のCOMポートを検出";
+        ActivityStatus = $"{ports.Length} COM port(s) detected";
     }
 
     [RelayCommand]
@@ -380,11 +383,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             if (string.IsNullOrEmpty(SelectedPort))
             {
-                ActivityStatus = "⚠️ COMポートを選択してください";
+                ActivityStatus = "⚠️ Please select a COM port";
                 return;
             }
 
-            ActivityStatus = $"接続中... {SelectedPort}";
+            ActivityStatus = $"Connecting... {SelectedPort}";
 
             if (_serialService.Connect(SelectedPort, SelectedBaudRate))
             {
@@ -420,13 +423,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
             received.Contains("S=Status"))
         {
             IsBootloaderMode = true;
-            StatusText = $"Bootloaderモード ({SelectedPort})";
-            ActivityStatus = "⚠️ Bootloaderモードで接続 - ファームウェア更新タブを使用してください";
+            StatusText = $"Bootloader Mode ({SelectedPort})";
+            ActivityStatus = "⚠️ Connected in Bootloader mode - Use Firmware Update tab";
             return;
         }
 
         // Firmwareとして接続 - パラメータ取得
-        ActivityStatus = "✅ Firmwareモード - パラメータを取得中...";
+        ActivityStatus = "✅ Firmware mode - Loading parameters...";
         await LoadParametersInternal();
     }
 
@@ -443,7 +446,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private async Task LoadParametersInternal()
     {
         IsBusy = true;
-        ActivityStatus = "📥 パラメータを読み込み中...";
+        ActivityStatus = "📥 Loading parameters...";
 
         try
         {
@@ -486,14 +489,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
             TxCount++;
             await Task.Delay(100);
 
-            ActivityStatus = "✅ パラメータを読み込みました";
+            ActivityStatus = "✅ Parameters loaded";
 
             // パラメータ読込完了イベントを発火（CAN設定もこのタイミングで読み込む）
             ParametersLoaded?.Invoke(this, EventArgs.Empty);
         }
         catch (Exception ex)
         {
-            ActivityStatus = $"❌ 読み込みエラー: {ex.Message}";
+            ActivityStatus = $"❌ Load error: {ex.Message}";
         }
         finally
         {
@@ -516,7 +519,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             return;
         }
 
-        ActivityStatus = "📤 パラメータを送信中...";
+        ActivityStatus = "📤 Saving parameters...";
 
         try
         {
@@ -560,11 +563,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
             _serialService.SendCommand("exit");
             TxCount++;
 
-            ActivityStatus = "✅ パラメータを保存しました";
+            ActivityStatus = "✅ Parameters saved";
         }
         catch (Exception ex)
         {
-            ActivityStatus = $"❌ 保存エラー: {ex.Message}";
+            ActivityStatus = $"❌ Save error: {ex.Message}";
         }
     }
 
@@ -584,7 +587,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         if (result != MessageBoxResult.Yes) return;
 
-        ActivityStatus = "🔄 デフォルト値にリセット中...";
+        ActivityStatus = "🔄 Resetting to defaults...";
 
         try
         {
@@ -611,11 +614,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
             var response = _responseBuffer.ToString();
             ParseParameterResponse(response);
 
-            ActivityStatus = "✅ デフォルト値にリセットしました";
+            ActivityStatus = "✅ Reset to defaults";
         }
         catch (Exception ex)
         {
-            ActivityStatus = $"❌ リセットエラー: {ex.Message}";
+            ActivityStatus = $"❌ Reset error: {ex.Message}";
         }
     }
 
@@ -635,7 +638,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         if (result != MessageBoxResult.Yes) return;
 
-        ActivityStatus = "🔄 TRIPリセット中...";
+        ActivityStatus = "🔄 Resetting TRIP...";
 
         try
         {
@@ -666,11 +669,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
             var response = _responseBuffer.ToString();
             ParseParameterResponse(response);
 
-            ActivityStatus = "✅ TRIPをリセットしました";
+            ActivityStatus = "✅ TRIP reset";
         }
         catch (Exception ex)
         {
-            ActivityStatus = $"❌ TRIPリセットエラー: {ex.Message}";
+            ActivityStatus = $"❌ TRIP reset error: {ex.Message}";
         }
     }
 
@@ -679,7 +682,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         if (!IsConnected) return;
 
-        ActivityStatus = "🕐 RTC同期中...";
+        ActivityStatus = "🕐 Syncing RTC...";
 
         try
         {
@@ -708,7 +711,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             _serialService.SendCommand("exit");
             TxCount++;
 
-            ActivityStatus = $"✅ RTCを同期しました ({now:yy/MM/dd HH:mm:ss})";
+            ActivityStatus = $"✅ RTC synced ({now:yy/MM/dd HH:mm:ss})";
         }
         catch (Exception ex)
         {
@@ -722,13 +725,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
         var dialog = new Microsoft.Win32.OpenFileDialog
         {
             Filter = "BINファイル (*.bin)|*.bin|すべてのファイル (*.*)|*.*",
-            Title = "ファームウェアファイルを選択"
+            Title = "Select Firmware File"
         };
 
         if (dialog.ShowDialog() == true)
         {
             FirmwareFilePath = dialog.FileName;
-            FirmwareStatus = "ファイルを選択しました";
+            FirmwareStatus = "File selected";
             OnPropertyChanged(nameof(CanStartFirmwareUpdate));
         }
     }
@@ -833,7 +836,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     IsFirmwareUpdating = false;
                     if (success)
                     {
-                        ActivityStatus = "✅ ファームウェア更新完了 - 再接続中...";
+                        ActivityStatus = "✅ Firmware update complete - Reconnecting...";
 
                         // デバイス再起動を待つ
                         await Task.Delay(3000);
@@ -1068,7 +1071,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             if (connected)
             {
-                StatusText = $"接続中 ({SelectedPort})";
+                StatusText = $"Connected ({SelectedPort})";
                 TxCount = 0;
                 RxCount = 0;
             }
