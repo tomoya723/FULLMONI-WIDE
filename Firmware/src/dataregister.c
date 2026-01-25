@@ -12,6 +12,14 @@
 #include "lib_table.h"
 #include "lib_general.h"
 #include "param_storage.h"      /* CAN設定 (Issue #65) */
+#include "master_warning.h"    /* Issue #50: マスターワーニング */
+#include "speaker.h"           /* 警告音再生 */
+#include "GUI.h"               /* emWin GUI関数 */
+#include "TEXT.h"              /* TEXT Widget関数 */
+#include "WM.h"                /* Window Manager関数 */
+#include "../aw002/Source/Generated/Resource.h"  /* AppWizard リソース定義 */
+#include "../aw002/Source/Generated/ID_SCREEN_01a.h"  /* ID_TEXT_ACC 定義 */
+#include "../aw002/Source/Generated/ID_SCREEN_Telltale.h"  /* ID_ICON_xx 定義 */
 
 #define PI 3.1415923
 
@@ -296,7 +304,7 @@ void data_store(void)
 	APPW_SetVarData(ID_VAR_AD2, g_CALC_data.AD2 * 10);
 	APPW_SetVarData(ID_VAR_AD3, g_CALC_data.AD3 * 10);
 	APPW_SetVarData(ID_VAR_AD4, g_CALC_data.AD4 * 10);
-	aPara0[0].v = 0;																			APPW_DoJob(ID_SCREEN_Telltale, ID_ICON_00 , APPW_JOB_SETVIS, aPara0);	// Master Warning
+	aPara0[0].v = master_warning_is_active() ? 1 : 0;											APPW_DoJob(ID_SCREEN_Telltale, ID_ICON_00 , APPW_JOB_SETVIS, aPara0);	// Master Warning (Issue #50)
 	aPara1[0].v = 0;																			APPW_DoJob(ID_SCREEN_Telltale, ID_ICON_01 , APPW_JOB_SETVIS, aPara1);	// Oil Warning
 	if(g_CALC_data.num1 >  60)	{	aPara2[0].v = 0;	} else {		aPara2[0].v = 1;	}	APPW_DoJob(ID_SCREEN_Telltale, ID_ICON_02L, APPW_JOB_SETVIS, aPara2);	// Water Temp Warning Low
 	if(g_CALC_data.num1 < 100)	{	aPara3[0].v = 0;	} else {		aPara3[0].v = 1;	}	APPW_DoJob(ID_SCREEN_Telltale, ID_ICON_02H, APPW_JOB_SETVIS, aPara3);	// Water Temp Warning High
@@ -349,8 +357,86 @@ void data_setLCD50ms(void)
 	APPW_SetVarData(ID_VAR_04, g_CALC_data_sm.num4); // MAP
 }
 
+/* Issue #50: マスターワーニング表示状態 */
+static uint8_t s_warning_displayed = 0;
+static uint8_t s_warning_gui_update_needed = 0;  /* GUI更新要求フラグ */
+static uint8_t s_warning_sound_cooldown = 0;     /* 警告音クールダウン（100ms単位）*/
+
+/* 警告音の最小間隔（100ms単位、30 = 3秒）*/
+#define WARNING_SOUND_COOLDOWN  30
+
+/**
+ * @brief マスターワーニングGUI更新（メインループから呼び出し）
+ *
+ * emWinはリエントラントではないため、タイマー割り込みからではなく
+ * メインループから呼び出す必要がある
+ */
+void master_warning_gui_update(void)
+{
+	if (!s_warning_gui_update_needed) {
+		return;
+	}
+	s_warning_gui_update_needed = 0;
+
+	if (master_warning_is_active()) {
+		WM_HWIN hWin = WM_GetDialogItem(ID_SCREEN_01a_RootInfo.hWin, ID_TEXT_ACC);
+		if (hWin) {
+			const char *msg = master_warning_get_message();
+			if (msg != NULL && msg[0] != '\0') {
+				TEXT_SetText(hWin, msg);
+			}
+			/* 警告タイプに応じた背景色（HIGH/LOW両方とも赤） */
+			TEXT_SetBkColor(hWin, 0xFFFF0000);  /* 赤背景 (ARGB) */
+		}
+		APPW_SetVarData(ID_VAR_PRM, 1);
+		s_warning_displayed = 1;
+	} else {
+		if (s_warning_displayed) {
+			WM_HWIN hWin = WM_GetDialogItem(ID_SCREEN_01a_RootInfo.hWin, ID_TEXT_ACC);
+			if (hWin) {
+				/* 警告解除時は緑に戻さず、テキストをクリアしてから非表示にする */
+				TEXT_SetText(hWin, "");
+			}
+			s_warning_displayed = 0;
+		}
+		if (g_system_mode == MODE_NORMAL) {
+			APPW_SetVarData(ID_VAR_PRM, 0);
+		}
+	}
+}
+
 void data_setLCD100ms(void)
 {
+	/* 警告音クールダウン処理 */
+	if (s_warning_sound_cooldown > 0) {
+		s_warning_sound_cooldown--;
+	}
+
+	/* パラメータモード中は警告チェックをスキップ */
+	if (g_system_mode == MODE_PARAM) {
+		return;
+	}
+
+	/* Issue #50: マスターワーニング処理（タイマー割り込みコンテキスト）*/
+	master_warning_check();
+
+	if (master_warning_is_active()) {
+		/* 警告発報開始時のみ警告音を再生 */
+		if (!s_warning_displayed && s_warning_sound_cooldown == 0) {
+			/* 最初の警告時のみ警告音を再生（クールダウン中は抑制、sound_enabledで無効化可能）*/
+			if (g_can_config.sound_enabled) {
+				speaker_play_warning();
+			}
+			s_warning_sound_cooldown = WARNING_SOUND_COOLDOWN;
+		}
+		/* GUI更新は常に行う（値がリアルタイムで変わる場合に対応）*/
+		s_warning_gui_update_needed = 1;
+	} else {
+		/* 警告解除 */
+		if (s_warning_displayed) {
+			s_warning_gui_update_needed = 1;
+		}
+	}
 
 	APPW_SetVarData(ID_VAR_01, g_CALC_data.num1); //WaterTemp
 	APPW_SetVarData(ID_VAR_02, g_CALC_data.num2); //IAT

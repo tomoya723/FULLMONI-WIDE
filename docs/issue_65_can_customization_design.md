@@ -78,7 +78,14 @@ typedef struct __attribute__((packed)) {
     int16_t  offset;            /* オフセット値 (加算後) */
     uint16_t multiplier;        /* 乗算係数 (x1000) */
     uint16_t divisor;           /* 除算係数 (x1000) */
-    uint16_t reserved;          /* 予約 */
+    uint8_t  decimal_shift;     /* 小数シフト: 0=整数, 1=÷10, 2=÷100 */
+    uint8_t  reserved;          /* 予約 */
+    char     name[8];           /* 警告名 (Issue #50) */
+    char     unit[4];           /* 単位 (Issue #50) */
+    uint8_t  warn_low_enabled;  /* Lo警告有効 */
+    uint8_t  warn_high_enabled; /* Hi警告有効 */
+    float    warn_low;          /* Lo警告閾値 (表示単位) */
+    float    warn_high;         /* Hi警告閾値 (表示単位) */
 } CAN_Field_t;
 
 /* 拡張パラメータ構造体 */
@@ -166,7 +173,7 @@ float can_field_to_physical(const CAN_Field_t *field, const can_frame_t *rx_data
 | コマンド | 説明 | 例 |
 |---------|------|-----|
 | `can_ch <n> <id> <en>` | CANチャンネル設定 | `can_ch 1 0x3E8 1` |
-| `can_field <n> <ch> <byte> <size> <type> <end> <var> <off> <mul> <div>` | フィールド定義 | `can_field 0 1 0 2 0 0 10 0 1000 1000` |
+| `can_field <n> <ch> <byte> <size> <type> <end> <var> <off> <mul> <div> <dec> <name> <unit> <wlo_en> <wlo> <whi_en> <whi>` | フィールド定義 | `can_field 0 1 0 2 0 0 10 0 1000 1000 0 REV rpm 0 0 1 9000` |
 | `can_list` | CAN設定一覧表示 | `can_list` |
 | `can_preset <name>` | プリセット適用 | `can_preset motec_m100` |
 
@@ -294,6 +301,7 @@ float can_field_to_physical(const CAN_Field_t *field, const can_frame_t *rx_data
 |------|-----------|------|
 | 2026/01/15 | 1.0 | 初版作成 |
 | 2026/01/16 | 2.0 | Phase 1-3完了: Firmware側CAN設定UI、EEPROM永続化実装完了 |
+| 2026/01/25 | 3.0 | CAN_CONFIG_VERSION 5: decimal_shiftフィールド追加、警告閾値float化 |
 
 ---
 

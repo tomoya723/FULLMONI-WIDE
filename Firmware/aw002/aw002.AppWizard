@@ -141,6 +141,7 @@
     Item=4119,ID_VAR_AD4,0
     Item=4127,ID_VAR_SPEED_CAN,0
     Item=4120,ID_VAR_PRM,0
+    Item=4121,ID_VAR_WARNING,0
   </Variables>
   <FocusInfo>
     Color=ff2777b3
@@ -907,7 +908,7 @@
       IdPrev=0
       IdPost=0
       <Dispose>
-        xSize=256
+        xSize=253
         ySize=32
         <X0>
           Mode=2
@@ -928,9 +929,6 @@
         xOff=0
         yOff=0
       </SetTextAlign>
-      <SetTextId>
-        Id=21
-      </SetTextId>
       <SetBkColor>
         BkColor=ff00aa00
       </SetBkColor>
@@ -2814,10 +2812,6 @@
       </Para>
     </SETVALUE>
   </Interactions>
-  <Selection>
-    Root=ID_SCREEN_00
-    Object=2050
-  </Selection>
   <Terms>
   </Terms>
   <AnimItems>

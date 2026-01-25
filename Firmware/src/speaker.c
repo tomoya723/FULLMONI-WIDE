@@ -570,6 +570,10 @@ void speaker_play_warning(void)
     TPU0.TGRA = (60000000UL / WARNING_SAMPLE_RATE) - 1;
     TPU0.TCNT = 0U;
 
+    /* 割り込み有効化 */
+    IR(PERIB, INTB130) = 0U;   /* フラグクリア */
+    IEN(PERIB, INTB130) = 1U;  /* 割り込み許可 */
+
     /* 再生開始 */
     s_speaker_active = true;
     TPUA.TSTR.BIT.CST0 = 1U;

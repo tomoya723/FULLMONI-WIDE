@@ -20,6 +20,11 @@
 #include "param_storage.h"
 #include "usb_cdc.h"  /* USB CDC for parameter mode */
 #include "speaker.h"  /* Speaker output (DA1 + LM4861M) */
+#include "master_warning.h"  /* Issue #50: マスターワーニング */
+#include "GUI.h"               /* emWin GUI関数 */
+#include "TEXT.h"              /* TEXT Widget関数 */
+#include "WM.h"                /* Window Manager関数 */
+#include "../aw002/Source/Generated/ID_SCREEN_01a.h"  /* ID_TEXT_ACC 定義 */
 
 // --------------------------------------------------------------------
 // グローバル変数宣言
@@ -67,11 +72,17 @@ void ap_10ms(void);
 void ap_50ms(void);
 void ap_100ms(void);
 
+#include <string.h>  /* memset */
+
 extern void LCD_FadeIN(void);
+
+/* bss2セクションの初期化用シンボル（linker_script.ldで定義） */
+extern char __attribute__((section(".bss2"))) _bss2_dummy;
 
 void main(void)
  {
 	unsigned int shift_rev_cnt;
+	unsigned int warning_led_phase = 0;  /* Issue #50: ワーニングLED明滅フェーズ (0-99) */
 
 	/* USB CDC初期化（SCI9の代わり） */
 	usb_cdc_init();
@@ -112,6 +123,9 @@ void main(void)
 
 	// CAN設定は仮初期化（EEPROMはI2C初期化後に読み込む）
 	can_config_init();
+
+	// Issue #50: マスターワーニング初期化
+	master_warning_init();
 
 	// Init CAN
 	Init_CAN();
@@ -168,10 +182,10 @@ void main(void)
 
 	// CAN設定をEEPROMから読み込み（I2C初期化後）
 	if (can_config_load()) {
-		// EEPROM読み込み成功 → CANフィルタを更新
-		can_update_rx_filters();
+		// EEPROM読み込み成功
 	}
-	// 失敗時は既にcan_config_init()で初期化済み
+	// 成功・失敗に関わらずCANフィルタを更新（デフォルト値使用時も必要）
+	can_update_rx_filters();
 
 	// Start MTU8 (Vehicle speed　Pulse　Interupt function)
 	R_Config_MTU8_Start();
@@ -218,6 +232,14 @@ void main(void)
 				g_system_mode = MODE_PARAM;
 				g_param_mode_active = 1;
 				usb_cdc_set_mode(USB_MODE_ACTIVE);  /* フル通信モードへ */
+
+				/* 緑背景表示に "HOST ACCESS" を表示 */
+				WM_HWIN hWin = WM_GetDialogItem(ID_SCREEN_01a_RootInfo.hWin, ID_TEXT_ACC);
+				if (hWin) {
+					TEXT_SetText(hWin, "HOST ACCESS");
+					TEXT_SetBkColor(hWin, 0xFF00AA00);  /* 緑背景 (ARGB) */
+				}
+
 				APPW_SetVarData(ID_VAR_PRM, 1);     /* パラメータモード画面表示 */
 				param_console_enter();
 				continue;
@@ -264,6 +286,9 @@ void main(void)
 		GUI_Exec1();
 		APPW_Exec();
 
+		/* Issue #50: マスターワーニングGUI更新（メインループから呼ぶこと！）*/
+		master_warning_gui_update();
+
 		main_CAN();
 
 		if((sp_int != sp_int_old) && (g_sp_int_flg == 100))
@@ -288,7 +313,27 @@ void main(void)
 			wr_cnt ++;
 		}
 
-		if((g_CALC_data.rev >= g_param.shift_rpm1) && (g_CALC_data.rev < g_param.shift_rpm2))
+		/* Issue #50: マスターワーニング発報中はワーニングLED表示（赤色じわじわ明滅） */
+		if(master_warning_is_active())
+		{
+			/* 3秒周期（100ms×30ステップ）のサイン波明滅 */
+			/* フェーズ0-149: フェードイン, 150-299: フェードアウト */
+			int brightness;
+			if(warning_led_phase < 150) {
+				/* フェードイン: 0→255 */
+				brightness = (warning_led_phase * 255) / 150;
+			} else {
+				/* フェードアウト: 255→0 */
+				brightness = ((300 - warning_led_phase) * 255) / 150;
+			}
+			warning_led_phase = (warning_led_phase + 10) % 300;  /* 100ms毎に10進む、3秒で1周期 */
+
+			/* 8つのLED全て赤色で明滅 */
+			for(int i = 0; i < 8; i++) {
+				Neopixel_SetRGB(i, brightness, 0, 0);  /* G=brightness換算で赤 */
+			}
+		}
+		else if((g_CALC_data.rev >= g_param.shift_rpm1) && (g_CALC_data.rev < g_param.shift_rpm2))
 		{
 			Neopixel_SetRGB(0, 0, 0, 255);
 			Neopixel_SetRGB(1, 0, 0, 0);
@@ -370,6 +415,7 @@ void main(void)
 			Neopixel_SetRGB(6, 0, 0, 0);
 			Neopixel_SetRGB(7, 0, 0, 0);
 			shift_rev_cnt = 0;
+			warning_led_phase = 0;  /* Issue #50: ワーニングLEDフェーズリセット */
 		}
 		Neopixel_TX();
 

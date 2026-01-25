@@ -70,8 +70,15 @@ SendMsg(sMsgStruct_Frame4);
 SendMsg(sMsgStruct_Frame5);
 SendMsg(sMsgStruct_Frame6);
 
-
-
+MAP = 1000;
+LA1 = 1000;//LA1 = 1235;
+THW = 1000;//THW = 1200;
+THA = 400;//THA = 1000;
+OT = 1000;//OT = 1290;
+OP = 40000;
+BATTV = 1450;
+	
+/*
 MAP = MAP +0.4;
 LA1 = LA1+0.2;
 THW = THW +0.1;
@@ -79,39 +86,42 @@ THA = THA +0.2;
 OT = OT + 0.3;
 OP = OP +1;
 BATTV = BATTV +0.15;
-
+*/
 if(i == 0){
-	RPM =RPM + 100;
+	RPM =RPM + 50;
 	if(RPM >= 7000){
 		i=1;
 	}
 }
 else if(i == 1){
-	RPM =RPM - 100;
+	RPM =RPM - 50;
 	if(RPM <= 4000){
 		i=2;
 	}
 }
 else if(i == 2){
-	RPM =RPM + 50;
+	RPM =RPM + 25;
+OP = 40000;
 	if(RPM >= 7500){
 		i=3;
 	}
 }
 else if(i == 3){
-	RPM =RPM - 100;
+	RPM =RPM - 50;
+OP = 12000;
 	if(RPM <= 4500){
 		i=4;
 	}
 }
 else if(i == 4){
-	RPM =RPM + 20;
+	RPM =RPM + 10;
 	if(RPM >= 8000){
 		i=5;
 	}
 }
 else if(i == 5){
 	RPM =RPM - 100;
+OP = 10000;
 	if(RPM <= 1000){
 		i=0;
 	}

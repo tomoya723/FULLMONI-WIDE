@@ -30,7 +30,7 @@
         <item key="GuiFrameBufferAddr1">134217728</item>
         <item key="GuiFrameBufferAddr2">8388608</item>
         <item key="UseCacheMemory">false</item>
-        <item key="GuiMemorySize">81920</item>
+        <item key="GuiMemorySize">112640</item>
         <item key="UseTouch">false</item>
         <item key="TouchInterface">TOUCH_IF_SCI_IIC</item>
         <item key="I2CChannelNumber">6</item>

@@ -1,0 +1,24 @@
+can_list
+
+=== CAN Configuration ===
+Version: 2, Preset: 1
+
+-- Channels --
+CH1: ID=0x3E8, ON
+CH2: ID=0x3E9, ON
+CH3: ID=0x3EA, ON
+CH4: ID=0x3EB, ON
+CH5: ID=0x3EC, ON
+CH6: ID=0x3ED, OFF
+
+-- Fields --
+No CH Byte Len Type End Var    Off  Mul   Div   Name    Unit WE WarnLo WarnHi
+ 0  1   0   2   U    B   REV      0  1000  1000 REV     rpm  Y     200   9000
+ 1  1   4   2   U    B   NUM4     0  1000 10000 MAP     kPa  Y       0    150
+ 2  1   6   2   S    B   NUM2     0  1000 10000 IAT     C    Y     -40     80
+ 3  2   0   2   S    B   NUM1     0  1000 10000 WATER   C    Y      60    110
+ 4  2   2   2   U    B   AF       0   147  1000 A/F     afr  Y     100    180
+ 5  3   6   2   S    B   NUM3     0  1000 10000 OIL-T   C    Y      60    130
+ 6  4   0   2   U    B   NUM5     0     1  1000 OIL P   kPa  Y       1    ---
+ 7  4   6   2   U    B   NUM6     0  1000 10000 BATT    V    N       9    160
+> 

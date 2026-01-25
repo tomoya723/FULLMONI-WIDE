@@ -4,5 +4,6 @@
         <item key="IsOutputLCDTimingHeader">true</item>
         <item key="IsOutputLCDImageHeader">true</item>
         <item key="GuiTool">false</item>
+        <item key="GuiToolHeaderPath">\src</item>
     </SelectFolder>
 </settings>

@@ -115,6 +115,7 @@ extern GUI_CONST_STORAGE unsigned char acfuel2[];
 #define ID_VAR_AD4 (GUI_ID_USER + 2071)
 #define ID_VAR_SPEED_CAN (GUI_ID_USER + 2079)
 #define ID_VAR_PRM (GUI_ID_USER + 2072)
+#define ID_VAR_WARNING (GUI_ID_USER + 2073)
 
 /*********************************************************************
 *

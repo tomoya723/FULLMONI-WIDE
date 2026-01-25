@@ -167,7 +167,7 @@ static APPW_CREATE_ITEM _aCreate[] = {
         { DISPOSE_MODE_NULL, 0, 0, 0 },
         { DISPOSE_MODE_NULL, 0, 0, 0 },
       },
-      256, 32, 0, 0, 0, 0
+      253, 32, 0, 0, 0, 0
     },
     { 0, 0 }
   },
@@ -252,7 +252,6 @@ static GUI_CONST_STORAGE APPW_SETUP_ITEM _aSetup[] = {
   { ID_TEXT_ACC,         APPW_SET_PROP_ALIGNTEXT,    { ARG_V(GUI_ALIGN_HCENTER | GUI_ALIGN_VCENTER),
                                                        ARG_V(0),
                                                        ARG_V(0) } },
-  { ID_TEXT_ACC,         APPW_SET_PROP_TEXTID,       { ARG_V(ID_RTEXT_ACC) } },
   { ID_TEXT_ACC,         APPW_SET_PROP_BKCOLOR,      { ARG_V(0xff00aa00) } },
   { ID_TEXT_ACC,         APPW_SET_PROP_FONT,         { ARG_VP(0, ac51_20_Normal_EXT_AA2) } },
 };

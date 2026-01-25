@@ -41,6 +41,7 @@
         <Setting id="P44" value="AN004"/>
         <Setting id="P47" value="AN007"/>
         <Setting id="P46" value="AN006"/>
+        <Setting id="P05" value="DA1"/>
         <Setting id="PE2" value="LCD_DATA14"/>
         <Setting id="PE1" value="LCD_DATA15"/>
         <Setting id="PA0" value="LCD_DATA8"/>
@@ -104,11 +105,14 @@
         <Setting id="r_drw2d_rx" value="FIT"/>
         <Setting id="r_usb_pcdc" value="FIT"/>
         <Setting id="Config_MTU8" value="CG"/>
+        <Setting id="Config_DA" value="CG"/>
         <Setting id="r_glcdc_rx" value="FIT"/>
         <Setting id="r_gpio_rx" value="FIT"/>
         <Setting id="Config_LVD0" value="CG"/>
+        <Setting id="Config_TPU0" value="CG"/>
         <Setting id="r_can_rx" value="FIT"/>
         <Setting id="r_cmt_rx" value="FIT"/>
+        <Setting id="r_dtc_rx" value="FIT"/>
         <Setting id="Config_S12AD0" value="CG"/>
         <Setting id="Config_RIIC0" value="CG"/>
         <Setting id="Config_SCI9" value="CG"/>
@@ -366,6 +370,14 @@
             <Setting id="ClkEdg" value="Rise"/>
             <Setting id="TGRBValue" value="100"/>
         </Segment>
+        <Segment component="com.renesas.smc.tools.swcomponent.codegenerator.da" id="Config_DA" source="com.renesas.smc.tools.swcomponent.codegenerator.source">
+            <Setting id="EnableDA0ASW" value="Disable"/>
+            <Setting id="EnableS12AD1" value="Disable"/>
+            <Setting id="EnableDA1ASW" value="Disable"/>
+            <Setting id="EnableDA1Amp" value="Disable"/>
+            <Setting id="DataFormat" value="Right"/>
+            <Setting id="EnableDA1" value="Enable"/>
+        </Segment>
         <Segment component="r_glcdc_rx1.50" id="r_glcdc_rx" source="com.renesas.smc.tools.swcomponent.fit.source">
             <Setting id="LCD_CH0_CLUT_GR1_PBASE" value="FIT_NO_PTR"/>
             <Setting id="IMGC_GAMMA_B_GAIN_10" value="967"/>
@@ -566,6 +578,53 @@
             <Setting id="LVD0Start" value="ResetDisable"/>
             <Setting id="LVD_VoltLvl" value="lvd_280"/>
         </Segment>
+        <Segment component="com.renesas.smc.tools.swcomponent.codegenerator.normalmode" id="Config_TPU0" source="com.renesas.smc.tools.swcomponent.codegenerator.source">
+            <Setting id="CntClk" value="Div1"/>
+            <Setting id="TGRCValue" value="100"/>
+            <Setting id="TgrbScale" value="us"/>
+            <Setting id="Tgid" value="Disable"/>
+            <Setting id="Tgic" value="Disable"/>
+            <Setting id="Tgib" value="Disable"/>
+            <Setting id="Tgia" value="Enable"/>
+            <Setting id="MultiIntTgidEnable" value="UnCheck"/>
+            <Setting id="PrioV" value="Level15"/>
+            <Setting id="MultiIntTgiaEnable" value="UnCheck"/>
+            <Setting id="TGRAValue" value="100"/>
+            <Setting id="TGRDValue" value="100"/>
+            <Setting id="IOA" value="OutDis"/>
+            <Setting id="Tciv" value="Disable"/>
+            <Setting id="Sync" value="Disable"/>
+            <Setting id="IOC" value="OutDis"/>
+            <Setting id="IOB" value="OutDis"/>
+            <Setting id="IOD" value="OutDis"/>
+            <Setting id="ClrSrc" value="TGRA"/>
+            <Setting id="NoiseA" value="Disable"/>
+            <Setting id="PrioD" value="Level15"/>
+            <Setting id="ADSM1" value="Disable"/>
+            <Setting id="Tgrd" value="Out"/>
+            <Setting id="Tgrc" value="Out"/>
+            <Setting id="AdSrc1" value="NoSrc"/>
+            <Setting id="Tgrb" value="Out"/>
+            <Setting id="Tgra" value="Out"/>
+            <Setting id="TgrcScale" value="us"/>
+            <Setting id="NoiseClock" value="PCLK"/>
+            <Setting id="PrioA" value="Level15"/>
+            <Setting id="MultiIntTgicEnable" value="UnCheck"/>
+            <Setting id="PrioB" value="Level15"/>
+            <Setting id="PrioC" value="Level15"/>
+            <Setting id="ADSM0" value="Disable"/>
+            <Setting id="NoiseD" value="Disable"/>
+            <Setting id="NoiseC" value="Disable"/>
+            <Setting id="NoiseB" value="Disable"/>
+            <Setting id="TRGAN" value="Disable"/>
+            <Setting id="TgraScale" value="us"/>
+            <Setting id="MultiIntTgibEnable" value="UnCheck"/>
+            <Setting id="AdSrc0" value="NoSrc"/>
+            <Setting id="TgrdScale" value="us"/>
+            <Setting id="MultiIntTcivEnable" value="UnCheck"/>
+            <Setting id="ClkEdg" value="Rise"/>
+            <Setting id="TGRBValue" value="100"/>
+        </Segment>
         <Segment component="r_can_rx5.50" id="r_can_rx" source="com.renesas.smc.tools.swcomponent.fit.source">
             <Setting id="CAN1_TRX_ENABLE_PIN" value="0"/>
             <Setting id="CAN_CFG_RXFIFO_INT_GEN_TIMING" value="0"/>
@@ -606,6 +665,14 @@
             <Setting id="CMT_CFG_CH3_EN_NESTED_INT" value="0"/>
             <Setting id="CMT_CFG_CH0_EN_NESTED_INT" value="0"/>
             <Setting id="CMT_RX_CFG_IPR" value="5"/>
+        </Segment>
+        <Segment component="r_dtc_rx4.52" id="r_dtc_rx" source="com.renesas.smc.tools.swcomponent.fit.source">
+            <Setting id="DTC_CFG_PARAM_CHECKING_ENABLE" value="BSP_CFG_PARAM_CHECKING_ENABLE"/>
+            <Setting id="DTC_CFG_DISABLE_ALL_ACT_SOURCE" value="DTC_ENABLE"/>
+            <Setting id="DTC_CFG_USE_DMAC_FIT_MODULE" value="DTC_ENABLE"/>
+            <Setting id="DTC_CFG_TRANSFER_DATA_READ_SKIP_EN" value="DTC_ENABLE"/>
+            <Setting id="DTC_CFG_USE_SEQUENCE_TRANSFER" value="DTC_DISABLE"/>
+            <Setting id="DTC_CFG_SHORT_ADDRESS_MODE" value="DTC_DISABLE"/>
         </Segment>
         <Segment component="com.renesas.smc.tools.swcomponent.codegenerator.singlescanmode" id="Config_S12AD0" source="com.renesas.smc.tools.swcomponent.codegenerator.source">
             <Setting id="SDFmode" value="Unused"/>
@@ -1467,7 +1534,7 @@
             <Setting id="EMWIN_USE_LCD_CS_PIN" value="1"/>
             <Setting id="EMWIN_LCD_BAUDRATE" value="1000000"/>
             <Setting id="EMWIN_SELECT_DMAC_DTC" value="2"/>
-            <Setting id="EMWIN_GUI_NUM_BYTES" value="102400"/>
+            <Setting id="EMWIN_GUI_NUM_BYTES" value="112640"/>
             <Setting id="EMWIN_XSIZE_PHYS" value="800"/>
             <Setting id="EMWIN_GUI_USE_CACHE" value="0"/>
             <Setting id="EMWIN_USE_TOUCH" value="1"/>
