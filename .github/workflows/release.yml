@@ -1,0 +1,204 @@
+name: Release Distribution
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to process (e.g., v1.2.3)'
+        required: true
+        type: string
+
+env:
+  REPO_OWNER: tomoya723
+  REPO_NAME: FULLMONI-WIDE
+
+jobs:
+  generate-manifest:
+    name: Generate Release Manifest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get release info
+        id: release
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            TAG="${{ inputs.tag }}"
+          else
+            TAG="${{ github.event.release.tag_name }}"
+          fi
+          VERSION="${TAG#v}"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "date=$(date -I)" >> $GITHUB_OUTPUT
+
+      - name: Download release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p release-assets
+          cd release-assets
+
+          TAG="${{ steps.release.outputs.tag }}"
+
+          # Download all assets from the release
+          gh release download "$TAG" --repo "${{ env.REPO_OWNER }}/${{ env.REPO_NAME }}" || true
+
+          echo "=== Downloaded assets ==="
+          ls -la
+
+      - name: Calculate checksums and generate manifest
+        id: manifest
+        run: |
+          cd release-assets
+
+          TAG="${{ steps.release.outputs.tag }}"
+          VERSION="${{ steps.release.outputs.version }}"
+          DATE="${{ steps.release.outputs.date }}"
+
+          # Initialize manifest
+          cat > release-manifest.json << EOF
+          {
+            "schemaVersion": 1,
+            "version": "$VERSION",
+            "releaseDate": "$DATE",
+            "releaseNotes": "https://github.com/${{ env.REPO_OWNER }}/${{ env.REPO_NAME }}/releases/tag/$TAG",
+            "firmware": {
+              "minimumBootloaderVersion": "1.0.0",
+              "variants": [
+          EOF
+
+          # Find firmware variants (aw001, aw002, etc.)
+          FIRST=true
+          for bin_file in FULLMONI-WIDE-*-aw*.bin; do
+            if [ -f "$bin_file" ]; then
+              # Extract variant ID (e.g., aw001)
+              VARIANT_ID=$(echo "$bin_file" | grep -oP 'aw\d{3}')
+
+              # Calculate SHA256
+              SHA256=$(sha256sum "$bin_file" | cut -d' ' -f1)
+              SIZE=$(stat -c%s "$bin_file")
+
+              # Determine name based on variant
+              case "$VARIANT_ID" in
+                aw001) NAME="Standard"; DESC="標準デザイン - シンプルで見やすいレイアウト" ;;
+                aw002) NAME="Racing"; DESC="レーシングテーマ - スポーティなデザイン" ;;
+                aw003) NAME="Classic"; DESC="クラシックテーマ" ;;
+                *) NAME="Variant $VARIANT_ID"; DESC="AppWizard $VARIANT_ID" ;;
+              esac
+
+              # Add comma if not first
+              if [ "$FIRST" = true ]; then
+                FIRST=false
+              else
+                echo "," >> release-manifest.json
+              fi
+
+              # Check for thumbnail
+              THUMBNAIL=""
+              if [ -f "thumbnails/${VARIANT_ID}.png" ]; then
+                THUMBNAIL="thumbnails/${VARIANT_ID}.png"
+              fi
+
+              cat >> release-manifest.json << EOF
+                {
+                  "id": "$VARIANT_ID",
+                  "name": "$NAME",
+                  "description": "$DESC",
+                  "file": "$bin_file",
+                  "thumbnail": "$THUMBNAIL",
+                  "size": $SIZE,
+                  "sha256": "$SHA256"
+                }
+          EOF
+            fi
+          done
+
+          # Close firmware variants array
+          cat >> release-manifest.json << EOF
+              ]
+            }
+          EOF
+
+          # Add host apps section
+          echo ',' >> release-manifest.json
+          echo '"hostApps": {' >> release-manifest.json
+
+          # Windows app
+          WIN_FILE=$(ls FULLMONI-WIDE-Terminal-*-win-x64.zip 2>/dev/null | head -1)
+          if [ -n "$WIN_FILE" ] && [ -f "$WIN_FILE" ]; then
+            WIN_SHA256=$(sha256sum "$WIN_FILE" | cut -d' ' -f1)
+            WIN_SIZE=$(stat -c%s "$WIN_FILE")
+            cat >> release-manifest.json << EOF
+              "windows": {
+                "version": "$VERSION",
+                "file": "$WIN_FILE",
+                "size": $WIN_SIZE,
+                "sha256": "$WIN_SHA256"
+              }
+          EOF
+          fi
+
+          # Android app
+          APK_FILE=$(ls FULLMONI-WIDE-Terminal-*.apk 2>/dev/null | head -1)
+          if [ -n "$APK_FILE" ] && [ -f "$APK_FILE" ]; then
+            APK_SHA256=$(sha256sum "$APK_FILE" | cut -d' ' -f1)
+            APK_SIZE=$(stat -c%s "$APK_FILE")
+
+            # Add comma if windows exists
+            if [ -n "$WIN_FILE" ] && [ -f "$WIN_FILE" ]; then
+              # Insert comma before android
+              sed -i '/"windows":/,/}$/ { /}$/ s/$/,/ }' release-manifest.json
+            fi
+
+            cat >> release-manifest.json << EOF
+              "android": {
+                "version": "$VERSION",
+                "file": "$APK_FILE",
+                "size": $APK_SIZE,
+                "minSdk": 21,
+                "sha256": "$APK_SHA256"
+              }
+          EOF
+          fi
+
+          # Close hostApps and root
+          cat >> release-manifest.json << EOF
+            }
+          }
+          EOF
+
+          echo "=== Generated manifest ==="
+          cat release-manifest.json
+
+          # Validate JSON
+          python3 -m json.tool release-manifest.json > /dev/null
+          echo "Manifest JSON is valid"
+
+      - name: Upload manifest to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.release.outputs.tag }}"
+
+          # Upload manifest
+          gh release upload "$TAG" release-assets/release-manifest.json \
+            --repo "${{ env.REPO_OWNER }}/${{ env.REPO_NAME }}" \
+            --clobber
+
+          echo "✅ Manifest uploaded to release $TAG"
+
+  notify:
+    name: Notify Release
+    needs: generate-manifest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Release notification
+        run: |
+          echo "🎉 Release manifest generated and uploaded successfully!"
+          echo "Release: ${{ github.event.release.tag_name || inputs.tag }}"

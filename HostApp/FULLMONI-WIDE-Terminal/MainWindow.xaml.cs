@@ -87,7 +87,7 @@ namespace FullmoniTerminal
             DataContextChanged += (s, e) =>
             {
                 System.Diagnostics.Debug.WriteLine($"DataContextChanged: {e.NewValue?.GetType().Name ?? "null"}");
-            
+
                 if (e.OldValue is MainViewModel oldVm)
                 {
                     oldVm.ParametersLoaded -= ViewModel_ParametersLoaded;
@@ -133,7 +133,7 @@ namespace FullmoniTerminal
         private void HeroImageTimer_Tick(object? sender, EventArgs e)
         {
             var duration = new Duration(TimeSpan.FromSeconds(1.5));
-            
+
             if (_showingImage1)
             {
                 // FM3 → FM2 に切り替え
@@ -150,7 +150,7 @@ namespace FullmoniTerminal
                 HeroImage2.BeginAnimation(OpacityProperty, fadeOut);
                 HeroImage1.BeginAnimation(OpacityProperty, fadeIn);
             }
-            
+
             _showingImage1 = !_showingImage1;
         }
 
@@ -665,6 +665,24 @@ namespace FullmoniTerminal
                 CanReadButton.IsEnabled = true;
                 CanWriteButton.IsEnabled = true;
                 CanDefaultButton.IsEnabled = true;
+            }
+        }
+
+        #endregion
+
+        #region Firmware Catalog Events
+
+        /// <summary>
+        /// ファームウェアバリアントがクリックされたときの処理
+        /// </summary>
+        private void FirmwareVariant_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (sender is FrameworkElement element && element.DataContext is FirmwareVariantViewModel variant)
+            {
+                if (DataContext is MainViewModel vm)
+                {
+                    vm.FirmwareCatalog.SelectedVariant = variant;
+                }
             }
         }
 

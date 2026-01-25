@@ -48,6 +48,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public StartupImageViewModel StartupImageViewModel { get; }
 
     /// <summary>
+    /// ファームウェアカタログViewModel（オンライン更新用）
+    /// </summary>
+    public FirmwareCatalogViewModel FirmwareCatalog { get; private set; } = null!;
+
+    /// <summary>
     /// アプリバージョン
     /// </summary>
     public string AppVersion => Assembly.GetExecutingAssembly()
@@ -125,6 +130,46 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         // 起動画面書き込みViewModelを初期化
         StartupImageViewModel = new StartupImageViewModel(_serialService);
+
+        // ファームウェアカタログViewModelを初期化
+        FirmwareCatalog = new FirmwareCatalogViewModel(_serialService);
+
+        // ダウンロード完了時にファイルパスを設定
+        FirmwareCatalog.DownloadCompleted += (_, path) =>
+        {
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                FirmwareFilePath = path;
+                System.Diagnostics.Debug.WriteLine($"[MainViewModel] FirmwareFilePath set to: {path}");
+            });
+        };
+
+        // ダウンロード＆フラッシュ要求時にフラッシュを自動開始
+        FirmwareCatalog.FlashRequested += async (_, path) =>
+        {
+            await System.Windows.Application.Current.Dispatcher.InvokeAsync(async () =>
+            {
+                FirmwareFilePath = path;
+                System.Diagnostics.Debug.WriteLine($"[MainViewModel] FlashRequested: {path}");
+                if (CanStartFirmwareUpdate)
+                {
+                    await StartFirmwareUpdate();
+                }
+                else
+                {
+                    // エラーメッセージを表示
+                    if (!IsConnected)
+                    {
+                        FirmwareCatalog.ErrorMessage = "デバイスに接続してから実行してください";
+                    }
+                    else if (IsFirmwareUpdating)
+                    {
+                        FirmwareCatalog.ErrorMessage = "ファームウェア更新中です";
+                    }
+                    System.Diagnostics.Debug.WriteLine($"[MainViewModel] Cannot start update. IsConnected={IsConnected}, FirmwareFilePath={FirmwareFilePath}, IsFirmwareUpdating={IsFirmwareUpdating}");
+                }
+            });
+        };
 
         // イベント登録
         _serialService.DataReceived += SerialService_DataReceived;

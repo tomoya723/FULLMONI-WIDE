@@ -19,6 +19,10 @@
 
     <ui:FluentWindow.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+        <local:InverseBoolConverter x:Key="InverseBoolConverter"/>
+        <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <local:NullToBoolConverter x:Key="NullToBoolConverter"/>
+        <local:BoolToBorderBrushConverter x:Key="BoolToBorderBrushConverter"/>
 
         <!-- アクセントカラー -->
         <SolidColorBrush x:Key="AccentBrush" Color="#0078D4"/>
@@ -158,11 +162,11 @@
                                 <!-- CAD背景画像 (FM3.png) -->
                                 <Image x:Name="HeroImage1" Source="Assets/FM3.png" Stretch="UniformToFill" Opacity="0.35"
                                        HorizontalAlignment="Right" Margin="0,0,-100,0"/>
-                                
+
                                 <!-- 実機画像 (FM2.png) -->
                                 <Image x:Name="HeroImage2" Source="Assets/FM2.png" Stretch="UniformToFill" Opacity="0"
                                        HorizontalAlignment="Right" Margin="0,0,-100,0"/>
-                                
+
                                 <!-- グラデーションオーバーレイ -->
                                 <Border>
                                     <Border.Background>
@@ -346,8 +350,8 @@
                                 <StackPanel Grid.Column="0">
                                     <ui:TextBlock Text="Connected Device" FontTypography="BodyStrong" Margin="0,0,0,4"/>
                                     <TextBlock Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}">
-                                        <Run Text="Port: "/><Run Text="{Binding ConnectedPort, FallbackValue=Not connected}"/>
-                                        <Run Text="  |  FW: "/><Run Text="{Binding FirmwareVersion, FallbackValue=---}"/>
+                                        <Run Text="Port: "/><Run Text="{Binding ConnectedPort, FallbackValue=Not connected, Mode=OneWay}"/>
+                                        <Run Text="  |  FW: "/><Run Text="{Binding FirmwareVersion, FallbackValue=---, Mode=OneWay}"/>
                                     </TextBlock>
                                 </StackPanel>
                                 <ui:Button Grid.Column="1" Content="View Details" Click="NavCard_Click" Tag="status"
@@ -783,13 +787,134 @@
                                        FontWeight="SemiBold" FontSize="16" Foreground="#4CAF50" Margin="8"/>
                         </ui:CardExpander>
 
-                        <ui:CardExpander Header="Select Firmware File" IsExpanded="True" Margin="0,0,0,12">
+                        <!-- Online Firmware Catalog -->
+                        <ui:CardExpander x:Name="OnlineCatalogExpander" IsExpanded="True" Margin="0,0,0,12">
+                            <ui:CardExpander.Header>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Grid.Row="0" Orientation="Horizontal">
+                                        <ui:SymbolIcon Symbol="Cloud24" Margin="0,0,8,0" Foreground="#0891B2"/>
+                                        <ui:TextBlock Text="Online Firmware Catalog" FontTypography="Body"/>
+                                    </StackPanel>
+                                    <ui:TextBlock Grid.Row="1" Text="Download firmware variants from GitHub Releases" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"/>
+                                </Grid>
+                            </ui:CardExpander.Header>
+                            <StackPanel Margin="8">
+                                <!-- Release Selection -->
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ui:TextBlock Grid.Column="0" Text="Release:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <ComboBox Grid.Column="1" x:Name="ReleaseComboBox"
+                                              ItemsSource="{Binding FirmwareCatalog.AvailableReleases}"
+                                              SelectedItem="{Binding FirmwareCatalog.SelectedRelease}"
+                                              IsEnabled="{Binding FirmwareCatalog.IsLoading, Converter={StaticResource InverseBoolConverter}}"
+                                              Margin="0,0,8,0"/>
+                                    <ui:Button Grid.Column="2" Content="Check for Updates"
+                                               Icon="{ui:SymbolIcon ArrowSync24}"
+                                               Command="{Binding FirmwareCatalog.LoadLatestReleaseCommand}"
+                                               IsEnabled="{Binding FirmwareCatalog.IsLoading, Converter={StaticResource InverseBoolConverter}}"/>
+                                </Grid>
+
+                                <!-- Release Info -->
+                                <Border Background="#1E293B" CornerRadius="8" Padding="12" Margin="0,0,0,12"
+                                        Visibility="{Binding FirmwareCatalog.CurrentManifest, Converter={StaticResource NullToVisibilityConverter}}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <ui:SymbolIcon Symbol="Tag24" Margin="0,0,8,0" Foreground="#22C55E"/>
+                                        <TextBlock>
+                                            <Run Text="Version: " FontWeight="SemiBold"/>
+                                            <Run Text="{Binding FirmwareCatalog.ReleaseVersion, Mode=OneWay}" Foreground="#22C55E"/>
+                                            <Run Text="  |  Released: "/>
+                                            <Run Text="{Binding FirmwareCatalog.ReleaseDate, Mode=OneWay}"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Firmware Variants List -->
+                                <ItemsControl ItemsSource="{Binding FirmwareCatalog.Variants}" Margin="0,0,0,12">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#1A1A2E" CornerRadius="8" Padding="12" Margin="0,4"
+                                                    BorderBrush="{Binding IsSelected, Converter={StaticResource BoolToBorderBrushConverter}}"
+                                                    BorderThickness="2" Cursor="Hand"
+                                                    MouseLeftButtonDown="FirmwareVariant_Click">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="80"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!-- Thumbnail -->
+                                                    <Border Grid.Column="0" Width="72" Height="48" CornerRadius="4" Background="#0D1B2A" Margin="0,0,12,0">
+                                                        <Image Source="{Binding ThumbnailImage}" Stretch="Uniform"/>
+                                                    </Border>
+
+                                                    <!-- Info -->
+                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Name, Mode=OneWay}" FontWeight="SemiBold" FontSize="14"/>
+                                                        <TextBlock Text="{Binding Description, Mode=OneWay}" Opacity="0.7" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                                                        <TextBlock FontSize="11" Opacity="0.5" Margin="0,4,0,0">
+                                                            <Run Text="{Binding Id, StringFormat=[{0}], Mode=OneWay}"/>
+                                                            <Run Text="  |  "/>
+                                                            <Run Text="{Binding SizeDisplay, Mode=OneWay}"/>
+                                                        </TextBlock>
+                                                    </StackPanel>
+
+                                                    <!-- Select Indicator -->
+                                                    <ui:SymbolIcon Grid.Column="2" Symbol="CheckmarkCircle24" FontSize="24" Foreground="#22C55E"
+                                                                   Visibility="{Binding IsSelected, Converter={StaticResource BoolToVisibility}}"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <!-- Download Progress -->
+                                <StackPanel Visibility="{Binding FirmwareCatalog.IsDownloading, Converter={StaticResource BoolToVisibility}}" Margin="0,0,0,12">
+                                    <ProgressBar Value="{Binding FirmwareCatalog.Progress}" Height="8" Margin="0,0,0,4"/>
+                                </StackPanel>
+
+                                <!-- Status Message (always visible when not empty) -->
+                                <TextBlock Text="{Binding FirmwareCatalog.StatusMessage}" FontSize="12" Foreground="#22C55E" 
+                                           Margin="0,0,0,12" TextAlignment="Center"
+                                           Visibility="{Binding FirmwareCatalog.StatusMessage, Converter={StaticResource NullToVisibilityConverter}}"/>
+
+                                <!-- Error Message -->
+                                <Border Background="#7F1D1D" CornerRadius="4" Padding="8" Margin="0,0,0,12"
+                                        Visibility="{Binding FirmwareCatalog.ErrorMessage, Converter={StaticResource NullToVisibilityConverter}}">
+                                    <TextBlock Text="{Binding FirmwareCatalog.ErrorMessage}" Foreground="#FCA5A5"/>
+                                </Border>
+
+                                <!-- Actions -->
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <ui:Button Content="Download Selected"
+                                               Icon="{ui:SymbolIcon ArrowDownload24}"
+                                               Command="{Binding FirmwareCatalog.DownloadSelectedCommand}"
+                                               IsEnabled="{Binding FirmwareCatalog.SelectedVariant, Converter={StaticResource NullToBoolConverter}}"
+                                               Margin="0,0,8,0"/>
+                                    <ui:Button Content="Download &amp; Flash"
+                                               Appearance="Primary"
+                                               Icon="{ui:SymbolIcon ArrowUpload24}"
+                                               Command="{Binding FirmwareCatalog.DownloadAndFlashCommand}"
+                                               IsEnabled="{Binding FirmwareCatalog.SelectedVariant, Converter={StaticResource NullToBoolConverter}}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </ui:CardExpander>
+
+                        <ui:CardExpander Header="Select Local File" IsExpanded="False" Margin="0,0,0,12">
                             <Grid Margin="8">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <ui:TextBox Grid.Column="0" Text="{Binding SelectedFirmwarePath}" IsReadOnly="True" Margin="0,0,8,0"/>
+                                <ui:TextBox Grid.Column="0" Text="{Binding FirmwareFilePath}" IsReadOnly="True" Margin="0,0,8,0"/>
                                 <ui:Button Grid.Column="1" Content="Browse..." Icon="{ui:SymbolIcon FolderOpen24}" Command="{Binding BrowseFirmwareCommand}"/>
                             </Grid>
                         </ui:CardExpander>
@@ -801,7 +926,7 @@
                             </StackPanel>
                         </ui:CardExpander>
 
-                        <ui:CardExpander Header="Communication Log" IsExpanded="True" Margin="0,0,0,12">
+                        <ui:CardExpander Header="Communication Log" IsExpanded="False" Margin="0,0,0,12">
                             <StackPanel Margin="8">
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                                     <ui:Button Content="Clear" Margin="0,0,8,0" Icon="{ui:SymbolIcon Delete24}" Command="{Binding ClearFirmwareLogCommand}"/>
@@ -832,11 +957,11 @@
                     <StackPanel x:Name="AboutPage" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="600">
                         <!-- Logo -->
                         <Image Source="Assets/FM1.png" Width="280" Margin="0,0,0,32"/>
-                        
+
                         <!-- Title -->
                         <TextBlock Text="FULLMONI-WIDE Terminal" FontSize="32" FontWeight="Bold" HorizontalAlignment="Center"/>
                         <TextBlock Text="Version 1.0.0" FontSize="14" Opacity="0.7" HorizontalAlignment="Center" Margin="0,8,0,0"/>
-                        
+
                         <!-- Description -->
                         <Border Background="{DynamicResource CardBackgroundBrush}" CornerRadius="8" Padding="20" Margin="0,32,0,0">
                             <StackPanel>
@@ -845,7 +970,7 @@
                                     Configuration tool for FULLMONI-WIDE digital meter.
                                     Connect via USB to configure parameters and update firmware.
                                 </TextBlock>
-                                
+
                                 <TextBlock Text="Features" FontSize="14" FontWeight="SemiBold" Margin="0,20,0,8"/>
                                 <StackPanel Margin="8,0,0,0">
                                     <TextBlock Text="• Real-time status monitoring (RPM, Speed, Temp, etc.)" FontSize="12" Opacity="0.8" Margin="0,2"/>
@@ -854,17 +979,17 @@
                                     <TextBlock Text="• Boot screen customization (765×256 BMP)" FontSize="12" Opacity="0.8" Margin="0,2"/>
                                     <TextBlock Text="• Firmware update via USB (~268KB/s)" FontSize="12" Opacity="0.8" Margin="0,2"/>
                                 </StackPanel>
-                                
+
                                 <TextBlock Text="Hardware" FontSize="14" FontWeight="SemiBold" Margin="0,20,0,8"/>
-                                <TextBlock Text="Renesas RX72N MCU • 800×256 TFT LCD • CAN Bus • Neopixel LEDs" 
+                                <TextBlock Text="Renesas RX72N MCU • 800×256 TFT LCD • CAN Bus • Neopixel LEDs"
                                            FontSize="12" Opacity="0.8" TextWrapping="Wrap"/>
                             </StackPanel>
                         </Border>
-                        
+
                         <!-- Copyright & Links -->
-                        <TextBlock Text="© 2024-2026 FULLMONI-WIDE Project" FontSize="12" Opacity="0.5" 
+                        <TextBlock Text="© 2024-2026 FULLMONI-WIDE Project" FontSize="12" Opacity="0.5"
                                    HorizontalAlignment="Center" Margin="0,24,0,0"/>
-                        <TextBlock Text="Open Source Hardware &amp; Software (MIT License)" FontSize="11" Opacity="0.4" 
+                        <TextBlock Text="Open Source Hardware &amp; Software (MIT License)" FontSize="11" Opacity="0.4"
                                    HorizontalAlignment="Center" Margin="0,4,0,0"/>
 
                         <ui:HyperlinkButton Content="🔗 GitHub" NavigateUri="https://github.com/tomoya723/FULLMONI-WIDE"

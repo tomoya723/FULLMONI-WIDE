@@ -1,0 +1,45 @@
+{
+  "$schema": "./release-manifest.schema.json",
+  "schemaVersion": 1,
+  "version": "1.2.3",
+  "releaseDate": "2026-01-25",
+  "releaseNotes": "https://github.com/tomoya723/FULLMONI-WIDE/releases/tag/v1.2.3",
+  "firmware": {
+    "minimumBootloaderVersion": "1.0.0",
+    "variants": [
+      {
+        "id": "aw001",
+        "name": "Standard",
+        "description": "標準デザイン - シンプルで見やすいレイアウト",
+        "file": "FULLMONI-WIDE-v1.2.3-aw001.bin",
+        "thumbnail": "thumbnails/aw001.png",
+        "size": 1351680,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "id": "aw002",
+        "name": "Racing",
+        "description": "レーシングテーマ - スポーティなデザイン",
+        "file": "FULLMONI-WIDE-v1.2.3-aw002.bin",
+        "thumbnail": "thumbnails/aw002.png",
+        "size": 1351680,
+        "sha256": "d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592"
+      }
+    ]
+  },
+  "hostApps": {
+    "windows": {
+      "version": "1.2.3",
+      "file": "FULLMONI-WIDE-Terminal-v1.2.3-win-x64.zip",
+      "size": 52428800,
+      "sha256": "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456"
+    },
+    "android": {
+      "version": "1.2.3",
+      "file": "FULLMONI-WIDE-Terminal-v1.2.3.apk",
+      "size": 15728640,
+      "minSdk": 21,
+      "sha256": "fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321"
+    }
+  }
+}
