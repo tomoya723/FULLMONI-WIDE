@@ -4,37 +4,32 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import com.fullmoni.terminal.R
-import com.fullmoni.terminal.ui.theme.TerminalBackground
-import com.fullmoni.terminal.ui.theme.TerminalText
-import com.fullmoni.terminal.ui.theme.TerminalTypography
-import com.fullmoni.terminal.ui.theme.StatusConnected
-import com.fullmoni.terminal.ui.theme.StatusDisconnected
+import com.fullmoni.terminal.ui.theme.*
 import com.fullmoni.terminal.viewmodel.MainViewModel
 
 /**
- * ターミナル画面
+ * ターミナル画面 (デバッグ/高度な操作用に残す)
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TerminalScreen(viewModel: MainViewModel) {
     val isConnected by viewModel.isConnected.collectAsState()
     val receivedData by viewModel.receivedData.collectAsState()
-    val availableDrivers by viewModel.availableDrivers.collectAsState()
-    val selectedDriver by viewModel.selectedDriver.collectAsState()
     
     var commandText by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
     
     val scrollState = rememberScrollState()
     
@@ -48,103 +43,6 @@ fun TerminalScreen(viewModel: MainViewModel) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // 接続ステータスとデバイス選択
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(12.dp)
-                                .background(
-                                    color = if (isConnected) StatusConnected else StatusDisconnected,
-                                    shape = MaterialTheme.shapes.small
-                                )
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = if (isConnected) stringResource(R.string.connected) 
-                                   else stringResource(R.string.not_connected),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                    
-                    Button(
-                        onClick = {
-                            if (isConnected) {
-                                viewModel.disconnect()
-                            } else {
-                                viewModel.connect()
-                            }
-                        },
-                        enabled = selectedDriver != null || isConnected
-                    ) {
-                        Text(
-                            text = if (isConnected) stringResource(R.string.disconnect)
-                                   else stringResource(R.string.connect)
-                        )
-                    }
-                }
-                
-                if (!isConnected && availableDrivers.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    ExposedDropdownMenuBox(
-                        expanded = expanded,
-                        onExpandedChange = { expanded = it }
-                    ) {
-                        OutlinedTextField(
-                            value = selectedDriver?.device?.deviceName ?: "デバイスを選択",
-                            onValueChange = {},
-                            readOnly = true,
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                            modifier = Modifier
-                                .menuAnchor()
-                                .fillMaxWidth()
-                        )
-                        
-                        ExposedDropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
-                            availableDrivers.forEach { driver ->
-                                DropdownMenuItem(
-                                    text = { 
-                                        Text("${driver.device.deviceName} (${driver.javaClass.simpleName})")
-                                    },
-                                    onClick = {
-                                        viewModel.selectDriver(driver)
-                                        expanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-                
-                if (availableDrivers.isEmpty()) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = stringResource(R.string.no_device),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-        }
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
         // クイックコマンドボタン
         Row(
             modifier = Modifier
@@ -152,12 +50,12 @@ fun TerminalScreen(viewModel: MainViewModel) {
                 .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            QuickCommandButton(stringResource(R.string.cmd_help)) { viewModel.sendCommand("help") }
-            QuickCommandButton(stringResource(R.string.cmd_version)) { viewModel.sendCommand("version") }
-            QuickCommandButton(stringResource(R.string.cmd_list)) { viewModel.sendCommand("list") }
-            QuickCommandButton(stringResource(R.string.cmd_save)) { viewModel.sendCommand("save") }
-            QuickCommandButton(stringResource(R.string.cmd_load)) { viewModel.sendCommand("load") }
-            QuickCommandButton(stringResource(R.string.cmd_default)) { viewModel.sendCommand("default") }
+            QuickCommandButton("help") { viewModel.sendCommand("help") }
+            QuickCommandButton("version") { viewModel.sendCommand("version") }
+            QuickCommandButton("list") { viewModel.sendCommand("list") }
+            QuickCommandButton("save") { viewModel.sendCommand("save") }
+            QuickCommandButton("load") { viewModel.sendCommand("load") }
+            QuickCommandButton("default") { viewModel.sendCommand("default") }
         }
         
         Spacer(modifier = Modifier.height(16.dp))
@@ -166,7 +64,9 @@ fun TerminalScreen(viewModel: MainViewModel) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
+                .weight(1f),
+            colors = CardDefaults.cardColors(containerColor = CardBackground),
+            shape = RoundedCornerShape(8.dp)
         ) {
             Box(
                 modifier = Modifier
@@ -175,7 +75,7 @@ fun TerminalScreen(viewModel: MainViewModel) {
                     .padding(8.dp)
             ) {
                 Text(
-                    text = receivedData.ifEmpty { ">>> 接続してコマンドを送信してください" },
+                    text = receivedData.ifEmpty { ">>> Connect and send commands" },
                     style = TerminalTypography,
                     color = TerminalText,
                     modifier = Modifier
@@ -196,7 +96,7 @@ fun TerminalScreen(viewModel: MainViewModel) {
                 value = commandText,
                 onValueChange = { commandText = it },
                 modifier = Modifier.weight(1f),
-                placeholder = { Text(stringResource(R.string.command_hint)) },
+                placeholder = { Text("Enter command...", color = TextMuted) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
                 keyboardActions = KeyboardActions(
@@ -205,7 +105,13 @@ fun TerminalScreen(viewModel: MainViewModel) {
                         commandText = ""
                     }
                 ),
-                enabled = isConnected
+                enabled = isConnected,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = FullmoniPrimary,
+                    unfocusedBorderColor = TextMuted,
+                    focusedTextColor = TextPrimary,
+                    unfocusedTextColor = TextPrimary
+                )
             )
             
             Spacer(modifier = Modifier.width(8.dp))
@@ -215,17 +121,10 @@ fun TerminalScreen(viewModel: MainViewModel) {
                     viewModel.sendCommand(commandText)
                     commandText = ""
                 },
-                enabled = isConnected && commandText.isNotBlank()
+                enabled = isConnected && commandText.isNotBlank(),
+                colors = ButtonDefaults.buttonColors(containerColor = FullmoniPrimary)
             ) {
-                Text(stringResource(R.string.send))
-            }
-            
-            Spacer(modifier = Modifier.width(8.dp))
-            
-            OutlinedButton(
-                onClick = { viewModel.clearTerminal() }
-            ) {
-                Text(stringResource(R.string.clear))
+                Text("Send")
             }
         }
     }
@@ -238,7 +137,11 @@ private fun QuickCommandButton(
 ) {
     FilledTonalButton(
         onClick = onClick,
-        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+        colors = ButtonDefaults.filledTonalButtonColors(
+            containerColor = CardBackground,
+            contentColor = TextPrimary
+        )
     ) {
         Text(text)
     }

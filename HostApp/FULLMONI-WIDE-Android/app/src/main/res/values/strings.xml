@@ -1,18 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">FULLMONI Terminal</string>
-    <string name="connect">接続</string>
-    <string name="disconnect">切断</string>
-    <string name="send">送信</string>
-    <string name="clear">クリア</string>
-    <string name="terminal">ターミナル</string>
-    <string name="parameters">パラメータ</string>
-    <string name="command_hint">コマンドを入力...</string>
-    <string name="not_connected">未接続</string>
-    <string name="connected">接続中</string>
-    <string name="connection_failed">接続に失敗しました</string>
-    <string name="no_device">USBデバイスが見つかりません</string>
-    <string name="permission_denied">USB許可が拒否されました</string>
+    <string name="app_name">FULLMONI-WIDE Terminal</string>
+    
+    <!-- Connection -->
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="refresh">Refresh</string>
+    <string name="connected">Connected</string>
+    <string name="not_connected">Not Connected</string>
+    <string name="connection_failed">Connection failed</string>
+    <string name="no_device">No USB device found</string>
+    <string name="permission_denied">USB permission denied</string>
+    <string name="select_device">Select device</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_status">Status</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_can">CAN Config</string>
+    <string name="nav_startup">Boot Screen</string>
+    <string name="nav_firmware">FW Update</string>
+    <string name="nav_about">About</string>
+    <string name="terminal">Terminal</string>
+    <string name="parameters">Parameters</string>
+    
+    <!-- Actions -->
+    <string name="send">Send</string>
+    <string name="clear">Clear</string>
+    <string name="save">Save</string>
+    <string name="reload">Reload</string>
+    <string name="default_btn">Default</string>
+    <string name="copy">Copy</string>
+    <string name="browse">Browse</string>
+    
+    <!-- Terminal -->
+    <string name="command_hint">Enter command...</string>
     
     <!-- Quick Commands -->
     <string name="cmd_help">help</string>
@@ -21,4 +43,72 @@
     <string name="cmd_save">save</string>
     <string name="cmd_load">load</string>
     <string name="cmd_default">default</string>
+    
+    <!-- Status Page -->
+    <string name="status_title">Status</string>
+    <string name="meter_info">Meter Info</string>
+    <string name="meter_info_desc">View and configure ODO/TRIP/DateTime</string>
+    <string name="odo">ODO</string>
+    <string name="trip">TRIP</string>
+    <string name="datetime">DateTime</string>
+    <string name="reset">RESET</string>
+    <string name="sync_phone">Sync with Phone</string>
+    
+    <!-- Settings Page -->
+    <string name="settings_title">Vehicle Settings</string>
+    <string name="tire_size">Tire Size</string>
+    <string name="tire_size_desc">Tire diameter for speed calculation</string>
+    <string name="width">Width</string>
+    <string name="aspect">Aspect</string>
+    <string name="diameter">Diameter</string>
+    <string name="gear_ratio">Gear Ratio</string>
+    <string name="gear_ratio_desc">Used for gear position calculation</string>
+    <string name="preset">Preset</string>
+    <string name="final_gear">Final</string>
+    <string name="warning_settings">Warning Settings</string>
+    <string name="warning_settings_desc">Water temp &amp; fuel warning thresholds</string>
+    <string name="water_low">Water Low</string>
+    <string name="water_high">Water High</string>
+    <string name="fuel_warn">Fuel Warn</string>
+    <string name="shift_indicator">Shift Indicator</string>
+    <string name="shift_indicator_desc">Shift lamp activation RPM</string>
+    
+    <!-- CAN Config Page -->
+    <string name="can_title">CAN Communication Settings</string>
+    <string name="master_warning">Master Warning Settings</string>
+    <string name="master_warning_desc">Enable warning display based on CAN values</string>
+    <string name="enable">Enable</string>
+    <string name="sound">Sound</string>
+    <string name="receive_channels">Receive Channel Settings</string>
+    <string name="receive_channels_desc">Configure up to 6 CAN IDs</string>
+    <string name="data_fields">Data Field Definitions (Max 16)</string>
+    <string name="data_fields_desc">Define how to parse CAN data</string>
+    
+    <!-- Boot Screen Page -->
+    <string name="boot_title">Boot Screen</string>
+    <string name="select_image">Select Image</string>
+    <string name="read_device">Read Device</string>
+    <string name="write_device">Write to Device</string>
+    <string name="preview">Preview (765×256)</string>
+    <string name="upload_progress">Upload Progress</string>
+    <string name="log">Log</string>
+    
+    <!-- Firmware Update Page -->
+    <string name="fw_title">Firmware Update</string>
+    <string name="current_version">Current Version</string>
+    <string name="select_firmware">Select Firmware File</string>
+    <string name="transfer_progress">Transfer Progress</string>
+    <string name="comm_log">Communication Log</string>
+    <string name="start_update">Start Firmware Update</string>
+    
+    <!-- About Page -->
+    <string name="about_title">FULLMONI-WIDE Terminal</string>
+    <string name="about_version">Version 1.0.0</string>
+    <string name="about_this_tool">About This Tool</string>
+    <string name="about_description">Configuration tool for FULLMONI-WIDE digital meter.\nConnect via USB to configure parameters and update firmware.</string>
+    <string name="features">Features</string>
+    <string name="hardware">Hardware</string>
+    <string name="copyright">© 2024–2026 FULLMONI-WIDE Project</string>
+    <string name="license">Open Source Hardware &amp; Software (MIT License)</string>
+    <string name="github">GitHub</string>
 </resources>
