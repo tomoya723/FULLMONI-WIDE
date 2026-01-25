@@ -449,8 +449,8 @@ static const CAN_Config_t CAN_PRESET_MOTEC = {
         { .channel = 2, .start_byte = 2, .byte_count = 2, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_AF, .offset = 0, .multiplier = 147, .divisor = 1000,
           .name = "A/F", .unit = "afr", .decimal_shift = 1,
-          .warn_low_enabled = 1, .warn_high_enabled = 1, .reserved = 0,
-          .warn_low = 10.0f, .warn_high = 18.0f },     /* A/F: 内部147→表示14.7 */
+          .warn_low_enabled = 0, .warn_high_enabled = 0, .reserved = 0,
+          .warn_low = 10.0f, .warn_high = 18.0f },     /* A/F: 内部147→表示14.7, 警告無効 */
         /* CH3 (0x3EA): OilTemp(6-7) */
         { .channel = 3, .start_byte = 6, .byte_count = 2, .data_type = 1, .endian = 0,
           .target_var = CAN_TARGET_NUM3, .offset = 0, .multiplier = 1000, .divisor = 10000,
@@ -460,14 +460,14 @@ static const CAN_Config_t CAN_PRESET_MOTEC = {
         /* CH4 (0x3EB): OilPressure(0-1), BattV(6-7) */
         { .channel = 4, .start_byte = 0, .byte_count = 2, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_NUM5, .offset = 0, .multiplier = 1, .divisor = 1000,
-          .name = "OIL-P", .unit = "x100", .decimal_shift = 1,
+          .name = "OIL-P", .unit = "x100kPa", .decimal_shift = 1,
           .warn_low_enabled = 1, .warn_high_enabled = 1, .reserved = 0,
-          .warn_low = 1.5f, .warn_high = 9.0f },     /* OIL-P: 内部40→表示4.0 */
+          .warn_low = 1.5f, .warn_high = 9.0f },  /* OIL-P: CAN4000→内部4.0(x100kPa)→表示4.0 */
         { .channel = 4, .start_byte = 6, .byte_count = 2, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_NUM6, .offset = 0, .multiplier = 1000, .divisor = 10000,
           .name = "BATT", .unit = "V", .decimal_shift = 1,
           .warn_low_enabled = 0, .warn_high_enabled = 0, .reserved = 0,
-          .warn_low = 9.0f, .warn_high = 16.0f },  /* BATT: 内部142→表示14.2 */
+          .warn_low = 9.0f, .warn_high = 16.0f },  /* BATT: CAN1450→内部145→÷10=14.5V */
         /* 残りは無効 */
         { .channel = 0, .start_byte = 0, .byte_count = 0, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_NONE, .offset = 0, .multiplier = 1000, .divisor = 1000,
@@ -528,12 +528,14 @@ bool can_config_load(void)
     /* EEPROM読み込み */
     if (!eeprom_read(EEPROM_ADDR_CAN_CONFIG, buf, CAN_CONFIG_SIZE)) {
         can_config_init();
+        can_config_save();  /* デフォルト値をEEPROMに保存 */
         return false;
     }
 
     /* バージョンチェック */
     if (buf[0] != CAN_CONFIG_VERSION) {
         can_config_init();
+        can_config_save();  /* デフォルト値をEEPROMに保存（バージョンアップ時） */
         return false;
     }
 
@@ -544,6 +546,7 @@ bool can_config_load(void)
 
     if (crc_calc != crc_stored) {
         can_config_init();
+        can_config_save();  /* デフォルト値をEEPROMに保存（CRC不一致時） */
         return false;
     }
 

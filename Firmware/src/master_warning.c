@@ -26,6 +26,9 @@
 /* 複数警告表示切り替え間隔（100ms単位、5 = 0.5秒）*/
 #define WARNING_ROTATE_INTERVAL  5
 
+/* 警告ラッチ期間（100ms単位、100 = 10秒）*/
+#define WARNING_LATCH_COUNT  100
+
 /* 最大同時警告数 */
 #define MAX_ACTIVE_WARNINGS  8
 
@@ -46,6 +49,12 @@ static MasterWarningType_t s_active_warning_types[MAX_ACTIVE_WARNINGS];  /* 各�
 static uint8_t s_display_index = 0;         /* 現在表示中の警告インデックス */
 static uint8_t s_rotate_counter = 0;        /* 表示切り替えカウンタ */
 static bool s_message_changed = false;      /* メッセージ変更フラグ */
+
+/* ラッチ機能用 */
+static uint8_t s_latch_counter = 0;         /* ラッチカウンタ（警告解除後の表示継続用）*/
+static uint8_t s_latched_warning_count = 0; /* ラッチ中の警告数 */
+static int8_t s_latched_warnings[MAX_ACTIVE_WARNINGS];  /* ラッチ中の警告インデックス */
+static MasterWarningType_t s_latched_warning_types[MAX_ACTIVE_WARNINGS];  /* ラッチ中の警告タイプ */
 
 /* ============================================================
  * 内部関数
@@ -80,20 +89,46 @@ static float get_field_internal_value(uint8_t target_var)
 }
 
 /**
- * @brief CANフィールドの現在値を取得（表示単位）
+ * @brief CANフィールドの現在値を取得（表示単位、閾値比較用）
  * @param field CANフィールド設定
- * @return 現在値（表示単位、閾値比較用）
- * @note decimal_shiftに基づいて内部値を表示単位に変換
+ * @return 表示値（decimal_shift適用後の物理値）
+ * @note 閾値は表示単位（物理単位）で指定する
  */
 static float get_field_display_value(const CAN_Field_t *field)
 {
     float internal = get_field_internal_value(field->target_var);
     
-    /* decimal_shiftに応じて変換 (0:そのまま, 1:÷10, 2:÷100) */
+    /* decimal_shiftに応じて変換 (0:そのまま, 1:÷10, 2:÷100, 3:÷1000) */
     if (field->decimal_shift > 0 && field->decimal_shift < 4) {
         return internal / pow10_table[field->decimal_shift];
     }
     return internal;
+}
+
+/* target_varに対応するデフォルト名 */
+static const char * const s_target_var_names[] = {
+    "REV",    /* CAN_TARGET_REV = 0 */
+    "A/F",    /* CAN_TARGET_AF = 1 */
+    "WATER",  /* CAN_TARGET_NUM1 = 2 */
+    "IAT",    /* CAN_TARGET_NUM2 = 3 */
+    "OIL-T",  /* CAN_TARGET_NUM3 = 4 */
+    "MAP",    /* CAN_TARGET_NUM4 = 5 */
+    "OIL-P",  /* CAN_TARGET_NUM5 = 6 */
+    "BATT",   /* CAN_TARGET_NUM6 = 7 */
+    "SPEED",  /* CAN_TARGET_SPEED = 8 */
+};
+
+/**
+ * @brief 名前が有効かチェック（空でない、かつ英数字で始まる）
+ * @param name 名前文字列
+ * @return true: 有効, false: 無効
+ */
+static bool is_valid_name(const char *name)
+{
+    if (name[0] == '\0') return false;
+    /* 英大文字(A-Z)、英小文字(a-z)で始まるかチェック */
+    char c = name[0];
+    return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
 }
 
 /**
@@ -105,20 +140,21 @@ static float get_field_display_value(const CAN_Field_t *field)
 static void build_warning_message(const CAN_Field_t *field, MasterWarningType_t type)
 {
     const char *type_str = (type == WARN_TYPE_HIGH) ? "HIGH" : "LOW";
+    const char *name_src;
     int pos = 0;
 
-    /* 名前をコピー（最大7文字）*/
-    if (field->name[0] != '\0') {
-        const char *src = field->name;
-        while (*src && pos < MASTER_WARNING_MSG_MAX - 6) {  /* " HIGH\0" 用に6バイト確保 */
-            s_warning_message[pos++] = *src++;
-        }
+    /* 名前を決定: field->nameが有効なら使用、なければtarget_varからデフォルト名 */
+    if (is_valid_name(field->name)) {
+        name_src = field->name;
+    } else if (field->target_var < sizeof(s_target_var_names) / sizeof(s_target_var_names[0])) {
+        name_src = s_target_var_names[field->target_var];
     } else {
-        /* デフォルト名 "WARN" */
-        const char *src = "WARN";
-        while (*src) {
-            s_warning_message[pos++] = *src++;
-        }
+        name_src = "WARN";
+    }
+
+    /* 名前をコピー（最大7文字）*/
+    while (*name_src && pos < MASTER_WARNING_MSG_MAX - 6) {  /* " HIGH\0" 用に6バイト確保 */
+        s_warning_message[pos++] = *name_src++;
     }
 
     /* スペース追加 */
@@ -155,6 +191,11 @@ void master_warning_init(void)
     s_rotate_counter = 0;
     s_message_changed = false;
     memset(s_active_warnings, -1, sizeof(s_active_warnings));
+
+    /* ラッチ機能の初期化 */
+    s_latch_counter = 0;
+    s_latched_warning_count = 0;
+    memset(s_latched_warnings, -1, sizeof(s_latched_warnings));
 }
 
 /**
@@ -310,14 +351,61 @@ void master_warning_check(void)
         }
 
         s_warning_active = true;
+
+        /* ラッチ用に現在の警告をコピー */
+        s_latched_warning_count = new_warning_count;
+        for (i = 0; i < new_warning_count; i++) {
+            s_latched_warnings[i] = new_warnings[i];
+            s_latched_warning_types[i] = new_warning_types[i];
+        }
+        s_latch_counter = WARNING_LATCH_COUNT;  /* ラッチカウンタをリセット */
     } else {
-        s_warning_active = false;
-        s_warning_field_idx = -1;
-        s_warning_type = WARN_TYPE_NONE;
-        s_warning_message[0] = '\0';
-        s_active_warning_count = 0;
-        s_display_index = 0;
-        s_rotate_counter = 0;
+        /* アクティブな警告がない場合 */
+        if (s_latch_counter > 0) {
+            /* ラッチ期間中 - 前回の警告を継続表示 */
+            s_latch_counter--;
+
+            /* ラッチ中の警告リストを使用 */
+            s_active_warning_count = s_latched_warning_count;
+            for (i = 0; i < s_latched_warning_count; i++) {
+                s_active_warnings[i] = s_latched_warnings[i];
+                s_active_warning_types[i] = s_latched_warning_types[i];
+            }
+
+            /* 表示切り替えタイマー処理（複数警告時のみ）*/
+            if (s_active_warning_count > 1) {
+                s_rotate_counter++;
+                if (s_rotate_counter >= WARNING_ROTATE_INTERVAL) {
+                    s_rotate_counter = 0;
+                    s_display_index++;
+                    if (s_display_index >= s_active_warning_count) {
+                        s_display_index = 0;
+                    }
+                    /* ラッチ中の切り替えでもメッセージを更新 */
+                    if (s_display_index < s_active_warning_count) {
+                        int8_t disp_idx = s_active_warnings[s_display_index];
+                        if (disp_idx >= 0 && disp_idx < CAN_FIELD_MAX) {
+                            field = &g_can_config.fields[disp_idx];
+                            build_warning_message(field, s_active_warning_types[s_display_index]);
+                            s_warning_field_idx = disp_idx;
+                            s_warning_type = s_active_warning_types[s_display_index];
+                        }
+                    }
+                }
+            }
+
+            s_warning_active = true;  /* ラッチ中は警告状態を維持 */
+        } else {
+            /* ラッチ期間終了 - 警告を解除 */
+            s_warning_active = false;
+            s_warning_field_idx = -1;
+            s_warning_type = WARN_TYPE_NONE;
+            s_warning_message[0] = '\0';
+            s_active_warning_count = 0;
+            s_latched_warning_count = 0;
+            s_display_index = 0;
+            s_rotate_counter = 0;
+        }
     }
 }
 

@@ -101,6 +101,7 @@ else if(i == 1){
 }
 else if(i == 2){
 	RPM =RPM + 50;
+OP = 40000;
 	if(RPM >= 7500){
 		i=3;
 	}
@@ -119,6 +120,7 @@ else if(i == 4){
 }
 else if(i == 5){
 	RPM =RPM - 100;
+OP = 12000;
 	if(RPM <= 1000){
 		i=0;
 	}

@@ -19,6 +19,7 @@
 #include "WM.h"                /* Window Manager関数 */
 #include "../aw002/Source/Generated/Resource.h"  /* AppWizard リソース定義 */
 #include "../aw002/Source/Generated/ID_SCREEN_01a.h"  /* ID_TEXT_ACC 定義 */
+#include "../aw002/Source/Generated/ID_SCREEN_Telltale.h"  /* ID_ICON_xx 定義 */
 
 #define PI 3.1415923
 
@@ -303,7 +304,7 @@ void data_store(void)
 	APPW_SetVarData(ID_VAR_AD2, g_CALC_data.AD2 * 10);
 	APPW_SetVarData(ID_VAR_AD3, g_CALC_data.AD3 * 10);
 	APPW_SetVarData(ID_VAR_AD4, g_CALC_data.AD4 * 10);
-	aPara0[0].v = 0;																			APPW_DoJob(ID_SCREEN_Telltale, ID_ICON_00 , APPW_JOB_SETVIS, aPara0);	// Master Warning
+	aPara0[0].v = master_warning_is_active() ? 1 : 0;											APPW_DoJob(ID_SCREEN_Telltale, ID_ICON_00 , APPW_JOB_SETVIS, aPara0);	// Master Warning (Issue #50)
 	aPara1[0].v = 0;																			APPW_DoJob(ID_SCREEN_Telltale, ID_ICON_01 , APPW_JOB_SETVIS, aPara1);	// Oil Warning
 	if(g_CALC_data.num1 >  60)	{	aPara2[0].v = 0;	} else {		aPara2[0].v = 1;	}	APPW_DoJob(ID_SCREEN_Telltale, ID_ICON_02L, APPW_JOB_SETVIS, aPara2);	// Water Temp Warning Low
 	if(g_CALC_data.num1 < 100)	{	aPara3[0].v = 0;	} else {		aPara3[0].v = 1;	}	APPW_DoJob(ID_SCREEN_Telltale, ID_ICON_02H, APPW_JOB_SETVIS, aPara3);	// Water Temp Warning High
@@ -384,12 +385,8 @@ void master_warning_gui_update(void)
 			if (msg != NULL && msg[0] != '\0') {
 				TEXT_SetText(hWin, msg);
 			}
-			/* 警告タイプに応じた背景色 */
-			if (master_warning_get_type() == WARN_TYPE_HIGH) {
-				TEXT_SetBkColor(hWin, 0xFFFF0000);  /* HIGH: 赤背景 (ARGB) */
-			} else {
-				TEXT_SetBkColor(hWin, 0xFF0055FF);  /* LOW: 青背景 (ARGB) */
-			}
+			/* 警告タイプに応じた背景色（HIGH/LOW両方とも赤） */
+			TEXT_SetBkColor(hWin, 0xFFFF0000);  /* 赤背景 (ARGB) */
 		}
 		APPW_SetVarData(ID_VAR_PRM, 1);
 		s_warning_displayed = 1;
@@ -397,7 +394,8 @@ void master_warning_gui_update(void)
 		if (s_warning_displayed) {
 			WM_HWIN hWin = WM_GetDialogItem(ID_SCREEN_01a_RootInfo.hWin, ID_TEXT_ACC);
 			if (hWin) {
-				TEXT_SetBkColor(hWin, 0xFF00AA00);  /* 緑背景 (ARGB) */
+				/* 警告解除時は緑に戻さず、テキストをクリアしてから非表示にする */
+				TEXT_SetText(hWin, "");
 			}
 			s_warning_displayed = 0;
 		}

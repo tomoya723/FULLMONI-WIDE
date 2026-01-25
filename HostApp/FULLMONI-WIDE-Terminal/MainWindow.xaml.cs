@@ -214,13 +214,13 @@ public partial class MainWindow : Window
             new { Ch = 2, Byte = 0, Size = 2, Type = "S", End = "B", Var = 2, Off = 0, Mul = 1000, Div = 10000, En = true,
                   Name = "WATER", Unit = "deg", DecShift = 0, WarnLoEn = false, WarnLo = -40.0, WarnHiEn = true, WarnHi = 110.0 },
             new { Ch = 2, Byte = 2, Size = 2, Type = "U", End = "B", Var = 1, Off = 0, Mul = 147, Div = 1000, En = true,
-                  Name = "A/F", Unit = "afr", DecShift = 1, WarnLoEn = true, WarnLo = 10.0, WarnHiEn = true, WarnHi = 18.0 },
+                  Name = "A/F", Unit = "afr", DecShift = 1, WarnLoEn = false, WarnLo = 10.0, WarnHiEn = false, WarnHi = 18.0 },
             // CH3 (0x3EA): OilTemp(6-7)
             new { Ch = 3, Byte = 6, Size = 2, Type = "S", End = "B", Var = 4, Off = 0, Mul = 1000, Div = 10000, En = true,
                   Name = "OIL-T", Unit = "deg", DecShift = 0, WarnLoEn = false, WarnLo = -40.0, WarnHiEn = true, WarnHi = 130.0 },
             // CH4 (0x3EB): OilPressure(0-1), BattV(6-7)
             new { Ch = 4, Byte = 0, Size = 2, Type = "U", End = "B", Var = 6, Off = 0, Mul = 1, Div = 1000, En = true,
-                  Name = "OIL-P", Unit = "x100", DecShift = 1, WarnLoEn = true, WarnLo = 1.5, WarnHiEn = true, WarnHi = 9.0 },
+                  Name = "OIL-P", Unit = "x100kPa", DecShift = 1, WarnLoEn = true, WarnLo = 1.5, WarnHiEn = true, WarnHi = 9.0 },
             new { Ch = 4, Byte = 6, Size = 2, Type = "U", End = "B", Var = 7, Off = 0, Mul = 1000, Div = 10000, En = true,
                   Name = "BATT", Unit = "V", DecShift = 1, WarnLoEn = false, WarnLo = 9.0, WarnHiEn = false, WarnHi = 16.0 },
         };
@@ -743,8 +743,9 @@ public partial class MainWindow : Window
                 // 閾値はfloat形式で送信 (InvariantCultureで小数点をピリオドに)
                 var warnLoStr = field.WarnLow.ToString("G", System.Globalization.CultureInfo.InvariantCulture);
                 var warnHiStr = field.WarnHigh.ToString("G", System.Globalization.CultureInfo.InvariantCulture);
-                // can_field <n> <ch> <byte> <len> <type> <end> <var> <off> <mul> <div> <dsh> <name> <unit> <wlo_en> <warn_lo> <whi_en> <warn_hi>
-                commands.Add($"can_field {field.Index} {channel} {field.StartByte} {field.ByteCount} {dataType} {endian} {field.TargetVar} {field.Offset} {field.Multiplier} {field.Divisor} {field.DecimalShift} {name} {unit} {warnLoEn} {warnLoStr} {warnHiEn} {warnHiStr}");
+                // can_field <n> <ch> <byte> <len> <type> <end> <var> <off> <mul> <div> <name> <unit> <dec_shift> <wlo_en> <warn_lo> <whi_en> <warn_hi>
+                // 注意: Firmware側のパース順に合わせる (name, unit, dec_shift の順)
+                commands.Add($"can_field {field.Index} {channel} {field.StartByte} {field.ByteCount} {dataType} {endian} {field.TargetVar} {field.Offset} {field.Multiplier} {field.Divisor} {name} {unit} {field.DecimalShift} {warnLoEn} {warnLoStr} {warnHiEn} {warnHiStr}");
             }
 
             if (commands.Count == 0)
@@ -813,13 +814,13 @@ public partial class MainWindow : Window
                 new { Ch = 2, Byte = 0, Size = 2, Type = "S", End = "B", Var = 2, Off = 0, Mul = 1000, Div = 10000, DecShift = 0, En = true,
                       Name = "WATER", Unit = "deg", WarnLoEn = false, WarnLo = -40.0, WarnHiEn = true, WarnHi = 110.0 },
                 new { Ch = 2, Byte = 2, Size = 2, Type = "U", End = "B", Var = 1, Off = 0, Mul = 147, Div = 1000, DecShift = 1, En = true,
-                      Name = "A/F", Unit = "afr", WarnLoEn = true, WarnLo = 10.0, WarnHiEn = true, WarnHi = 18.0 },
+                      Name = "A/F", Unit = "afr", WarnLoEn = false, WarnLo = 10.0, WarnHiEn = false, WarnHi = 18.0 },
                 // CH3 (0x3EA): OilTemp(6-7)
                 new { Ch = 3, Byte = 6, Size = 2, Type = "S", End = "B", Var = 4, Off = 0, Mul = 1000, Div = 10000, DecShift = 0, En = true,
                       Name = "OIL-T", Unit = "deg", WarnLoEn = false, WarnLo = -40.0, WarnHiEn = true, WarnHi = 130.0 },
                 // CH4 (0x3EB): OilPressure(0-1), BattV(6-7)
                 new { Ch = 4, Byte = 0, Size = 2, Type = "U", End = "B", Var = 6, Off = 0, Mul = 1, Div = 1000, DecShift = 1, En = true,
-                      Name = "OIL-P", Unit = "x100", WarnLoEn = true, WarnLo = 1.5, WarnHiEn = true, WarnHi = 9.0 },
+                      Name = "OIL-P", Unit = "x100kPa", WarnLoEn = true, WarnLo = 1.5, WarnHiEn = true, WarnHi = 9.0 },
                 new { Ch = 4, Byte = 6, Size = 2, Type = "U", End = "B", Var = 7, Off = 0, Mul = 1000, Div = 10000, DecShift = 1, En = true,
                       Name = "BATT", Unit = "V", WarnLoEn = false, WarnLo = 9.0, WarnHiEn = false, WarnHi = 16.0 },
             };

@@ -22,7 +22,7 @@
 
 /* Issue #50: マスターワーニング用定数 */
 #define CAN_FIELD_NAME_MAX  8       /* 名前文字列最大長 (7文字+NULL) */
-#define CAN_FIELD_UNIT_MAX  4       /* 単位文字列最大長 (3文字+NULL) */
+#define CAN_FIELD_UNIT_MAX  8       /* 単位文字列最大長 (7文字+NULL) "x100kPa"対応 */
 #define CAN_WARN_DISABLED   (-1e30f) /* 閾値無効値: float用 */
 
 /* CAN受信チャンネル設定 */
@@ -53,7 +53,7 @@ typedef struct __attribute__((packed)) {
     uint8_t  reserved;              /* 予約 (アライメント用) */
     float    warn_low;              /* 下限閾値 (表示単位、これを下回るとワーニング) */
     float    warn_high;             /* 上限閾値 (表示単位、これを超えるとワーニング) */
-} CAN_Field_t;  /* 合計: 36 bytes */
+} CAN_Field_t;  /* 合計: 40 bytes (unit拡張により+4) */
 
 /* CAN設定全体 (RAM2領域に配置) */
 typedef struct __attribute__((packed)) {
@@ -69,7 +69,7 @@ typedef struct __attribute__((packed)) {
 #define CAN_CONFIG_SIZE     sizeof(CAN_Config_t)
 
 /* CAN設定バージョン */
-#define CAN_CONFIG_VERSION  5       /* Issue #50: decimal_shift フィールド追加 */
+#define CAN_CONFIG_VERSION  6       /* Issue #50: unit フィールドを8文字に拡張 */
 
 /* プリセットID */
 #define CAN_PRESET_CUSTOM       0

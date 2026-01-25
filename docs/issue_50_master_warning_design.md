@@ -39,10 +39,12 @@ AppWizardの `APPW_SetVarData()` は**整数値のみ**受け付けます。
 
 ### 4. 警告表示
 - 画面下部に赤いエリアが出現し警告を知らせる
-- AppWizard変数 `ID_VAR_WARNING` で表示/非表示を制御（0=正常, 1=警告）
-- AppWizard変数 `ID_RTEXT_WARNING` で警告テキストを設定（Firmware側から文字列指定）
+- AppWizard変数 `ID_VAR_PRM` で表示/非表示を制御（0=正常, 1=警告）
+- `TEXT_SetText()` で警告テキストを設定（Firmware側から直接制御）
 - 警告テキストウィジェットに警告対象のパラメータ名と HIGH/LOW を表示
 - 例: 「WATER HIGH」「OIL-P LOW」
+- **背景色**: HIGH/LOW 両方とも赤背景（0xFFFF0000）で統一
+- **ラッチ機能**: 警告発生後、条件が解消しても10秒間は表示を継続
 
 ### 5. 警告音
 - 警告が OFF→ON になった瞬間に1回だけ警告音を再生
@@ -68,7 +70,7 @@ AppWizardの `APPW_SetVarData()` は**整数値のみ**受け付けます。
 
 ```c
 #define CAN_FIELD_NAME_MAX  8   /* 名前文字列最大長 (7文字+NULL) */
-#define CAN_FIELD_UNIT_MAX  4   /* 単位文字列最大長 (3文字+NULL) */
+#define CAN_FIELD_UNIT_MAX  8   /* 単位文字列最大長 (7文字+NULL) - "x100kPa"対応 */
 #define CAN_WARN_DISABLED   (-1e30f)  /* 閾値無効値 (float型) */
 
 typedef struct __attribute__((packed)) {
@@ -83,32 +85,32 @@ typedef struct __attribute__((packed)) {
     uint16_t multiplier;            /* 乗算係数 (x1000) 例: 1000=x1, 100=x0.1 */
     uint16_t divisor;               /* 除算係数 (x1000) 例: 1000=/1, 10000=/10 */
 
-    /* === 新規追加フィールド (24 bytes) === */
-    uint8_t  decimal_shift;         /* 小数シフト: 0=整数, 1=÷10, 2=÷100 */
+    /* === 新規追加フィールド (28 bytes) === */
+    uint8_t  decimal_shift;         /* 小数シフト: 0=整数, 1=÷10, 2=÷100, 3=÷1000 */
     uint8_t  reserved;              /* 予約 */
     char     name[CAN_FIELD_NAME_MAX];  /* 名前文字列 (例: "WATER", "OIL-P") */
-    char     unit[CAN_FIELD_UNIT_MAX];  /* 単位文字列 (例: "C", "kPa", "rpm") */
+    char     unit[CAN_FIELD_UNIT_MAX];  /* 単位文字列 (例: "C", "x100kPa", "rpm") */
     uint8_t  warn_low_enabled;      /* 下限ワーニング有効: 0=無効, 1=有効 */
     uint8_t  warn_high_enabled;     /* 上限ワーニング有効: 0=無効, 1=有効 */
     float    warn_low;              /* 下限閾値 (表示単位、これを下回るとワーニング) */
     float    warn_high;             /* 上限閾値 (表示単位、これを超えるとワーニング) */
-} CAN_Field_t;  /* 合計: 36 bytes */
+} CAN_Field_t;  /* 合計: 40 bytes */
 ```
 
 ### メモリ使用量
 
 | 項目 | 変更前 | 変更後 | 増分 |
 |------|--------|--------|------|
-| CAN_Field_t (1個) | 12 bytes | 36 bytes | +24 bytes |
-| CAN_Field_t × 16 | 192 bytes | 576 bytes | +384 bytes |
-| CAN_Config_t 合計 | 約220 bytes | 約604 bytes | +384 bytes |
+| CAN_Field_t (1個) | 12 bytes | 40 bytes | +28 bytes |
+| CAN_Field_t × 16 | 192 bytes | 640 bytes | +448 bytes |
+| CAN_Config_t 合計 | 約220 bytes | 約668 bytes | +448 bytes |
 
 ※ CAN_Config_tは `.bss2` セクション (RAM2領域) に配置されており、メインRAM (48KB) への影響なし
 
 ### フィールドの説明
-- `decimal_shift`: 小数シフト値（0=整数, 1=÷10, 2=÷100）- AppWizard Maskとの対応
+- `decimal_shift`: 小数シフト値（0=整数, 1=÷10, 2=÷100, 3=÷1000）- AppWizard Maskとの対応
 - `name[8]`: パラメータ名（警告表示用）- "WATER", "OIL-T", "OIL-P", "INTAKE", "MAP", "BATT", "REV", "A/F"
-- `unit[4]`: 単位文字列（英字のみ、最大3文字）- "C", "kPa", "rpm", "V", "afr"
+- `unit[8]`: 単位文字列（最大7文字）- "C", "x100kPa", "rpm", "V", "AFR"
 - `warn_low_enabled`: 下限警告の有効/無効フラグ
 - `warn_high_enabled`: 上限警告の有効/無効フラグ
 - `warn_low`: 下限閾値（**表示単位**で設定）
@@ -116,7 +118,7 @@ typedef struct __attribute__((packed)) {
 
 ### CAN設定バージョン
 ```c
-#define CAN_CONFIG_VERSION  5   /* decimal_shift フィールド追加 */
+#define CAN_CONFIG_VERSION  6   /* unit フィールド拡張 */
 ```
 
 ### バージョン履歴
@@ -125,6 +127,7 @@ typedef struct __attribute__((packed)) {
 - VERSION 3: warn_enabled を warn_low_enabled/warn_high_enabled に分離
 - VERSION 4: warn_low/warn_high を int16_t から float に変更
 - VERSION 5: decimal_shift フィールド追加（内部値→表示値変換を汎用化）
+- VERSION 6: unit フィールド拡張（4→8バイト、"x100kPa" 対応）
 
 ## データフィールド定義例（MoTeC M400プリセット）
 
@@ -139,7 +142,7 @@ typedef struct __attribute__((packed)) {
 │ 3 │ WATER  │ C    │ 2  │ 0    │ 2    │ S    │ B   │ NUM1 │ 0   │ 1000 │ 10000 │ 0   │ 60.0   │ ✓  │ 110.0  │ ✓  │
 │ 4 │ A/F    │ afr  │ 2  │ 2    │ 2    │ U    │ B   │ AF   │ 0   │ 147  │ 1000  │ 1   │ 10.0   │ ✓  │ 18.0   │ ✓  │
 │ 5 │ OIL-T  │ C    │ 3  │ 6    │ 2    │ S    │ B   │ NUM3 │ 0   │ 1000 │ 10000 │ 0   │ 60.0   │ ✓  │ 130.0  │ ✓  │
-│ 6 │ OIL-P  │ x100 │ 4  │ 0    │ 2    │ U    │ B   │ NUM5 │ 0   │ 1    │ 1000  │ 1   │ 1.5    │ ✓  │ 9.0    │ ✓  │
+│ 6 │ OIL-P  │x100kPa│ 4  │ 0    │ 2    │ U    │ B   │ NUM5 │ 0   │ 1    │ 1000  │ 1   │ 1.5    │ ✓  │ 9.0    │ ✓  │
 │ 7 │ BATT   │ V    │ 4  │ 6    │ 2    │ U    │ B   │ NUM6 │ 0   │ 1000 │ 10000 │ 1   │ 11.0   │ ✓  │ 16.0   │ ✓  │
 └───┴────────┴──────┴────┴──────┴──────┴──────┴─────┴──────┴─────┴──────┴───────┴─────┴────────┴────┴────────┴────┘
 ```
@@ -155,7 +158,7 @@ typedef struct __attribute__((packed)) {
 |------------|----------|------------|--------|------------|
 | A/F | AFR | 147 | 14.7 | 10.0〜18.0 |
 | OIL-P | x100kPa | 40 | 4.0 | 1.5〜9.0 |
-| BATT | V | 142 | 14.2 | 11.0〜16.0 |
+| BATT | V | 145 | 14.5 | 9.0〜16.0 |
 | 水温等 | °C | 95 | 95 | 60.0〜110.0 |
 
 ### カラム説明
@@ -163,7 +166,7 @@ typedef struct __attribute__((packed)) {
 |--------|------|----------|
 | # | フィールドインデックス | 0-15 |
 | Name | パラメータ名（警告表示用） | 最大7文字 |
-| Unit | 単位文字列（英字のみ） | 最大3文字 |
+| Unit | 単位文字列 | 最大7文字 |
 | CH | CANチャンネル | 1-6, 0=無効 |
 | Byte | 開始バイト位置 | 0-7 |
 | Size | バイト数 | 1, 2, 4 |
@@ -373,7 +376,7 @@ can_field <idx> <ch> <byte> <size> <type> <end> <var> <off> <mul> <div> <name> <
 ## 注意事項
 
 1. **名前文字列**: 英数字および "-", "/" のみ、最大7文字（+NULL終端で8バイト）
-2. **単位文字列**: 英数字のみ、最大3文字（+NULL終端で4バイト）
+2. **単位文字列**: 英数字のみ、最大7文字（+NULL終端で8バイト）- "x100kPa" 対応
 3. **EEPROM互換性**: CAN_CONFIG_VERSION更新により、旧設定は初期化される
 4. **閾値無効値**: `-1e30f` を使用、HostAppでは "---" と表示
 5. **閾値の単位**: **表示単位で設定**（画面に表示される値と同じ）
@@ -396,3 +399,10 @@ can_field <idx> <ch> <byte> <size> <type> <end> <var> <off> <mul> <div> <name> <
 |            |     | - CAN_CONFIG_VERSION を 5 に更新 |
 |            |     | - CAN_Field_t サイズ: 34 bytes → 36 bytes |
 |            |     | - 内部値→表示値変換を汎用化（ハードコード削除） |
+| 2026/01/25 | 4.0 | unit フィールド拡張、警告表示改善 |
+|            |     | - CAN_CONFIG_VERSION を 6 に更新 |
+|            |     | - CAN_Field_t サイズ: 36 bytes → 40 bytes |
+|            |     | - unit フィールド: 4→8バイト（"x100kPa" 対応） |
+|            |     | - HIGH/LOW 両方とも赤背景に統一 |
+|            |     | - 警告表示 10秒ラッチ機能追加 |
+|            |     | - 警告解除時の緑背景フラッシュ修正 |
