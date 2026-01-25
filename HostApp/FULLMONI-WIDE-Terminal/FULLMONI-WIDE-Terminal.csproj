@@ -25,11 +25,14 @@
   <ItemGroup>
     <Resource Include="Assets\FMW.ico" />
     <Resource Include="Assets\FM1.png" />
+    <Resource Include="Assets\FM2.png" />
+    <Resource Include="Assets\FM3.png" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     <PackageReference Include="System.IO.Ports" Version="8.0.0" />
+    <PackageReference Include="WPF-UI" Version="4.2.0" />
   </ItemGroup>
 
   <ItemGroup>

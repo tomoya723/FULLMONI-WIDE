@@ -2,6 +2,13 @@
 
 FULLMONI-WIDEファームウェアとUSB CDC通信するためのWindowsホストアプリケーションです。
 
+## 特徴
+
+- **モダンUI**: WPF-UI (Fluent Design) によるダークテーマ
+- **英語UI**: 全インターフェースを英語化
+- **直感的な操作**: カード型ナビゲーションとグラフィカルなホーム画面
+- **ヒーローバナー**: CADプレビューと実機画像のスライドショー（5秒間隔）
+
 ## 機能
 
 ### ターミナル機能
@@ -316,10 +323,12 @@ dotnet publish -c Release -r win-x64 --self-contained
 ## 技術仕様
 
 - **フレームワーク**: .NET 8.0 WPF
+- **UIライブラリ**: WPF-UI 4.2.0 (Fluent Design)
 - **アーキテクチャ**: MVVM (CommunityToolkit.Mvvm)
 - **シリアル通信**: System.IO.Ports
 - **通信設定**: 115200bps, 8N1, XON/XOFFフロー制御
 - **転送速度**: 約268 KB/s（ストリーミングモード）
+- **言語**: 英語UI
 
 ## ライセンス
 

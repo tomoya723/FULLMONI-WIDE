@@ -18,7 +18,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- ファイル選択 -->
+        <!-- File Selection -->
         <Border Grid.Row="0" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,8">
             <Grid>
                 <Grid.RowDefinitions>
@@ -27,39 +27,39 @@
                 </Grid.RowDefinitions>
                 <TextBox Grid.Row="0" Text="{Binding ImageFilePath}" IsReadOnly="True"
                          Height="24" FontSize="12" Margin="0,0,0,6" VerticalContentAlignment="Center"
-                         ToolTip="選択された画像ファイルのパス"/>
+                         ToolTip="Selected image file path"/>
                 <StackPanel Grid.Row="1" Orientation="Horizontal">
-                    <Button Content="画像を選択..." Width="90" Height="24" FontSize="11"
+                    <Button Content="Select Image..." Width="90" Height="24" FontSize="11"
                             Style="{DynamicResource SecondaryButton}"
                             Command="{Binding SelectImageCommand}"
                             IsEnabled="{Binding CanSelectImage}"
                             Margin="0,0,4,0"
-                            ToolTip="765×256ピクセルのBMP画像を選択"/>
-                    <Button Content="デバイスから読込" Width="105" Height="24" FontSize="11"
+                            ToolTip="Select a 765x256 pixel BMP image"/>
+                    <Button Content="Read from Device" Width="105" Height="24" FontSize="11"
                             Style="{DynamicResource SecondaryButton}"
                             Command="{Binding ReadFromDeviceCommand}"
                             IsEnabled="{Binding CanRead}"
                             Margin="0,0,4,0"
-                            ToolTip="現在の起動画面をデバイスから読み込む"/>
-                    <Button Content="PCに保存" Width="70" Height="24" FontSize="11"
+                            ToolTip="Read current boot screen from device"/>
+                    <Button Content="Save to PC" Width="70" Height="24" FontSize="11"
                             Style="{DynamicResource SecondaryButton}"
                             Command="{Binding SaveImageCommand}"
                             IsEnabled="{Binding CanSave}"
-                            ToolTip="読み込んだ画像をBMPファイルで保存"/>
+                            ToolTip="Save loaded image as BMP file"/>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <!-- 画像プレビュー -->
+        <!-- Image Preview -->
         <Border Grid.Row="1" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10,6,10,6" Margin="0,0,0,8">
             <StackPanel>
-                <TextBlock Text="プレビュー (765×256)" FontWeight="Bold" FontSize="12" Margin="0,0,0,4"
+                <TextBlock Text="Preview (765×256)" FontWeight="Bold" FontSize="12" Margin="0,0,0,4"
                            Foreground="{DynamicResource TextBrush}"/>
                 <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
                         Background="#1E1E1E" Height="140" CornerRadius="2">
                     <Grid>
-                        <!-- プレビュー画像がない場合のメッセージ -->
-                        <TextBlock Text="画像が選択されていません"
+                        <!-- Message when no preview image -->
+                        <TextBlock Text="No image selected"
                                    FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
                                    HorizontalAlignment="Center" VerticalAlignment="Center">
                             <TextBlock.Style>
@@ -82,16 +82,16 @@
             </StackPanel>
         </Border>
 
-        <!-- ログ表示 -->
-        <Border Grid.Row="2" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10,8,10,8" Margin="0,0,0,8">
+        <!-- Log Display -->
+        <Border Grid.Row="2" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10,8,10,8" Margin="0,0,0,8" Height="150">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,4">
-                    <TextBlock Text="ログ" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"
+                    <TextBlock Text="Log" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"
                                Foreground="{DynamicResource TextBrush}"/>
-                    <Button Content="クリア" Width="60" Height="20" FontSize="12" Margin="10,0,0,0"
+                    <Button Content="Clear" Width="60" Height="20" FontSize="12" Margin="10,0,0,0"
                             Style="{DynamicResource OutlineButton}"
                             Command="{Binding ClearLogCommand}"/>
-                    <Button Content="コピー" Width="60" Height="20" FontSize="12" Margin="6,0,0,0"
+                    <Button Content="Copy" Width="60" Height="20" FontSize="12" Margin="6,0,0,0"
                             Style="{DynamicResource OutlineButton}"
                             Command="{Binding CopyLogCommand}"/>
                 </StackPanel>
@@ -109,10 +109,10 @@
             </DockPanel>
         </Border>
 
-        <!-- 進捗表示 -->
+        <!-- Transfer Progress -->
         <Border Grid.Row="3" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,8">
             <StackPanel>
-                <TextBlock Text="転送進捗" FontWeight="Bold" FontSize="12" Margin="0,0,0,6"
+                <TextBlock Text="Transfer Progress" FontWeight="Bold" FontSize="12" Margin="0,0,0,6"
                            Foreground="{DynamicResource TextBrush}"/>
                 <ProgressBar Height="20" Value="{Binding Progress}" Maximum="100" Margin="0,0,0,4"/>
                 <TextBlock Text="{Binding StatusMessage}" FontSize="12"
@@ -120,18 +120,18 @@
             </StackPanel>
         </Border>
 
-        <!-- 書き込みボタン -->
+        <!-- Write Buttons -->
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,0">
-            <Button Content="書き込み開始" Width="120" Height="32" FontSize="12" Margin="0,0,6,0"
+            <Button Content="Start Write" Width="120" Height="32" FontSize="12" Margin="0,0,6,0"
                     Style="{DynamicResource WarningButton}"
                     Command="{Binding WriteImageCommand}"
                     IsEnabled="{Binding CanWrite}"
-                    ToolTip="起動画面をRX72Nのフラッシュメモリに書き込みます"/>
-            <Button Content="キャンセル" Width="80" Height="32" FontSize="12"
+                    ToolTip="Write boot screen to RX72N flash memory"/>
+            <Button Content="Cancel" Width="80" Height="32" FontSize="12"
                     Style="{DynamicResource SecondaryButton}"
                     Command="{Binding CancelCommand}"
                     IsEnabled="{Binding CanCancel}"
-                    ToolTip="書き込みをキャンセルします"/>
+                    ToolTip="Cancel write operation"/>
         </StackPanel>
     </Grid>
 </UserControl>

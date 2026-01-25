@@ -49,7 +49,7 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
     private int _progress;
 
     [ObservableProperty]
-    private string _statusMessage = "画像を選択してください";
+    private string _statusMessage = "Please select an image";
 
     [ObservableProperty]
     private bool _isWriting;
@@ -104,8 +104,8 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
     {
         var dialog = new Microsoft.Win32.OpenFileDialog
         {
-            Filter = "BMPファイル (*.bmp)|*.bmp|すべてのファイル (*.*)|*.*",
-            Title = "起動画面BMPファイルを選択"
+            Filter = "BMP Files (*.bmp)|*.bmp|All Files (*.*)|*.*",
+            Title = "Select Boot Screen BMP Image"
         };
 
         if (dialog.ShowDialog() == true)
@@ -124,19 +124,19 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
 
                 PreviewImage = bitmap;
                 ImageFilePath = dialog.FileName;
-                StatusMessage = $"画像を読み込みました: {imageData.Length:N0} bytes (765×256)";
-                AppendLog($"画像を選択: {dialog.FileName}");
-                AppendLog($"サイズ: {imageData.Length:N0} bytes");
+                StatusMessage = $"Image loaded: {imageData.Length:N0} bytes (765×256)";
+                AppendLog($"Selected: {dialog.FileName}");
+                AppendLog($"Size: {imageData.Length:N0} bytes");
             }
             catch (Exception ex)
             {
-                StatusMessage = $"エラー: {ex.Message}";
-                AppendLog($"エラー: {ex.Message}");
+                StatusMessage = $"Error: {ex.Message}";
+                AppendLog($"Error: {ex.Message}");
 
                 MessageBox.Show(
                     Application.Current.MainWindow,
-                    $"画像の読み込みに失敗しました。\n\n{ex.Message}",
-                    "エラー",
+                    $"Failed to load image.\n\n{ex.Message}",
+                    "Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
@@ -157,17 +157,17 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
             return;
         }
 
-        // 確認ダイアログ
+        // Confirmation dialog
         var result = await Application.Current.Dispatcher.InvokeAsync(() =>
             MessageBox.Show(
                 Application.Current.MainWindow,
-                "起動画面をRX72Nのフラッシュメモリに書き込みます。\n\n" +
-                "【重要】\n" +
-                "• 書き込み中は絶対に電源を切らないでください\n" +
-                "• 既存の起動画面は上書きされます\n" +
-                "• 完了後、デバイスを再起動してください\n\n" +
-                "書き込みを開始しますか？",
-                "確認",
+                "Write boot screen to RX72N flash memory.\n\n" +
+                "[IMPORTANT]\n" +
+                "• Do NOT turn off power during writing\n" +
+                "• Existing boot screen will be overwritten\n" +
+                "• Device will restart after completion\n\n" +
+                "Start writing?",
+                "Confirm",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning));
 
@@ -179,33 +179,33 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
         IsWriting = true;
         Progress = 0;
         Log = "";
-        StatusMessage = "準備中...";
+        StatusMessage = "Preparing...";
 
         _cancellationTokenSource = new CancellationTokenSource();
 
         try
         {
-            // 画像データを準備（ロード済みデータがあればそれを使用、なければファイルから読み込み）
+            // Prepare image data (use loaded data if available, otherwise load from file)
             byte[] imageData;
             if (_loadedAppWizardData != null)
             {
                 imageData = _loadedAppWizardData;
-                AppendLog("読み込み済みデータを使用");
+                AppendLog("Using loaded data");
             }
             else
             {
                 imageData = await Task.Run(() =>
                     StartupImageService.LoadAndValidateBmp(ImageFilePath));
-                AppendLog($"ファイルから読み込み: {ImageFilePath}");
+                AppendLog($"Loaded from file: {ImageFilePath}");
             }
 
             // フラッシュに書き込み
             await _imageService.WriteToFlashAsync(imageData, _cancellationTokenSource.Token);
 
-            // 成功 - デバイスは自動再起動するので再接続を試みる
+            // Success - device auto-restarts, try to reconnect
             Progress = 100;
-            StatusMessage = "書き込み完了。デバイス再起動後に再接続中...";
-            AppendLog("デバイス再起動待ち...");
+            StatusMessage = "Write complete. Reconnecting after device restart...";
+            AppendLog("Waiting for device restart...");
 
             // COMポート情報を保存
             var portName = _serialService.CurrentPortName;
@@ -217,40 +217,40 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
                 var reconnected = await _serialService.ReconnectAsync(portName, baudRate, 20, 500);
                 if (reconnected)
                 {
-                    AppendLog("デバイスに再接続しました");
-                    StatusMessage = "起動画面の書き込みが完了しました";
+                    AppendLog("Reconnected to device");
+                    StatusMessage = "Boot screen write completed";
                 }
                 else
                 {
-                    AppendLog("再接続に失敗しました。手動で接続してください。");
-                    StatusMessage = "書き込み完了（再接続に失敗）";
+                    AppendLog("Reconnection failed. Please connect manually.");
+                    StatusMessage = "Write complete (reconnection failed)";
                 }
             }
 
             await Application.Current.Dispatcher.InvokeAsync(() =>
                 MessageBox.Show(
                     Application.Current.MainWindow,
-                    "起動画面の書き込みが完了しました。\n\n" +
-                    "デバイスは自動的に再起動され、新しい起動画面が表示されます。",
-                    "完了",
+                    "Boot screen write completed.\n\n" +
+                    "Device will restart automatically and display the new boot screen.",
+                    "Complete",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information));
         }
         catch (OperationCanceledException)
         {
-            StatusMessage = "書き込みがキャンセルされました";
-            AppendLog("書き込みがキャンセルされました");
+            StatusMessage = "Write cancelled";
+            AppendLog("Write cancelled");
         }
         catch (Exception ex)
         {
-            StatusMessage = $"エラー: {ex.Message}";
-            AppendLog($"エラー: {ex.Message}");
+            StatusMessage = $"Error: {ex.Message}";
+            AppendLog($"Error: {ex.Message}");
 
             await Application.Current.Dispatcher.InvokeAsync(() =>
                 MessageBox.Show(
                     Application.Current.MainWindow,
-                    $"起動画面の書き込み中にエラーが発生しました。\n\n{ex.Message}",
-                    "エラー",
+                    $"Error during boot screen write.\n\n{ex.Message}",
+                    "Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error));
         }
@@ -266,7 +266,7 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
     private void Cancel()
     {
         _cancellationTokenSource?.Cancel();
-        StatusMessage = "キャンセル中...";
+        StatusMessage = "Cancelling...";
     }
 
     [RelayCommand]
@@ -281,7 +281,7 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
         if (!string.IsNullOrEmpty(Log))
         {
             Clipboard.SetText(Log);
-            StatusMessage = "ログをクリップボードにコピーしました";
+            StatusMessage = "Log copied to clipboard";
         }
     }
 
@@ -290,14 +290,14 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
     {
         if (_loadedBmpData == null)
         {
-            StatusMessage = "保存する画像がありません";
+            StatusMessage = "No image to save";
             return;
         }
 
         var dialog = new Microsoft.Win32.SaveFileDialog
         {
-            Filter = "BMPファイル (*.bmp)|*.bmp",
-            Title = "起動画面をBMPで保存",
+            Filter = "BMP Files (*.bmp)|*.bmp",
+            Title = "Save Boot Screen as BMP",
             FileName = $"startup_image_{DateTime.Now:yyyyMMdd_HHmmss}.bmp"
         };
 
@@ -306,18 +306,18 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
             try
             {
                 System.IO.File.WriteAllBytes(dialog.FileName, _loadedBmpData);
-                StatusMessage = $"画像を保存しました: {dialog.FileName}";
-                AppendLog($"BMPを保存: {dialog.FileName}");
+                StatusMessage = $"Image saved: {dialog.FileName}";
+                AppendLog($"Saved BMP: {dialog.FileName}");
             }
             catch (Exception ex)
             {
-                StatusMessage = $"保存エラー: {ex.Message}";
-                AppendLog($"保存エラー: {ex.Message}");
+                StatusMessage = $"Save error: {ex.Message}";
+                AppendLog($"Save error: {ex.Message}");
 
                 MessageBox.Show(
                     Application.Current.MainWindow,
-                    $"画像の保存に失敗しました。\n\n{ex.Message}",
-                    "エラー",
+                    $"Failed to save image.\n\n{ex.Message}",
+                    "Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
@@ -332,22 +332,22 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
             return;
         }
 
-        IsWriting = true;  // 読み込み中も同じフラグを使用
+        IsWriting = true;  // Use same flag during reading
         Progress = 0;
-        // ログはクリアしない（履歴を残す）
+        // Don't clear log (keep history)
         AppendLog("\n========================================");
-        StatusMessage = "デバイスから起動画面を読み込み中...";
+        StatusMessage = "Reading boot screen from device...";
 
         _cancellationTokenSource = new CancellationTokenSource();
 
         try
         {
-            AppendLog("起動画面読み込み開始");
+            AppendLog("Starting boot screen read");
 
             // フラッシュから読み込み
             var imageData = await _imageService.ReadFromFlashAsync(_cancellationTokenSource.Token);
 
-            AppendLog($"受信データ: {imageData.Length:N0} bytes");
+            AppendLog($"Received data: {imageData.Length:N0} bytes");
 
             // AppWizard形式からBMPに変換してプレビュー表示
             var bmpData = AppWizardImageConverter.ConvertAppWizardToBmp(imageData);
@@ -368,25 +368,25 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
             bitmap.Freeze();
 
             PreviewImage = bitmap;
-            ImageFilePath = "(デバイスから読み込み)";
-            StatusMessage = "起動画面の読み込みが完了しました - BMPで保存できます";
-            AppendLog("読み込み完了 - BMPで保存可能");
+            ImageFilePath = "(Read from device)";
+            StatusMessage = "Boot screen read complete - Can be saved as BMP";
+            AppendLog("Read complete - Can save as BMP");
         }
         catch (OperationCanceledException)
         {
-            StatusMessage = "読み込みがキャンセルされました";
-            AppendLog("読み込みがキャンセルされました");
+            StatusMessage = "Read cancelled";
+            AppendLog("Read cancelled");
         }
         catch (Exception ex)
         {
-            StatusMessage = $"エラー: {ex.Message}";
-            AppendLog($"エラー: {ex.Message}");
+            StatusMessage = $"Error: {ex.Message}";
+            AppendLog($"Error: {ex.Message}");
 
             await Application.Current.Dispatcher.InvokeAsync(() =>
                 MessageBox.Show(
                     Application.Current.MainWindow,
-                    $"起動画面の読み込み中にエラーが発生しました。\n\n{ex.Message}",
-                    "エラー",
+                    $"Error reading boot screen.\n\n{ex.Message}",
+                    "Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error));
         }
@@ -441,7 +441,7 @@ public partial class StartupImageViewModel : ObservableObject, IDisposable
 
             if (!connected && IsWriting)
             {
-                StatusMessage = "接続が切断されました";
+                StatusMessage = "Connection lost";
                 _cancellationTokenSource?.Cancel();
             }
         });

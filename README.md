@@ -41,10 +41,12 @@ ECUからCANバス経由で送られる車両情報を受信し、800×256ドッ
 ## ホストアプリケーション
 
 ### Windows Terminal（.NET 8.0 WPF）
+- **モダンUI**: WPF-UI (Fluent Design) によるダークテーマ、英語UI
 - パラメータ設定GUI（タイヤサイズ、ギア比プリセット、警告設定、シフトRPM）
+- CAN設定カスタマイズ（CAN ID、データフィールド、ECUプリセット）
+- 起動画面カスタマイズ（765×256 BMP画像）
 - ファームウェア更新機能（BINファイル選択→高速転送 約268KB/s）
 - Bootloaderモード自動検出（ファームウェア破損時の復旧対応）
-- ダーク/ライトテーマ対応
 
 ### Android Terminal（Jetpack Compose）
 - USB Serial通信によるパラメータ設定

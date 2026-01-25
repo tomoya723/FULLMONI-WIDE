@@ -2,12 +2,59 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:FullmoniTerminal"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Themes/PopTheme.xaml"/>
+                <ui:ThemesDictionary Theme="Dark" />
+                <ui:ControlsDictionary />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- グローバルカードスタイル -->
+            <Style TargetType="{x:Type ui:CardExpander}" BasedOn="{StaticResource {x:Type ui:CardExpander}}">
+                <Setter Property="Background">
+                    <Setter.Value>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#1A2942" Offset="0"/>
+                            <GradientStop Color="#152238" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="BorderBrush" Value="#2A3F5F"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Foreground" Value="#F0F0F0"/>
+                <Setter Property="FontSize" Value="14"/>
+            </Style>
+
+            <Style TargetType="{x:Type ui:Card}" BasedOn="{StaticResource {x:Type ui:Card}}">
+                <Setter Property="Background">
+                    <Setter.Value>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#1A2942" Offset="0"/>
+                            <GradientStop Color="#152238" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="BorderBrush" Value="#2A3F5F"/>
+                <Setter Property="BorderThickness" Value="1"/>
+            </Style>
+
+            <!-- TextBox読みやすさ向上 -->
+            <Style TargetType="{x:Type ui:TextBox}" BasedOn="{StaticResource {x:Type ui:TextBox}}">
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Foreground" Value="#FFFFFF"/>
+                <Setter Property="Background" Value="#1E3A5F"/>
+                <Setter Property="CaretBrush" Value="#FFFFFF"/>
+            </Style>
+
+            <!-- 標準TextBox -->
+            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Foreground" Value="#FFFFFF"/>
+                <Setter Property="Background" Value="#1E3A5F"/>
+                <Setter Property="CaretBrush" Value="#FFFFFF"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

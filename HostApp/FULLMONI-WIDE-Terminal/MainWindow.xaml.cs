@@ -1,726 +1,421 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Animation;
+using System.Windows.Threading;
+using Wpf.Ui.Controls;
+using FullmoniTerminal.ViewModels;
+using WpfTextBox = System.Windows.Controls.TextBox;
+using SystemMsgBox = System.Windows.MessageBox;
+using SystemMsgButton = System.Windows.MessageBoxButton;
+using SystemMsgImage = System.Windows.MessageBoxImage;
+using SystemMsgResult = System.Windows.MessageBoxResult;
 
-namespace FullmoniTerminal;
-
-/// <summary>
-/// ComboBox選択肢用のDataContext
-/// </summary>
-public class CanFieldsContext
+namespace FullmoniTerminal
 {
-    public ObservableCollection<CanFieldItem> Fields { get; set; } = new();
-    public List<string> DataTypeOptions { get; } = new() { "U", "S" };
-    public List<string> EndianOptions { get; } = new() { "B", "L" };
-    public List<string> VarOptions { get; } = new() { "REV", "AF", "NUM1", "NUM2", "NUM3", "NUM4", "NUM5", "NUM6", "SPEED" };
-}
-
-/// <summary>
-/// CANフィールド定義のデータモデル
-/// Issue #50: 警告設定（Name, Unit, WarnLowEnabled, WarnLow, WarnHighEnabled, WarnHigh）を追加
-/// </summary>
-public class CanFieldItem : INotifyPropertyChanged
-{
-    private int _index;
-    private int _channel = 1;
-    private int _startByte = 0;
-    private int _byteCount = 2;
-    private string _dataType = "U";
-    private string _endian = "B";
-    private int _targetVar = 0;
-    private int _offset = 0;
-    private int _multiplier = 1000;
-    private int _divisor = 1000;
-    private bool _enabled = false;
-    // Issue #50: 警告設定用フィールド（Lo/Hi個別有効化）
-    private string _name = "";
-    private string _unit = "";
-    private int _decimalShift = 0;  // 小数点シフト (0=整数, 1=÷10, 2=÷100)
-    private bool _warnLowEnabled = false;
-    private bool _warnHighEnabled = false;
-    private double _warnLow = -1e30;   // CAN_WARN_DISABLED (float用)
-    private double _warnHigh = -1e30;  // CAN_WARN_DISABLED (float用)
-
-    // 変数名リスト（TargetVarNameプロパティで使用）
-    private static readonly string[] VarNames = { "REV", "AF", "NUM1", "NUM2", "NUM3", "NUM4", "NUM5", "NUM6", "SPEED" };
-
-    public int Index { get => _index; set { _index = value; OnPropertyChanged(nameof(Index)); } }
-    public int Channel { get => _channel; set { _channel = value; OnPropertyChanged(nameof(Channel)); } }
-    public int StartByte { get => _startByte; set { _startByte = value; OnPropertyChanged(nameof(StartByte)); } }
-    public int ByteCount { get => _byteCount; set { _byteCount = value; OnPropertyChanged(nameof(ByteCount)); } }
-    public string DataType { get => _dataType; set { _dataType = value; OnPropertyChanged(nameof(DataType)); } }
-    public string Endian { get => _endian; set { _endian = value; OnPropertyChanged(nameof(Endian)); } }
-    public int TargetVar { get => _targetVar; set { _targetVar = value; OnPropertyChanged(nameof(TargetVar)); OnPropertyChanged(nameof(TargetVarName)); } }
-
-    // ComboBox用: 変数名で表示・選択
-    public string TargetVarName
-    {
-        get => (_targetVar >= 0 && _targetVar < VarNames.Length) ? VarNames[_targetVar] : "REV";
-        set
-        {
-            for (int i = 0; i < VarNames.Length; i++)
-            {
-                if (VarNames[i] == value)
-                {
-                    TargetVar = i;
-                    return;
-                }
-            }
-            TargetVar = 0; // デフォルト
-        }
-    }
-
-    public int Offset { get => _offset; set { _offset = value; OnPropertyChanged(nameof(Offset)); } }
-    public int Multiplier { get => _multiplier; set { _multiplier = value; OnPropertyChanged(nameof(Multiplier)); } }
-    public int Divisor { get => _divisor; set { _divisor = value; OnPropertyChanged(nameof(Divisor)); } }
-    public bool Enabled { get => _enabled; set { _enabled = value; OnPropertyChanged(nameof(Enabled)); } }
-    // Issue #50: 警告設定用プロパティ（Lo/Hi個別有効化）
-    public string Name { get => _name; set { _name = value; OnPropertyChanged(nameof(Name)); } }
-    public string Unit { get => _unit; set { _unit = value; OnPropertyChanged(nameof(Unit)); } }
-    public int DecimalShift { get => _decimalShift; set { _decimalShift = value; OnPropertyChanged(nameof(DecimalShift)); } }
-    public bool WarnLowEnabled { get => _warnLowEnabled; set { _warnLowEnabled = value; OnPropertyChanged(nameof(WarnLowEnabled)); } }
-    public bool WarnHighEnabled { get => _warnHighEnabled; set { _warnHighEnabled = value; OnPropertyChanged(nameof(WarnHighEnabled)); } }
-    public double WarnLow { get => _warnLow; set { _warnLow = value; OnPropertyChanged(nameof(WarnLow)); } }
-    public double WarnHigh { get => _warnHigh; set { _warnHigh = value; OnPropertyChanged(nameof(WarnHigh)); } }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void OnPropertyChanged(string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-}
-
-/// <summary>
-/// Interaction logic for MainWindow.xaml
-/// </summary>
-public partial class MainWindow : Window
-{
-    private ObservableCollection<CanFieldItem> _canFields = new();
-    private CanFieldsContext _canFieldsContext = new();
-
-    public MainWindow()
-    {
-        InitializeComponent();
-        InitializeCanFields();
-
-        // ViewModelのParametersLoadedイベントを購読して、CAN設定も読み込む
-        Loaded += MainWindow_Loaded;
-    }
-
-    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
-    {
-        if (DataContext is ViewModels.MainViewModel vm)
-        {
-            vm.ParametersLoaded += ViewModel_ParametersLoaded;
-        }
-    }
-
-    private async void ViewModel_ParametersLoaded(object? sender, EventArgs e)
-    {
-        // パラメータ読込完了後にCAN設定も読み込む
-        await LoadCanConfigurationAsync();
-    }
-
     /// <summary>
-    /// CAN設定をデバイスから読み込む (Issue #50: 接続時自動読込対応)
+    /// MainWindow.xaml の相互作用ロジック
     /// </summary>
-    private async Task LoadCanConfigurationAsync()
+    public partial class MainWindow : FluentWindow
     {
-        if (DataContext is not ViewModels.MainViewModel vm || !vm.IsConnected)
-            return;
+        private readonly Dictionary<string, StackPanel> _pages;
+        private readonly Dictionary<string, Wpf.Ui.Controls.Button> _navButtons;
+        private string _currentPage = "home";
+        private ObservableCollection<CanFieldItem> _canFields = new();
+        private DispatcherTimer? _heroImageTimer;
+        private bool _showingImage1 = true;
 
-        UpdateCanStatus("CAN設定を読み込み中...");
-
-        try
+        public MainWindow()
         {
-            // パラメータモードに入る
-            vm.ClearResponseBuffer();
-            vm.SendCommandDirect("");
-            await Task.Delay(300);
+            InitializeComponent();
 
-            // バッファをクリアして安定するまで待つ
-            vm.ClearResponseBuffer();
-            await Task.Delay(100);
+            // ヒーロー画像切り替えタイマーを開始
+            StartHeroImageAnimation();
 
-            // can_listを送信
-            var response = await vm.SendCommandAndGetResponseAsync("can_list", 5000);
-
-            // 応答を解析してUIに反映
-            int chCount = ParseCanConfigResponse(response);
-
-            // パラメータモードを抜ける
-            vm.ClearResponseBuffer();
-            vm.SendCommandDirect("exit");
-            await Task.Delay(200);
-
-            if (string.IsNullOrWhiteSpace(response))
+            // ページ辞書を初期化
+            _pages = new Dictionary<string, StackPanel>
             {
-                UpdateCanStatus("CAN設定: 応答なし");
-                return;
+                { "home", HomePage },
+                { "status", StatusPage },
+                { "settings", SettingsPage },
+                { "can", CanPage },
+                { "startup", StartupPage },
+                { "firmware", FirmwarePage },
+                { "about", AboutPage }
+            };
+
+            // ナビゲーションボタン辞書を初期化
+            _navButtons = new Dictionary<string, Wpf.Ui.Controls.Button>
+            {
+                { "home", NavHome },
+                { "status", NavStatus },
+                { "settings", NavSettings },
+                { "can", NavCan },
+                { "startup", NavStartup },
+                { "firmware", NavFirmware },
+                { "about", NavAbout }
+            };
+
+            // 初期ページを表示（ホームページをデフォルトで表示）
+            ShowPage("home");
+
+            // CANフィールドを初期化
+            InitializeCanFields();
+
+            // StartupImageViewのDataContextを設定
+            SetupStartupImageView();
+
+            // ViewModelのイベントを購読（接続後にCAN設定を自動読み込み）
+            System.Diagnostics.Debug.WriteLine($"DataContext type: {DataContext?.GetType().Name ?? "null"}");
+            if (DataContext is MainViewModel vm)
+            {
+                System.Diagnostics.Debug.WriteLine("Subscribing to ViewModel events");
+                vm.ParametersLoaded += ViewModel_ParametersLoaded;
+                vm.PropertyChanged += ViewModel_PropertyChanged;
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("DataContext is NOT MainViewModel at constructor");
             }
 
-            UpdateCanStatus($"CAN設定: {chCount}件読込完了");
-        }
-        catch (Exception ex)
-        {
-            UpdateCanStatus($"CAN設定読込エラー: {ex.Message}");
-        }
-    }
-
-    // 変数名 → 数値インデックス変換テーブル
-    private static readonly Dictionary<string, int> VarNameToIndex = new(StringComparer.OrdinalIgnoreCase)
-    {
-        { "REV", 0 },
-        { "AF", 1 },
-        { "NUM1", 2 },
-        { "NUM2", 3 },
-        { "NUM3", 4 },
-        { "NUM4", 5 },
-        { "NUM5", 6 },
-        { "NUM6", 7 },
-        { "SPEED", 8 },
-        { "---", 255 }
-    };
-
-    // 数値インデックス → 変数名変換テーブル
-    private static readonly string[] VarIndexToName = { "REV", "AF", "NUM1", "NUM2", "NUM3", "NUM4", "NUM5", "NUM6", "SPEED" };
-
-    private void InitializeCanFields()
-    {
-        _canFields = new ObservableCollection<CanFieldItem>();
-        _canFieldsContext = new CanFieldsContext { Fields = _canFields };
-
-        // Issue #50: MoTeC M100デフォルト設定 (Firmware側CAN_PRESET_MOTECと一致)
-        // Var: 0=REV, 1=AF, 2=NUM1(水温), 3=NUM2(吸気温), 4=NUM3(油温), 5=NUM4(MAP), 6=NUM5(油圧), 7=NUM6(電圧), 8=SPEED
-        // WarnLow/WarnHigh: -1e30 = 無効 (CAN_WARN_DISABLED) ※float対応
-        // WarnLoEn/WarnHiEn: Lo/Hi個別有効化
-        // DecShift: 小数点シフト (0=整数, 1=÷10 for AppWizard Mask ###.#)
-        var defaults = new[]
-        {
-            // CH1 (0x3E8): RPM(0-1), MAP(4-5), IAT(6-7)
-            new { Ch = 1, Byte = 0, Size = 2, Type = "U", End = "B", Var = 0, Off = 0, Mul = 1000, Div = 1000, En = true,
-                  Name = "REV", Unit = "rpm", DecShift = 0, WarnLoEn = false, WarnLo = 200.0, WarnHiEn = true, WarnHi = 9000.0 },
-            new { Ch = 1, Byte = 4, Size = 2, Type = "U", End = "B", Var = 5, Off = 0, Mul = 1000, Div = 10000, En = true,
-                  Name = "MAP", Unit = "kPa", DecShift = 0, WarnLoEn = false, WarnLo = 0.0, WarnHiEn = false, WarnHi = 150.0 },
-            new { Ch = 1, Byte = 6, Size = 2, Type = "S", End = "B", Var = 3, Off = 0, Mul = 1000, Div = 10000, En = true,
-                  Name = "IAT", Unit = "deg", DecShift = 0, WarnLoEn = false, WarnLo = -40.0, WarnHiEn = true, WarnHi = 80.0 },
-            // CH2 (0x3E9): ECT(0-1), AFR(2-3)
-            new { Ch = 2, Byte = 0, Size = 2, Type = "S", End = "B", Var = 2, Off = 0, Mul = 1000, Div = 10000, En = true,
-                  Name = "WATER", Unit = "deg", DecShift = 0, WarnLoEn = false, WarnLo = -40.0, WarnHiEn = true, WarnHi = 110.0 },
-            new { Ch = 2, Byte = 2, Size = 2, Type = "U", End = "B", Var = 1, Off = 0, Mul = 147, Div = 1000, En = true,
-                  Name = "A/F", Unit = "afr", DecShift = 1, WarnLoEn = false, WarnLo = 10.0, WarnHiEn = false, WarnHi = 18.0 },
-            // CH3 (0x3EA): OilTemp(6-7)
-            new { Ch = 3, Byte = 6, Size = 2, Type = "S", End = "B", Var = 4, Off = 0, Mul = 1000, Div = 10000, En = true,
-                  Name = "OIL-T", Unit = "deg", DecShift = 0, WarnLoEn = false, WarnLo = -40.0, WarnHiEn = true, WarnHi = 130.0 },
-            // CH4 (0x3EB): OilPressure(0-1), BattV(6-7)
-            new { Ch = 4, Byte = 0, Size = 2, Type = "U", End = "B", Var = 6, Off = 0, Mul = 1, Div = 1000, En = true,
-                  Name = "OIL-P", Unit = "x100kPa", DecShift = 1, WarnLoEn = true, WarnLo = 1.5, WarnHiEn = true, WarnHi = 9.0 },
-            new { Ch = 4, Byte = 6, Size = 2, Type = "U", End = "B", Var = 7, Off = 0, Mul = 1000, Div = 10000, En = true,
-                  Name = "BATT", Unit = "V", DecShift = 1, WarnLoEn = false, WarnLo = 9.0, WarnHiEn = false, WarnHi = 16.0 },
-        };
-
-        for (int i = 0; i < defaults.Length; i++)
-        {
-            var d = defaults[i];
-            _canFields.Add(new CanFieldItem
+            // DataContextが後から設定される場合に備える
+            DataContextChanged += (s, e) =>
             {
-                Index = i,
-                Channel = d.Ch,
-                StartByte = d.Byte,
-                ByteCount = d.Size,
-                DataType = d.Type,
-                Endian = d.End,
-                TargetVar = d.Var,
-                Offset = d.Off,
-                Multiplier = d.Mul,
-                Divisor = d.Div,
-                Enabled = d.En,
-                Name = d.Name,
-                Unit = d.Unit,
-                DecimalShift = d.DecShift,
-                WarnLowEnabled = d.WarnLoEn,
-                WarnLow = d.WarnLo,
-                WarnHighEnabled = d.WarnHiEn,
-                WarnHigh = d.WarnHi
-            });
+                System.Diagnostics.Debug.WriteLine($"DataContextChanged: {e.NewValue?.GetType().Name ?? "null"}");
+            
+                if (e.OldValue is MainViewModel oldVm)
+                {
+                    oldVm.ParametersLoaded -= ViewModel_ParametersLoaded;
+                    oldVm.PropertyChanged -= ViewModel_PropertyChanged;
+                }
+                if (e.NewValue is MainViewModel newVm)
+                {
+                    newVm.ParametersLoaded += ViewModel_ParametersLoaded;
+                    newVm.PropertyChanged += ViewModel_PropertyChanged;
+                    // StartupImageViewのDataContextも更新
+                    SetupStartupImageView();
+                }
+            };
         }
 
-        // 残り8個の空フィールドを追加（合計16個）
-        for (int i = defaults.Length; i < 16; i++)
+        /// <summary>
+        /// StartupImageViewのDataContextを設定
+        /// </summary>
+        private void SetupStartupImageView()
         {
-            _canFields.Add(new CanFieldItem
+            if (DataContext is MainViewModel vm)
             {
-                Index = i,
-                Channel = 0,  // channel=0 で無効
-                StartByte = 0,
-                ByteCount = 2,
-                DataType = "U",
-                Endian = "B",
-                TargetVar = 0,
-                Offset = 0,
-                Multiplier = 1000,
-                Divisor = 1000,
-                Enabled = false,
-                Name = "",
-                Unit = "",
-                DecimalShift = 0,
-                WarnLowEnabled = false,
-                WarnLow = -1e30,
-                WarnHighEnabled = false,
-                WarnHigh = -1e30
-            });
-        }
-
-        CanFieldsGrid.DataContext = _canFieldsContext;
-        CanFieldsGrid.ItemsSource = _canFields;
-
-        // セル編集終了時のバリデーションハンドラを登録
-        CanFieldsGrid.CellEditEnding += CanFieldsGrid_CellEditEnding;
-    }
-
-    /// <summary>
-    /// DataGridのセル編集終了時に数値バリデーションを行う
-    /// </summary>
-    private void CanFieldsGrid_CellEditEnding(object? sender, DataGridCellEditEndingEventArgs e)
-    {
-        // キャンセル時は何もしない
-        if (e.EditAction == DataGridEditAction.Cancel)
-            return;
-
-        // 編集要素がTextBoxの場合のみ検証
-        if (e.EditingElement is not TextBox textBox)
-            return;
-
-        // 列名を取得
-        var columnHeader = e.Column.Header?.ToString();
-        if (string.IsNullOrEmpty(columnHeader))
-            return;
-
-        // 数値列のみバリデーション
-        var numericColumns = new[] { "CH", "Byte", "Size", "Off", "Mul", "Div" };
-        if (!numericColumns.Contains(columnHeader))
-            return;
-
-        var inputText = textBox.Text.Trim();
-
-        // 空文字列チェック
-        if (string.IsNullOrEmpty(inputText))
-        {
-            MessageBox.Show(
-                this,
-                $"{columnHeader}フィールドには数値を入力してください。",
-                "入力エラー",
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
-            e.Cancel = true;
-            return;
-        }
-
-        // 整数パースチェック
-        if (!int.TryParse(inputText, out int value))
-        {
-            MessageBox.Show(
-                this,
-                $"{columnHeader}フィールドには整数を入力してください。\n入力値: {inputText}",
-                "入力エラー",
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
-            e.Cancel = true;
-            return;
-        }
-
-        // 列ごとの範囲チェック
-        string? rangeError = columnHeader switch
-        {
-            "CH" when value < 1 || value > 6 => "CH は 1～6 の範囲で入力してください。",
-            "Byte" when value < 0 || value > 7 => "Byte は 0～7 の範囲で入力してください。",
-            "Size" when value != 1 && value != 2 && value != 4 => "Size は 1, 2, 4 のいずれかを入力してください。",
-            "Mul" when value <= 0 => "Mul は 1 以上の値を入力してください。",
-            "Div" when value <= 0 => "Div は 1 以上の値を入力してください。",
-            _ => null
-        };
-
-        if (rangeError != null)
-        {
-            MessageBox.Show(
-                this,
-                rangeError,
-                "入力エラー",
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
-            e.Cancel = true;
-        }
-    }
-
-    private void Window_Closing(object sender, CancelEventArgs e)
-    {
-        if (DataContext is ViewModels.MainViewModel vm)
-        {
-            // ファームウェア更新中は閉じられないようにする
-            if (vm.IsFirmwareUpdating)
-            {
-                e.Cancel = true;
-                MessageBox.Show(
-                    this,
-                    "ファームウェア更新中はアプリケーションを終了できません。\n更新が完了するまでお待ちください。",
-                    "警告",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                return;
+                StartupImageViewControl.DataContext = new StartupImageViewModel(vm.SerialService);
             }
-            vm.Dispose();
         }
-    }
 
-    private void FirmwareLogTextBox_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        if (sender is TextBox textBox)
+        /// <summary>
+        /// ヒーロー画像の切り替えアニメーションを開始
+        /// </summary>
+        private void StartHeroImageAnimation()
         {
-            textBox.ScrollToEnd();
-        }
-    }
-
-    private void OpenGitHubLink_Click(object sender, RoutedEventArgs e)
-    {
-        OpenUrl("https://github.com/tomoya723/FULLMONI-WIDE");
-    }
-
-    private void OpenDocsLink_Click(object sender, RoutedEventArgs e)
-    {
-        OpenUrl("https://github.com/tomoya723/FULLMONI-WIDE/blob/main/Firmware/docs/PARAM_CONSOLE.md");
-    }
-
-    private void OpenIssuesLink_Click(object sender, RoutedEventArgs e)
-    {
-        OpenUrl("https://github.com/tomoya723/FULLMONI-WIDE/issues");
-    }
-
-    private void AboutScrollViewer_Loaded(object sender, RoutedEventArgs e)
-    {
-        if (sender is ScrollViewer scrollViewer)
-        {
-            scrollViewer.ScrollToTop();
-        }
-    }
-
-    private static void OpenUrl(string url)
-    {
-        try
-        {
-            Process.Start(new ProcessStartInfo
+            _heroImageTimer = new DispatcherTimer
             {
-                FileName = url,
-                UseShellExecute = true
-            });
+                Interval = TimeSpan.FromSeconds(5)
+            };
+            _heroImageTimer.Tick += HeroImageTimer_Tick;
+            _heroImageTimer.Start();
         }
-        catch
+
+        /// <summary>
+        /// ヒーロー画像を切り替え
+        /// </summary>
+        private void HeroImageTimer_Tick(object? sender, EventArgs e)
         {
-            // ブラウザで開けなかった場合は無視
-        }
-    }
-
-    #region CAN設定
-
-    private void UpdateCanStatus(string message)
-    {
-        CanStatusText.Text = $"[{DateTime.Now:HH:mm:ss}] {message}";
-    }
-
-    /// <summary>
-    /// パラメータモードに入ってからコマンドを送信
-    /// </summary>
-    private async Task SendCanCommandAsync(ViewModels.MainViewModel vm, string command)
-    {
-        // パラメータモードに入る（空コマンドでウェイク）
-        vm.SendCommandDirect("");
-        await Task.Delay(300);
-
-        // コマンド送信
-        vm.SendCommandDirect(command);
-    }
-
-    private async void CanReadButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (DataContext is ViewModels.MainViewModel vm && vm.IsConnected)
-        {
-            vm.IsBusy = true;
-            UpdateCanStatus("CAN設定を読み込み中...");
-
-            try
+            var duration = new Duration(TimeSpan.FromSeconds(1.5));
+            
+            if (_showingImage1)
             {
-                // パラメータモードに入る
-                vm.ClearResponseBuffer();
-                vm.SendCommandDirect("");
-                await Task.Delay(300);
+                // FM3 → FM2 に切り替え
+                var fadeOut = new DoubleAnimation(0.35, 0, duration);
+                var fadeIn = new DoubleAnimation(0, 0.35, duration);
+                HeroImage1.BeginAnimation(OpacityProperty, fadeOut);
+                HeroImage2.BeginAnimation(OpacityProperty, fadeIn);
+            }
+            else
+            {
+                // FM2 → FM3 に切り替え
+                var fadeOut = new DoubleAnimation(0.35, 0, duration);
+                var fadeIn = new DoubleAnimation(0, 0.35, duration);
+                HeroImage2.BeginAnimation(OpacityProperty, fadeOut);
+                HeroImage1.BeginAnimation(OpacityProperty, fadeIn);
+            }
+            
+            _showingImage1 = !_showingImage1;
+        }
 
-                // バッファをクリアして安定するまで待つ
-                vm.ClearResponseBuffer();
-                await Task.Delay(100);
+        /// <summary>
+        /// ViewModelのプロパティ変更時
+        /// </summary>
+        private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(MainViewModel.IsConnected))
+            {
+                Dispatcher.Invoke(UpdateHeroConnectButton);
+            }
+        }
 
-                // can_listを送信（プロンプトが来るまで待機）
-                var response = await vm.SendCommandAndGetResponseAsync("can_list", 5000);
-
-                // デバッグ: 応答をファイルに保存
-                try
+        /// <summary>
+        /// ヒーロー接続ボタンの表示を更新
+        /// </summary>
+        private void UpdateHeroConnectButton()
+        {
+            if (DataContext is MainViewModel vm)
+            {
+                System.Diagnostics.Debug.WriteLine($"UpdateHeroConnectButton: IsConnected = {vm.IsConnected}");
+                if (vm.IsConnected)
                 {
-                    System.IO.File.WriteAllText("can_list_response.txt", response ?? "(null)");
-                }
-                catch { }
-
-                // 応答を解析してUIに反映
-                int chCount = ParseCanConfigResponse(response);
-
-                // パラメータモードを抜ける
-                vm.ClearResponseBuffer();
-                vm.SendCommandDirect("exit");
-                await Task.Delay(200);
-
-                if (string.IsNullOrWhiteSpace(response))
-                {
-                    UpdateCanStatus("エラー: 応答がありません");
-                    return;
-                }
-
-                // フィールドが読み込めなかった場合は警告
-                if (chCount <= 6)
-                {
-                    UpdateCanStatus($"警告: フィールドが読み込めませんでした（{chCount}件はチャンネルのみ）");
+                    HeroConnectButton.Content = "Disconnect";
+                    HeroConnectButton.Icon = new Wpf.Ui.Controls.SymbolIcon(Wpf.Ui.Controls.SymbolRegular.PlugDisconnected24);
                 }
                 else
                 {
-                    UpdateCanStatus($"読み込み完了: {chCount}件のデータを反映");
+                    HeroConnectButton.Content = "Connect to Device";
+                    HeroConnectButton.Icon = new Wpf.Ui.Controls.SymbolIcon(Wpf.Ui.Controls.SymbolRegular.PlugConnected24);
                 }
+            }
+        }
+
+        /// <summary>
+        /// パラメータ読み込み完了時にCAN設定も読み込む
+        /// </summary>
+        private async void ViewModel_ParametersLoaded(object? sender, EventArgs e)
+        {
+            // CAN設定を自動で読み込む
+            await LoadCanSettingsAsync();
+        }
+
+        /// <summary>
+        /// CAN設定を非同期で読み込む
+        /// </summary>
+        private async Task LoadCanSettingsAsync()
+        {
+            if (DataContext is not MainViewModel vm || !vm.IsConnected)
+                return;
+
+            try
+            {
+                CanStatusText.Text = "Loading CAN settings...";
+
+                // パラメータモードに入る（前の処理でexitしているので再度入る）
+                vm.ClearResponseBuffer();
+                await vm.SendCommandAndGetResponseAsync("", 800);
+
+                // can_list コマンドを送信して応答を取得
+                vm.ClearResponseBuffer();
+                var response = await vm.SendCommandAndGetResponseAsync("can_list", 5000);
+
+                // パラメータモードを終了
+                await vm.SendCommandAndGetResponseAsync("exit", 500);
+
+                if (string.IsNullOrEmpty(response))
+                {
+                    CanStatusText.Text = "CAN Config: No response";
+                    return;
+                }
+
+                // パース処理
+                ParseCanResponse(response);
+
+                CanStatusText.Text = "CAN settings loaded";
+            }
+            catch (Exception ex)
+            {
+                CanStatusText.Text = $"CAN load error: {ex.Message}";
+            }
+        }
+
+        /// <summary>
+        /// ナビゲーションボタンのクリックハンドラ
+        /// </summary>
+        private void NavButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Wpf.Ui.Controls.Button button && button.Tag is string tag)
+            {
+                ShowPage(tag);
+            }
+        }
+
+        /// <summary>
+        /// ナビゲーションカードのクリックハンドラ
+        /// </summary>
+        private void NavCard_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Wpf.Ui.Controls.CardAction card && card.Tag is string tag)
+            {
+                ShowPage(tag);
+            }
+            else if (sender is Wpf.Ui.Controls.Button button && button.Tag is string buttonTag)
+            {
+                ShowPage(buttonTag);
+            }
+        }
+
+        /// <summary>
+        /// ヒーロー接続ボタンのクリックハンドラ
+        /// </summary>
+        private void HeroConnectButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is MainViewModel vm)
+            {
+                vm.ConnectCommand.Execute(null);
+            }
+        }
+
+        /// <summary>
+        /// 指定されたページを表示
+        /// </summary>
+        private void ShowPage(string pageName)
+        {
+            // すべてのページを非表示
+            foreach (var page in _pages.Values)
+            {
+                page.Visibility = Visibility.Collapsed;
+            }
+
+            // 指定ページを表示
+            if (_pages.TryGetValue(pageName, out var targetPage))
+            {
+                targetPage.Visibility = Visibility.Visible;
+            }
+
+            // ボタンの外観を更新
+            foreach (var kvp in _navButtons)
+            {
+                kvp.Value.Appearance = kvp.Key == pageName
+                    ? ControlAppearance.Primary
+                    : ControlAppearance.Secondary;
+            }
+
+            _currentPage = pageName;
+        }
+
+        /// <summary>
+        /// ウィンドウ閉じる時のイベント
+        /// </summary>
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (DataContext is MainViewModel vm)
+            {
+                if (!vm.CanCloseWindow)
+                {
+                    e.Cancel = true;
+                    SystemMsgBox.Show("処理中は終了できません", "FULLMONI-WIDE Terminal",
+                        SystemMsgButton.OK, SystemMsgImage.Warning);
+                    return;
+                }
+
+                // シリアル接続を切断
+                vm.ConnectCommand.Execute(null);
+            }
+        }
+
+        /// <summary>
+        /// ファームウェアログのテキスト変更時にスクロール
+        /// </summary>
+        private void FirmwareLogTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (sender is WpfTextBox textBox)
+            {
+                textBox.ScrollToEnd();
+            }
+        }
+
+        #region CAN設定関連
+
+        /// <summary>
+        /// CANフィールドを初期化
+        /// </summary>
+        private void InitializeCanFields()
+        {
+            _canFields.Clear();
+
+            for (int i = 0; i < 16; i++)
+            {
+                _canFields.Add(new CanFieldItem
+                {
+                    Index = i + 1,
+                    Enabled = false,
+                    Channel = 0,
+                    StartByte = 0,
+                    ByteCount = 2,
+                    DataType = "U",
+                    Endian = "B",
+                    TargetVarName = "USER1",
+                    Offset = 0,
+                    Multiplier = 1.0,
+                    Divisor = 1.0,
+                    Decimals = 0,
+                    Name = "",
+                    Unit = "",
+                    WarnLowEnabled = false,
+                    WarnLow = "---",
+                    WarnHighEnabled = false,
+                    WarnHigh = "---"
+                });
+            }
+
+            CanFieldsGrid.ItemsSource = _canFields;
+            CanFieldsGrid.Items.Refresh();
+        }
+
+        /// <summary>
+        /// CAN設定読み込みボタン
+        /// </summary>
+        private async void CanReadButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is not MainViewModel vm || !vm.IsConnected)
+            {
+                SystemMsgBox.Show("Please connect to device", "CAN Config",
+                    SystemMsgButton.OK, SystemMsgImage.Warning);
+                return;
+            }
+
+            try
+            {
+                CanReadButton.IsEnabled = false;
+                CanWriteButton.IsEnabled = false;
+
+                // パラメータモードに入る（最初のコマンドでウェルカムメッセージが返る）
+                await vm.SendCommandAndGetResponseAsync("", 500);
+                await Task.Delay(100);
+
+                // CAN設定を読み込む
+                await LoadCanSettingsAsync();
             }
             finally
             {
-                vm.IsBusy = false;
+                CanReadButton.IsEnabled = true;
+                CanWriteButton.IsEnabled = true;
             }
         }
-        else
+
+        /// <summary>
+        /// CAN応答をパースしてUIに反映
+        /// </summary>
+        private void ParseCanResponse(string response)
         {
-            UpdateCanStatus("エラー: デバイスに接続してください");
-        }
-    }
-
-    /// <summary>
-    /// can_listの応答を解析してUIに反映
-    /// Issue #50: Name, Unit, WarnEnabled, WarnLow, WarnHigh対応
-    /// </summary>
-    private int ParseCanConfigResponse(string response)
-    {
-        int matchCount = 0;
-
-        // マスターワーニング/警告音設定を解析: Warning: ON, Sound: ON
-        var warnSoundRegex = new Regex(@"Warning:\s*(ON|OFF),\s*Sound:\s*(ON|OFF)", RegexOptions.IgnoreCase);
-        var warnSoundMatch = warnSoundRegex.Match(response);
-        if (warnSoundMatch.Success)
-        {
-            WarningEnabledBox.IsChecked = warnSoundMatch.Groups[1].Value.Equals("ON", StringComparison.OrdinalIgnoreCase);
-            SoundEnabledBox.IsChecked = warnSoundMatch.Groups[2].Value.Equals("ON", StringComparison.OrdinalIgnoreCase);
-        }
-
-        // チャンネル設定を解析: CH1: ID=0x3E8, ON
-        var chRegex = new Regex(@"CH(\d+):\s*ID=0x([0-9A-Fa-f]+),\s*(ON|OFF)", RegexOptions.IgnoreCase);
-        var chMatches = chRegex.Matches(response);
-
-        var channelBoxes = new (TextBox idBox, CheckBox enableBox)[] {
-            (CanCh1IdBox, CanCh1EnabledBox),
-            (CanCh2IdBox, CanCh2EnabledBox),
-            (CanCh3IdBox, CanCh3EnabledBox),
-            (CanCh4IdBox, CanCh4EnabledBox),
-            (CanCh5IdBox, CanCh5EnabledBox),
-            (CanCh6IdBox, CanCh6EnabledBox)
-        };
-
-        foreach (Match match in chMatches)
-        {
-            int chNum = int.Parse(match.Groups[1].Value);
-            string canId = match.Groups[2].Value;
-            bool enabled = match.Groups[3].Value.Equals("ON", StringComparison.OrdinalIgnoreCase);
-
-            if (chNum >= 1 && chNum <= 6)
+            // Warning設定を解析
+            var warnSoundRegex = new Regex(@"Warning:\s*(ON|OFF),\s*Sound:\s*(ON|OFF)", RegexOptions.IgnoreCase);
+            var warnSoundMatch = warnSoundRegex.Match(response);
+            if (warnSoundMatch.Success)
             {
-                channelBoxes[chNum - 1].idBox.Text = $"0x{canId}";
-                channelBoxes[chNum - 1].enableBox.IsChecked = enabled;
-                matchCount++;
-            }
-        }
-
-        // フィールド設定を解析 (Issue #50: 警告設定対応, float閾値, decimal_shift)
-        // ファームウェア出力: "%2d %2d   %d   %d   %c    %c   %-5s %4d %5d %5d  %d  %-7s %-4s %c %6s %c %6s"
-        // 例: " 4  2   2   2   U    B   AF       0   147  1000  1  A/F     afr  Y  10.00 Y  18.00"
-        // グループ: Index, CH, Byte, Len, Type, End, Var, Off, Mul, Div, DecShift, Name, Unit, WLoEn, WarnLo, WHiEn, WarnHi
-        // 空のName/Unitはファームウェアが "-" を出力する
-        var fieldRegex = new Regex(@"^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([US])\s+([BL])\s+(\S+)\s+(-?\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\S+)\s+(\S+)\s+([YN])\s+(-?[\d.]+|---)\s+([YN])\s+(-?[\d.]+|---)", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-        var fieldMatches = fieldRegex.Matches(response);
-
-        // フィールドがマッチした場合のみ更新（読込み失敗時は既存設定を保持）
-        if (fieldMatches.Count > 0)
-        {
-            // 一旦全フィールドを無効化
-            foreach (var field in _canFields)
-            {
-                field.Enabled = false;
-            }
-        }
-
-        foreach (Match match in fieldMatches)
-        {
-            int index = int.Parse(match.Groups[1].Value);
-            if (index >= 0 && index < _canFields.Count)
-            {
-                var field = _canFields[index];
-                field.Channel = int.Parse(match.Groups[2].Value);
-                field.StartByte = int.Parse(match.Groups[3].Value);
-                field.ByteCount = int.Parse(match.Groups[4].Value);
-                field.DataType = match.Groups[5].Value.ToUpper();
-                field.Endian = match.Groups[6].Value.ToUpper();
-                // Groups[7] = Var名 → 数値に変換
-                string varName = match.Groups[7].Value;
-                field.TargetVar = VarNameToIndex.TryGetValue(varName, out int varIdx) ? varIdx : 255;
-                // Groups[8] = Offset
-                field.Offset = int.Parse(match.Groups[8].Value);
-                field.Multiplier = int.Parse(match.Groups[9].Value);
-                field.Divisor = int.Parse(match.Groups[10].Value);
-                field.DecimalShift = int.Parse(match.Groups[11].Value);
-
-                // Issue #50: 警告設定 ("-" は空として扱う)
-                string nameVal = match.Groups[12].Value.Trim();
-                string unitVal = match.Groups[13].Value.Trim();
-                field.Name = (nameVal == "-") ? "" : nameVal;
-                field.Unit = (unitVal == "-") ? "" : unitVal;
-
-                // Issue #50: Lo/Hi個別有効化 (float対応)
-                field.WarnLowEnabled = match.Groups[14].Value.Equals("Y", StringComparison.OrdinalIgnoreCase);
-                string warnLoStr = match.Groups[15].Value;
-                field.WarnLow = warnLoStr == "---" ? -1e30 : double.Parse(warnLoStr, System.Globalization.CultureInfo.InvariantCulture);
-                field.WarnHighEnabled = match.Groups[16].Value.Equals("Y", StringComparison.OrdinalIgnoreCase);
-                string warnHiStr = match.Groups[17].Value;
-                field.WarnHigh = warnHiStr == "---" ? -1e30 : double.Parse(warnHiStr, System.Globalization.CultureInfo.InvariantCulture);
-
-                // channel > 0 なら有効
-                field.Enabled = field.Channel > 0;
-                matchCount++;
-            }
-        }
-
-        return matchCount;
-    }
-
-    /// <summary>
-    /// CAN設定のバリデーション
-    /// </summary>
-    private bool ValidateCanSettings(out string errorMessage)
-    {
-        errorMessage = "";
-        var errors = new List<string>();
-
-        // チャンネル設定のバリデーション
-        var channelBoxes = new[] {
-            (CanCh1IdBox, "CH1"),
-            (CanCh2IdBox, "CH2"),
-            (CanCh3IdBox, "CH3"),
-            (CanCh4IdBox, "CH4"),
-            (CanCh5IdBox, "CH5"),
-            (CanCh6IdBox, "CH6")
-        };
-
-        foreach (var (idBox, name) in channelBoxes)
-        {
-            if (!string.IsNullOrEmpty(idBox.Text))
-            {
-                var canId = ParseCanId(idBox.Text);
-                if (canId < 0 || canId > 0x7FF)
-                {
-                    errors.Add($"{name}: CAN IDは0x000〜0x7FFの範囲で指定してください");
-                }
-            }
-        }
-
-        // フィールド設定のバリデーション
-        foreach (var field in _canFields)
-        {
-            if (!field.Enabled) continue; // 無効なフィールドはスキップ
-
-            var idx = field.Index;
-
-            // チャンネル範囲チェック
-            if (field.Channel < 1 || field.Channel > 6)
-            {
-                errors.Add($"フィールド{idx}: CHは1〜6の範囲で指定してください");
+                WarningEnabledBox.IsChecked = warnSoundMatch.Groups[1].Value.Equals("ON", StringComparison.OrdinalIgnoreCase);
+                SoundEnabledBox.IsChecked = warnSoundMatch.Groups[2].Value.Equals("ON", StringComparison.OrdinalIgnoreCase);
             }
 
-            // Byte位置チェック
-            if (field.StartByte < 0 || field.StartByte > 7)
-            {
-                errors.Add($"フィールド{idx}: Byteは0〜7の範囲で指定してください");
-            }
-
-            // Sizeチェック
-            if (field.ByteCount != 1 && field.ByteCount != 2 && field.ByteCount != 4)
-            {
-                errors.Add($"フィールド{idx}: Sizeは1, 2, 4のいずれかを指定してください");
-            }
-
-            // Byte + Size がデータ範囲を超えていないかチェック
-            if (field.StartByte + field.ByteCount > 8)
-            {
-                errors.Add($"フィールド{idx}: Byte({field.StartByte}) + Size({field.ByteCount}) が8を超えています");
-            }
-
-            // Mul/Divチェック
-            if (field.Multiplier <= 0)
-            {
-                errors.Add($"フィールド{idx}: Mulは1以上を指定してください");
-            }
-            if (field.Divisor <= 0)
-            {
-                errors.Add($"フィールド{idx}: Divは1以上を指定してください");
-            }
-        }
-
-        if (errors.Count > 0)
-        {
-            errorMessage = string.Join("\n", errors);
-            return false;
-        }
-
-        return true;
-    }
-
-    private async void CanWriteButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (DataContext is not ViewModels.MainViewModel vm || !vm.IsConnected)
-        {
-            UpdateCanStatus("エラー: デバイスに接続してください");
-            return;
-        }
-
-        // バリデーション
-        if (!ValidateCanSettings(out var errorMessage))
-        {
-            MessageBox.Show($"入力値に問題があります:\n\n{errorMessage}", "入力エラー", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
-
-        vm.IsBusy = true;
-
-        try
-        {
-            var commands = new List<string>();
-
-            // マスターワーニング/警告音設定
-            commands.Add($"can_warning {(WarningEnabledBox.IsChecked == true ? 1 : 0)}");
-            commands.Add($"can_sound {(SoundEnabledBox.IsChecked == true ? 1 : 0)}");
-
-            // CANチャンネル設定
-            var channelBoxes = new[] {
+            // チャンネル設定を解析
+            var channelBoxes = new (WpfTextBox idBox, CheckBox enableBox)[] {
                 (CanCh1IdBox, CanCh1EnabledBox),
                 (CanCh2IdBox, CanCh2EnabledBox),
                 (CanCh3IdBox, CanCh3EnabledBox),
@@ -729,187 +424,301 @@ public partial class MainWindow : Window
                 (CanCh6IdBox, CanCh6EnabledBox)
             };
 
-            for (int i = 0; i < channelBoxes.Length; i++)
+            // ファームウェア形式: "CH1: ID=0x3E8, ON"
+            var chRegex = new Regex(@"CH(\d):\s*ID=0x([0-9A-Fa-f]+),\s*(ON|OFF)", RegexOptions.IgnoreCase);
+            foreach (Match match in chRegex.Matches(response))
             {
-                var (idBox, enabledBox) = channelBoxes[i];
-                if (!string.IsNullOrEmpty(idBox.Text))
+                var chNum = int.Parse(match.Groups[1].Value);
+                var canId = match.Groups[2].Value;
+                var enabled = match.Groups[3].Value.Equals("ON", StringComparison.OrdinalIgnoreCase);
+
+                if (chNum >= 1 && chNum <= 6)
                 {
-                    var canId = ParseCanId(idBox.Text);
-                    var enabled = enabledBox.IsChecked == true ? 1 : 0;
-                    // can_ch <n> <id> <en> (n=1-6)
-                    commands.Add($"can_ch {i + 1} {canId} {enabled}");
+                    channelBoxes[chNum - 1].idBox.Text = $"0x{canId}";
+                    channelBoxes[chNum - 1].enableBox.IsChecked = enabled;
                 }
             }
 
-            // CANフィールド設定（ENオフの場合はchannel=0で無効化）
-            foreach (var field in _canFields)
+            // フィールド定義を解析
+            // ファームウェア形式: " 0  1   0   2   U    B   REV      0  1000  1000  0  Engine  rpm  N    ---  N    ---"
+            // No CH Byte Len Type End Var    Off  Mul   Div  Dsh Name    Unit WLo  Lo WHi    Hi
+            var fieldRegex = new Regex(@"^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(U|S)\s+(B|L)\s+(\S+)\s+([-\d]+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\S+)\s+(\S+)\s+(Y|N)\s+(\S+)\s+(Y|N)\s+(\S+)", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+            foreach (Match match in fieldRegex.Matches(response))
             {
-                var dataType = field.DataType == "S" ? 1 : 0;
-                var endian = field.Endian == "L" ? 1 : 0;
-                // ENオフの場合はchannel=0で無効化
-                var channel = field.Enabled ? field.Channel : 0;
-                var warnLoEn = field.WarnLowEnabled ? 1 : 0;
-                var warnHiEn = field.WarnHighEnabled ? 1 : 0;
-                // 名前と単位（空の場合は "-" を送信）
-                var name = string.IsNullOrWhiteSpace(field.Name) ? "-" : field.Name.Replace(" ", "_");
-                var unit = string.IsNullOrWhiteSpace(field.Unit) ? "-" : field.Unit.Replace(" ", "_");
-                // 閾値はfloat形式で送信 (InvariantCultureで小数点をピリオドに)
-                var warnLoStr = field.WarnLow.ToString("G", System.Globalization.CultureInfo.InvariantCulture);
-                var warnHiStr = field.WarnHigh.ToString("G", System.Globalization.CultureInfo.InvariantCulture);
-                // can_field <n> <ch> <byte> <len> <type> <end> <var> <off> <mul> <div> <name> <unit> <dec_shift> <wlo_en> <warn_lo> <whi_en> <warn_hi>
-                // 注意: Firmware側のパース順に合わせる (name, unit, dec_shift の順)
-                commands.Add($"can_field {field.Index} {channel} {field.StartByte} {field.ByteCount} {dataType} {endian} {field.TargetVar} {field.Offset} {field.Multiplier} {field.Divisor} {name} {unit} {field.DecimalShift} {warnLoEn} {warnLoStr} {warnHiEn} {warnHiStr}");
+                var idx = int.Parse(match.Groups[1].Value);
+                if (idx >= 0 && idx < _canFields.Count)
+                {
+                    var field = _canFields[idx];
+                    field.Channel = int.Parse(match.Groups[2].Value);
+                    field.StartByte = int.Parse(match.Groups[3].Value);
+                    field.ByteCount = int.Parse(match.Groups[4].Value);
+                    field.DataType = match.Groups[5].Value.ToUpper();
+                    field.Endian = match.Groups[6].Value.ToUpper();
+                    field.TargetVarName = match.Groups[7].Value;
+                    field.Offset = int.Parse(match.Groups[8].Value);
+                    field.Multiplier = double.Parse(match.Groups[9].Value);
+                    field.Divisor = double.Parse(match.Groups[10].Value);
+                    field.Decimals = int.Parse(match.Groups[11].Value);
+                    // Name: "-" は空文字に変換
+                    var name = match.Groups[12].Value;
+                    field.Name = (name == "-") ? "" : name;
+                    // Unit: "-" は空文字に変換
+                    var unit = match.Groups[13].Value;
+                    field.Unit = (unit == "-") ? "" : unit;
+                    // Warning Low
+                    field.WarnLowEnabled = match.Groups[14].Value.Equals("Y", StringComparison.OrdinalIgnoreCase);
+                    field.WarnLow = match.Groups[15].Value;
+                    // Warning High
+                    field.WarnHighEnabled = match.Groups[16].Value.Equals("Y", StringComparison.OrdinalIgnoreCase);
+                    field.WarnHigh = match.Groups[17].Value;
+                    field.Enabled = field.Channel > 0;
+                }
             }
 
-            if (commands.Count == 0)
+            CanFieldsGrid.Items.Refresh();
+        }
+
+        /// <summary>
+        /// CAN設定書き込みボタン
+        /// </summary>
+        private async void CanWriteButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is not MainViewModel vm || !vm.IsConnected)
             {
-                UpdateCanStatus("設定するCAN項目がありません（ENを有効にしてください）");
+                SystemMsgBox.Show("Please connect to device", "CAN Config",
+                    SystemMsgButton.OK, SystemMsgImage.Warning);
                 return;
             }
 
-            // パラメータモードに入ってからコマンドを順番に送信
-            UpdateCanStatus($"送信中: {commands.Count}個のコマンド...");
-
-            // パラメータモードに入る
-            vm.SendCommandDirect("");
-            await Task.Delay(300);
-
-            foreach (var cmd in commands)
+            try
             {
-                vm.SendCommandDirect(cmd);
-                await Task.Delay(150);
+                CanStatusText.Text = "Saving...";
+                CanReadButton.IsEnabled = false;
+                CanWriteButton.IsEnabled = false;
+
+                var commands = new List<string>();
+
+                // マスターワーニング設定
+                commands.Add($"can_warning {(WarningEnabledBox.IsChecked == true ? 1 : 0)}");
+                commands.Add($"can_sound {(SoundEnabledBox.IsChecked == true ? 1 : 0)}");
+
+                // チャンネル設定
+                var channelBoxes = new[] {
+                    (CanCh1IdBox, CanCh1EnabledBox),
+                    (CanCh2IdBox, CanCh2EnabledBox),
+                    (CanCh3IdBox, CanCh3EnabledBox),
+                    (CanCh4IdBox, CanCh4EnabledBox),
+                    (CanCh5IdBox, CanCh5EnabledBox),
+                    (CanCh6IdBox, CanCh6EnabledBox)
+                };
+
+                for (int i = 0; i < channelBoxes.Length; i++)
+                {
+                    var (idBox, enabledBox) = channelBoxes[i];
+                    if (!string.IsNullOrEmpty(idBox.Text))
+                    {
+                        var canId = ParseCanId(idBox.Text);
+                        var enabled = enabledBox.IsChecked == true ? 1 : 0;
+                        commands.Add($"can_ch {i + 1} {canId} {enabled}");
+                    }
+                }
+
+                // フィールド設定
+                foreach (var field in _canFields)
+                {
+                    var dataType = field.DataType == "S" ? 1 : 0;
+                    var endian = field.Endian == "L" ? 1 : 0;
+                    var channel = field.Enabled ? field.Channel : 0;
+                    var targetVar = GetTargetVarIndex(field.TargetVarName);
+                    var name = string.IsNullOrEmpty(field.Name) ? "-" : field.Name;
+                    var unit = string.IsNullOrEmpty(field.Unit) ? "-" : field.Unit;
+                    var warnLoEnabled = field.WarnLowEnabled ? 1 : 0;
+                    var warnLo = string.IsNullOrEmpty(field.WarnLow) || field.WarnLow == "---" ? "0" : field.WarnLow;
+                    var warnHiEnabled = field.WarnHighEnabled ? 1 : 0;
+                    var warnHi = string.IsNullOrEmpty(field.WarnHigh) || field.WarnHigh == "---" ? "0" : field.WarnHigh;
+
+                    commands.Add($"can_field {field.Index} {channel} {field.StartByte} {field.ByteCount} {dataType} {endian} {targetVar} {field.Offset} {field.Multiplier} {field.Divisor} {name} {unit} {field.Decimals} {warnLoEnabled} {warnLo} {warnHiEnabled} {warnHi}");
+                }
+
+                // コマンドを順次送信
+                foreach (var cmd in commands)
+                {
+                    await vm.SendCommandAndGetResponseAsync(cmd);
+                    await System.Threading.Tasks.Task.Delay(150);
+                }
+
+                // 設定を保存
+                await vm.SendCommandAndGetResponseAsync("can_save");
+
+                // パラメータモードを終了
+                await vm.SendCommandAndGetResponseAsync("exit", 200);
+
+                CanStatusText.Text = "Save complete (Saved to EEPROM)";
             }
-
-            // EEPROMに保存（E2PROM書き込みは時間がかかるため長めに待機）
-            vm.SendCommandDirect("can_save");
-            await Task.Delay(1000);
-
-            // パラメータモードを抜ける
-            vm.SendCommandDirect("exit");
-            await Task.Delay(300);
-
-            UpdateCanStatus($"完了: {commands.Count}個のCAN設定を送信・保存");
-        }
-        finally
-        {
-            vm.IsBusy = false;
-        }
-    }
-
-    private void CanDefaultButton_Click(object sender, RoutedEventArgs e)
-    {
-        var result = MessageBox.Show("CAN設定を出荷時設定に戻しますか？", "確認", MessageBoxButton.YesNo, MessageBoxImage.Question);
-        if (result == MessageBoxResult.Yes)
-        {
-            // マスターワーニング/警告音設定をデフォルトに
-            WarningEnabledBox.IsChecked = true;
-            SoundEnabledBox.IsChecked = true;
-
-            // チャンネル設定をデフォルトに
-            CanCh1IdBox.Text = "0x3E8"; CanCh1EnabledBox.IsChecked = true;
-            CanCh2IdBox.Text = "0x3E9"; CanCh2EnabledBox.IsChecked = true;
-            CanCh3IdBox.Text = "0x3EA"; CanCh3EnabledBox.IsChecked = true;
-            CanCh4IdBox.Text = "0x3EB"; CanCh4EnabledBox.IsChecked = true;
-            CanCh5IdBox.Text = "0x3EC"; CanCh5EnabledBox.IsChecked = true;
-            CanCh6IdBox.Text = "0x3ED"; CanCh6EnabledBox.IsChecked = false;
-
-            // フィールド設定を再初期化 (Issue #50: Firmware側CAN_PRESET_MOTECと完全一致)
-            _canFields.Clear();
-            // Var: 0=REV, 1=AF, 2=NUM1(水温), 3=NUM2(吸気温), 4=NUM3(油温), 5=NUM4(MAP), 6=NUM5(油圧), 7=NUM6(電圧), 8=SPEED
-            // WarnLo/WarnHi: float対応（表示単位で指定）
-            // DecShift: 0=整数, 1=÷10, 2=÷100 (AppWizard Maskと対応)
-            var defaults = new[]
+            catch (FormatException)
             {
-                // CH1 (0x3E8): RPM(0-1), MAP(4-5), IAT(6-7)
-                new { Ch = 1, Byte = 0, Size = 2, Type = "U", End = "B", Var = 0, Off = 0, Mul = 1000, Div = 1000, DecShift = 0, En = true,
-                      Name = "REV", Unit = "rpm", WarnLoEn = false, WarnLo = 200.0, WarnHiEn = true, WarnHi = 9000.0 },
-                new { Ch = 1, Byte = 4, Size = 2, Type = "U", End = "B", Var = 5, Off = 0, Mul = 1000, Div = 10000, DecShift = 0, En = true,
-                      Name = "MAP", Unit = "kPa", WarnLoEn = false, WarnLo = 0.0, WarnHiEn = false, WarnHi = 150.0 },
-                new { Ch = 1, Byte = 6, Size = 2, Type = "S", End = "B", Var = 3, Off = 0, Mul = 1000, Div = 10000, DecShift = 0, En = true,
-                      Name = "IAT", Unit = "deg", WarnLoEn = false, WarnLo = -40.0, WarnHiEn = true, WarnHi = 80.0 },
-                // CH2 (0x3E9): ECT(0-1), AFR(2-3)
-                new { Ch = 2, Byte = 0, Size = 2, Type = "S", End = "B", Var = 2, Off = 0, Mul = 1000, Div = 10000, DecShift = 0, En = true,
-                      Name = "WATER", Unit = "deg", WarnLoEn = false, WarnLo = -40.0, WarnHiEn = true, WarnHi = 110.0 },
-                new { Ch = 2, Byte = 2, Size = 2, Type = "U", End = "B", Var = 1, Off = 0, Mul = 147, Div = 1000, DecShift = 1, En = true,
-                      Name = "A/F", Unit = "afr", WarnLoEn = false, WarnLo = 10.0, WarnHiEn = false, WarnHi = 18.0 },
-                // CH3 (0x3EA): OilTemp(6-7)
-                new { Ch = 3, Byte = 6, Size = 2, Type = "S", End = "B", Var = 4, Off = 0, Mul = 1000, Div = 10000, DecShift = 0, En = true,
-                      Name = "OIL-T", Unit = "deg", WarnLoEn = false, WarnLo = -40.0, WarnHiEn = true, WarnHi = 130.0 },
-                // CH4 (0x3EB): OilPressure(0-1), BattV(6-7)
-                new { Ch = 4, Byte = 0, Size = 2, Type = "U", End = "B", Var = 6, Off = 0, Mul = 1, Div = 1000, DecShift = 1, En = true,
-                      Name = "OIL-P", Unit = "x100kPa", WarnLoEn = true, WarnLo = 1.5, WarnHiEn = true, WarnHi = 9.0 },
-                new { Ch = 4, Byte = 6, Size = 2, Type = "U", End = "B", Var = 7, Off = 0, Mul = 1000, Div = 10000, DecShift = 1, En = true,
-                      Name = "BATT", Unit = "V", WarnLoEn = false, WarnLo = 9.0, WarnHiEn = false, WarnHi = 16.0 },
+                CanStatusText.Text = "Error: CAN ID must be hexadecimal (e.g. 0x7E0)";
+            }
+            catch (Exception ex)
+            {
+                CanStatusText.Text = $"エラー: {ex.Message}";
+            }
+            finally
+            {
+                CanReadButton.IsEnabled = true;
+                CanWriteButton.IsEnabled = true;
+            }
+        }
+
+        /// <summary>
+        /// CAN IDをパース
+        /// </summary>
+        private int ParseCanId(string text)
+        {
+            text = text.Trim();
+            if (text.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+            {
+                return Convert.ToInt32(text.Substring(2), 16);
+            }
+            return Convert.ToInt32(text, 16);
+        }
+
+        /// <summary>
+        /// ターゲット変数名からインデックスを取得
+        /// </summary>
+        private int GetTargetVarIndex(string varName)
+        {
+            return varName?.ToUpperInvariant() switch
+            {
+                "REV" => 0,      // CAN_TARGET_REV
+                "AF" => 1,       // CAN_TARGET_AF
+                "NUM1" => 2,     // CAN_TARGET_NUM1 (水温)
+                "NUM2" => 3,     // CAN_TARGET_NUM2 (吸気温)
+                "NUM3" => 4,     // CAN_TARGET_NUM3 (油温)
+                "NUM4" => 5,     // CAN_TARGET_NUM4 (MAP)
+                "NUM5" => 6,     // CAN_TARGET_NUM5 (油圧)
+                "NUM6" => 7,     // CAN_TARGET_NUM6 (バッテリー)
+                "SPEED" => 8,    // CAN_TARGET_SPEED
+                _ => 255         // CAN_TARGET_NONE
             };
-
-            for (int i = 0; i < defaults.Length; i++)
-            {
-                var d = defaults[i];
-                _canFields.Add(new CanFieldItem
-                {
-                    Index = i,
-                    Channel = d.Ch,
-                    StartByte = d.Byte,
-                    ByteCount = d.Size,
-                    DataType = d.Type,
-                    Endian = d.End,
-                    TargetVar = d.Var,
-                    Offset = d.Off,
-                    Multiplier = d.Mul,
-                    Divisor = d.Div,
-                    DecimalShift = d.DecShift,
-                    Enabled = d.En,
-                    Name = d.Name,
-                    Unit = d.Unit,
-                    WarnLowEnabled = d.WarnLoEn,
-                    WarnLow = d.WarnLo,
-                    WarnHighEnabled = d.WarnHiEn,
-                    WarnHigh = d.WarnHi
-                });
-            }
-
-            // 残り8個の空フィールドを追加（合計16個）
-            for (int i = defaults.Length; i < 16; i++)
-            {
-                _canFields.Add(new CanFieldItem
-                {
-                    Index = i,
-                    Channel = 0,  // channel=0 で無効
-                    StartByte = 0,
-                    ByteCount = 2,
-                    DataType = "U",
-                    Endian = "B",
-                    TargetVar = 0,
-                    Offset = 0,
-                    Multiplier = 1000,
-                    Divisor = 1000,
-                    DecimalShift = 0,
-                    Enabled = false,
-                    Name = "",
-                    Unit = "",
-                    WarnLowEnabled = false,
-                    WarnLow = -1e30,
-                    WarnHighEnabled = false,
-                    WarnHigh = -1e30
-                });
-            }
-
-            UpdateCanStatus("デフォルト値に戻しました（書込ボタンで適用）");
         }
-    }
 
-    private static int ParseCanId(string text)
-    {
-        text = text.Trim();
-        if (text.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+        /// <summary>
+        /// CAN設定デフォルトボタン
+        /// </summary>
+        private async void CanDefaultButton_Click(object sender, RoutedEventArgs e)
         {
-            if (int.TryParse(text.Substring(2), System.Globalization.NumberStyles.HexNumber, null, out int hexResult))
-                return hexResult;
+            if (DataContext is not MainViewModel vm || !vm.IsConnected)
+            {
+                SystemMsgBox.Show("Please connect to device", "CAN Config",
+                    SystemMsgButton.OK, SystemMsgImage.Warning);
+                return;
+            }
+
+            var result = SystemMsgBox.Show(
+                "Reset CAN settings to MoTeC defaults?\n(Device settings will be updated)",
+                "CAN Config",
+                SystemMsgButton.YesNo,
+                SystemMsgImage.Question);
+
+            if (result != SystemMsgResult.Yes)
+                return;
+
+            try
+            {
+                CanReadButton.IsEnabled = false;
+                CanWriteButton.IsEnabled = false;
+                CanDefaultButton.IsEnabled = false;
+                CanStatusText.Text = "Applying default settings...";
+
+                // パラメータモードに入る
+                vm.ClearResponseBuffer();
+                await vm.SendCommandAndGetResponseAsync("", 800);
+
+                // can_preset motec コマンドを送信してデフォルト設定を適用
+                vm.ClearResponseBuffer();
+                await vm.SendCommandAndGetResponseAsync("can_preset motec", 1000);
+
+                // 設定を保存
+                await vm.SendCommandAndGetResponseAsync("can_save", 500);
+
+                // 設定を再読み込み
+                vm.ClearResponseBuffer();
+                var response = await vm.SendCommandAndGetResponseAsync("can_list", 5000);
+
+                // パラメータモードを終了
+                await vm.SendCommandAndGetResponseAsync("exit", 500);
+
+                if (!string.IsNullOrEmpty(response))
+                {
+                    ParseCanResponse(response);
+                }
+
+                CanStatusText.Text = "MoTeC default settings applied";
+            }
+            catch (Exception ex)
+            {
+                CanStatusText.Text = $"Error: {ex.Message}";
+            }
+            finally
+            {
+                CanReadButton.IsEnabled = true;
+                CanWriteButton.IsEnabled = true;
+                CanDefaultButton.IsEnabled = true;
+            }
         }
-        if (int.TryParse(text, out int decResult))
-            return decResult;
-        return 0;
+
+        #endregion
     }
 
-    #endregion
+    /// <summary>
+    /// CANフィールドのデータモデル
+    /// </summary>
+    public class CanFieldItem : INotifyPropertyChanged
+    {
+        private int _index;
+        private bool _enabled;
+        private int _channel;
+        private int _startByte;
+        private int _byteCount = 2;
+        private string _dataType = "U";
+        private string _endian = "B";
+        private string _targetVarName = "USER1";
+        private int _offset;
+        private double _multiplier = 1.0;
+        private double _divisor = 1.0;
+        private int _decimals;
+        private string _name = "";
+        private string _unit = "";
+        private bool _warnLowEnabled;
+        private string _warnLow = "---";
+        private bool _warnHighEnabled;
+        private string _warnHigh = "---";
+
+        public int Index { get => _index; set { _index = value; OnPropertyChanged(nameof(Index)); } }
+        public bool Enabled { get => _enabled; set { _enabled = value; OnPropertyChanged(nameof(Enabled)); } }
+        public int Channel { get => _channel; set { _channel = value; OnPropertyChanged(nameof(Channel)); } }
+        public int StartByte { get => _startByte; set { _startByte = value; OnPropertyChanged(nameof(StartByte)); } }
+        public int ByteCount { get => _byteCount; set { _byteCount = value; OnPropertyChanged(nameof(ByteCount)); } }
+        public string DataType { get => _dataType; set { _dataType = value; OnPropertyChanged(nameof(DataType)); } }
+        public string Endian { get => _endian; set { _endian = value; OnPropertyChanged(nameof(Endian)); } }
+        public string TargetVarName { get => _targetVarName; set { _targetVarName = value; OnPropertyChanged(nameof(TargetVarName)); } }
+        public int Offset { get => _offset; set { _offset = value; OnPropertyChanged(nameof(Offset)); } }
+        public double Multiplier { get => _multiplier; set { _multiplier = value; OnPropertyChanged(nameof(Multiplier)); } }
+        public double Divisor { get => _divisor; set { _divisor = value; OnPropertyChanged(nameof(Divisor)); } }
+        public int Decimals { get => _decimals; set { _decimals = value; OnPropertyChanged(nameof(Decimals)); } }
+        public string Name { get => _name; set { _name = value; OnPropertyChanged(nameof(Name)); } }
+        public string Unit { get => _unit; set { _unit = value; OnPropertyChanged(nameof(Unit)); } }
+        public bool WarnLowEnabled { get => _warnLowEnabled; set { _warnLowEnabled = value; OnPropertyChanged(nameof(WarnLowEnabled)); } }
+        public string WarnLow { get => _warnLow; set { _warnLow = value; OnPropertyChanged(nameof(WarnLow)); } }
+        public bool WarnHighEnabled { get => _warnHighEnabled; set { _warnHighEnabled = value; OnPropertyChanged(nameof(WarnHighEnabled)); } }
+        public string WarnHigh { get => _warnHigh; set { _warnHigh = value; OnPropertyChanged(nameof(WarnHigh)); } }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
 }
