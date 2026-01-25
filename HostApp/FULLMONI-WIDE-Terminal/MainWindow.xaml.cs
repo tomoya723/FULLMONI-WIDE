@@ -516,6 +516,15 @@ public partial class MainWindow : Window
     {
         int matchCount = 0;
 
+        // マスターワーニング/警告音設定を解析: Warning: ON, Sound: ON
+        var warnSoundRegex = new Regex(@"Warning:\s*(ON|OFF),\s*Sound:\s*(ON|OFF)", RegexOptions.IgnoreCase);
+        var warnSoundMatch = warnSoundRegex.Match(response);
+        if (warnSoundMatch.Success)
+        {
+            WarningEnabledBox.IsChecked = warnSoundMatch.Groups[1].Value.Equals("ON", StringComparison.OrdinalIgnoreCase);
+            SoundEnabledBox.IsChecked = warnSoundMatch.Groups[2].Value.Equals("ON", StringComparison.OrdinalIgnoreCase);
+        }
+
         // チャンネル設定を解析: CH1: ID=0x3E8, ON
         var chRegex = new Regex(@"CH(\d+):\s*ID=0x([0-9A-Fa-f]+),\s*(ON|OFF)", RegexOptions.IgnoreCase);
         var chMatches = chRegex.Matches(response);
@@ -706,6 +715,10 @@ public partial class MainWindow : Window
         {
             var commands = new List<string>();
 
+            // マスターワーニング/警告音設定
+            commands.Add($"can_warning {(WarningEnabledBox.IsChecked == true ? 1 : 0)}");
+            commands.Add($"can_sound {(SoundEnabledBox.IsChecked == true ? 1 : 0)}");
+
             // CANチャンネル設定
             var channelBoxes = new[] {
                 (CanCh1IdBox, CanCh1EnabledBox),
@@ -788,6 +801,10 @@ public partial class MainWindow : Window
         var result = MessageBox.Show("CAN設定を出荷時設定に戻しますか？", "確認", MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (result == MessageBoxResult.Yes)
         {
+            // マスターワーニング/警告音設定をデフォルトに
+            WarningEnabledBox.IsChecked = true;
+            SoundEnabledBox.IsChecked = true;
+
             // チャンネル設定をデフォルトに
             CanCh1IdBox.Text = "0x3E8"; CanCh1EnabledBox.IsChecked = true;
             CanCh2IdBox.Text = "0x3E9"; CanCh2EnabledBox.IsChecked = true;

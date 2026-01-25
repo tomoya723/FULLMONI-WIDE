@@ -348,59 +348,74 @@
                 <Grid Margin="8">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- CANチャンネル設定 -->
+                    <!-- マスターワーニング設定 -->
                     <Border Grid.Row="0" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock Text="マスターワーニング設定" FontWeight="Bold" FontSize="12" Margin="0,0,0,8" Foreground="{DynamicResource TextBrush}"/>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox x:Name="WarningEnabledBox" IsChecked="True" VerticalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <TextBlock Text="ON/OFF" FontSize="11" VerticalAlignment="Center" Margin="4,0,20,0" Foreground="{DynamicResource TextBrush}"/>
+                                <CheckBox x:Name="SoundEnabledBox" IsChecked="True" VerticalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <TextBlock Text="警告音" FontSize="11" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource TextBrush}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- CANチャンネル設定 -->
+                    <Border Grid.Row="1" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,8">
                         <StackPanel>
                             <TextBlock Text="受信チャンネル設定" FontWeight="Bold" FontSize="12" Margin="0,0,0,8" Foreground="{DynamicResource TextBrush}"/>
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="35"/>
-                                    <ColumnDefinition Width="80"/>
-                                    <ColumnDefinition Width="40"/>
-                                    <ColumnDefinition Width="20"/>
-                                    <ColumnDefinition Width="35"/>
-                                    <ColumnDefinition Width="80"/>
-                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="55"/>
+                                    <ColumnDefinition Width="24"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="55"/>
+                                    <ColumnDefinition Width="24"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="55"/>
+                                    <ColumnDefinition Width="24"/>
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
 
-                                <!-- CH1-2 -->
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="CH1" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                <TextBox Grid.Row="0" Grid.Column="1" x:Name="CanCh1IdBox" Text="0x3E8" Height="22" FontSize="11" Margin="2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <!-- CH1-2-3 -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="CH1" FontSize="10" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBox Grid.Row="0" Grid.Column="1" x:Name="CanCh1IdBox" Text="0x3E8" Height="20" FontSize="10" Margin="1" IsEnabled="{Binding IsOperationEnabled}"/>
                                 <CheckBox Grid.Row="0" Grid.Column="2" x:Name="CanCh1EnabledBox" IsChecked="True" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
-                                <TextBlock Grid.Row="0" Grid.Column="4" Text="CH2" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                <TextBox Grid.Row="0" Grid.Column="5" x:Name="CanCh2IdBox" Text="0x3E9" Height="22" FontSize="11" Margin="2" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <TextBlock Grid.Row="0" Grid.Column="4" Text="CH2" FontSize="10" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBox Grid.Row="0" Grid.Column="5" x:Name="CanCh2IdBox" Text="0x3E9" Height="20" FontSize="10" Margin="1" IsEnabled="{Binding IsOperationEnabled}"/>
                                 <CheckBox Grid.Row="0" Grid.Column="6" x:Name="CanCh2EnabledBox" IsChecked="True" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <TextBlock Grid.Row="0" Grid.Column="8" Text="CH3" FontSize="10" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBox Grid.Row="0" Grid.Column="9" x:Name="CanCh3IdBox" Text="0x3EA" Height="20" FontSize="10" Margin="1" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <CheckBox Grid.Row="0" Grid.Column="10" x:Name="CanCh3EnabledBox" IsChecked="True" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
 
-                                <!-- CH3-4 -->
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="CH3" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                <TextBox Grid.Row="1" Grid.Column="1" x:Name="CanCh3IdBox" Text="0x3EA" Height="22" FontSize="11" Margin="2" IsEnabled="{Binding IsOperationEnabled}"/>
-                                <CheckBox Grid.Row="1" Grid.Column="2" x:Name="CanCh3EnabledBox" IsChecked="True" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
-                                <TextBlock Grid.Row="1" Grid.Column="4" Text="CH4" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                <TextBox Grid.Row="1" Grid.Column="5" x:Name="CanCh4IdBox" Text="0x3EB" Height="22" FontSize="11" Margin="2" IsEnabled="{Binding IsOperationEnabled}"/>
-                                <CheckBox Grid.Row="1" Grid.Column="6" x:Name="CanCh4EnabledBox" IsChecked="True" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
-
-                                <!-- CH5-6 -->
-                                <TextBlock Grid.Row="2" Grid.Column="0" Text="CH5" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                <TextBox Grid.Row="2" Grid.Column="1" x:Name="CanCh5IdBox" Text="0x3EC" Height="22" FontSize="11" Margin="2" IsEnabled="{Binding IsOperationEnabled}"/>
-                                <CheckBox Grid.Row="2" Grid.Column="2" x:Name="CanCh5EnabledBox" IsChecked="True" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
-                                <TextBlock Grid.Row="2" Grid.Column="4" Text="CH6" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
-                                <TextBox Grid.Row="2" Grid.Column="5" x:Name="CanCh6IdBox" Text="0x3ED" Height="22" FontSize="11" Margin="2" IsEnabled="{Binding IsOperationEnabled}"/>
-                                <CheckBox Grid.Row="2" Grid.Column="6" x:Name="CanCh6EnabledBox" IsChecked="False" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <!-- CH4-5-6 -->
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="CH4" FontSize="10" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" x:Name="CanCh4IdBox" Text="0x3EB" Height="20" FontSize="10" Margin="1" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <CheckBox Grid.Row="1" Grid.Column="2" x:Name="CanCh4EnabledBox" IsChecked="True" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="4" Text="CH5" FontSize="10" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBox Grid.Row="1" Grid.Column="5" x:Name="CanCh5IdBox" Text="0x3EC" Height="20" FontSize="10" Margin="1" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <CheckBox Grid.Row="1" Grid.Column="6" x:Name="CanCh5EnabledBox" IsChecked="True" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="8" Text="CH6" FontSize="10" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
+                                <TextBox Grid.Row="1" Grid.Column="9" x:Name="CanCh6IdBox" Text="0x3ED" Height="20" FontSize="10" Margin="1" IsEnabled="{Binding IsOperationEnabled}"/>
+                                <CheckBox Grid.Row="1" Grid.Column="10" x:Name="CanCh6EnabledBox" IsChecked="False" VerticalAlignment="Center" HorizontalAlignment="Center" IsEnabled="{Binding IsOperationEnabled}"/>
                             </Grid>
                         </StackPanel>
                     </Border>
 
                     <!-- データフィールド定義 -->
-                    <Border Grid.Row="1" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10">
+                    <Border Grid.Row="2" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="4" Padding="10">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -509,7 +524,7 @@
                     </Border>
 
                     <!-- ボタンとステータス -->
-                    <StackPanel Grid.Row="2" Margin="0,8,0,0">
+                    <StackPanel Grid.Row="3" Margin="0,8,0,0">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <Button Content="読込" Width="70" Height="26" FontSize="12" Margin="0,0,6,0"
                                     Style="{DynamicResource PrimaryButton}"

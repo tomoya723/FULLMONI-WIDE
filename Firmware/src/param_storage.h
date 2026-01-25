@@ -59,7 +59,8 @@ typedef struct __attribute__((packed)) {
 typedef struct __attribute__((packed)) {
     uint8_t          version;                       /* 設定バージョン */
     uint8_t          preset_id;                     /* プリセットID (0=カスタム) */
-    uint16_t         reserved;                      /* 予約 */
+    uint8_t          warning_enabled;               /* マスターワーニング有効: 0=無効, 1=有効 */
+    uint8_t          sound_enabled;                 /* 警告音有効: 0=無効, 1=有効 */
     CAN_RX_Channel_t channels[CAN_CHANNEL_MAX];     /* 受信チャンネル設定 */
     CAN_Field_t      fields[CAN_FIELD_MAX];         /* データフィールド定義 */
     uint16_t         crc16;                         /* CRCチェックサム */
@@ -69,7 +70,7 @@ typedef struct __attribute__((packed)) {
 #define CAN_CONFIG_SIZE     sizeof(CAN_Config_t)
 
 /* CAN設定バージョン */
-#define CAN_CONFIG_VERSION  6       /* Issue #50: unit フィールドを8文字に拡張 */
+#define CAN_CONFIG_VERSION  7       /* マスターワーニング/警告音 有効フラグ追加 */
 
 /* プリセットID */
 #define CAN_PRESET_CUSTOM       0

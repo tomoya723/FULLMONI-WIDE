@@ -414,7 +414,8 @@ CAN_Config_t g_can_config __attribute__((section(".bss2")));
 static const CAN_Config_t CAN_PRESET_MOTEC = {
     .version = CAN_CONFIG_VERSION,
     .preset_id = CAN_PRESET_MOTEC_M100,
-    .reserved = 0,
+    .warning_enabled = 1,   /* マスターワーニング有効 */
+    .sound_enabled = 1,     /* 警告音有効 */
     .channels = {
         { .can_id = 0x3E8, .enabled = 1, .reserved = 0 },  /* CH1: MoTeC #1 */
         { .can_id = 0x3E9, .enabled = 1, .reserved = 0 },  /* CH2: MoTeC #2 */

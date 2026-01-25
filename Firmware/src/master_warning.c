@@ -56,6 +56,10 @@ static uint8_t s_latched_warning_count = 0; /* ラッチ中の警告数 */
 static int8_t s_latched_warnings[MAX_ACTIVE_WARNINGS];  /* ラッチ中の警告インデックス */
 static MasterWarningType_t s_latched_warning_types[MAX_ACTIVE_WARNINGS];  /* ラッチ中の警告タイプ */
 
+/* フィールドごとの最悪値追跡用 */
+static float s_peak_values[CAN_FIELD_MAX];  /* 各フィールドの最悪値（HIGHは最大、LOWは最小）*/
+static bool s_peak_valid[CAN_FIELD_MAX];    /* 最悪値が有効かどうか */
+
 /* ============================================================
  * 内部関数
  * ============================================================ */
@@ -97,7 +101,7 @@ static float get_field_internal_value(uint8_t target_var)
 static float get_field_display_value(const CAN_Field_t *field)
 {
     float internal = get_field_internal_value(field->target_var);
-    
+
     /* decimal_shiftに応じて変換 (0:そのまま, 1:÷10, 2:÷100, 3:÷1000) */
     if (field->decimal_shift > 0 && field->decimal_shift < 4) {
         return internal / pow10_table[field->decimal_shift];
@@ -132,16 +136,57 @@ static bool is_valid_name(const char *name)
 }
 
 /**
+ * @brief 整数を文字列に変換（バッファ末尾から書き込み）
+ * @param buf バッファ
+ * @param buf_size バッファサイズ
+ * @param value 整数値
+ * @return 文字列の開始位置
+ */
+static char* int_to_str(char *buf, int buf_size, int value)
+{
+    char *p = buf + buf_size - 1;
+    int is_negative = 0;
+
+    *p = '\0';
+
+    if (value < 0) {
+        is_negative = 1;
+        value = -value;
+    }
+
+    if (value == 0) {
+        *(--p) = '0';
+    } else {
+        while (value > 0 && p > buf) {
+            *(--p) = '0' + (value % 10);
+            value /= 10;
+        }
+    }
+
+    if (is_negative && p > buf) {
+        *(--p) = '-';
+    }
+
+    return p;
+}
+
+/**
  * @brief 警告メッセージを生成
  * @param field 対象フィールド
  * @param type 警告タイプ
+ * @param current_value 現在値（表示単位）
  * @note snprintfは非リエントラントのため、手動で文字列を構築
  */
-static void build_warning_message(const CAN_Field_t *field, MasterWarningType_t type)
+static void build_warning_message(const CAN_Field_t *field, MasterWarningType_t type, float current_value)
 {
     const char *type_str = (type == WARN_TYPE_HIGH) ? "HIGH" : "LOW";
     const char *name_src;
     int pos = 0;
+    char num_buf[12];
+    const char *num_str;
+    int int_part;
+    int frac_part;
+    int decimal_digits;
 
     /* 名前を決定: field->nameが有効なら使用、なければtarget_varからデフォルト名 */
     if (is_valid_name(field->name)) {
@@ -153,7 +198,7 @@ static void build_warning_message(const CAN_Field_t *field, MasterWarningType_t 
     }
 
     /* 名前をコピー（最大7文字）*/
-    while (*name_src && pos < MASTER_WARNING_MSG_MAX - 6) {  /* " HIGH\0" 用に6バイト確保 */
+    while (*name_src && pos < 8) {
         s_warning_message[pos++] = *name_src++;
     }
 
@@ -161,8 +206,50 @@ static void build_warning_message(const CAN_Field_t *field, MasterWarningType_t 
     s_warning_message[pos++] = ' ';
 
     /* タイプ文字列をコピー */
-    while (*type_str && pos < MASTER_WARNING_MSG_MAX - 1) {
+    while (*type_str && pos < MASTER_WARNING_MSG_MAX - 10) {  /* " -123.45\0" 用に10バイト確保 */
         s_warning_message[pos++] = *type_str++;
+    }
+
+    /* スペース追加 */
+    s_warning_message[pos++] = ' ';
+
+    /* decimal_shiftに応じた小数桁数 */
+    decimal_digits = field->decimal_shift;
+    if (decimal_digits > 2) decimal_digits = 2;  /* 最大2桁まで */
+
+    /* 整数部を取得 */
+    int_part = (int)current_value;
+
+    /* 負の値の処理 */
+    if (current_value < 0 && int_part == 0) {
+        s_warning_message[pos++] = '-';
+    }
+
+    /* 整数部を文字列に変換して追加 */
+    num_str = int_to_str(num_buf, sizeof(num_buf), int_part);
+    while (*num_str && pos < MASTER_WARNING_MSG_MAX - 4) {
+        s_warning_message[pos++] = *num_str++;
+    }
+
+    /* 小数部を追加（decimal_shift > 0の場合）*/
+    if (decimal_digits > 0 && pos < MASTER_WARNING_MSG_MAX - 3) {
+        float abs_value = (current_value < 0) ? -current_value : current_value;
+        float frac = abs_value - (int)abs_value;
+
+        /* 小数点追加 */
+        s_warning_message[pos++] = '.';
+
+        /* 小数桁数に応じて丸め */
+        if (decimal_digits == 1) {
+            frac_part = (int)(frac * 10 + 0.5f) % 10;
+            s_warning_message[pos++] = '0' + frac_part;
+        } else {  /* decimal_digits == 2 */
+            frac_part = (int)(frac * 100 + 0.5f) % 100;
+            s_warning_message[pos++] = '0' + (frac_part / 10);
+            if (pos < MASTER_WARNING_MSG_MAX - 1) {
+                s_warning_message[pos++] = '0' + (frac_part % 10);
+            }
+        }
     }
 
     /* NULL終端 */
@@ -196,6 +283,9 @@ void master_warning_init(void)
     s_latch_counter = 0;
     s_latched_warning_count = 0;
     memset(s_latched_warnings, -1, sizeof(s_latched_warnings));
+
+    /* フィールドごとの最悪値追跡を初期化 */
+    memset(s_peak_valid, 0, sizeof(s_peak_valid));
 }
 
 /**
@@ -249,6 +339,14 @@ void master_warning_check(void)
         return;
     }
 
+    /* マスターワーニングが無効なら警告チェックをスキップ */
+    if (!g_can_config.warning_enabled) {
+        s_warning_active = false;
+        s_active_warning_count = 0;
+        s_latch_counter = 0;  /* ラッチもクリア */
+        return;
+    }
+
     /* エンジン回転数を取得（下限警告の有効化判定用）*/
     current_rpm = get_field_internal_value(CAN_TARGET_REV);
     check_low_warning = (current_rpm >= MIN_RPM_FOR_LOW_WARNING);
@@ -268,6 +366,11 @@ void master_warning_check(void)
         /* 上限チェック（warn_high_enabled が有効な場合のみ）*/
         if (field->warn_high_enabled && field->warn_high > CAN_WARN_DISABLED) {
             if (current_value > field->warn_high) {
+                /* HIGH警告：最大値を追跡 */
+                if (!s_peak_valid[i] || current_value > s_peak_values[i]) {
+                    s_peak_values[i] = current_value;
+                    s_peak_valid[i] = true;
+                }
                 new_warnings[new_warning_count] = (int8_t)i;
                 new_warning_types[new_warning_count] = WARN_TYPE_HIGH;
                 new_warning_count++;
@@ -278,6 +381,11 @@ void master_warning_check(void)
         /* 下限チェック（warn_low_enabled が有効 かつ エンジン回転中のみ）*/
         if (field->warn_low_enabled && check_low_warning && field->warn_low > CAN_WARN_DISABLED) {
             if (current_value < field->warn_low) {
+                /* LOW警告：最小値を追跡 */
+                if (!s_peak_valid[i] || current_value < s_peak_values[i]) {
+                    s_peak_values[i] = current_value;
+                    s_peak_valid[i] = true;
+                }
                 new_warnings[new_warning_count] = (int8_t)i;
                 new_warning_types[new_warning_count] = WARN_TYPE_LOW;
                 new_warning_count++;
@@ -334,21 +442,11 @@ void master_warning_check(void)
             return;
         }
 
-        /* 前回と違う警告を表示する場合、または最初の警告の場合のみメッセージを更新 */
-        if (!s_warning_active) {
-            /* 新規警告発生時のみメッセージ生成 */
-            field = &g_can_config.fields[disp_idx];
-            build_warning_message(field, disp_type);
-            s_warning_field_idx = disp_idx;
-            s_warning_type = disp_type;
-            s_message_changed = true;
-        } else if (s_message_changed) {
-            /* 複数警告の切り替え時のみメッセージ更新 */
-            field = &g_can_config.fields[disp_idx];
-            build_warning_message(field, disp_type);
-            s_warning_field_idx = disp_idx;
-            s_warning_type = disp_type;
-        }
+        /* メッセージを毎フレーム更新（最悪値を表示）*/
+        field = &g_can_config.fields[disp_idx];
+        build_warning_message(field, disp_type, s_peak_values[disp_idx]);
+        s_warning_field_idx = disp_idx;
+        s_warning_type = disp_type;
 
         s_warning_active = true;
 
@@ -365,11 +463,46 @@ void master_warning_check(void)
             /* ラッチ期間中 - 前回の警告を継続表示 */
             s_latch_counter--;
 
+            /* ラッチ中も現在値をチェックして最悪値を更新（s_peak_valuesを使用）*/
+            for (i = 0; i < s_latched_warning_count; i++) {
+                int8_t field_idx = s_latched_warnings[i];
+                if (field_idx >= 0 && field_idx < CAN_FIELD_MAX) {
+                    field = &g_can_config.fields[field_idx];
+                    current_value = get_field_display_value(field);
+
+                    if (s_latched_warning_types[i] == WARN_TYPE_HIGH) {
+                        /* HIGH警告：より大きい値で更新 */
+                        if (current_value > s_peak_values[field_idx]) {
+                            s_peak_values[field_idx] = current_value;
+                        }
+                    } else if (s_latched_warning_types[i] == WARN_TYPE_LOW) {
+                        /* LOW警告：より小さい値で更新 */
+                        if (current_value < s_peak_values[field_idx]) {
+                            s_peak_values[field_idx] = current_value;
+                        }
+                    }
+                }
+            }
+
             /* ラッチ中の警告リストを使用 */
             s_active_warning_count = s_latched_warning_count;
             for (i = 0; i < s_latched_warning_count; i++) {
                 s_active_warnings[i] = s_latched_warnings[i];
                 s_active_warning_types[i] = s_latched_warning_types[i];
+            }
+
+            /* メッセージを更新（最悪値を表示）*/
+            if (s_active_warning_count > 0) {
+                if (s_display_index >= s_active_warning_count) {
+                    s_display_index = 0;
+                }
+                int8_t disp_idx = s_active_warnings[s_display_index];
+                if (disp_idx >= 0 && disp_idx < CAN_FIELD_MAX) {
+                    field = &g_can_config.fields[disp_idx];
+                    build_warning_message(field, s_active_warning_types[s_display_index], s_peak_values[disp_idx]);
+                    s_warning_field_idx = disp_idx;
+                    s_warning_type = s_active_warning_types[s_display_index];
+                }
             }
 
             /* 表示切り替えタイマー処理（複数警告時のみ）*/
@@ -381,17 +514,7 @@ void master_warning_check(void)
                     if (s_display_index >= s_active_warning_count) {
                         s_display_index = 0;
                     }
-                    /* ラッチ中の切り替えでもメッセージを更新 */
-                    if (s_display_index < s_active_warning_count) {
-                        int8_t disp_idx = s_active_warnings[s_display_index];
-                        if (disp_idx >= 0 && disp_idx < CAN_FIELD_MAX) {
-                            field = &g_can_config.fields[disp_idx];
-                            build_warning_message(field, s_active_warning_types[s_display_index]);
-                            s_warning_field_idx = disp_idx;
-                            s_warning_type = s_active_warning_types[s_display_index];
-                        }
-                    }
-                }
+            }
             }
 
             s_warning_active = true;  /* ラッチ中は警告状態を維持 */
@@ -405,6 +528,8 @@ void master_warning_check(void)
             s_latched_warning_count = 0;
             s_display_index = 0;
             s_rotate_counter = 0;
+            /* フィールドごとの最悪値追跡をリセット */
+            memset(s_peak_valid, 0, sizeof(s_peak_valid));
         }
     }
 }

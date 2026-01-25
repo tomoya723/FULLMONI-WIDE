@@ -88,39 +88,40 @@ OP = OP +1;
 BATTV = BATTV +0.15;
 */
 if(i == 0){
-	RPM =RPM + 100;
+	RPM =RPM + 50;
 	if(RPM >= 7000){
 		i=1;
 	}
 }
 else if(i == 1){
-	RPM =RPM - 100;
+	RPM =RPM - 50;
 	if(RPM <= 4000){
 		i=2;
 	}
 }
 else if(i == 2){
-	RPM =RPM + 50;
+	RPM =RPM + 25;
 OP = 40000;
 	if(RPM >= 7500){
 		i=3;
 	}
 }
 else if(i == 3){
-	RPM =RPM - 100;
+	RPM =RPM - 50;
+OP = 12000;
 	if(RPM <= 4500){
 		i=4;
 	}
 }
 else if(i == 4){
-	RPM =RPM + 20;
+	RPM =RPM + 10;
 	if(RPM >= 8000){
 		i=5;
 	}
 }
 else if(i == 5){
 	RPM =RPM - 100;
-OP = 12000;
+OP = 10000;
 	if(RPM <= 1000){
 		i=0;
 	}

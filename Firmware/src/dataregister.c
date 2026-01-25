@@ -421,16 +421,16 @@ void data_setLCD100ms(void)
 	master_warning_check();
 
 	if (master_warning_is_active()) {
-		/* 警告発報開始時、または複数警告の表示切り替え時 */
-		if (!s_warning_displayed || master_warning_message_changed()) {
-			if (!s_warning_displayed && s_warning_sound_cooldown == 0) {
-				/* 最初の警告時のみ警告音を再生（クールダウン中は抑制）*/
+		/* 警告発報開始時のみ警告音を再生 */
+		if (!s_warning_displayed && s_warning_sound_cooldown == 0) {
+			/* 最初の警告時のみ警告音を再生（クールダウン中は抑制、sound_enabledで無効化可能）*/
+			if (g_can_config.sound_enabled) {
 				speaker_play_warning();
-				s_warning_sound_cooldown = WARNING_SOUND_COOLDOWN;
 			}
-			/* GUI更新はメインループで行う（フラグを立てるだけ）*/
-			s_warning_gui_update_needed = 1;
+			s_warning_sound_cooldown = WARNING_SOUND_COOLDOWN;
 		}
+		/* GUI更新は常に行う（値がリアルタイムで変わる場合に対応）*/
+		s_warning_gui_update_needed = 1;
 	} else {
 		/* 警告解除 */
 		if (s_warning_displayed) {

@@ -15,7 +15,7 @@
 #include <stdint.h>
 
 /* 警告メッセージ最大長 */
-#define MASTER_WARNING_MSG_MAX  16  /* "WATER HIGH" + NULL */
+#define MASTER_WARNING_MSG_MAX  24  /* "WATER HIGH 120" + NULL */
 
 /* 警告タイプ */
 typedef enum {

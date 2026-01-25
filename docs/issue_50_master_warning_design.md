@@ -41,10 +41,13 @@ AppWizardの `APPW_SetVarData()` は**整数値のみ**受け付けます。
 - 画面下部に赤いエリアが出現し警告を知らせる
 - AppWizard変数 `ID_VAR_PRM` で表示/非表示を制御（0=正常, 1=警告）
 - `TEXT_SetText()` で警告テキストを設定（Firmware側から直接制御）
-- 警告テキストウィジェットに警告対象のパラメータ名と HIGH/LOW を表示
-- 例: 「WATER HIGH」「OIL-P LOW」
+- 警告テキストウィジェットに警告対象のパラメータ名、HIGH/LOW、および**ピーク値**を表示
+- 例: 「OIL-T HIGH 120」「OIL-P LOW 1.0」
+- **ピーク値追跡**: HIGH警告は最大値、LOW警告は最小値を追跡・表示
+- **小数点対応**: `decimal_shift` に基づき0〜2桁の小数点表示
 - **背景色**: HIGH/LOW 両方とも赤背景（0xFFFF0000）で統一
-- **ラッチ機能**: 警告発生後、条件が解消しても10秒間は表示を継続
+- **ラッチ機能**: 警告発生後、条件が解消しても10秒間は表示を継続（ラッチ中もピーク値更新）
+- **メッセージ最大長**: 24バイト（`MASTER_WARNING_MSG_MAX`）
 
 ### 5. 警告音
 - 警告が OFF→ON になった瞬間に1回だけ警告音を再生
@@ -118,7 +121,7 @@ typedef struct __attribute__((packed)) {
 
 ### CAN設定バージョン
 ```c
-#define CAN_CONFIG_VERSION  6   /* unit フィールド拡張 */
+#define CAN_CONFIG_VERSION  7   /* warning_enabled, sound_enabled フラグ追加 */
 ```
 
 ### バージョン履歴
@@ -128,6 +131,7 @@ typedef struct __attribute__((packed)) {
 - VERSION 4: warn_low/warn_high を int16_t から float に変更
 - VERSION 5: decimal_shift フィールド追加（内部値→表示値変換を汎用化）
 - VERSION 6: unit フィールド拡張（4→8バイト、"x100kPa" 対応）
+- VERSION 7: warning_enabled, sound_enabled フラグ追加（個別警告ON/OFF対応）
 
 ## データフィールド定義例（MoTeC M400プリセット）
 
@@ -343,7 +347,9 @@ can_field <idx> <ch> <byte> <size> <type> <end> <var> <off> <mul> <div> <name> <
 ### 表示制御
 1. `ID_VAR_WARNING == 1` のとき、警告テキストウィジェットを表示
 2. `ID_VAR_WARNING == 0` のとき、警告テキストウィジェットを非表示
-3. 警告メッセージ形式: `"<name> HIGH"` または `"<name> LOW"`
+3. 警告メッセージ形式: `"<name> HIGH <peak>"` または `"<name> LOW <peak>"`
+   - 例: `"OIL-T HIGH 120"`, `"OIL-P LOW 1.0"`
+   - ピーク値は小数点対応（decimal_shiftに基づく）
 
 ### 制約事項
 - **aw001/aw002フォルダのファイルは編集禁止**
@@ -406,3 +412,11 @@ can_field <idx> <ch> <byte> <size> <type> <end> <var> <off> <mul> <div> <name> <
 |            |     | - HIGH/LOW 両方とも赤背景に統一 |
 |            |     | - 警告表示 10秒ラッチ機能追加 |
 |            |     | - 警告解除時の緑背景フラッシュ修正 |
+| 2026/01/25 | 5.0 | 警告メッセージにピーク値表示機能追加 |
+|            |     | - CAN_CONFIG_VERSION を 7 に更新 |
+|            |     | - 警告メッセージに数値表示（例: "OIL-T HIGH 120"） |
+|            |     | - ピーク値追跡（HIGH警告は最大値、LOW警告は最小値） |
+|            |     | - 小数点対応（decimal_shift に基づく0〜2桁） |
+|            |     | - MASTER_WARNING_MSG_MAX を 16→24 バイトに拡張 |
+|            |     | - ラッチ期間中もピーク値を継続更新 |
+|            |     | - 複数警告の3x2レイアウト対応 |

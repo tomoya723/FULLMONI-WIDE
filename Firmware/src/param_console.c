@@ -101,6 +101,8 @@ static void cmd_help(void)
     param_console_print("  exit              - Exit parameter mode\r\n");
     param_console_print("\r\nCAN Configuration (Issue #65):\r\n");
     param_console_print("  can_list          - Show CAN configuration\r\n");
+    param_console_print("  can_warning <0|1> - Enable/disable master warning\r\n");
+    param_console_print("  can_sound <0|1>   - Enable/disable warning sound\r\n");
     param_console_print("  can_ch <n> <id> <en> - Set CAN channel (n=1-6)\r\n");
     param_console_print("  can_field <n> <ch> <byte> <len> <type> <end> <var> <off> <mul> <div>\r\n");
     param_console_print("            <name> <unit> <dec_shift> <warn_lo_en> <warn_lo> <warn_hi_en> <warn_hi>\r\n");
@@ -290,6 +292,9 @@ static void cmd_can_list(void)
     param_console_print("\r\n=== CAN Configuration ===\r\n");
     param_console_printf("Version: %d, Preset: %d\r\n",
                         g_can_config.version, g_can_config.preset_id);
+    param_console_printf("Warning: %s, Sound: %s\r\n",
+                        g_can_config.warning_enabled ? "ON" : "OFF",
+                        g_can_config.sound_enabled ? "ON" : "OFF");
 
     param_console_print("\r\n-- Channels --\r\n");
     for (i = 0; i < CAN_CHANNEL_MAX; i++) {
@@ -627,6 +632,18 @@ static void parse_command(const char *line)
     /* === CAN設定コマンド (Issue #65) === */
     } else if (strcmp(cmd, "can_list") == 0) {
         cmd_can_list();
+    } else if (strcmp(cmd, "can_warning") == 0 && argc >= 2) {
+        /* can_warning <0|1> - Enable/disable master warning */
+        uint8_t enabled = (uint8_t)atoi(arg1);
+        g_can_config.warning_enabled = enabled ? 1 : 0;
+        can_config_changed = true;
+        param_console_printf("Warning: %s\r\n", g_can_config.warning_enabled ? "ON" : "OFF");
+    } else if (strcmp(cmd, "can_sound") == 0 && argc >= 2) {
+        /* can_sound <0|1> - Enable/disable warning sound */
+        uint8_t enabled = (uint8_t)atoi(arg1);
+        g_can_config.sound_enabled = enabled ? 1 : 0;
+        can_config_changed = true;
+        param_console_printf("Sound: %s\r\n", g_can_config.sound_enabled ? "ON" : "OFF");
     } else if (strcmp(cmd, "can_ch") == 0 && argc >= 4) {
         /* can_ch <n> <id> <en> */
         uint8_t ch = (uint8_t)atoi(arg1);
