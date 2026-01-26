@@ -3,6 +3,8 @@ package com.fullmoni.terminal.service
 import android.content.Context
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
+import com.hoho.android.usbserial.driver.CdcAcmSerialDriver
+import com.hoho.android.usbserial.driver.ProbeTable
 import com.hoho.android.usbserial.driver.UsbSerialDriver
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
@@ -26,6 +28,18 @@ class UsbSerialService(private val context: Context) {
         const val PARITY = UsbSerialPort.PARITY_NONE
         const val READ_WAIT_MILLIS = 200
         const val WRITE_TIMEOUT_MILLIS = 500
+        
+        // FULLMONI-WIDE (RX72N USB CDC) VID/PID
+        const val FULLMONI_VID = 0x1209
+        const val FULLMONI_PID = 0x7230
+    }
+    
+    // FULLMONI-WIDEを認識するカスタムProber
+    private val customProber: UsbSerialProber by lazy {
+        val probeTable = ProbeTable()
+        // FULLMONI-WIDE (RX72N CDC ACM)
+        probeTable.addProduct(FULLMONI_VID, FULLMONI_PID, CdcAcmSerialDriver::class.java)
+        UsbSerialProber(probeTable)
     }
     
     private var usbSerialPort: UsbSerialPort? = null
@@ -63,9 +77,18 @@ class UsbSerialService(private val context: Context) {
      */
     fun refreshDevices(): List<UsbSerialDriver> {
         val usbManager = context.getSystemService(Context.USB_SERVICE) as UsbManager
-        val drivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager)
-        _availableDevices.value = drivers.map { it.device }
-        return drivers
+        
+        // カスタムProberでFULLMONI-WIDEを検索
+        val customDrivers = customProber.findAllDrivers(usbManager)
+        
+        // デフォルトProberで他のUSBシリアルデバイスも検索
+        val defaultDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager)
+        
+        // 重複を除いて結合（FULLMONI-WIDEを優先）
+        val allDrivers = (customDrivers + defaultDrivers).distinctBy { it.device.deviceId }
+        
+        _availableDevices.value = allDrivers.map { it.device }
+        return allDrivers
     }
     
     /**

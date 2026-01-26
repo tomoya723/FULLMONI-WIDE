@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- USB CDC ACM デバイスフィルタ -->
 <resources>
+    <!-- FULLMONI-WIDE (RX72N USB CDC) -->
+    <usb-device vendor-id="4617" product-id="29232" />
+    
     <!-- 一般的なUSB-UARTブリッジチップ -->
     
     <!-- FTDI FT232 -->
