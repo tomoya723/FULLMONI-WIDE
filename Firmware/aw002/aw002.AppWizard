@@ -1263,7 +1263,7 @@
       </SetColors>
       <SetRange>
         Min=0
-        Max=800
+        Max=80
       </SetRange>
     </Progbar>
     <Progbar>
@@ -2812,6 +2812,10 @@
       </Para>
     </SETVALUE>
   </Interactions>
+  <Selection>
+    Root=ID_SCREEN_01b
+    Object=2060
+  </Selection>
   <Terms>
   </Terms>
   <AnimItems>

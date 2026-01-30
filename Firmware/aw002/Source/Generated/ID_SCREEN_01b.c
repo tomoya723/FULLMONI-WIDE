@@ -303,7 +303,7 @@ static GUI_CONST_STORAGE APPW_SETUP_ITEM _aSetup[] = {
                                                          ARG_V(0xff323232),
                                                          ARG_V(GUI_INVALID_COLOR) } },
   { ID_PROGBAR_OILP,       APPW_SET_PROP_RANGE,        { ARG_V(0),
-                                                         ARG_V(800) } },
+                                                         ARG_V(80) } },
   { ID_PROGBAR_OP_WARN,    APPW_SET_PROP_COLOR,        { ARG_V(0xff2c2c30) } },
   { ID_PROGBAR_OP_WARN,    APPW_SET_PROP_VALUE,        { ARG_V(100) } },
   { ID_PROGBAR_OP_WARN,    APPW_SET_PROP_COLORS,       { ARG_V(0xffaa0000),
