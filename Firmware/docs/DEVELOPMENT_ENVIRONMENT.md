@@ -8,9 +8,9 @@
 
 | ツール | バージョン | 説明 |
 |--------|-----------|------|
-| **Renesas e² studio** | 2024-04 (24.4.0) | 統合開発環境 |
-| | Build Id: R20240415-1426 | |
-| **GCC for Renesas RX** | 8.3.0.202405 | C/C++コンパイラ |
+| **Renesas e² studio** | 2025-12 (25.12.0) | 統合開発環境 |
+| | Build Id: R20251204-1223 | |
+| **GCC for Renesas RX** | 25.12.0.v20251117 | C/C++コンパイラ |
 
 ### GUIフレームワーク
 
@@ -36,7 +36,7 @@
 
 | ツール | リンク |
 |--------|--------|
-| **Renesas e² studio** | [https://www.renesas.com/us/en/software-tool/e-studio](https://www.renesas.com/us/en/software-tool/e-studio) |
+| **Renesas e² studio** | [https://www.renesas.com/ja/software-tool/e2studio-information-rx-family](https://www.renesas.com/ja/software-tool/e2studio-information-rx-family) |
 | **GCC for Renesas RX** | [https://llvm-gcc-renesas.com/ja/rx-download-toolchains/](https://llvm-gcc-renesas.com/ja/rx-download-toolchains/) |
 | **E2 Lite ドライバ** | [https://www.renesas.com/eu/en/software-tool/e2-emulator-rte0t00020kce00000r#downloads](https://www.renesas.com/eu/en/software-tool/e2-emulator-rte0t00020kce00000r#downloads) |
 | **SEGGER AppWizard** | [https://www.segger.com/downloads/emwin/](https://www.segger.com/downloads/emwin/) |
@@ -47,7 +47,7 @@
 
 ### 1. Renesas e² studio のインストール
 
-1. [Renesas公式サイト](https://www.renesas.com/us/en/software-tool/e-studio)から **e² studio 2024-04** をダウンロード
+1. [Renesas公式サイト](https://www.renesas.com/ja/software-tool/e2studio-information-rx-family)から **e² studio 2025-12** をダウンロード
 2. インストーラを実行
 3. インストール時に以下を選択：
    - **RX Family** を対象デバイスとして選択
@@ -57,7 +57,7 @@
 
 e² studio インストール時に選択しなかった場合：
 
-1. [GCC-RX ダウンロードページ](https://llvm-gcc-renesas.com/ja/rx-download-toolchains/)から **GNURX 8.3.0.202405** をダウンロード
+1. [GCC-RX ダウンロードページ](https://llvm-gcc-renesas.com/ja/rx-download-toolchains/)から **GNURX 25.12.0.v20251117** をダウンロード
 2. インストーラを実行
 3. e² studio への統合：
    ```
