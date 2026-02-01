@@ -140,20 +140,74 @@ frame No6 address : 1005(dec) , 0x3ED(hex)
 ・Click “Code Generation.”<br>
 ![image](https://github.com/user-attachments/assets/01f0507d-a2b9-420b-afb1-4e5bb2bbb660)<br>
 ***
-## emWin AppWizard resource swith setting
-The project provides multiple screen resources, so select the one you want to use.<br>
-Switch display resources by changing Eclipse source path settings and resource includes.<br>
-<br>
-The Project Explorer configuration provides multiple image resources.<br>
-Double-clicking an AppWizard file in "awxxx" will launch the editor for that image resource.<br>
-![image](https://github.com/user-attachments/assets/50a501ed-c50e-4862-8025-8d1785cb3be7)<br>
-<br>
-In the build path source folder settings, set resource paths such as "aw001", "aw002", etc. Set both resources and sources.<br>
-![image](https://github.com/user-attachments/assets/c7a7df58-1156-43a7-99f1-0c031d55beeb)<br>
-<br>
-Change the contents of "src/settings.h"<br>
-Set the "DISP" number appropriately.<br>
-![image](https://github.com/user-attachments/assets/4bc4fe29-edbc-4c54-9ac6-5f0a8b6d810b)<br>
+## emWin AppWizard resource switch setting
+
+The project provides multiple screen resources (variants), so select the one you want to use.
+
+### 利用可能なバリアント
+
+| ID | テーマ | 説明 |
+|----|--------|------|
+| aw001 | Standard (Blue Theme) | 標準テーマ（青系）- デフォルト |
+| aw002 | Racing (Red Theme) | レーシングテーマ（赤系） |
+
+### 自動ビルド（推奨）
+
+`tools/build_variants.ps1` を使用すると、複数バリアントを自動でビルドできます：
+
+```powershell
+# 両バリアントをビルド
+powershell -ExecutionPolicy Bypass -File tools/build_variants.ps1 -Version "0.1.2"
+
+# 特定バリアントのみ
+powershell -ExecutionPolicy Bypass -File tools/build_variants.ps1 -Variants aw001
+```
+
+出力先: `test-release/Firmware_v{version}_{variant}.bin`
+
+詳細は [tools/README.md](../tools/README.md#build_variantsps1) を参照。
+
+### 手動ビルド（e2 studio）
+
+バリアント切り替えには **Junction** 方式を使用します。`Firmware/aw` フォルダが `aw001` または `aw002` へのリンクとして機能します。
+
+#### 初回セットアップ
+
+1. **Junction を作成**（VS Code ターミナルまたはコマンドプロンプト）:
+   ```cmd
+   cd Firmware
+   mklink /J aw aw002
+   ```
+
+2. **e2 studio でソースフォルダを追加**:
+   - プロジェクト右クリック → Properties → C/C++ General → Paths and Symbols → Source Location
+   - `aw/Resource` と `aw/Source` を追加
+   - Apply and Close
+
+#### バリアント切り替え方法
+
+**方法1: バッチファイル（推奨）**
+
+Explorer で以下のファイルをダブルクリック:
+- `tools/switch_to_aw001.bat` → aw001（青テーマ）に切り替え
+- `tools/switch_to_aw002.bat` → aw002（赤テーマ）に切り替え
+
+**方法2: e2 studio External Tools**
+
+事前に External Tools に登録しておくと、メニューから切り替え可能:
+1. Run → External Tools → External Tools Configurations
+2. Program → New Configuration
+3. 設定:
+   - Name: `Switch to aw001`
+   - Location: `C:\Windows\System32\cmd.exe`
+   - Working Directory: `${project_loc:Firmware}`
+   - Arguments: `/c "..\tools\switch_to_aw001.bat"`
+
+#### 切り替え後の操作
+
+1. e2 studio でプロジェクトを **Refresh**（F5）
+2. **Clean** → **Build**
+3. デバッグ実行
 
 ***
 ## Startup Image Transfer Protocol (imgread/imgwrite)

@@ -332,6 +332,11 @@ void main(void)
 
                             /* Wait and verify */
                             for (volatile uint32_t d = 0; d < 1000000; d++);
+
+                            /* Invalidate ROM cache before verification */
+                            FLASH.ROMCIV.WORD = 0x0001;
+                            while (FLASH.ROMCIV.WORD != 0x0000) { /* wait */ }
+
                             if (is_valid_image()) {
                                 /* Success - reset */
                                 for (volatile uint32_t d = 0; d < 2000000; d++);

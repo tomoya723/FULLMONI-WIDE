@@ -146,6 +146,181 @@ mapファイルが存在しないか、ビルドが完了していません。�
 
 ---
 
+## build_variants.ps1
+
+### 概要
+
+AppWizardバリアント（aw001, aw002）のファームウェアを自動ビルドするPowerShellスクリプト。
+Junction + 動的subdir.mk生成でバリアントを切り替えてビルドします。
+
+### 機能
+
+1. **Junction自動切り替え** - `Firmware/aw` を各バリアントディレクトリにリンク
+2. **subdir.mk動的生成** - AppWizardソースファイル用のMakefile断片を生成
+3. **バイナリ生成** - objcopyで正しいセクション構成のbinファイル生成
+4. **マニフェスト更新** - SHA256ハッシュとファイルサイズを自動更新
+
+### 使用方法
+
+```powershell
+# 両バリアントをビルド
+powershell -ExecutionPolicy Bypass -File tools/build_variants.ps1
+
+# 特定バリアントのみ
+powershell -ExecutionPolicy Bypass -File tools/build_variants.ps1 -Variants aw001
+
+# バージョン指定
+powershell -ExecutionPolicy Bypass -File tools/build_variants.ps1 -Version "0.1.2"
+```
+
+### パラメータ
+
+| パラメータ | デフォルト | 説明 |
+|-----------|-----------|------|
+| `-Variants` | `@("aw001", "aw002")` | ビルドするバリアント |
+| `-OutputDir` | `test-release` | 出力ディレクトリ |
+| `-Version` | (なし) | バージョン番号（ファイル名に付加） |
+
+### 出力ファイル
+
+| ファイル | 説明 |
+|----------|------|
+| `Firmware_v{ver}_{variant}.bin` | ファームウェアバイナリ |
+| `release-manifest.json` | SHA256/サイズ自動更新 |
+
+### 技術詳細
+
+#### セクション構成
+
+objcopyで以下のセクションを抽出：
+- `.firmware_header` - ブートローダー検証用ヘッダ (64バイト)
+- `.text` - コード
+- `.rvectors` - 割り込みベクタ
+- `.rodata*` - 読み取り専用データ
+- `.fvectors` - 固定ベクタ
+- `.data` - 初期化データ
+
+#### Junctionベースのビルド
+
+```
+Firmware/
+  aw/  ← Junction (シンボリックリンク)
+  aw001/  ← Standard Theme
+  aw002/  ← Racing Theme
+```
+
+ビルド時に `aw/` を目的のバリアントにリンクし、
+ソースコードは `#include "../aw/..."` で参照します。
+
+### 注意事項
+
+- Windows環境のみ対応（Junctionは管理者権限不要）
+- `rx-elf-gcc` がPATHに含まれている必要あり
+- e2 studioの `make.exe` パスがスクリプト内にハードコード
+
+---
+
+## switch_to_aw001.bat / switch_to_aw002.bat
+
+### 概要
+
+開発時にAppWizardバリアントを切り替えるためのバッチファイル。
+e2 studio でのデバッグ前に実行することで、目的のバリアントをビルド対象にできます。
+
+### 使用方法
+
+**方法1: Explorer からダブルクリック**
+
+- `tools/switch_to_aw001.bat` → aw001（青テーマ）に切り替え
+- `tools/switch_to_aw002.bat` → aw002（赤テーマ）に切り替え
+
+**方法2: e2 studio External Tools に登録**
+
+1. Run → External Tools → External Tools Configurations
+2. Program → New Configuration
+3. 設定:
+   - Name: `Switch to aw001`
+   - Location: `C:\Windows\System32\cmd.exe`
+   - Working Directory: `${project_loc:Firmware}`
+   - Arguments: `/c "..\tools\switch_to_aw001.bat"`
+4. Apply → Close
+
+以降は Run → External Tools → Switch to aw001 で切り替え可能。
+
+### 仕組み
+
+Junctionを使用してフォルダのリンク先を切り替えます：
+
+```
+Firmware/aw → aw001  (switch_to_aw001.bat 実行後)
+Firmware/aw → aw002  (switch_to_aw002.bat 実行後)
+```
+
+### 切り替え後の操作
+
+1. e2 studio でプロジェクトを **Refresh**（F5）
+2. **Clean** → **Build**
+3. デバッグ実行
+
+---
+
 ## fw_upload.py
 
 ファームウェアアップロードツール（別途ドキュメント参照）
+
+---
+
+## capture_thumbnails.ps1
+
+### 概要
+
+GUISimulation（AppWizardシミュレータ）を自動起動し、LCD表示部分のスクリーンショットをキャプチャするPowerShellスクリプト。HOST Appのファームウェアカタログ用サムネイル生成に使用。
+
+### 機能
+
+1. **バリアント自動検出**
+   - `Firmware/aw001`, `aw002`, `aw003`... を自動検出
+   - `aw` リンクフォルダは除外（`^aw\d+$` パターンで判定）
+
+2. **GUI_Lib自動セットアップ**
+   - SEGGER AppWizardインストール先またはバックアップから自動コピー
+   - ライセンス上の理由でgitにはコミットしない（.gitignoreで除外）
+
+3. **GUISimulation.exe自動ビルド**
+   - MSBuildを自動検出
+   - Windows SDK 10.0 / PlatformToolset v145 で上書きビルド（vcxprojは変更しない）
+
+4. **LCD領域キャプチャ**
+   - 800x256ピクセルのLCD表示部分のみをキャプチャ
+   - ウィンドウを強制的にフォアグラウンドに移動（AttachThreadInputトリック使用）
+
+### 使用方法
+
+```powershell
+# バージョン指定でサムネイル生成
+powershell -ExecutionPolicy Bypass -File tools/capture_thumbnails.ps1 -Version "0.1.2"
+# → test-release/thumbnail_v0.1.2_aw001.png, thumbnail_v0.1.2_aw002.png ...
+
+# バージョンなし
+powershell -ExecutionPolicy Bypass -File tools/capture_thumbnails.ps1
+# → test-release/thumbnail_aw001.png, thumbnail_aw002.png ...
+```
+
+### パラメータ
+
+| パラメータ | デフォルト | 説明 |
+|-----------|-----------|------|
+| `-Version` | (なし) | サムネイルファイル名に付加するバージョン |
+| `-OutputDir` | `test-release` | 出力先フォルダ |
+
+### 前提条件
+
+- Visual Studio (MSBuild) がインストールされていること
+- SEGGER AppWizard がインストールされているか、GUI_Libのバックアップがあること
+  - バックアップ場所: `%USERPROFILE%\Desktop\FULLMONI-WIDE_aw003\Firmware\aw001\Simulation\GUI_Lib`
+
+### 注意事項
+
+- **GUI_Lib, Exe, Output フォルダは .gitignore で除外済み**（SEGGER機密コード保護のため）
+- スクリプト実行中はGUISimulationウィンドウが表示されます（自動的に閉じます）
+- キャプチャ中に他のウィンドウを操作しないでください

@@ -24,7 +24,7 @@
 #include "GUI.h"               /* emWin GUI関数 */
 #include "TEXT.h"              /* TEXT Widget関数 */
 #include "WM.h"                /* Window Manager関数 */
-#include "../aw002/Source/Generated/ID_SCREEN_01a.h"  /* ID_TEXT_ACC 定義 */
+#include "../aw/Source/Generated/ID_SCREEN_01a.h"  /* ID_TEXT_ACC 定義 (Junction経由) */
 
 // --------------------------------------------------------------------
 // グローバル変数宣言

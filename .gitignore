@@ -27,6 +27,9 @@ LICENSE
 Firmware/build
 Firmware/HardwareDebug
 Firmware/trash
+
+# Junction (aw001/aw002切替用) - ビルド時のみ使用
+Firmware/aw/
 Firmware/src/smc_gen/r_emwin_rx/tool
 Bootloader/build
 Bootloader/HardwareDebug
@@ -71,3 +74,14 @@ HostApp/FULLMONI-WIDE-Android/local.properties
 
 # PR作成用一時ファイル
 pr_body.md
+
+# Test release folder (local testing)
+test-release/
+
+# Visual Studio user-specific files
+**/.vs/
+
+# SEGGER GUI Library (licensed, not redistributable)
+Firmware/aw*/Simulation/GUI_Lib/
+Firmware/aw*/Simulation/Exe/
+Firmware/aw*/Simulation/Output/

@@ -1,0 +1,145 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/tomoya723/FULLMONI-WIDE/schemas/release-manifest.schema.json",
+  "title": "FULLMONI-WIDE Release Manifest",
+  "description": "Release manifest for FULLMONI-WIDE firmware and host applications",
+  "type": "object",
+  "required": ["schemaVersion", "version", "releaseDate", "firmware"],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "description": "Schema version number",
+      "minimum": 1
+    },
+    "version": {
+      "type": "string",
+      "description": "Release version (semver format)",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9]+)?$"
+    },
+    "releaseDate": {
+      "type": "string",
+      "description": "Release date in ISO 8601 format",
+      "format": "date"
+    },
+    "releaseNotes": {
+      "type": "string",
+      "description": "URL to release notes",
+      "format": "uri"
+    },
+    "firmware": {
+      "type": "object",
+      "description": "Firmware information",
+      "required": ["minimumBootloaderVersion", "variants"],
+      "properties": {
+        "minimumBootloaderVersion": {
+          "type": "string",
+          "description": "Minimum bootloader version required",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "variants": {
+          "type": "array",
+          "description": "List of firmware variants (AppWizard resources)",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "file", "size", "sha256"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Variant ID (e.g., aw001, aw002)",
+                "pattern": "^aw\\d{3}$"
+              },
+              "name": {
+                "type": "string",
+                "description": "Display name for the variant"
+              },
+              "description": {
+                "type": "string",
+                "description": "Detailed description of the variant"
+              },
+              "file": {
+                "type": "string",
+                "description": "Filename of the firmware binary"
+              },
+              "thumbnail": {
+                "type": "string",
+                "description": "Relative path to thumbnail image"
+              },
+              "size": {
+                "type": "integer",
+                "description": "File size in bytes",
+                "minimum": 0
+              },
+              "sha256": {
+                "type": "string",
+                "description": "SHA-256 checksum of the file",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            }
+          }
+        }
+      }
+    },
+    "hostApps": {
+      "type": "object",
+      "description": "Host application information",
+      "properties": {
+        "windows": {
+          "type": "object",
+          "description": "Windows application",
+          "required": ["version", "file", "size", "sha256"],
+          "properties": {
+            "version": {
+              "type": "string",
+              "description": "Application version"
+            },
+            "file": {
+              "type": "string",
+              "description": "Filename of the Windows application archive"
+            },
+            "size": {
+              "type": "integer",
+              "description": "File size in bytes",
+              "minimum": 0
+            },
+            "sha256": {
+              "type": "string",
+              "description": "SHA-256 checksum",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "android": {
+          "type": "object",
+          "description": "Android application",
+          "required": ["version", "file", "size", "sha256"],
+          "properties": {
+            "version": {
+              "type": "string",
+              "description": "Application version"
+            },
+            "file": {
+              "type": "string",
+              "description": "Filename of the Android APK"
+            },
+            "size": {
+              "type": "integer",
+              "description": "File size in bytes",
+              "minimum": 0
+            },
+            "minSdk": {
+              "type": "integer",
+              "description": "Minimum Android SDK version",
+              "minimum": 21
+            },
+            "sha256": {
+              "type": "string",
+              "description": "SHA-256 checksum",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        }
+      }
+    }
+  }
+}
