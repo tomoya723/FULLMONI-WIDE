@@ -146,6 +146,80 @@ mapファイルが存在しないか、ビルドが完了していません。�
 
 ---
 
+## build_variants.ps1
+
+### 概要
+
+AppWizardバリアント（aw001, aw002）のファームウェアを自動ビルドするPowerShellスクリプト。
+Junction + 動的subdir.mk生成でバリアントを切り替えてビルドします。
+
+### 機能
+
+1. **Junction自動切り替え** - `Firmware/aw` を各バリアントディレクトリにリンク
+2. **subdir.mk動的生成** - AppWizardソースファイル用のMakefile断片を生成
+3. **バイナリ生成** - objcopyで正しいセクション構成のbinファイル生成
+4. **マニフェスト更新** - SHA256ハッシュとファイルサイズを自動更新
+
+### 使用方法
+
+```powershell
+# 両バリアントをビルド
+powershell -ExecutionPolicy Bypass -File tools/build_variants.ps1
+
+# 特定バリアントのみ
+powershell -ExecutionPolicy Bypass -File tools/build_variants.ps1 -Variants aw001
+
+# バージョン指定
+powershell -ExecutionPolicy Bypass -File tools/build_variants.ps1 -Version "0.1.2"
+```
+
+### パラメータ
+
+| パラメータ | デフォルト | 説明 |
+|-----------|-----------|------|
+| `-Variants` | `@("aw001", "aw002")` | ビルドするバリアント |
+| `-OutputDir` | `test-release` | 出力ディレクトリ |
+| `-Version` | (なし) | バージョン番号（ファイル名に付加） |
+
+### 出力ファイル
+
+| ファイル | 説明 |
+|----------|------|
+| `Firmware_v{ver}_{variant}.bin` | ファームウェアバイナリ |
+| `release-manifest.json` | SHA256/サイズ自動更新 |
+
+### 技術詳細
+
+#### セクション構成
+
+objcopyで以下のセクションを抽出：
+- `.firmware_header` - ブートローダー検証用ヘッダ (64バイト)
+- `.text` - コード
+- `.rvectors` - 割り込みベクタ
+- `.rodata*` - 読み取り専用データ
+- `.fvectors` - 固定ベクタ
+- `.data` - 初期化データ
+
+#### Junctionベースのビルド
+
+```
+Firmware/
+  aw/  ← Junction (シンボリックリンク)
+  aw001/  ← Standard Theme
+  aw002/  ← Racing Theme
+```
+
+ビルド時に `aw/` を目的のバリアントにリンクし、
+ソースコードは `#include "../aw/..."` で参照します。
+
+### 注意事項
+
+- Windows環境のみ対応（Junctionは管理者権限不要）
+- `rx-elf-gcc` がPATHに含まれている必要あり
+- e2 studioの `make.exe` パスがスクリプト内にハードコード
+
+---
+
 ## fw_upload.py
 
 ファームウェアアップロードツール（別途ドキュメント参照）

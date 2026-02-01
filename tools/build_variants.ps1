@@ -22,7 +22,8 @@
 
 param(
     [string[]]$Variants = @("aw001", "aw002"),
-    [string]$OutputDir = ""
+    [string]$OutputDir = "",
+    [string]$Version = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -212,9 +213,10 @@ foreach ($variant in $Variants) {
             continue
         }
         
-        # Step 5: objcopyでFirmware.binを生成
+        # Step 5: objcopyでFirmware.binを生成（正規Makefileと同じオプション）
+        # PowerShellのワイルドカード展開を避けるためcmd.exeで実行
         Write-Host "Generating Firmware.bin..."
-        & rx-elf-objcopy -O binary -j .text -j .rvectors -j ".rodata*" -j .data Firmware.elf Firmware.bin 2>&1 | Out-Null
+        cmd /c 'rx-elf-objcopy -O binary --gap-fill=0xFF -j .firmware_header -j .text -j .rvectors -j .rodata* -j .fvectors -j .data Firmware.elf Firmware.bin' 2>&1 | Out-Null
         
         if (-not (Test-Path "Firmware.bin")) {
             Write-Host "Failed to generate Firmware.bin" -ForegroundColor Red
@@ -223,8 +225,12 @@ foreach ($variant in $Variants) {
         
         Write-Host "Build successful!" -ForegroundColor Green
         
-        # Step 6: 出力ファイルをコピー
-        $outputBin = if ($variant -eq "aw001") { "Firmware.bin" } else { "Firmware_$variant.bin" }
+        # Step 6: 出力ファイルをコピー（バージョン付きファイル名）
+        if ([string]::IsNullOrEmpty($Version)) {
+            $outputBin = "Firmware_$variant.bin"
+        } else {
+            $outputBin = "Firmware_${Version}_$variant.bin"
+        }
         $destPath = Join-Path $OutputDir $outputBin
         
         Copy-Item "Firmware.bin" $destPath -Force

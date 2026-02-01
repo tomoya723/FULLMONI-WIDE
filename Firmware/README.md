@@ -140,8 +140,35 @@ frame No6 address : 1005(dec) , 0x3ED(hex)
 ・Click “Code Generation.”<br>
 ![image](https://github.com/user-attachments/assets/01f0507d-a2b9-420b-afb1-4e5bb2bbb660)<br>
 ***
-## emWin AppWizard resource swith setting
-The project provides multiple screen resources, so select the one you want to use.<br>
+## emWin AppWizard resource switch setting
+
+The project provides multiple screen resources (variants), so select the one you want to use.
+
+### 利用可能なバリアント
+
+| ID | テーマ | 説明 |
+|----|--------|------|
+| aw001 | Standard (Blue Theme) | 標準テーマ（青系）- デフォルト |
+| aw002 | Racing (Red Theme) | レーシングテーマ（赤系） |
+
+### 自動ビルド（推奨）
+
+`tools/build_variants.ps1` を使用すると、複数バリアントを自動でビルドできます：
+
+```powershell
+# 両バリアントをビルド
+powershell -ExecutionPolicy Bypass -File tools/build_variants.ps1 -Version "0.1.2"
+
+# 特定バリアントのみ
+powershell -ExecutionPolicy Bypass -File tools/build_variants.ps1 -Variants aw001
+```
+
+出力先: `test-release/Firmware_v{version}_{variant}.bin`
+
+詳細は [tools/README.md](../tools/README.md#build_variantsps1) を参照。
+
+### 手動ビルド（e2 studio）
+
 Switch display resources by changing Eclipse source path settings and resource includes.<br>
 <br>
 The Project Explorer configuration provides multiple image resources.<br>
