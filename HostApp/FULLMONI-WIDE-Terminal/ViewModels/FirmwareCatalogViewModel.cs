@@ -99,6 +99,11 @@ public partial class FirmwareCatalogViewModel : ObservableObject, IDisposable
     private string? _selectedRelease;
 
     /// <summary>
+    /// SelectedRelease変更時の再帰呼び出し防止フラグ
+    /// </summary>
+    private bool _isUpdatingSelectedRelease;
+
+    /// <summary>
     /// ダウンロード完了イベント（ファイルパスを返す）
     /// </summary>
     public event EventHandler<string>? DownloadCompleted;
@@ -133,15 +138,28 @@ public partial class FirmwareCatalogViewModel : ObservableObject, IDisposable
     /// </summary>
     public async Task LoadReleaseAsync(string? tag)
     {
-        if (IsLoading || IsDownloading) return;
+        System.Diagnostics.Debug.WriteLine($"[FirmwareCatalog] LoadReleaseAsync called: tag={tag}, IsLoading={IsLoading}");
+        
+        if (IsDownloading) return;
+        
+        // 既に読み込み中の場合はキャンセルして新しいリクエストを優先
+        if (IsLoading)
+        {
+            _cts?.Cancel();
+        }
 
         try
         {
             IsLoading = true;
             ErrorMessage = null;
+            
+            // 古いデータを即座にクリア
+            CurrentManifest = null;
+            ReleaseVersion = string.Empty;
+            ReleaseDate = string.Empty;
             Variants.Clear();
 
-            _cts?.Cancel();
+            _cts?.Dispose();
             _cts = new CancellationTokenSource();
 
             // リリース一覧を取得（初回のみ）
@@ -157,24 +175,41 @@ public partial class FirmwareCatalogViewModel : ObservableObject, IDisposable
 
             // マニフェストを取得
             ReleaseManifest? manifest;
+            string targetTag;
             if (string.IsNullOrEmpty(tag))
             {
-                manifest = await _onlineService.GetLatestManifestAsync(_cts.Token);
+                // 最新リリースのタグを取得
+                targetTag = AvailableReleases.Count > 0 ? AvailableReleases[0] : string.Empty;
+                if (string.IsNullOrEmpty(targetTag))
+                {
+                    ErrorMessage = "No releases available";
+                    return;
+                }
+                manifest = await _onlineService.GetManifestForTagAsync(targetTag, _cts.Token);
+                // ドロップダウンで選択状態にする（マニフェスト取得後に設定）
             }
             else
             {
+                targetTag = tag;
+                System.Diagnostics.Debug.WriteLine($"[FirmwareCatalog] Loading manifest for tag: {tag}");
                 manifest = await _onlineService.GetManifestForTagAsync(tag, _cts.Token);
             }
 
             if (manifest == null)
             {
-                ErrorMessage = "Failed to load release information";
+                System.Diagnostics.Debug.WriteLine($"[FirmwareCatalog] Manifest is null for tag: {targetTag}");
+                ErrorMessage = $"Release {targetTag} does not have firmware manifest";
                 return;
             }
 
             CurrentManifest = manifest;
             ReleaseVersion = manifest.Version;
             ReleaseDate = manifest.ReleaseDate;
+            
+            // マニフェスト取得成功後にドロップダウンを更新（イベント発火を防ぐ）
+            _isUpdatingSelectedRelease = true;
+            SelectedRelease = targetTag;
+            _isUpdatingSelectedRelease = false;
 
             // バリアントを追加
             if (manifest.Firmware?.Variants != null)
@@ -370,12 +405,11 @@ public partial class FirmwareCatalogViewModel : ObservableObject, IDisposable
         _cts?.Cancel();
     }
 
-    partial void OnSelectedReleaseChanged(string? value)
+    partial void OnSelectedReleaseChanged(string? oldValue, string? newValue)
     {
-        if (!string.IsNullOrEmpty(value))
-        {
-            _ = LoadReleaseAsync(value);
-        }
+        // 選択変更時の処理はMainWindow.xaml.csのReleaseComboBox_SelectionChangedで行う
+        // ここでは何もしない（重複呼び出し防止）
+        System.Diagnostics.Debug.WriteLine($"[FirmwareCatalog] OnSelectedReleaseChanged: old={oldValue}, new={newValue} (no action)");
     }
 
     public void Dispose()

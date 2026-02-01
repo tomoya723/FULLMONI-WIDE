@@ -19,7 +19,7 @@ public class OnlineUpdateService : IDisposable
     private const string RepoName = "FULLMONI-WIDE";
 
     // ローカルテストモード
-    private static readonly bool UseLocalTest = true;  // TODO: リリース時は false に変更
+    private static readonly bool UseLocalTest = false;  // GitHub Releasesから取得
     private static readonly string LocalTestPath = @"C:\Users\tomoy\git\FULLMONI-WIDE\test-release";
 
     /// <summary>
@@ -64,8 +64,8 @@ public class OnlineUpdateService : IDisposable
         {
             StatusChanged?.Invoke(this, "Checking for latest release...");
 
-            // GitHub API で最新リリース情報を取得
-            var apiUrl = $"{ApiBaseUrl}/releases/latest";
+            // GitHub API でリリース一覧を取得（pre-releaseも含む）
+            var apiUrl = $"{ApiBaseUrl}/releases?per_page=1";
             var response = await _httpClient.GetAsync(apiUrl, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
@@ -76,9 +76,15 @@ public class OnlineUpdateService : IDisposable
 
             var json = await response.Content.ReadAsStringAsync(cancellationToken);
             using var doc = JsonDocument.Parse(json);
-            var root = doc.RootElement;
+            var releases = doc.RootElement;
 
-            var tagName = root.GetProperty("tag_name").GetString();
+            if (releases.GetArrayLength() == 0)
+            {
+                StatusChanged?.Invoke(this, "No releases found");
+                return null;
+            }
+
+            var tagName = releases[0].GetProperty("tag_name").GetString();
             if (string.IsNullOrEmpty(tagName))
             {
                 StatusChanged?.Invoke(this, "No release tag found");

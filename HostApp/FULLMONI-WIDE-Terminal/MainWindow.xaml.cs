@@ -686,6 +686,23 @@ namespace FullmoniTerminal
             }
         }
 
+        /// <summary>
+        /// リリースComboBoxの選択変更イベント
+        /// </summary>
+        private async void ReleaseComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // ユーザーによる選択変更時のみ処理（RemovedItemsがある = 既に何か選択されていた状態からの変更）
+            if (e.AddedItems.Count > 0 && e.RemovedItems.Count > 0 && e.AddedItems[0] is string selectedTag)
+            {
+                System.Diagnostics.Debug.WriteLine($"[MainWindow] User selected release: {selectedTag} (from {e.RemovedItems[0]})");
+                if (DataContext is MainViewModel vm)
+                {
+                    // 直接マニフェストをロード（ViewModelのSelectedRelease変更による呼び出しをバイパス）
+                    await vm.FirmwareCatalog.LoadReleaseAsync(selectedTag);
+                }
+            }
+        }
+
         #endregion
     }
 

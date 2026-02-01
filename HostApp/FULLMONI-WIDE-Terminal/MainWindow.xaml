@@ -813,7 +813,8 @@
                                     <ui:TextBlock Grid.Column="0" Text="Release:" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                     <ComboBox Grid.Column="1" x:Name="ReleaseComboBox"
                                               ItemsSource="{Binding FirmwareCatalog.AvailableReleases}"
-                                              SelectedItem="{Binding FirmwareCatalog.SelectedRelease}"
+                                              SelectedItem="{Binding FirmwareCatalog.SelectedRelease, Mode=TwoWay}"
+                                              SelectionChanged="ReleaseComboBox_SelectionChanged"
                                               IsEnabled="{Binding FirmwareCatalog.IsLoading, Converter={StaticResource InverseBoolConverter}}"
                                               Margin="0,0,8,0"/>
                                     <ui:Button Grid.Column="2" Content="Check for Updates"
