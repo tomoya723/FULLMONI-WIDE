@@ -27,6 +27,9 @@ LICENSE
 Firmware/build
 Firmware/HardwareDebug
 Firmware/trash
+
+# Junction (aw001/aw002切替用) - ビルド時のみ使用
+Firmware/aw/
 Firmware/src/smc_gen/r_emwin_rx/tool
 Bootloader/build
 Bootloader/HardwareDebug
