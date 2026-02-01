@@ -62,16 +62,17 @@ def upload_firmware(port, firmware_path, baudrate=115200):
         size_bytes = file_size.to_bytes(4, 'little')
         ser.write(size_bytes)
 
-        # ACK待ち
+        # ACK待ち (サイズ受信後のみ)
         ack = ser.read(1)
         if ack != b'.':
             print(f"Size ACK failed: {ack}")
             ser.close()
             return False
-        print(f"Size sent: {file_size} bytes")
+        print(f"Size ACK received. Starting streaming transfer...")
 
-        # チャンクサイズ (128バイト = Flash write単位)
-        chunk_size = 128
+        # ストリーミングモード - 中間ACKなしで高速転送
+        # チャンクサイズ (16KB = ホスト側送信単位)
+        chunk_size = 16 * 1024
         sent = 0
         start_time = time.time()
 
@@ -83,44 +84,45 @@ def upload_firmware(port, firmware_path, baudrate=115200):
             # 進捗表示
             progress = (sent / file_size) * 100
             kb_sent = sent / 1024
-            print(f"\rProgress: {progress:5.1f}% ({kb_sent:.1f} KB / {file_size/1024:.1f} KB)", end='', flush=True)
+            elapsed = time.time() - start_time
+            speed = kb_sent / elapsed if elapsed > 0 else 0
+            print(f"\rProgress: {progress:5.1f}% ({kb_sent:.1f} KB / {file_size/1024:.1f} KB) - {speed:.1f} KB/s", end='', flush=True)
 
-            # ACK ('.')を待つ - デバイスがFlash書き込み完了後に送信
-            # 最後のチャンクでは完了メッセージが返ってくる
-            ack = ser.read(1)
-            if ack == b'.':
-                continue  # ACK received, continue
-            elif ack == b'\r' or ack == b'\n' or ack == b'D':
-                # Completion message started - read the rest
+            # 小さな遅延でUSBバッファを安定化
+            time.sleep(0.01)
+
+        print("\n\nWaiting for completion message...")
+
+        # 完了メッセージを待つ (最大30秒)
+        ser.timeout = 30
+        response = b''
+        while True:
+            data = ser.read(1)
+            if not data:
+                break
+            response += data
+            if b'Done' in response or b'ERR' in response:
+                # 残りを読む
                 time.sleep(0.3)
-                remaining = ser.read(ser.in_waiting) if ser.in_waiting else b''
-                print(f"\n\n{(ack + remaining).decode('utf-8', errors='replace')}")
-                break  # Transfer complete
-            elif ack == b'':
-                print(f"\n\nTimeout waiting for ACK at {sent} bytes")
-                ser.close()
-                return False
-            else:
-                # Read remaining error message
-                time.sleep(0.2)
-                remaining = ser.read(ser.in_waiting) if ser.in_waiting else b''
-                print(f"\n\nError at {sent} bytes: {(ack + remaining).decode('utf-8', errors='replace')}")
-                ser.close()
-                return False
+                if ser.in_waiting:
+                    response += ser.read(ser.in_waiting)
+                break
+
+        if response:
+            print(f"Response: {response.decode('utf-8', errors='replace')}")
+
+        if b'Done' in response:
+            pass  # Success
+        elif b'ERR' in response:
+            print("Flash write error!")
+            ser.close()
+            return False
+        else:
+            print("Warning: No completion message received")
 
         elapsed = time.time() - start_time
         speed = (file_size / 1024) / elapsed if elapsed > 0 else 0
-        print(f"\n\nTransfer complete! ({elapsed:.1f}s, {speed:.1f} KB/s)")
-
-        # 完了メッセージを待つ (デバイスが自動的に送信)
-        time.sleep(0.5)
-        response = b''
-        while ser.in_waiting:
-            response += ser.read(ser.in_waiting)
-            time.sleep(0.1)
-
-        if response:
-            print(f"\nResponse: {response.decode('utf-8', errors='replace')}")
+        print(f"\nTransfer complete! ({elapsed:.1f}s, {speed:.1f} KB/s)")
 
         ser.close()
         print("\nUpload completed!")

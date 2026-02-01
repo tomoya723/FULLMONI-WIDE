@@ -137,7 +137,8 @@ SECTIONS
 	} >RAM AT>RAM
 	/* Issue #65: CAN設定用の追加RAM領域 (高位RAM 0x00864000-0x0087FFFF) */
 	/* GUIConf.o (emWin設定、約80KB) もRAM2に配置してLow RAMの空きを確保 */
-	.bss2 :
+	/* NOLOAD: 初期化不要なBSSセクションはMOTファイルに含めない */
+	.bss2 (NOLOAD) :
 	{
 		_bss2 = .;
 		*(.bss2)
@@ -145,7 +146,7 @@ SECTIONS
 		*GUIConf.o(.bss)
 		*GUIConf.o(.bss.*)
 		_ebss2 = .;
-	} >RAM2 AT>RAM2
+	} >RAM2
 	.ofs1 0xFE7F5D00 : AT(0xFE7F5D00)
 	{
 		KEEP(*(.ofs1))
