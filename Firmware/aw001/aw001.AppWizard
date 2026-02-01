@@ -1087,8 +1087,8 @@
         Font=51_30_Normal_EXT.xbf
       </SetFont>
       <SetDecMode>
-        Len=3
-        Shift=0
+        Len=5
+        Shift=1
         Signed=0
         Space=1
       </SetDecMode>
@@ -1731,10 +1731,6 @@
       </Para>
     </SETVALUE>
   </Interactions>
-  <Selection>
-    Root=ID_SCREEN_01a
-    Object=2048
-  </Selection>
   <Terms>
   </Terms>
   <AnimItems>
