@@ -80,3 +80,8 @@ test-release/
 
 # Visual Studio user-specific files
 **/.vs/
+
+# SEGGER GUI Library (licensed, not redistributable)
+Firmware/aw*/Simulation/GUI_Lib/
+Firmware/aw*/Simulation/Exe/
+Firmware/aw*/Simulation/Output/

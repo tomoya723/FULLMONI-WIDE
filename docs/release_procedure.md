@@ -69,31 +69,43 @@ $bytes = [System.IO.File]::ReadAllBytes("test-release/Firmware_v0.1.3_aw001.bin"
 
 ## 3. サムネイル画像の生成
 
-### 3.1 AppWizard Simulation の実行
+### 3.1 自動キャプチャスクリプトの実行
 
-各バリアントの Simulation を実行し、スクリーンショットをキャプチャします。
+```powershell
+cd C:\Users\tomoy\git\FULLMONI-WIDE
 
-#### aw001 (Standard Theme)
+# 全バリアント（aw001, aw002, ...）のサムネイルを自動生成
+powershell -ExecutionPolicy Bypass -File tools/capture_thumbnails.ps1 -Version "0.1.3"
+```
 
-1. `Firmware/aw001/Simulation/Simulation_VS2015_2017_Lib.sln` を Visual Studio で開く
-2. ビルド・実行
-3. LCD領域（800×256）をキャプチャ
-4. `test-release/thumbnail_aw001.png` として保存
+スクリプトは以下を自動で行います：
+- `Firmware/aw001`, `aw002`, ... フォルダを自動検出
+- GUI_Lib がない場合は AppWizard インストール先から自動コピー
+- GUISimulation.exe がない場合は MSBuild で自動ビルド
+- LCD領域（800×256）のみをキャプチャ
 
-#### aw002 (Racing Theme)
+### 3.2 出力確認
 
-1. `Firmware/aw002/Simulation/Simulation_VS2015_2017_Lib.sln` を Visual Studio で開く
-2. ビルド・実行
-3. LCD領域（800×256）をキャプチャ
-4. `test-release/thumbnail_aw002.png` として保存
+```
+test-release/
+  thumbnail_v0.1.3_aw001.png  ← Standard Theme
+  thumbnail_v0.1.3_aw002.png  ← Racing Theme
+```
 
-### 3.2 サムネイル仕様
+### 3.3 サムネイル仕様
 
 | 項目 | 値 |
 |------|-----|
 | 解像度 | 800 × 256 ピクセル |
 | 形式 | PNG |
 | 内容 | LCD表示領域のみ（ウィンドウ枠を除く） |
+| 目安サイズ | 約25〜35KB |
+
+### 3.4 注意事項
+
+- スクリプト実行中はGUISimulationウィンドウが表示されます（自動的に閉じます）
+- キャプチャ中に他のウィンドウを操作しないでください
+- GUI_Lib, Exe, Output フォルダは `.gitignore` で除外済み（SEGGER機密コード保護）
 
 ---
 

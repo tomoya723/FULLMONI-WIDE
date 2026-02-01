@@ -267,3 +267,60 @@ Firmware/aw → aw002  (switch_to_aw002.bat 実行後)
 ## fw_upload.py
 
 ファームウェアアップロードツール（別途ドキュメント参照）
+
+---
+
+## capture_thumbnails.ps1
+
+### 概要
+
+GUISimulation（AppWizardシミュレータ）を自動起動し、LCD表示部分のスクリーンショットをキャプチャするPowerShellスクリプト。HOST Appのファームウェアカタログ用サムネイル生成に使用。
+
+### 機能
+
+1. **バリアント自動検出**
+   - `Firmware/aw001`, `aw002`, `aw003`... を自動検出
+   - `aw` リンクフォルダは除外（`^aw\d+$` パターンで判定）
+
+2. **GUI_Lib自動セットアップ**
+   - SEGGER AppWizardインストール先またはバックアップから自動コピー
+   - ライセンス上の理由でgitにはコミットしない（.gitignoreで除外）
+
+3. **GUISimulation.exe自動ビルド**
+   - MSBuildを自動検出
+   - Windows SDK 10.0 / PlatformToolset v145 で上書きビルド（vcxprojは変更しない）
+
+4. **LCD領域キャプチャ**
+   - 800x256ピクセルのLCD表示部分のみをキャプチャ
+   - ウィンドウを強制的にフォアグラウンドに移動（AttachThreadInputトリック使用）
+
+### 使用方法
+
+```powershell
+# バージョン指定でサムネイル生成
+powershell -ExecutionPolicy Bypass -File tools/capture_thumbnails.ps1 -Version "0.1.2"
+# → test-release/thumbnail_v0.1.2_aw001.png, thumbnail_v0.1.2_aw002.png ...
+
+# バージョンなし
+powershell -ExecutionPolicy Bypass -File tools/capture_thumbnails.ps1
+# → test-release/thumbnail_aw001.png, thumbnail_aw002.png ...
+```
+
+### パラメータ
+
+| パラメータ | デフォルト | 説明 |
+|-----------|-----------|------|
+| `-Version` | (なし) | サムネイルファイル名に付加するバージョン |
+| `-OutputDir` | `test-release` | 出力先フォルダ |
+
+### 前提条件
+
+- Visual Studio (MSBuild) がインストールされていること
+- SEGGER AppWizard がインストールされているか、GUI_Libのバックアップがあること
+  - バックアップ場所: `%USERPROFILE%\Desktop\FULLMONI-WIDE_aw003\Firmware\aw001\Simulation\GUI_Lib`
+
+### 注意事項
+
+- **GUI_Lib, Exe, Output フォルダは .gitignore で除外済み**（SEGGER機密コード保護のため）
+- スクリプト実行中はGUISimulationウィンドウが表示されます（自動的に閉じます）
+- キャプチャ中に他のウィンドウを操作しないでください
