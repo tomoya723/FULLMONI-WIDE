@@ -12,15 +12,15 @@
 
 /* バージョン定義 (ビルド時にカスタマイズ可能) */
 #ifndef FW_VERSION_MAJOR
-#define FW_VERSION_MAJOR    0
+#define FW_VERSION_MAJOR    1
 #endif
 
 #ifndef FW_VERSION_MINOR
-#define FW_VERSION_MINOR    1
+#define FW_VERSION_MINOR    0
 #endif
 
 #ifndef FW_VERSION_PATCH
-#define FW_VERSION_PATCH    1
+#define FW_VERSION_PATCH    0
 #endif
 
 /* バージョン文字列マクロ */
