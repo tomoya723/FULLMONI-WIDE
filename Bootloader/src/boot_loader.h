@@ -70,7 +70,7 @@
 #define BL_BOOTLOADER_SIZE          (0x20000UL)      /* 128KB */
 
 #define BL_APP_START                (0xFFC20000UL)
-#define BL_APP_END                  (0xFFFFFFFFUL)
+#define BL_APP_END                  (0xFFDFFFFFUL)  /* startup_image領域(0xFFE00000～)を除外 */
 #define BL_APP_SIZE                 (0x3E0000UL)     /* 3.875MB = 4,063,232 bytes */
 #define BL_APP_BLOCKS               (124)            /* 124 x 32KB blocks */
 

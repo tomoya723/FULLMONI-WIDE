@@ -19,9 +19,9 @@
 
 /* Bootloader Configuration - same as boot_loader.c */
 #define BL_APP_START        (0xFFC20000UL)   /* Application start address */
-#define BL_APP_END          (0xFFFFFFFFUL)   /* Application end address */
+#define BL_APP_END          (0xFFDFFFFFUL)   /* Application end address (startup_image領域を除外) */
 #define BL_FLASH_BLOCK_SIZE (0x8000UL)       /* 32KB per block */
-#define BL_APP_BLOCKS       (124)            /* 124 x 32KB = 3.875MB */
+#define BL_APP_BLOCKS       (56)             /* 56 x 32KB = 1.75MB (0xFFC20000-0xFFDFFFFF) */
 #define BL_FW_HEADER_ADDR   (0xFFC20000UL)   /* Firmware header at app start */
 #define BL_FW_MAGIC         (0x52584657UL)   /* "RXFW" */
 #define BL_FLASH_WRITE_SIZE (128)            /* Flash write unit */
@@ -339,6 +339,25 @@ void main(void)
                                 SYSTEM.PRCR.WORD = 0xA502;
                                 SYSTEM.SWRR = 0xA501;
                                 while (1);
+                            } else {
+                                /* Verification failed - send error with actual header value */
+                                uint32_t *fw_header = (uint32_t *)BL_FW_HEADER_ADDR;
+                                const char *err_msg = "\r\nVerify ERR! Header=0x";
+                                int elen = 0;
+                                while (err_msg[elen]) { g_usb_tx_buf[elen] = err_msg[elen]; elen++; }
+                                /* Add hex value of header[0] */
+                                uint32_t val = fw_header[0];
+                                for (int sh = 28; sh >= 0; sh -= 4) {
+                                    int nib = (val >> sh) & 0xF;
+                                    g_usb_tx_buf[elen++] = (nib < 10) ? ('0' + nib) : ('A' + nib - 10);
+                                }
+                                g_usb_tx_buf[elen++] = '\r';
+                                g_usb_tx_buf[elen++] = '\n';
+                                g_usb_tx_buf[elen++] = '>';
+                                g_usb_tx_buf[elen++] = ' ';
+                                g_usb_ctrl.type = USB_PCDC;
+                                g_usb_ctrl.module = USB_IP0;
+                                R_USB_Write(&g_usb_ctrl, g_usb_tx_buf, elen);
                             }
                             break;
                         }
