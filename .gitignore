@@ -71,3 +71,9 @@ HostApp/FULLMONI-WIDE-Android/local.properties
 
 # PR作成用一時ファイル
 pr_body.md
+
+# Test release folder (local testing)
+test-release/
+
+# Visual Studio user-specific files
+**/.vs/
