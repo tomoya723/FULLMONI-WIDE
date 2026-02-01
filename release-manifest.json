@@ -1,0 +1,43 @@
+﻿{
+    "schemaVersion": 1,
+    "version": "1.0.0",
+    "releaseDate": "2026-02-02",
+    "releaseNotes": "https://github.com/tomoya723/FULLMONI-WIDE/releases/tag/v1.0.0",
+    "bootloader": {
+        "version": "0.1.2",
+        "file": "Bootloader_v0.1.2.mot",
+        "size": 231944,
+        "sha256": "7075f2c54cc895bfcb61ad7b78dcf2e35c7796833aa1eeb38e4c11f43154864d"
+    },
+    "firmware": {
+        "minimumBootloaderVersion": "0.1.2",
+        "variants": [
+            {
+                "id": "aw001",
+                "name": "type1",
+                "description": "tomoya723 ver",
+                "file": "Firmware_v1.0.0_aw001.bin",
+                "thumbnail": "thumbnail_v1.0.0_aw001.png",
+                "size": 956266,
+                "sha256": "779b3b36c2227e310dcc4ed65c22c61d3bda1be6e4c2c8aef90fd0f606abe6e6"
+            },
+            {
+                "id": "aw002",
+                "name": "type2",
+                "description": "chaketek ver",
+                "file": "Firmware_v1.0.0_aw002.bin",
+                "thumbnail": "thumbnail_v1.0.0_aw002.png",
+                "size": 916782,
+                "sha256": "25530b0da6dfc5e7d56eff3091f4d47f7be4cbf91f3720d4dfb38dbc09a5aeaa"
+            }
+        ]
+    },
+    "hostApps": {
+        "windows": {
+            "version": "0.1.2",
+            "file": "FULLMONI-WIDE-Terminal-win-x64.zip",
+            "size": 73438779,
+            "sha256": "bd784feb69bc79936bef12bbe6eef77aeee5c74dbb70834f153e79f4ef7be53a"
+        }
+    }
+}

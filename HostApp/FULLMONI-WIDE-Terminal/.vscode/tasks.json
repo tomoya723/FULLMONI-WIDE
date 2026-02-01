@@ -1,0 +1,16 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "dotnet-build-host",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"-c",
+				"Debug"
+			],
+			"group": "build"
+		}
+	]
+}
