@@ -22,9 +22,10 @@ public class FirmwareUpdateService
     private const byte ACK_CHAR = (byte)'.';
 
     // 送信制御 - ストリーミングモード（中間ACKなし）
-    private const int ChunkSize = 16384;       // 16KB チャンクで最大速度
+    private const int ChunkSize = 4096;        // 4KB チャンク（UI更新頻度とのバランス）
     private const int AckTimeoutMs = 10000;    // サイズACK待ちタイムアウト
     private const int ProgressUpdateInterval = 1; // 進捗更新間隔（%）- 細かく更新
+    private const int UiUpdateDelayMs = 1;     // UI更新のための最小遅延
 
     // 全体進捗のフェーズ重み付け（合計100%）
     private const int PhaseBootloaderSwitch = 5;   // Bootloader切り替え: 0-5%
@@ -374,10 +375,10 @@ public class FirmwareUpdateService
                     var speedKBps = elapsedSec > 0 ? (sentBytes / 1024.0) / elapsedSec : 0;
                     UpdateStatus($"転送中: {sentBytes:N0}/{totalBytes:N0} bytes ({transferProgress}%) - {speedKBps:F1} KB/s");
                     Log($"TX: {sentBytes:N0}/{totalBytes:N0} bytes ({transferProgress}%) - {speedKBps:F1} KB/s");
-
-                    // UIスレッドに制御を返す（5%ごとのみ）
-                    await Task.Yield();
                 }
+
+                // UIスレッドに制御を返す（毎チャンク）
+                await Task.Delay(UiUpdateDelayMs, cancellationToken);
             }
 
             stopwatch.Stop();

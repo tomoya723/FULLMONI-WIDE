@@ -182,6 +182,47 @@
                 "panel": "shared"
             },
             "detail": "mapファイルから正確なRAM使用量を計算して表示（rx-elf-sizeより正確）"
+        },
+        {
+            "label": "Generate Firmware_noofs.mot",
+            "type": "shell",
+            "command": "rx-elf-objcopy",
+            "args": [
+                "Firmware.elf",
+                "-O", "srec",
+                "-I", "elf32-rx-be-ns",
+                "--remove-section=.ofs1",
+                "--remove-section=.ofs2",
+                "--remove-section=.ofs3",
+                "--remove-section=.ofs4",
+                "--remove-section=.ofs5",
+                "--remove-section=.ofs6",
+                "--remove-section=.ofs7",
+                "--remove-section=.ofs8",
+                "--remove-section=.exvectors",
+                "Firmware_noofs.mot"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/Firmware/HardwareDebug"
+            },
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared"
+            },
+            "detail": "Bootloaderと衝突しないMOTファイルを生成（Renesas Flash Programmer用）"
+        },
+        {
+            "label": "Build + Generate MOT (GCC-RX)",
+            "dependsOn": [
+                "Build (GCC-RX)",
+                "Generate Firmware_noofs.mot"
+            ],
+            "dependsOrder": "sequence",
+            "group": "build",
+            "detail": "ビルド後にFirmware_noofs.motを自動生成"
         }
     ]
 }

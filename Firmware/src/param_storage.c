@@ -460,10 +460,10 @@ static const CAN_Config_t CAN_PRESET_MOTEC = {
           .warn_low = -40.0f, .warn_high = 130.0f },  /* OilTemp /10 signed → 整数表示 */
         /* CH4 (0x3EB): OilPressure(0-1), BattV(6-7) */
         { .channel = 4, .start_byte = 0, .byte_count = 2, .data_type = 0, .endian = 0,
-          .target_var = CAN_TARGET_NUM5, .offset = 0, .multiplier = 1, .divisor = 1000,
+          .target_var = CAN_TARGET_NUM5, .offset = 0, .multiplier = 1, .divisor = 100,
           .name = "OIL-P", .unit = "x100kPa", .decimal_shift = 1,
           .warn_low_enabled = 1, .warn_high_enabled = 1, .reserved = 0,
-          .warn_low = 1.5f, .warn_high = 9.0f },  /* OIL-P: CAN4000→内部4.0(x100kPa)→表示4.0 */
+          .warn_low = 1.5f, .warn_high = 9.0f },  /* OIL-P: CAN5000→内部50→÷10→表示5.0 */
         { .channel = 4, .start_byte = 6, .byte_count = 2, .data_type = 0, .endian = 0,
           .target_var = CAN_TARGET_NUM6, .offset = 0, .multiplier = 1000, .divisor = 10000,
           .name = "BATT", .unit = "V", .decimal_shift = 1,

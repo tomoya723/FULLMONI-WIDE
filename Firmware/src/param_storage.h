@@ -70,7 +70,7 @@ typedef struct __attribute__((packed)) {
 #define CAN_CONFIG_SIZE     sizeof(CAN_Config_t)
 
 /* CAN設定バージョン */
-#define CAN_CONFIG_VERSION  7       /* マスターワーニング/警告音 有効フラグ追加 */
+#define CAN_CONFIG_VERSION  8       /* OIL-P divisor修正 (1000→100) */
 
 /* プリセットID */
 #define CAN_PRESET_CUSTOM       0
