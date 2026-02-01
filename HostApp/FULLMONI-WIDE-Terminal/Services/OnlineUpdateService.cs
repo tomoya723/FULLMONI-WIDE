@@ -44,8 +44,14 @@ public class OnlineUpdateService : IDisposable
 
     public OnlineUpdateService()
     {
-        _httpClient = new HttpClient();
+        var handler = new HttpClientHandler
+        {
+            AllowAutoRedirect = true,
+            MaxAutomaticRedirections = 10
+        };
+        _httpClient = new HttpClient(handler);
         _httpClient.DefaultRequestHeaders.Add("User-Agent", $"FULLMONI-WIDE-Terminal/1.0");
+        _httpClient.DefaultRequestHeaders.Add("Accept", "*/*");
         _httpClient.Timeout = TimeSpan.FromMinutes(10); // 大きなファイル用に長めのタイムアウト
     }
 
@@ -269,22 +275,6 @@ public class OnlineUpdateService : IDisposable
             StatusChanged?.Invoke(this, $"Downloading {variant.Name}...");
             DownloadProgressChanged?.Invoke(this, 0);
 
-            using var response = await _httpClient.GetAsync(
-                variant.DownloadUrl,
-                HttpCompletionOption.ResponseHeadersRead,
-                cancellationToken);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                StatusChanged?.Invoke(this, $"Download failed: {response.StatusCode}");
-                return null;
-            }
-
-            var totalBytes = response.Content.Headers.ContentLength ?? variant.Size;
-            var buffer = new byte[81920]; // 80KB buffer
-            long bytesRead = 0;
-            int lastProgress = 0;
-
             // ディレクトリが存在しない場合は作成
             var directory = Path.GetDirectoryName(destinationPath);
             if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
@@ -292,23 +282,21 @@ public class OnlineUpdateService : IDisposable
                 Directory.CreateDirectory(directory);
             }
 
-            await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-            await using var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write, FileShare.None, 81920, true);
+            // 常にユニークなファイル名を使用
+            var ext = Path.GetExtension(destinationPath);
+            var baseName = Path.GetFileNameWithoutExtension(destinationPath);
+            var dir = Path.GetDirectoryName(destinationPath) ?? Path.GetTempPath();
+            destinationPath = Path.Combine(dir, $"{baseName}_{DateTime.Now:yyyyMMddHHmmss}{ext}");
 
-            int read;
-            while ((read = await contentStream.ReadAsync(buffer, cancellationToken)) > 0)
-            {
-                await fileStream.WriteAsync(buffer.AsMemory(0, read), cancellationToken);
-                bytesRead += read;
-
-                var progress = (int)(bytesRead * 100 / totalBytes);
-                if (progress != lastProgress)
-                {
-                    lastProgress = progress;
-                    DownloadProgressChanged?.Invoke(this, progress);
-                }
-            }
-
+            // メモリに全体をダウンロードしてからファイルに書き込む（ロック問題回避）
+            StatusChanged?.Invoke(this, $"Downloading from GitHub...");
+            var data = await _httpClient.GetByteArrayAsync(variant.DownloadUrl, cancellationToken);
+            
+            DownloadProgressChanged?.Invoke(this, 50);
+            StatusChanged?.Invoke(this, $"Saving to disk...");
+            
+            await File.WriteAllBytesAsync(destinationPath, data, cancellationToken);
+            
             DownloadProgressChanged?.Invoke(this, 100);
 
             // SHA256検証
