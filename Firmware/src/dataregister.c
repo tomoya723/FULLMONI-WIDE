@@ -17,9 +17,9 @@
 #include "GUI.h"               /* emWin GUI関数 */
 #include "TEXT.h"              /* TEXT Widget関数 */
 #include "WM.h"                /* Window Manager関数 */
-#include "../aw002/Source/Generated/Resource.h"  /* AppWizard リソース定義 */
-#include "../aw002/Source/Generated/ID_SCREEN_01a.h"  /* ID_TEXT_ACC 定義 */
-#include "../aw002/Source/Generated/ID_SCREEN_Telltale.h"  /* ID_ICON_xx 定義 */
+#include "../aw/Source/Generated/Resource.h"  /* AppWizard リソース定義 (Junction経由) */
+#include "../aw/Source/Generated/ID_SCREEN_01a.h"  /* ID_TEXT_ACC 定義 (Junction経由) */
+#include "../aw/Source/Generated/ID_SCREEN_Telltale.h"  /* ID_ICON_xx 定義 (Junction経由) */
 
 #define PI 3.1415923
 

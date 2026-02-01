@@ -23,22 +23,13 @@ extern volatile SYSTEM_MODE g_system_mode;
 extern volatile uint8_t g_param_mode_active;
 /* g_uart_rx_trigger は USB CDC化により削除 */
 
-// emwin display resource number select
-#define DISP (2)  // 1-2
-
-#if (DISP == 1)
-	#include "../aw001/Source/Generated/Resource.h"
-	#include "../aw001/Source/Generated/ID_SCREEN_Telltale.h"
-	#include "../aw001/Source/Generated/ID_SCREEN_01a.h"
-	#include "../aw001/Source/Generated/ID_SCREEN_01b.h"
-	#include "../aw001/Source/Generated/ID_SCREEN_01c.h"
-#elif (DISP == 2)
-	#include "../aw002/Source/Generated/Resource.h"
-	#include "../aw002/Source/Generated/ID_SCREEN_Telltale.h"
-	#include "../aw002/Source/Generated/ID_SCREEN_01a.h"
-	#include "../aw002/Source/Generated/ID_SCREEN_01b.h"
-	#include "../aw002/Source/Generated/ID_SCREEN_01c.h"
-#endif
+// emwin display resource - Junction経由で切り替え
+// ビルド前に tools/build_variants.ps1 で aw Junctionを設定すること
+#include "../aw/Source/Generated/Resource.h"
+#include "../aw/Source/Generated/ID_SCREEN_Telltale.h"
+#include "../aw/Source/Generated/ID_SCREEN_01a.h"
+#include "../aw/Source/Generated/ID_SCREEN_01b.h"
+#include "../aw/Source/Generated/ID_SCREEN_01c.h"
 
 extern void sch_10ms();
 

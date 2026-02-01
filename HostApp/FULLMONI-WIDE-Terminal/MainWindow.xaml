@@ -882,7 +882,7 @@
                                 </StackPanel>
 
                                 <!-- Status Message (always visible when not empty) -->
-                                <TextBlock Text="{Binding FirmwareCatalog.StatusMessage}" FontSize="12" Foreground="#22C55E" 
+                                <TextBlock Text="{Binding FirmwareCatalog.StatusMessage}" FontSize="12" Foreground="#22C55E"
                                            Margin="0,0,0,12" TextAlignment="Center"
                                            Visibility="{Binding FirmwareCatalog.StatusMessage, Converter={StaticResource NullToVisibilityConverter}}"/>
 

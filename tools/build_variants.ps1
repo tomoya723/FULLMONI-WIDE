@@ -81,30 +81,30 @@ function Generate-SubdirMk {
         [string]$RelativeDir,    # aw配下の相対パス（例: "Source/Generated"）
         [string]$BaseSrcPath     # Junctionが指すソースパス
     )
-    
+
     $srcDir = Join-Path $BaseSrcPath $RelativeDir
     $outDir = Join-Path $BuildAwDir $RelativeDir.Replace('/', '\')
-    
+
     if (-not (Test-Path $srcDir)) { return }
-    
+
     $cFiles = Get-ChildItem $srcDir -Filter "*.c" -File -ErrorAction SilentlyContinue
     if ($cFiles.Count -eq 0) { return }
-    
-    if (-not (Test-Path $outDir)) { 
-        New-Item -Path $outDir -ItemType Directory -Force | Out-Null 
+
+    if (-not (Test-Path $outDir)) {
+        New-Item -Path $outDir -ItemType Directory -Force | Out-Null
     }
-    
+
     $relPath = "aw/$RelativeDir"
     $srcRelPath = "../aw/$RelativeDir"
-    
+
     $lines = @()
     $lines += "################################################################################"
     $lines += "# Auto-generated for variant build"
     $lines += "################################################################################"
     $lines += ""
     $lines += "C_SRCS += \"
-    foreach ($f in $cFiles) { 
-        $lines += "$srcRelPath/$($f.Name) \" 
+    foreach ($f in $cFiles) {
+        $lines += "$srcRelPath/$($f.Name) \"
     }
     $lines[-1] = $lines[-1].TrimEnd(" \")
     $lines += ""
@@ -122,7 +122,7 @@ function Generate-SubdirMk {
     }
     $lines[-1] = $lines[-1].TrimEnd(" \")
     $lines += ""
-    
+
     foreach ($f in $cFiles) {
         $base = [System.IO.Path]::GetFileNameWithoutExtension($f.Name)
         $lines += "$relPath/$base.o: $srcRelPath/$($f.Name)"
@@ -130,11 +130,11 @@ function Generate-SubdirMk {
         $lines += "`t@rx-elf-gcc -c $IncFlags $GccFlags -MMD -MP -MF`"`$(@:%.o=%.d)`" -MT`"`$@`" -o `"`$@`" `"`$<`""
         $lines += ""
     }
-    
+
     $mkPath = Join-Path $outDir "subdir.mk"
     $content = $lines -join "`n"
     [System.IO.File]::WriteAllText($mkPath, $content, [System.Text.Encoding]::UTF8)
-    
+
     return $cFiles.Count
 }
 
@@ -143,11 +143,11 @@ function Generate-SubdirMk {
 #----------------------------------------------------------------------
 function Set-Junction {
     param([string]$JunctionPath, [string]$TargetPath)
-    
+
     if (Test-Path $JunctionPath) {
         cmd /c rmdir "$JunctionPath" 2>$null
     }
-    
+
     $result = cmd /c mklink /j "$JunctionPath" "$TargetPath" 2>&1
     return $?
 }
@@ -161,50 +161,51 @@ foreach ($variant in $Variants) {
     Write-Host "`n----------------------------------------" -ForegroundColor Yellow
     Write-Host "Building variant: $variant" -ForegroundColor Yellow
     Write-Host "----------------------------------------" -ForegroundColor Yellow
-    
+
     $SourceAwDir = "$FirmwareDir\$variant"
-    
+
     if (-not (Test-Path $SourceAwDir)) {
         Write-Host "Source directory not found: $SourceAwDir" -ForegroundColor Red
         continue
     }
-    
+
     # Step 1: Junction切り替え
     Write-Host "Setting up junction: aw -> $variant"
     if (-not (Set-Junction -JunctionPath $SourceJunction -TargetPath $SourceAwDir)) {
         Write-Host "Failed to create junction" -ForegroundColor Red
         continue
     }
-    
+
     # Step 2: awビルドディレクトリをクリア
     if (Test-Path $BuildAwDir) {
         Remove-Item $BuildAwDir -Recurse -Force
     }
-    
+
     # Step 3: subdir.mk生成（Simulation除外）
     Write-Host "Generating subdir.mk files..."
     $totalFiles = 0
-    Get-ChildItem $SourceAwDir -Recurse -Directory | 
-        Where-Object { $_.FullName -notlike "*Simulation*" } | 
+    Get-ChildItem $SourceAwDir -Recurse -Directory |
+        Where-Object { $_.FullName -notlike "*Simulation*" } |
         ForEach-Object {
             $rel = $_.FullName.Replace($SourceAwDir, "").TrimStart('\').Replace('\', '/')
             $count = Generate-SubdirMk -RelativeDir $rel -BaseSrcPath $SourceAwDir
             if ($count) { $totalFiles += $count }
         }
     Write-Host "  Generated subdir.mk for $totalFiles source files"
-    
+
     # Step 4: ビルド
     Push-Location $BuildDir
     try {
         # 既存の成果物を削除
         Remove-Item "Firmware.elf", "Firmware.bin", "Firmware.mot" -Force -ErrorAction SilentlyContinue
-        
+
         Write-Host "Building..."
-        $buildOutput = & $MakeExe -j8 all 2>&1
+        # stderrをstdoutにマージし、PowerShellのエラー検出を回避
+        $buildOutput = cmd /c "$MakeExe -j8 all 2>&1"
         
-        # エラーチェック
-        $hasError = $buildOutput | Where-Object { $_ -match "error:|Error:" }
-        
+        # エラーチェック（リンカエラーのみ検出）
+        $hasError = $buildOutput | Where-Object { $_ -match "^.+: error:" -or $_ -match "collect2.*error" }
+
         if (-not (Test-Path "Firmware.elf")) {
             Write-Host "Build failed for $variant" -ForegroundColor Red
             if ($hasError) {
@@ -212,19 +213,19 @@ foreach ($variant in $Variants) {
             }
             continue
         }
-        
+
         # Step 5: objcopyでFirmware.binを生成（正規Makefileと同じオプション）
         # PowerShellのワイルドカード展開を避けるためcmd.exeで実行
         Write-Host "Generating Firmware.bin..."
         cmd /c 'rx-elf-objcopy -O binary --gap-fill=0xFF -j .firmware_header -j .text -j .rvectors -j .rodata* -j .fvectors -j .data Firmware.elf Firmware.bin' 2>&1 | Out-Null
-        
+
         if (-not (Test-Path "Firmware.bin")) {
             Write-Host "Failed to generate Firmware.bin" -ForegroundColor Red
             continue
         }
-        
+
         Write-Host "Build successful!" -ForegroundColor Green
-        
+
         # Step 6: 出力ファイルをコピー（バージョン付きファイル名）
         if ([string]::IsNullOrEmpty($Version)) {
             $outputBin = "Firmware_$variant.bin"
@@ -232,22 +233,22 @@ foreach ($variant in $Variants) {
             $outputBin = "Firmware_${Version}_$variant.bin"
         }
         $destPath = Join-Path $OutputDir $outputBin
-        
+
         Copy-Item "Firmware.bin" $destPath -Force
-        
+
         # SHA256計算
         $hash = (Get-FileHash $destPath -Algorithm SHA256).Hash.ToLower()
         $size = (Get-Item $destPath).Length
-        
+
         $Results[$variant] = @{
             File = $outputBin
             Size = $size
             SHA256 = $hash
         }
-        
+
         Write-Host "  $outputBin : $size bytes" -ForegroundColor Green
         Write-Host "  SHA256: $hash"
-        
+
     } finally {
         Pop-Location
     }
@@ -262,9 +263,9 @@ if (Test-Path $SourceJunction) {
 $manifestPath = Join-Path $OutputDir "release-manifest.json"
 if ((Test-Path $manifestPath) -and ($Results.Count -gt 0)) {
     Write-Host "`nUpdating manifest..." -ForegroundColor Cyan
-    
+
     $manifest = Get-Content $manifestPath -Encoding UTF8 -Raw | ConvertFrom-Json
-    
+
     foreach ($variantObj in $manifest.firmware.variants) {
         if ($Results.ContainsKey($variantObj.id)) {
             $result = $Results[$variantObj.id]
@@ -274,7 +275,7 @@ if ((Test-Path $manifestPath) -and ($Results.Count -gt 0)) {
             Write-Host "  Updated: $($variantObj.id)" -ForegroundColor Green
         }
     }
-    
+
     $manifest | ConvertTo-Json -Depth 10 | Set-Content $manifestPath -Encoding UTF8
 }
 

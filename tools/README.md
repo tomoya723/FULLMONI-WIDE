@@ -220,6 +220,50 @@ Firmware/
 
 ---
 
+## switch_to_aw001.bat / switch_to_aw002.bat
+
+### 概要
+
+開発時にAppWizardバリアントを切り替えるためのバッチファイル。
+e2 studio でのデバッグ前に実行することで、目的のバリアントをビルド対象にできます。
+
+### 使用方法
+
+**方法1: Explorer からダブルクリック**
+
+- `tools/switch_to_aw001.bat` → aw001（青テーマ）に切り替え
+- `tools/switch_to_aw002.bat` → aw002（赤テーマ）に切り替え
+
+**方法2: e2 studio External Tools に登録**
+
+1. Run → External Tools → External Tools Configurations
+2. Program → New Configuration
+3. 設定:
+   - Name: `Switch to aw001`
+   - Location: `C:\Windows\System32\cmd.exe`
+   - Working Directory: `${project_loc:Firmware}`
+   - Arguments: `/c "..\tools\switch_to_aw001.bat"`
+4. Apply → Close
+
+以降は Run → External Tools → Switch to aw001 で切り替え可能。
+
+### 仕組み
+
+Junctionを使用してフォルダのリンク先を切り替えます：
+
+```
+Firmware/aw → aw001  (switch_to_aw001.bat 実行後)
+Firmware/aw → aw002  (switch_to_aw002.bat 実行後)
+```
+
+### 切り替え後の操作
+
+1. e2 studio でプロジェクトを **Refresh**（F5）
+2. **Clean** → **Build**
+3. デバッグ実行
+
+---
+
 ## fw_upload.py
 
 ファームウェアアップロードツール（別途ドキュメント参照）

@@ -265,7 +265,7 @@ git push origin v0.1.3
 
 **原因**: `release-manifest.json` の SHA256 が古い
 
-**解決**: 
+**解決**:
 ```powershell
 (Get-FileHash "ファイル.bin" -Algorithm SHA256).Hash.ToLower()
 ```
