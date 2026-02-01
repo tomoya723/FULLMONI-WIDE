@@ -181,6 +181,12 @@ foreach ($variant in $Variants) {
         Remove-Item $BuildAwDir -Recurse -Force
     }
 
+    # Step 2.5: make clean を実行（srcのオブジェクトファイルもクリア）
+    Push-Location $BuildDir
+    Write-Host "Cleaning previous build..."
+    cmd /c "$MakeExe clean 2>&1" | Out-Null
+    Pop-Location
+
     # Step 3: subdir.mk生成（Simulation除外）
     Write-Host "Generating subdir.mk files..."
     $totalFiles = 0

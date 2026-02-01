@@ -19,7 +19,7 @@
                 "file": "Firmware_v1.0.0_aw001.bin",
                 "thumbnail": "thumbnail_v1.0.0_aw001.png",
                 "size": 956266,
-                "sha256": "779b3b36c2227e310dcc4ed65c22c61d3bda1be6e4c2c8aef90fd0f606abe6e6"
+                "sha256": "4a416e10e3c3bec20ec1029e8ce7a37a99ddebd1d385a3188fa6b444bd88fbe0"
             },
             {
                 "id": "aw002",
@@ -28,7 +28,7 @@
                 "file": "Firmware_v1.0.0_aw002.bin",
                 "thumbnail": "thumbnail_v1.0.0_aw002.png",
                 "size": 916782,
-                "sha256": "25530b0da6dfc5e7d56eff3091f4d47f7be4cbf91f3720d4dfb38dbc09a5aeaa"
+                "sha256": "f2f9b9bbea159bcf2007937e1fa543248e3c26dc058e7a6306f4bb118ca8cc88"
             }
         ]
     },
