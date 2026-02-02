@@ -324,3 +324,113 @@ powershell -ExecutionPolicy Bypass -File tools/capture_thumbnails.ps1
 - **GUI_Lib, Exe, Output フォルダは .gitignore で除外済み**（SEGGER機密コード保護のため）
 - スクリプト実行中はGUISimulationウィンドウが表示されます（自動的に閉じます）
 - キャプチャ中に他のウィンドウを操作しないでください
+
+---
+
+## release.ps1
+
+### 概要
+
+FULLMONI-WIDE のリリース作成を自動化するPowerShellスクリプト。
+
+v1.0.0リリース時に発生した以下の3つのミスを防ぐために作成されました：
+
+1. **バリアント間のオブジェクト混入** → `make clean` を毎回実行
+2. **古いrelease-manifest.jsonのアップロード** → 毎回自動生成
+3. **古いホストアプリのアップロード** → 毎回ビルド＋SHA256検証
+
+### 機能
+
+1. **test-release/ のクリーンアップ**
+   - 古いビルド成果物を削除
+   - スキップされたコンポーネントのファイルは保持
+
+2. **ファームウェア全バリアントのビルド**
+   - `build_variants.ps1` を呼び出し
+   - 各バリアント間で `make clean` を実行（オブジェクト混入防止）
+   - MOTファイルを test-release/ にコピー
+
+3. **サムネイル画像の生成**
+   - `capture_thumbnails.ps1` を呼び出し
+   - GUISimulationから各バリアントのスクリーンショットを取得
+
+4. **ホストアプリのビルド・パッケージ**
+   - `dotnet publish` で自己完結型ビルド
+   - ZIPファイルに圧縮
+   - test-release/ にコピー
+
+5. **release-manifest.json の生成**
+   - 全ファイルのSHA256ハッシュを計算
+   - バージョン情報、リリース日時を記録
+   - 既存のBootloader情報を引き継ぎ
+
+6. **整合性検証**
+   - 生成したマニフェストと実ファイルを照合
+   - SHA256不一致があればエラー終了
+
+7. **GitHub Release 作成（オプション）**
+   - `gh release create` でリリース作成
+   - 全アセットをアップロード
+
+### ハイブリッドバージョン管理
+
+FirmwareとHostAppは独立したリリースサイクルを持てます：
+
+- `-SkipFirmware`: FWビルドをスキップ、既存マニフェストのFW情報を引き継ぎ
+- `-SkipHostApp`: HostAppビルドをスキップ、既存マニフェストのHostApp情報を引き継ぎ
+
+これにより、片方だけ更新する「ホットフィックス」的なリリースが可能です。
+
+### 使用方法
+
+#### 通常リリース（FW + HostApp両方）
+
+```powershell
+# ビルドのみ（test-release/ に成果物を生成）
+.\tools\release.ps1 -Version "1.0.1"
+
+# ビルド + GitHubアップロード
+.\tools\release.ps1 -Version "1.0.1" -Upload
+```
+
+#### FWのみリリース
+
+```powershell
+.\tools\release.ps1 -Version "1.0.1" -SkipHostApp -Upload
+```
+
+#### HostAppのみリリース
+
+```powershell
+.\tools\release.ps1 -Version "1.0.1" -SkipFirmware -SkipThumbnails -Upload
+```
+
+### パラメータ
+
+| パラメータ | 必須 | 説明 |
+|-----------|------|------|
+| `-Version` | ✓ | リリースバージョン（例: "1.0.1"） |
+| `-Upload` | | GitHub Releaseを作成してアップロード |
+| `-SkipFirmware` | | FWビルドをスキップ（既存情報を引き継ぎ） |
+| `-SkipThumbnails` | | サムネイル生成をスキップ |
+| `-SkipHostApp` | | HostAppビルドをスキップ（既存情報を引き継ぎ） |
+
+### 前提条件
+
+- **ファームウェアビルド**: GCC-RXツールチェーン、make
+- **サムネイル生成**: Visual Studio（MSBuild）、SEGGER AppWizard
+- **ホストアプリビルド**: .NET 8.0 SDK
+- **GitHubアップロード**: GitHub CLI (`gh`) がインストール・認証済み
+
+### 出力先
+
+```
+test-release/
+├── Firmware_aw001_v1.0.1.mot      # FW (tomoya723 ver)
+├── Firmware_aw002_v1.0.1.mot      # FW (chaketek ver)
+├── Bootloader_v0.1.2.mot          # Bootloader（既存を維持）
+├── thumbnail_aw001_v1.0.1.png     # サムネイル
+├── thumbnail_aw002_v1.0.1.png
+├── FULLMONI-WIDE-Terminal-win-x64.zip  # HostApp
+└── release-manifest.json          # マニフェスト
+```
