@@ -12,10 +12,21 @@
     6. 全ファイルの整合性を検証
     7. (オプション) GitHub Release を作成・アップロード
 
+    スキップしたコンポーネントは既存のrelease-manifest.jsonから
+    情報を引き継ぎます（ハイブリッドバージョン管理）。
+
 .EXAMPLE
     .\release.ps1 -Version "1.0.1"
+    # → 全コンポーネントをビルド
+
+    .\release.ps1 -Version "1.0.1" -SkipHostApp
+    # → FWのみビルド、HostAppは既存バージョンを維持
+
+    .\release.ps1 -Version "1.0.1" -SkipFirmware -SkipThumbnails
+    # → HostAppのみビルド、FWは既存バージョンを維持
+
     .\release.ps1 -Version "1.0.1" -Upload
-    .\release.ps1 -Version "1.0.1" -SkipFirmware -SkipHostApp
+    # → 全ビルド後、GitHubにアップロード
 
 .PARAMETER Version
     リリースバージョン（例: "1.0.1"）
@@ -24,13 +35,13 @@
     GitHub Release を作成してアップロードする
 
 .PARAMETER SkipFirmware
-    ファームウェアビルドをスキップ
+    ファームウェアビルドをスキップ（既存バージョンを維持）
 
 .PARAMETER SkipThumbnails
     サムネイル生成をスキップ
 
 .PARAMETER SkipHostApp
-    ホストアプリビルドをスキップ
+    ホストアプリビルドをスキップ（既存バージョンを維持）
 #>
 
 param(
@@ -69,13 +80,28 @@ Write-Host "  FULLMONI-WIDE Release v$Version"        -ForegroundColor Magenta
 Write-Host "========================================"  -ForegroundColor Magenta
 
 #----------------------------------------------------------------------
-# Step 0: test-release/ をクリーンアップ（Bootloaderは保持）
+# Step 0: 既存マニフェストの読み込み & クリーンアップ
 #----------------------------------------------------------------------
-Write-Step "Step 0: test-release/ をクリーンアップ"
+Write-Step "Step 0: 準備"
+
+# 既存マニフェストを読み込み（スキップ時の引き継ぎ用）
+$existingManifestPath = "$RootDir\release-manifest.json"
+$existingManifest = $null
+if (Test-Path $existingManifestPath) {
+    $existingManifest = Get-Content $existingManifestPath -Raw | ConvertFrom-Json
+    Write-Success "既存マニフェストを読み込みました (v$($existingManifest.version))"
+}
 
 if (Test-Path $OutputDir) {
-    # Bootloader以外を削除
-    Get-ChildItem $OutputDir -File | Where-Object { $_.Name -notlike "Bootloader*" } | Remove-Item -Force
+    # スキップするコンポーネント以外を削除
+    $keepPatterns = @("Bootloader*")
+    if ($SkipHostApp) { $keepPatterns += "FULLMONI-WIDE-Terminal*" }
+    if ($SkipFirmware) { $keepPatterns += "Firmware_*"; $keepPatterns += "thumbnail_*" }
+    
+    Get-ChildItem $OutputDir -File | Where-Object {
+        $file = $_
+        -not ($keepPatterns | Where-Object { $file.Name -like $_ })
+    } | Remove-Item -Force
     Write-Success "古いリリースファイルを削除しました"
 } else {
     New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
@@ -192,7 +218,7 @@ if (-not $SkipHostApp) {
         Pop-Location
     }
 } else {
-    Write-Warn "ホストアプリビルドをスキップ"
+    Write-Warn "ホストアプリビルドをスキップ（既存バージョンを引き継ぎ）"
 }
 
 #----------------------------------------------------------------------
@@ -209,26 +235,44 @@ $variantMeta = @{
     "aw002" = @{ name = "type2"; description = "chaketek ver" }
 }
 
-$firmwareBins = Get-ChildItem "$OutputDir\Firmware_v${Version}_*.bin" -ErrorAction SilentlyContinue
-foreach ($bin in $firmwareBins) {
-    $variantId = $bin.Name -replace "Firmware_v${Version}_(.+)\.bin", '$1'
-    $hash = (Get-FileHash $bin.FullName -Algorithm SHA256).Hash.ToLower()
-    $size = $bin.Length
-    $thumbName = "thumbnail_v${Version}_$variantId.png"
-
-    $meta = $variantMeta[$variantId]
-    if (-not $meta) {
-        $meta = @{ name = $variantId; description = $variantId }
+if ($SkipFirmware -and $existingManifest) {
+    # 既存マニフェストからファームウェア情報を引き継ぐ
+    Write-Host "  既存マニフェストからファームウェア情報を引き継ぎます"
+    foreach ($v in $existingManifest.firmware.variants) {
+        $variants += @{
+            id = $v.id
+            name = $v.name
+            description = $v.description
+            file = $v.file
+            thumbnail = $v.thumbnail
+            size = $v.size
+            sha256 = $v.sha256
+        }
     }
+    $fwVersion = $existingManifest.firmware.variants[0].file -replace 'Firmware_v([\d.]+)_.+\.bin', '$1'
+    Write-Success "ファームウェア v$fwVersion を引き継ぎ"
+} else {
+    $firmwareBins = Get-ChildItem "$OutputDir\Firmware_v${Version}_*.bin" -ErrorAction SilentlyContinue
+    foreach ($bin in $firmwareBins) {
+        $variantId = $bin.Name -replace "Firmware_v${Version}_(.+)\.bin", '$1'
+        $hash = (Get-FileHash $bin.FullName -Algorithm SHA256).Hash.ToLower()
+        $size = $bin.Length
+        $thumbName = "thumbnail_v${Version}_$variantId.png"
 
-    $variants += @{
-        id = $variantId
-        name = $meta.name
-        description = $meta.description
-        file = $bin.Name
-        thumbnail = $thumbName
-        size = $size
-        sha256 = $hash
+        $meta = $variantMeta[$variantId]
+        if (-not $meta) {
+            $meta = @{ name = $variantId; description = $variantId }
+        }
+
+        $variants += @{
+            id = $variantId
+            name = $meta.name
+            description = $meta.description
+            file = $bin.Name
+            thumbnail = $thumbName
+            size = $size
+            sha256 = $hash
+        }
     }
 }
 
@@ -248,14 +292,26 @@ if ($bootloaderFile) {
 }
 
 # ホストアプリ情報
-$hostAppZip = Get-Item "$OutputDir\FULLMONI-WIDE-Terminal-win-x64.zip" -ErrorAction SilentlyContinue
 $hostAppInfo = $null
-if ($hostAppZip) {
+if ($SkipHostApp -and $existingManifest -and $existingManifest.hostApps.windows) {
+    # 既存マニフェストからホストアプリ情報を引き継ぐ
+    $existingHostApp = $existingManifest.hostApps.windows
     $hostAppInfo = @{
-        version = $Version
-        file = $hostAppZip.Name
-        size = $hostAppZip.Length
-        sha256 = (Get-FileHash $hostAppZip.FullName -Algorithm SHA256).Hash.ToLower()
+        version = $existingHostApp.version
+        file = $existingHostApp.file
+        size = $existingHostApp.size
+        sha256 = $existingHostApp.sha256
+    }
+    Write-Success "ホストアプリ v$($existingHostApp.version) を引き継ぎ"
+} else {
+    $hostAppZip = Get-Item "$OutputDir\FULLMONI-WIDE-Terminal-win-x64.zip" -ErrorAction SilentlyContinue
+    if ($hostAppZip) {
+        $hostAppInfo = @{
+            version = $Version
+            file = $hostAppZip.Name
+            size = $hostAppZip.Length
+            sha256 = (Get-FileHash $hostAppZip.FullName -Algorithm SHA256).Hash.ToLower()
+        }
     }
 }
 
