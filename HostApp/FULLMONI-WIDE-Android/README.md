@@ -110,6 +110,105 @@ app/
 1. USB OTG対応のAndroid端末を接続
 2. Run > Run 'app'
 
+### エミュレーターで実機テスト（TCP Bridge）
+
+Android エミュレーターではUSBデバイスにアクセスできませんが、**TCP Bridge** 機能を使うことで、PCに接続された実機FULLMONI-WIDEとエミュレーター上のアプリを通信させることができます。
+
+#### 前提条件
+- FULLMONI-WIDEがPCのCOMポート（例: COM19）に接続されている
+- Android Emulatorが起動している
+- ADBにパスが通っている（または `C:\Users\<user>\AppData\Local\Android\Sdk\platform-tools\adb.exe` を使用）
+
+#### 手順
+
+**ターミナル1: TCPブリッジを起動**
+```powershell
+cd tools
+.\com_bridge.ps1 -ComPort COM19
+```
+出力例:
+```
+=== COM to TCP Bridge ===
+COM Port: COM19
+TCP Port: 9999
+
+[OK] Serial port opened
+[OK] TCP listener started on port 9999
+
+Waiting for connection...
+```
+
+**ターミナル2: ADB Reverseを設定してアプリをインストール**
+```powershell
+# エミュレーターのポート転送を設定（これにより127.0.0.1:9999がPCの9999に転送される）
+adb reverse tcp:9999 tcp:9999
+
+# APKをビルド＆インストール
+cd HostApp\FULLMONI-WIDE-Android
+.\gradlew assembleDebug
+adb install -r app\build\outputs\apk\debug\app-debug.apk
+
+# アプリを起動
+adb shell am start -n com.fullmoni.terminal/.MainActivity
+```
+
+**アプリ内で接続**
+1. アプリのHomeScreen で **「TCP Bridge (Real)」** ボタンをタップ
+2. ターミナル1に `[CONNECTED]` が表示される
+3. 実機のパラメータが読み込まれ、UIが接続状態になる
+
+#### 動作確認ログ例
+```
+[CONNECTED] Client connected from 127.0.0.1:54423
+[TX->DEVICE] 
+[RX<-DEVICE] ========================================
+  FULLMONI-WIDE Parameter Console
+========================================
+>
+[TX->DEVICE] version
+[RX<-DEVICE] VERSION 1.0.0
+>
+[TX->DEVICE] list
+[RX<-DEVICE] === Current Parameters ===
+ODO: 184692 km  TRIP: 114.7 km
+```
+
+#### トラブルシューティング
+
+| 問題 | 解決方法 |
+|------|----------|
+| `Access to port 'COM19' was denied` | 前のブリッジプロセスがポートを掴んでいる。PowerShellを全て閉じて再試行 |
+| 接続後すぐに切断される | `adb reverse tcp:9999 tcp:9999` を再実行 |
+| ボタンを押してもログが出ない | APKが古い可能性。再ビルド＆インストール |
+| エミュレーターが見つからない | `adb devices` で確認。`emulator-5554` が表示されるか確認 |
+
+#### 仕組み
+
+```
+┌─────────────────┐     TCP      ┌─────────────────┐    Serial    ┌─────────────┐
+│ Android         │◄────────────►│ com_bridge.ps1  │◄────────────►│ FULLMONI    │
+│ Emulator        │  127.0.0.1   │ (PC)            │   COM19      │ -WIDE       │
+│ (127.0.0.1:9999)│   :9999      │                 │   115200bps  │ (実機)      │
+└─────────────────┘              └─────────────────┘              └─────────────┘
+         ▲
+         │ adb reverse tcp:9999 tcp:9999
+         │ (エミュレーター内の127.0.0.1:9999をPCの9999に転送)
+         ▼
+┌─────────────────┐
+│ PC TCP:9999     │
+│ (Listener)      │
+└─────────────────┘
+```
+
+#### 自動テストスクリプト
+
+`tools/tcp_bridge_test.ps1` を使用すると、上記の手順を自動化できます:
+
+```powershell
+cd tools
+.\tcp_bridge_test.ps1
+```
+
 ## 使用方法
 
 1. USB OTGケーブルでFULLMONI-WIDEデバイスとスマートフォンを接続
