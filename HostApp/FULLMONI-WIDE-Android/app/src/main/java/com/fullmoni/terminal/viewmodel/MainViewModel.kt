@@ -75,6 +75,7 @@ class MainViewModel(private val context: Context) : ViewModel() {
     
     private val usbSerialService = UsbSerialService(context)
     private val firmwareUpdateService = FirmwareUpdateService(usbSerialService)
+    private val onlineUpdateService = com.fullmoni.terminal.service.OnlineUpdateService(context)
     
     // Connection
     val isConnected: StateFlow<Boolean> = usbSerialService.isConnected
@@ -210,12 +211,26 @@ class MainViewModel(private val context: Context) : ViewModel() {
     val selectedFirmwarePath: StateFlow<String> = _selectedFirmwarePath.asStateFlow()
     
     private var _selectedFirmwareUri: Uri? = null
+    private var _downloadedFirmwareFile: java.io.File? = null
     
     val firmwareProgress: StateFlow<Float> = firmwareUpdateService.progress
     val firmwareProgressText: StateFlow<String> = firmwareUpdateService.statusMessage
     val firmwareLog: StateFlow<String> = firmwareUpdateService.logMessages
     val isFirmwareUpdating: StateFlow<Boolean> = firmwareUpdateService.isUpdating
     val firmwareUpdateSucceeded: StateFlow<Boolean> = firmwareUpdateService.updateSucceeded
+    
+    // Online Update
+    val onlineReleases: StateFlow<List<String>> = onlineUpdateService.availableReleases
+    val onlineManifest: StateFlow<com.fullmoni.terminal.model.ReleaseManifest?> = onlineUpdateService.currentManifest
+    val onlineDownloadProgress: StateFlow<Int> = onlineUpdateService.downloadProgress
+    val onlineStatusMessage: StateFlow<String> = onlineUpdateService.statusMessage
+    val isOnlineLoading: StateFlow<Boolean> = onlineUpdateService.isLoading
+    
+    private val _selectedReleaseTag = MutableStateFlow("")
+    val selectedReleaseTag: StateFlow<String> = _selectedReleaseTag.asStateFlow()
+    
+    private val _selectedVariant = MutableStateFlow<com.fullmoni.terminal.model.FirmwareVariant?>(null)
+    val selectedVariant: StateFlow<com.fullmoni.terminal.model.FirmwareVariant?> = _selectedVariant.asStateFlow()
     
     private var pendingDriver: UsbSerialDriver? = null
     
@@ -961,6 +976,95 @@ class MainViewModel(private val context: Context) : ViewModel() {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         clipboard.setPrimaryClip(ClipData.newPlainText("Firmware Log", firmwareLog.value))
         Toast.makeText(context, "Log copied", Toast.LENGTH_SHORT).show()
+    }
+    
+    // ========== Online Update ==========
+    
+    /**
+     * 利用可能なリリースを取得
+     */
+    fun fetchOnlineReleases() {
+        viewModelScope.launch {
+            onlineUpdateService.fetchAvailableReleases()
+        }
+    }
+    
+    /**
+     * リリースタグを選択してマニフェストを取得
+     */
+    fun selectReleaseTag(tag: String) {
+        _selectedReleaseTag.value = tag
+        _selectedVariant.value = null
+        viewModelScope.launch {
+            onlineUpdateService.fetchManifestForTag(tag)
+        }
+    }
+    
+    /**
+     * ファームウェアバリアントを選択
+     */
+    fun selectFirmwareVariant(variant: com.fullmoni.terminal.model.FirmwareVariant) {
+        _selectedVariant.value = variant
+        _selectedFirmwarePath.value = variant.file
+        _selectedFirmwareUri = null
+        _downloadedFirmwareFile = null
+    }
+    
+    /**
+     * 選択したバリアントをダウンロードしてFW Updateを開始
+     */
+    fun downloadAndStartFirmwareUpdate(context: Context) {
+        val variant = _selectedVariant.value
+        if (variant == null) {
+            Toast.makeText(context, "Please select a firmware variant first", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        viewModelScope.launch {
+            try {
+                // ダウンロード
+                val downloadedFile = onlineUpdateService.downloadFirmware(variant)
+                if (downloadedFile == null) {
+                    Toast.makeText(context, "Download failed", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+                
+                _downloadedFirmwareFile = downloadedFile
+                
+                // ファームウェアファイルを読み込み
+                val firmwareData = downloadedFile.inputStream().use { inputStream ->
+                    firmwareUpdateService.loadFirmwareFromStream(inputStream)
+                }
+                
+                // ファームウェア更新開始
+                firmwareUpdateService.startUpdate(firmwareData) { success, message ->
+                    viewModelScope.launch {
+                        if (success) {
+                            Toast.makeText(context, "Firmware update successful!", Toast.LENGTH_LONG).show()
+                        } else {
+                            Toast.makeText(context, "Update failed: $message", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    
+    /**
+     * 最新リリースを取得
+     */
+    fun fetchLatestRelease() {
+        viewModelScope.launch {
+            val manifest = onlineUpdateService.fetchLatestManifest()
+            if (manifest != null) {
+                val releases = onlineUpdateService.availableReleases.value
+                if (releases.isNotEmpty()) {
+                    _selectedReleaseTag.value = releases.first()
+                }
+            }
+        }
     }
     
     /**
