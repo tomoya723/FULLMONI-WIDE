@@ -6,6 +6,9 @@
     <uses-feature
         android:name="android.hardware.usb.host"
         android:required="true" />
+    
+    <!-- TCPブリッジモード用（エミュレーターから実機接続） -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"

@@ -26,6 +26,13 @@ import com.fullmoni.terminal.viewmodel.MainViewModel
 fun SettingsScreen(viewModel: MainViewModel) {
     val isConnected by viewModel.isConnected.collectAsState()
     val scrollState = rememberScrollState()
+    
+    // 画面表示時にパラメータを読み込み
+    LaunchedEffect(isConnected) {
+        if (isConnected) {
+            viewModel.loadParameters()
+        }
+    }
 
     // パラメータの状態
     val tyreWidth by viewModel.tyreWidth.collectAsState()

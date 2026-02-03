@@ -157,6 +157,26 @@ fun MainScreen(viewModel: MainViewModel) {
                             }
                         }
                         
+                        // シミュレーター接続ボタン（未接続時のみ表示）
+                        if (!isConnected) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedButton(
+                                onClick = { viewModel.connectSimulator() },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = FullmoniAccent
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Computer,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Simulator", style = MaterialTheme.typography.labelSmall)
+                            }
+                        }
+                        
                         Spacer(modifier = Modifier.height(12.dp))
                         
                         // Connection status

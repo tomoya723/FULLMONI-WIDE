@@ -1,5 +1,6 @@
 package com.fullmoni.terminal.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,6 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fullmoni.terminal.ui.theme.*
 import com.fullmoni.terminal.viewmodel.MainViewModel
+
+// デバッグビルドかどうかを判定する定数（BuildConfigが生成されない場合のフォールバック）
+private val IS_DEBUG_BUILD = true  // リリースビルド時はfalseに変更
 
 /**
  * ホーム画面（ダッシュボード）
@@ -47,12 +51,19 @@ fun HomeScreen(
         HeroBanner(
             isConnected = isConnected,
             firmwareVersion = firmwareVersion,
+            isSimulationMode = viewModel.isSimulationMode,
             onConnectClick = {
                 if (isConnected) {
                     viewModel.disconnect()
                 } else {
                     viewModel.connect()
                 }
+            },
+            onSimulatorClick = {
+                viewModel.connectSimulator()
+            },
+            onTcpBridgeClick = {
+                viewModel.connectTcpBridge()
             }
         )
 
@@ -193,7 +204,10 @@ fun HomeScreen(
 private fun HeroBanner(
     isConnected: Boolean,
     firmwareVersion: String?,
-    onConnectClick: () -> Unit
+    isSimulationMode: Boolean,
+    onConnectClick: () -> Unit,
+    onSimulatorClick: () -> Unit,
+    onTcpBridgeClick: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -237,7 +251,11 @@ private fun HeroBanner(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = if (isConnected) "Connected" else "Not Connected",
+                                text = when {
+                                    isSimulationMode -> "Simulator"
+                                    isConnected -> "Connected"
+                                    else -> "Not Connected"
+                                },
                                 color = TextPrimary,
                                 style = MaterialTheme.typography.bodySmall,
                                 fontWeight = FontWeight.Medium
@@ -269,6 +287,7 @@ private fun HeroBanner(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
+                // 接続ボタン（実デバイス）
                 Button(
                     onClick = onConnectClick,
                     colors = ButtonDefaults.buttonColors(
@@ -287,6 +306,53 @@ private fun HeroBanner(
                         text = if (isConnected) "Disconnect" else "Connect Device",
                         fontWeight = FontWeight.Medium
                     )
+                }
+                
+                // シミュレーターボタン（デバッグビルドのみ）
+                if (IS_DEBUG_BUILD && !isConnected) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedButton(
+                        onClick = onSimulatorClick,
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = Color.White
+                        ),
+                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f)),
+                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Computer,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Connect Simulator",
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedButton(
+                        onClick = onTcpBridgeClick,
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = Color.White
+                        ),
+                        border = BorderStroke(1.dp, Color(0xFFFF9800).copy(alpha = 0.7f)),
+                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.SettingsEthernet,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = Color(0xFFFF9800)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "TCP Bridge (Real)",
+                            fontWeight = FontWeight.Medium,
+                            color = Color(0xFFFF9800)
+                        )
+                    }
                 }
             }
         }

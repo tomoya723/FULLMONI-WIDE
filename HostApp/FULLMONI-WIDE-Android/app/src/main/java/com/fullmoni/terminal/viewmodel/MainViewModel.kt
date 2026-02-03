@@ -286,17 +286,110 @@ class MainViewModel(private val context: Context) : ViewModel() {
         }
     }
     
+    /**
+     * シミュレーターモードで接続（エミュレーターでのテスト用）
+     */
+    fun connectSimulator() {
+        if (usbSerialService.connectSimulator()) {
+            _connectionPort.value = "Simulator"
+            viewModelScope.launch {
+                delay(300)
+                // シミュレーターモードでは直接Firmwareモードとして動作
+                _isBootloaderMode.value = false
+                
+                // 空文字送信でパラメータモードに入る
+                sendCommand("")
+                delay(500)
+                
+                // バージョン取得
+                sendCommand("version")
+                delay(500)
+                parseVersionFromResponse()
+                
+                // パラメータ読み込み
+                loadParameters()
+            }
+        }
+    }
+    
+    /**
+     * TCPブリッジモードで実機に接続（エミュレーターから実機テスト用）
+     * 事前に以下を実行：
+     * 1. PC側: .\tools\com_bridge.ps1 -ComPort COM19
+     * 2. adb reverse tcp:9999 tcp:9999
+     */
+    fun connectTcpBridge() {
+        viewModelScope.launch {
+            val success = usbSerialService.connectTcpBridge()
+            if (success) {
+                _connectionPort.value = "TCP Bridge (Real Device)"
+                delay(300)
+                _isBootloaderMode.value = false
+                
+                // パラメータモードに入る
+                sendCommand("")
+                delay(500)
+                
+                // バージョン取得
+                sendCommand("version")
+                delay(500)
+                parseVersionFromResponse()
+                
+                // パラメータ読み込み
+                loadParameters()
+            }
+        }
+    }
+    
+    /**
+     * シミュレーションモードかどうか
+     */
+    val isSimulationMode: Boolean
+        get() = usbSerialService.isSimulationMode
+    
+    /**
+     * TCPブリッジモードかどうか
+     */
+    val isTcpBridgeMode: Boolean
+        get() = usbSerialService.isTcpBridgeMode
+    
     private fun onConnected(driver: UsbSerialDriver) {
         _connectionPort.value = driver.device.deviceName
         viewModelScope.launch {
             delay(500)
-            // バージョン取得
-            sendCommand("version")
-            delay(300)
-            parseVersionFromResponse()
-            // パラメータ読み込み
-            loadParameters()
+            // Bootloaderモード検出
+            detectConnectionMode()
         }
+    }
+    
+    /**
+     * Bootloaderモードかどうかを検出
+     */
+    private suspend fun detectConnectionMode() {
+        _isBootloaderMode.value = false
+        
+        // キー送信してメニューを表示させる
+        sendCommand("\r")
+        delay(800)
+        
+        val received = receivedData.value
+        
+        // Bootloaderの特徴的な文字列をチェック
+        if (received.contains("Bootloader") ||
+            received.contains("U=Update") ||
+            received.contains("B=Boot") ||
+            received.contains("S=Status")) {
+            _isBootloaderMode.value = true
+            return
+        }
+        
+        // Firmwareとして接続 - パラメータ取得
+        // バージョン取得
+        sendCommand("version")
+        delay(300)
+        parseVersionFromResponse()
+        // パラメータ読み込み
+        loadParameters()
     }
     
     fun disconnect() {
@@ -376,10 +469,17 @@ class MainViewModel(private val context: Context) : ViewModel() {
     // ========== Parameters ==========
     
     fun loadParameters() {
+        android.util.Log.d("MainViewModel", "loadParameters called")
         viewModelScope.launch {
+            android.util.Log.d("MainViewModel", "loadParameters: clearing buffer")
+            usbSerialService.clearBuffer()
+            android.util.Log.d("MainViewModel", "loadParameters: sending 'list' command")
             sendCommand("list")
-            delay(500)
+            android.util.Log.d("MainViewModel", "loadParameters: waiting 800ms")
+            delay(800)  // シミュレーターの応答待ち時間を増やす
+            android.util.Log.d("MainViewModel", "loadParameters: calling parseParametersFromResponse")
             parseParametersFromResponse()
+            android.util.Log.d("MainViewModel", "loadParameters: done, tyreWidth=${_tyreWidth.value}")
         }
     }
     
@@ -419,44 +519,81 @@ class MainViewModel(private val context: Context) : ViewModel() {
     
     private fun parseVersionFromResponse() {
         val data = receivedData.value
-        val versionMatch = Regex("v?([0-9]+\\.[0-9]+\\.[0-9]+)").find(data)
-        versionMatch?.groupValues?.get(1)?.let {
-            _firmwareVersion.value = it
+        android.util.Log.d("MainViewModel", "parseVersion data: $data")
+        // VERSION 2.0.0 or v2.0.0 format
+        val versionMatch = Regex("""VERSION\s+([0-9]+\.[0-9]+\.[0-9]+)|v([0-9]+\.[0-9]+\.[0-9]+)""").find(data)
+        versionMatch?.let { match ->
+            val version = match.groupValues[1].takeIf { it.isNotEmpty() } ?: match.groupValues[2]
+            android.util.Log.d("MainViewModel", "Parsed version: $version")
+            _firmwareVersion.value = version
         }
     }
     
     private fun parseParametersFromResponse() {
         val data = receivedData.value
-        // Parse key=value pairs
-        val lines = data.lines()
-        for (line in lines) {
-            val parts = line.split("=", ":").map { it.trim() }
-            if (parts.size >= 2) {
-                when (parts[0].lowercase()) {
-                    "tyre_width", "tyrewidth" -> _tyreWidth.value = parts[1]
-                    "tyre_aspect", "tyreaspect" -> _tyreAspect.value = parts[1]
-                    "tyre_rim", "rim", "wheel_dia" -> _wheelDia.value = parts[1]
-                    "gear1" -> _gear1.value = parts[1]
-                    "gear2" -> _gear2.value = parts[1]
-                    "gear3" -> _gear3.value = parts[1]
-                    "gear4" -> _gear4.value = parts[1]
-                    "gear5" -> _gear5.value = parts[1]
-                    "gear6" -> _gear6.value = parts[1]
-                    "final", "finalgear" -> _finalGear.value = parts[1]
-                    "water_low" -> _waterTempLow.value = parts[1]
-                    "water_high" -> _waterTempHigh.value = parts[1]
-                    "fuel_warn" -> _fuelWarn.value = parts[1]
-                    "shift_rpm1" -> _shiftRpm1.value = parts[1]
-                    "shift_rpm2" -> _shiftRpm2.value = parts[1]
-                    "shift_rpm3" -> _shiftRpm3.value = parts[1]
-                    "shift_rpm4" -> _shiftRpm4.value = parts[1]
-                    "shift_rpm5" -> _shiftRpm5.value = parts[1]
-                    "odo" -> _odoValue.value = parts[1]
-                    "trip" -> _tripValue.value = parts[1]
-                    "rtc", "datetime" -> _rtcValue.value = parts[1]
-                }
-            }
+        android.util.Log.d("MainViewModel", "parseParameters data length: ${data.length}")
+        android.util.Log.d("MainViewModel", "parseParameters data: $data")
+        
+        // Parse firmware actual format:
+        // Tyre: 195/50 R15
+        val tyreRegex = Regex("""Tyre:\s*(\d+)/(\d+)\s*R(\d+)""")
+        tyreRegex.find(data)?.let { match ->
+            android.util.Log.d("MainViewModel", "Parsed tyre: ${match.groupValues}")
+            _tyreWidth.value = match.groupValues[1]
+            _tyreAspect.value = match.groupValues[2]
+            _wheelDia.value = match.groupValues[3]
         }
+        
+        // Gear1: 3.760  Gear2: 2.269  Gear3: 1.645
+        val gear1Regex = Regex("""Gear1:\s*([\d.]+)""")
+        gear1Regex.find(data)?.let { _gear1.value = it.groupValues[1] }
+        
+        val gear2Regex = Regex("""Gear2:\s*([\d.]+)""")
+        gear2Regex.find(data)?.let { _gear2.value = it.groupValues[1] }
+        
+        val gear3Regex = Regex("""Gear3:\s*([\d.]+)""")
+        gear3Regex.find(data)?.let { _gear3.value = it.groupValues[1] }
+        
+        val gear4Regex = Regex("""Gear4:\s*([\d.]+)""")
+        gear4Regex.find(data)?.let { _gear4.value = it.groupValues[1] }
+        
+        val gear5Regex = Regex("""Gear5:\s*([\d.]+)""")
+        gear5Regex.find(data)?.let { _gear5.value = it.groupValues[1] }
+        
+        val gear6Regex = Regex("""Gear6:\s*([\d.]+)""")
+        gear6Regex.find(data)?.let { _gear6.value = it.groupValues[1] }
+        
+        // Final: 4.300
+        val finalRegex = Regex("""Final:\s*([\d.]+)""")
+        finalRegex.find(data)?.let { _finalGear.value = it.groupValues[1] }
+        
+        // Water Temp Warning: 60 - 100 C
+        val waterRegex = Regex("""Water Temp Warning:\s*(\d+)\s*-\s*(\d+)""")
+        waterRegex.find(data)?.let { match ->
+            _waterTempLow.value = match.groupValues[1]
+            _waterTempHigh.value = match.groupValues[2]
+        }
+        
+        // Fuel Warning: 10 %
+        val fuelRegex = Regex("""Fuel Warning:\s*(\d+)""")
+        fuelRegex.find(data)?.let { _fuelWarn.value = it.groupValues[1] }
+        
+        // Shift RPM: 5500 / 6000 / 6500 / 7000 / 7500
+        val shiftRegex = Regex("""Shift RPM:\s*(\d+)\s*/\s*(\d+)\s*/\s*(\d+)\s*/\s*(\d+)\s*/\s*(\d+)""")
+        shiftRegex.find(data)?.let { match ->
+            _shiftRpm1.value = match.groupValues[1]
+            _shiftRpm2.value = match.groupValues[2]
+            _shiftRpm3.value = match.groupValues[3]
+            _shiftRpm4.value = match.groupValues[4]
+            _shiftRpm5.value = match.groupValues[5]
+        }
+        
+        // ODO: 184692 km  TRIP: 114.7 km
+        val odoRegex = Regex("""ODO:\s*([\d.]+)""")
+        odoRegex.find(data)?.let { _odoValue.value = it.groupValues[1] }
+        
+        val tripRegex = Regex("""TRIP:\s*([\d.]+)""")
+        tripRegex.find(data)?.let { _tripValue.value = it.groupValues[1] }
     }
     
     // ========== CAN Config ==========
@@ -482,17 +619,141 @@ class MainViewModel(private val context: Context) : ViewModel() {
     
     fun loadCanConfig() {
         viewModelScope.launch {
+            usbSerialService.clearBuffer()
             sendCommand("can_list")
-            delay(500)
-            // Parse CAN config from response
+            delay(1500)
+            parseCanListResponse()
+            Toast.makeText(context, "CAN config loaded", Toast.LENGTH_SHORT).show()
         }
+    }
+    
+    private fun parseCanListResponse() {
+        val response = receivedData.value
+        
+        // Warning設定を解析: "Warning: ON, Sound: OFF"
+        val warnSoundRegex = Regex("""Warning:\s*(ON|OFF),\s*Sound:\s*(ON|OFF)""", RegexOption.IGNORE_CASE)
+        warnSoundRegex.find(response)?.let { match ->
+            _canWarningEnabled.value = match.groupValues[1].equals("ON", ignoreCase = true)
+            _canSoundEnabled.value = match.groupValues[2].equals("ON", ignoreCase = true)
+        }
+        
+        // チャンネル設定を解析: "CH1: ID=0x3E8, ON"
+        val chRegex = Regex("""CH(\d):\s*ID=0x([0-9A-Fa-f]+),\s*(ON|OFF)""", RegexOption.IGNORE_CASE)
+        val updatedChannels = _canChannels.value.toMutableList()
+        chRegex.findAll(response).forEach { match ->
+            val chNum = match.groupValues[1].toInt()
+            val canId = "0x${match.groupValues[2]}"
+            val enabled = match.groupValues[3].equals("ON", ignoreCase = true)
+            if (chNum in 1..6) {
+                updatedChannels[chNum - 1] = CanChannel(chNum, canId, enabled)
+            }
+        }
+        _canChannels.value = updatedChannels
+        
+        // フィールド定義を解析
+        // Format: " 0  1   0   2   U    B   REV      0  1000  1000  0  Engine  rpm  N    ---  N    ---"
+        val fieldRegex = Regex(
+            """^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(U|S)\s+(B|L)\s+(\S+)\s+([-\d]+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\S+)\s+(\S+)\s+(Y|N)\s+(\S+)\s+(Y|N)\s+(\S+)""",
+            RegexOption.MULTILINE
+        )
+        val updatedFields = _canFields.value.toMutableList()
+        fieldRegex.findAll(response).forEach { match ->
+            val idx = match.groupValues[1].toInt()
+            if (idx in 0..15) {
+                val channel = match.groupValues[2].toInt()
+                val name = match.groupValues[12].let { if (it == "-") "" else it }
+                val unit = match.groupValues[13].let { if (it == "-") "" else it }
+                updatedFields[idx] = CanField(
+                    enabled = channel > 0,
+                    channel = channel,
+                    startByte = match.groupValues[3].toInt(),
+                    byteCount = match.groupValues[4].toInt(),
+                    dataType = match.groupValues[5].uppercase(),
+                    endian = match.groupValues[6].uppercase(),
+                    targetVar = match.groupValues[7],
+                    offset = match.groupValues[8].toFloat(),
+                    multiplier = match.groupValues[9].toFloat(),
+                    divisor = match.groupValues[10].toFloat(),
+                    decimals = match.groupValues[11].toInt(),
+                    name = name,
+                    unit = unit,
+                    warnLowEnabled = match.groupValues[14].equals("Y", ignoreCase = true),
+                    warnLow = match.groupValues[15].toFloatOrNull() ?: 0f,
+                    warnHighEnabled = match.groupValues[16].equals("Y", ignoreCase = true),
+                    warnHigh = match.groupValues[17].toFloatOrNull() ?: 0f
+                )
+            }
+        }
+        _canFields.value = updatedFields
     }
     
     fun saveCanConfig() {
         viewModelScope.launch {
-            // Send CAN config commands
+            // マスターワーニング設定
+            sendCommand("can_warning ${if (_canWarningEnabled.value) 1 else 0}")
+            delay(100)
+            sendCommand("can_sound ${if (_canSoundEnabled.value) 1 else 0}")
+            delay(100)
+            
+            // チャンネル設定
+            _canChannels.value.forEach { channel ->
+                val canId = parseCanId(channel.id)
+                val enabled = if (channel.enabled) 1 else 0
+                sendCommand("can_ch ${channel.number} $canId $enabled")
+                delay(100)
+            }
+            
+            // フィールド設定
+            _canFields.value.forEachIndexed { index, field ->
+                val dataType = if (field.dataType == "S") 1 else 0
+                val endian = if (field.endian == "L") 1 else 0
+                val channel = if (field.enabled) field.channel else 0
+                val targetVar = getTargetVarIndex(field.targetVar)
+                val name = field.name.ifEmpty { "-" }
+                val unit = field.unit.ifEmpty { "-" }
+                val warnLoEnabled = if (field.warnLowEnabled) 1 else 0
+                val warnHiEnabled = if (field.warnHighEnabled) 1 else 0
+                
+                sendCommand("can_field ${index + 1} $channel ${field.startByte} ${field.byteCount} $dataType $endian $targetVar ${field.offset.toInt()} ${field.multiplier.toInt()} ${field.divisor.toInt()} $name $unit ${field.decimals} $warnLoEnabled ${field.warnLow.toInt()} $warnHiEnabled ${field.warnHigh.toInt()}")
+                delay(150)
+            }
+            
+            // 設定を保存
             sendCommand("can_save")
+            delay(200)
+            sendCommand("exit")
+            
             Toast.makeText(context, "CAN config saved", Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    private fun parseCanId(text: String): Int {
+        val trimmed = text.trim()
+        return if (trimmed.startsWith("0x", ignoreCase = true)) {
+            trimmed.substring(2).toInt(16)
+        } else {
+            trimmed.toIntOrNull(16) ?: 0
+        }
+    }
+    
+    private fun getTargetVarIndex(varName: String): Int {
+        return when (varName.uppercase()) {
+            "REV" -> 0
+            "AF" -> 1
+            "NUM1" -> 2
+            "NUM2" -> 3
+            "NUM3" -> 4
+            "NUM4" -> 5
+            "NUM5" -> 6
+            "NUM6" -> 7
+            "SPEED" -> 8
+            "FUEL" -> 9
+            else -> {
+                if (varName.startsWith("USER", ignoreCase = true)) {
+                    val num = varName.substring(4).toIntOrNull() ?: 1
+                    9 + num // USER1=10, USER2=11, ...
+                } else 10
+            }
         }
     }
     
@@ -501,6 +762,7 @@ class MainViewModel(private val context: Context) : ViewModel() {
             sendCommand("can_default")
             delay(500)
             loadCanConfig()
+            Toast.makeText(context, "CAN config reset to default", Toast.LENGTH_SHORT).show()
         }
     }
     

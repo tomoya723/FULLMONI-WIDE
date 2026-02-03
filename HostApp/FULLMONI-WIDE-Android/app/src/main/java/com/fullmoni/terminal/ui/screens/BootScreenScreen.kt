@@ -194,7 +194,7 @@ fun BootScreenScreen(viewModel: MainViewModel) {
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     LinearProgressIndicator(
-                        progress = uploadProgress,
+                        progress = { uploadProgress },
                         modifier = Modifier.fillMaxWidth().height(8.dp),
                         color = FullmoniPrimary,
                         trackColor = TextMuted.copy(alpha = 0.2f)
