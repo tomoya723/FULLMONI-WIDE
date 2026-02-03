@@ -42,6 +42,10 @@ fun CanConfigScreen(viewModel: MainViewModel) {
     // 編集ダイアログ用の状態
     var editingFieldIndex by remember { mutableStateOf<Int?>(null) }
     var editingField by remember { mutableStateOf<CanField?>(null) }
+    
+    // 確認ダイアログ用の状態
+    var showSaveConfirmDialog by remember { mutableStateOf(false) }
+    var showDefaultConfirmDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -177,7 +181,7 @@ fun CanConfigScreen(viewModel: MainViewModel) {
             Spacer(modifier = Modifier.width(8.dp))
 
             Button(
-                onClick = { viewModel.saveCanConfig() },
+                onClick = { showSaveConfirmDialog = true },
                 enabled = isConnected,
                 colors = ButtonDefaults.buttonColors(containerColor = FullmoniPrimary)
             ) {
@@ -189,7 +193,7 @@ fun CanConfigScreen(viewModel: MainViewModel) {
             Spacer(modifier = Modifier.width(8.dp))
 
             OutlinedButton(
-                onClick = { viewModel.defaultCanConfig() },
+                onClick = { showDefaultConfirmDialog = true },
                 enabled = isConnected
             ) {
                 Icon(imageVector = Icons.Default.Restore, contentDescription = null)
@@ -212,6 +216,56 @@ fun CanConfigScreen(viewModel: MainViewModel) {
                 viewModel.updateCanField(editingFieldIndex!!, updatedField)
                 editingFieldIndex = null
                 editingField = null
+            }
+        )
+    }
+    
+    // Save確認ダイアログ
+    if (showSaveConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showSaveConfirmDialog = false },
+            title = { Text("Save CAN Config") },
+            text = { Text("Save current CAN configuration to device EEPROM?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showSaveConfirmDialog = false
+                        viewModel.saveCanConfig()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = FullmoniPrimary)
+                ) {
+                    Text("Save")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { showSaveConfirmDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+    
+    // Default確認ダイアログ
+    if (showDefaultConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showDefaultConfirmDialog = false },
+            title = { Text("Reset to Default") },
+            text = { Text("Reset CAN configuration to factory default (MoTeC M100)?\n\nNote: This will NOT save to EEPROM automatically.") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showDefaultConfirmDialog = false
+                        viewModel.defaultCanConfig()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = WarnHigh)
+                ) {
+                    Text("Reset")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { showDefaultConfirmDialog = false }) {
+                    Text("Cancel")
+                }
             }
         )
     }

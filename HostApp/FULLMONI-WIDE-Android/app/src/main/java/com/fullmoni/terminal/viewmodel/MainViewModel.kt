@@ -480,6 +480,23 @@ class MainViewModel(private val context: Context) : ViewModel() {
             android.util.Log.d("MainViewModel", "loadParameters: calling parseParametersFromResponse")
             parseParametersFromResponse()
             android.util.Log.d("MainViewModel", "loadParameters: done, tyreWidth=${_tyreWidth.value}")
+            
+            // rtcコマンドでRTC取得（Windows版と同様）
+            usbSerialService.clearBuffer()
+            sendCommand("rtc")
+            delay(500)
+            parseRtcFromResponse()
+            
+            // CAN設定読み込み（Windows版と同様）
+            usbSerialService.clearBuffer()
+            sendCommand("can_list")
+            delay(2000)  // CAN設定は応答が長いので長めに待つ
+            parseCanListResponse()
+            android.util.Log.d("MainViewModel", "loadParameters: CAN config loaded")
+            
+            // exitコマンドでパラメータモードを抜ける（Windows版と同様）
+            sendCommand("exit")
+            delay(100)
         }
     }
     
@@ -596,6 +613,26 @@ class MainViewModel(private val context: Context) : ViewModel() {
         tripRegex.find(data)?.let { _tripValue.value = it.groupValues[1] }
     }
     
+    private fun parseRtcFromResponse() {
+        val data = receivedData.value
+        android.util.Log.d("MainViewModel", "parseRtc data: $data")
+        
+        // RTC出力形式: "RTC: 26/01/07 12:34:56" のような形式を想定
+        val rtcRegex = Regex("""RTC:\s*(.+)""")
+        rtcRegex.find(data)?.let { match ->
+            _rtcValue.value = match.groupValues[1].trim()
+            android.util.Log.d("MainViewModel", "Parsed RTC: ${_rtcValue.value}")
+            return
+        }
+        
+        // 別の形式: "20YY/MM/DD HH:MM:SS" or "YY/MM/DD HH:MM:SS"
+        val dateRegex = Regex("""(\d{2,4}[/-]\d{2}[/-]\d{2}\s+\d{2}:\d{2}:\d{2})""")
+        dateRegex.find(data)?.let { match ->
+            _rtcValue.value = match.groupValues[1]
+            android.util.Log.d("MainViewModel", "Parsed RTC (alt): ${_rtcValue.value}")
+        }
+    }
+    
     // ========== CAN Config ==========
     
     fun updateCanWarningEnabled(enabled: Boolean) { _canWarningEnabled.value = enabled }
@@ -619,10 +656,20 @@ class MainViewModel(private val context: Context) : ViewModel() {
     
     fun loadCanConfig() {
         viewModelScope.launch {
+            // パラメータモードに入る（単独呼び出し時のため）
+            usbSerialService.clearBuffer()
+            sendCommand("list")
+            delay(500)
+            
             usbSerialService.clearBuffer()
             sendCommand("can_list")
             delay(1500)
             parseCanListResponse()
+            
+            // パラメータモードを終了
+            sendCommand("exit")
+            delay(100)
+            
             Toast.makeText(context, "CAN config loaded", Toast.LENGTH_SHORT).show()
         }
     }
@@ -714,7 +761,9 @@ class MainViewModel(private val context: Context) : ViewModel() {
                 val warnLoEnabled = if (field.warnLowEnabled) 1 else 0
                 val warnHiEnabled = if (field.warnHighEnabled) 1 else 0
                 
-                sendCommand("can_field ${index + 1} $channel ${field.startByte} ${field.byteCount} $dataType $endian $targetVar ${field.offset.toInt()} ${field.multiplier.toInt()} ${field.divisor.toInt()} $name $unit ${field.decimals} $warnLoEnabled ${field.warnLow.toInt()} $warnHiEnabled ${field.warnHigh.toInt()}")
+                // Field番号は0-based（0〜15）
+                // warnLow/warnHighはfloatなので小数点以下も送信する
+                sendCommand("can_field $index $channel ${field.startByte} ${field.byteCount} $dataType $endian $targetVar ${field.offset.toInt()} ${field.multiplier.toInt()} ${field.divisor.toInt()} $name $unit ${field.decimals} $warnLoEnabled ${field.warnLow} $warnHiEnabled ${field.warnHigh}")
                 delay(150)
             }
             
@@ -759,10 +808,24 @@ class MainViewModel(private val context: Context) : ViewModel() {
     
     fun defaultCanConfig() {
         viewModelScope.launch {
-            sendCommand("can_default")
+            usbSerialService.clearBuffer()
+            sendCommand("list")  // Enter parameter mode
+            delay(100)
+            
+            sendCommand("can_preset motec")  // Apply MoTeC M100 preset (default)
             delay(500)
-            loadCanConfig()
-            Toast.makeText(context, "CAN config reset to default", Toast.LENGTH_SHORT).show()
+            
+            // Read back the config
+            usbSerialService.clearBuffer()
+            sendCommand("can_list")
+            delay(1500)
+            parseCanListResponse()
+            
+            // Exit parameter mode
+            sendCommand("exit")
+            delay(100)
+            
+            Toast.makeText(context, "CAN config reset to default (MoTeC M100)", Toast.LENGTH_SHORT).show()
         }
     }
     
