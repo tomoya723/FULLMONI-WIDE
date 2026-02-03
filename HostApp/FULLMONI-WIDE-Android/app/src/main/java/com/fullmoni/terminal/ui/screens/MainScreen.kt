@@ -39,7 +39,7 @@ fun MainScreen(viewModel: MainViewModel) {
     val errorMessage by viewModel.errorMessage.collectAsState()
     val isBootloaderMode by viewModel.isBootloaderMode.collectAsState()
     
-    // エラーダイアログ
+    // エラーダイアログ（FW Update中/成功後のUSBエラーはViewModel側でフィルタリング済み）
     errorMessage?.let { error ->
         AlertDialog(
             onDismissRequest = { viewModel.clearError() },

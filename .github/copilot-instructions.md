@@ -34,3 +34,44 @@
 - IDE: e2 studio (Smart Configurator)
 - GUI: emWin (AppWizard)
 - ツールチェーン: GCC-RX
+
+## AndroidアプリのPCデバッグ手順
+
+ユーザーが「Androidアプリをデバッグ」「エミュレーターでテスト」等と言った場合、**まず現在の状態を確認**してから必要な手順のみ実行すること。
+
+### 1. 状態確認（最初に必ず実行）
+```powershell
+# ADBパスを通す（毎回必要）
+$env:Path += ";$env:LOCALAPPDATA\Android\Sdk\platform-tools"
+
+# エミュレーター確認
+adb devices
+
+# TCPブリッジ確認
+netstat -ano | Select-String ":9999"
+
+# COMポート確認
+Get-WMIObject Win32_SerialPort | Select-Object DeviceID, Description
+```
+
+### 2. 不足分のみ起動
+| 状態 | 対応 |
+|------|------|
+| エミュレーターが無い | `Start-Process "$env:LOCALAPPDATA\Android\Sdk\emulator\emulator.exe" -ArgumentList "-avd", "Medium_Phone_API_36.1"` |
+| adb reverse未設定 | `adb reverse tcp:9999 tcp:9999` |
+| TCPブリッジ未起動 | `cd tools; powershell -ExecutionPolicy Bypass -File .\com_bridge.ps1 -ComPort COM19` |
+| APK未インストール | `adb install -r "HostApp\FULLMONI-WIDE-Android\app\build\outputs\apk\debug\app-debug.apk"` |
+
+### 3. アプリ起動
+```powershell
+adb shell am start -n com.fullmoni.terminal/.MainActivity
+```
+
+### 4. 接続
+アプリのHomeScreenで **「TCP Bridge (Real)」** ボタンをタップ
+
+### 注意事項
+- **ゼロから全部セットアップし直さない**
+- 状態確認で動いているものは再起動しない
+- ExecutionPolicyエラーが出たら `-ExecutionPolicy Bypass` を付ける
+- ポート競合時は `Get-NetTCPConnection -LocalPort 9999` で確認

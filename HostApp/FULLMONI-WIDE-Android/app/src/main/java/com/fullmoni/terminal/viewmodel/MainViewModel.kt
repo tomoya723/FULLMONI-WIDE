@@ -17,12 +17,16 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.fullmoni.terminal.service.FirmwareUpdateService
 import com.fullmoni.terminal.service.UsbSerialService
 import com.hoho.android.usbserial.driver.UsbSerialDriver
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -70,11 +74,21 @@ class MainViewModel(private val context: Context) : ViewModel() {
     }
     
     private val usbSerialService = UsbSerialService(context)
+    private val firmwareUpdateService = FirmwareUpdateService(usbSerialService)
     
     // Connection
     val isConnected: StateFlow<Boolean> = usbSerialService.isConnected
     val receivedData: StateFlow<String> = usbSerialService.receivedData
-    val errorMessage: StateFlow<String?> = usbSerialService.errorMessage
+    
+    // FW Update中/成功後のUSBエラーを無視するフィルタリング済みerrorMessage
+    val errorMessage: StateFlow<String?> = combine(
+        usbSerialService.errorMessage,
+        firmwareUpdateService.isUpdating,
+        firmwareUpdateService.updateSucceeded
+    ) { error, isUpdating, succeeded ->
+        // FW Update中または成功後はUSBエラーを無視
+        if (isUpdating || succeeded) null else error
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
     
     private val _availableDrivers = MutableStateFlow<List<UsbSerialDriver>>(emptyList())
     val availableDrivers: StateFlow<List<UsbSerialDriver>> = _availableDrivers.asStateFlow()
@@ -195,17 +209,13 @@ class MainViewModel(private val context: Context) : ViewModel() {
     private val _selectedFirmwarePath = MutableStateFlow("")
     val selectedFirmwarePath: StateFlow<String> = _selectedFirmwarePath.asStateFlow()
     
-    private val _firmwareProgress = MutableStateFlow(0f)
-    val firmwareProgress: StateFlow<Float> = _firmwareProgress.asStateFlow()
+    private var _selectedFirmwareUri: Uri? = null
     
-    private val _firmwareProgressText = MutableStateFlow("Ready")
-    val firmwareProgressText: StateFlow<String> = _firmwareProgressText.asStateFlow()
-    
-    private val _firmwareLog = MutableStateFlow("")
-    val firmwareLog: StateFlow<String> = _firmwareLog.asStateFlow()
-    
-    private val _isFirmwareUpdating = MutableStateFlow(false)
-    val isFirmwareUpdating: StateFlow<Boolean> = _isFirmwareUpdating.asStateFlow()
+    val firmwareProgress: StateFlow<Float> = firmwareUpdateService.progress
+    val firmwareProgressText: StateFlow<String> = firmwareUpdateService.statusMessage
+    val firmwareLog: StateFlow<String> = firmwareUpdateService.logMessages
+    val isFirmwareUpdating: StateFlow<Boolean> = firmwareUpdateService.isUpdating
+    val firmwareUpdateSucceeded: StateFlow<Boolean> = firmwareUpdateService.updateSucceeded
     
     private var pendingDriver: UsbSerialDriver? = null
     
@@ -855,9 +865,11 @@ class MainViewModel(private val context: Context) : ViewModel() {
     
     fun readBootImageFromDevice() {
         viewModelScope.launch {
-            appendBootLog("Reading boot image from device...")
-            sendCommand("boot_read")
-            // TODO: Implement binary read
+            appendBootLog("Read from device: Not implemented yet")
+            appendBootLog("(Binary transfer protocol required)")
+            Toast.makeText(context, "Read function not implemented", Toast.LENGTH_SHORT).show()
+            // TODO: Implement imgread binary protocol
+            // See: HostApp/FULLMONI-WIDE-Terminal/Services/StartupImageService.cs
         }
     }
     
@@ -898,41 +910,57 @@ class MainViewModel(private val context: Context) : ViewModel() {
     // ========== Firmware Update ==========
     
     fun selectFirmwareFile(context: Context, uri: Uri) {
-        _selectedFirmwarePath.value = uri.lastPathSegment ?: "firmware.mot"
-        appendFirmwareLog("Selected: ${_selectedFirmwarePath.value}")
+        _selectedFirmwarePath.value = uri.lastPathSegment ?: "firmware.bin"
+        _selectedFirmwareUri = uri
     }
     
-    fun startFirmwareUpdate() {
+    fun startFirmwareUpdate(context: Context) {
+        val uri = _selectedFirmwareUri
+        if (uri == null) {
+            Toast.makeText(context, "Please select a firmware file first", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
         viewModelScope.launch {
-            _isFirmwareUpdating.value = true
-            _firmwareProgress.value = 0f
-            _firmwareProgressText.value = "Starting update..."
-            appendFirmwareLog("Starting firmware update...")
-            
-            // TODO: Implement actual firmware update
-            for (i in 1..100) {
-                delay(100)
-                _firmwareProgress.value = i.toFloat()
-                _firmwareProgressText.value = "Uploading... $i%"
+            try {
+                // ファームウェアファイルを読み込み
+                val inputStream = context.contentResolver.openInputStream(uri)
+                if (inputStream == null) {
+                    Toast.makeText(context, "Cannot open firmware file", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+                
+                val firmwareData = firmwareUpdateService.loadFirmwareFromStream(inputStream)
+                inputStream.close()
+                
+                // ファームウェア更新開始
+                firmwareUpdateService.startUpdate(firmwareData) { success, message ->
+                    viewModelScope.launch {
+                        if (success) {
+                            Toast.makeText(context, "Firmware update successful!", Toast.LENGTH_LONG).show()
+                        } else {
+                            Toast.makeText(context, "Update failed: $message", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
-            
-            _firmwareProgressText.value = "Update complete"
-            appendFirmwareLog("Firmware update complete")
-            _isFirmwareUpdating.value = false
         }
     }
     
-    fun clearFirmwareLog() { _firmwareLog.value = "" }
+    fun cancelFirmwareUpdate() {
+        firmwareUpdateService.cancel()
+    }
+    
+    fun clearFirmwareLog() {
+        firmwareUpdateService.clearLog()
+    }
     
     fun copyFirmwareLog(context: Context) {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboard.setPrimaryClip(ClipData.newPlainText("Firmware Log", _firmwareLog.value))
+        clipboard.setPrimaryClip(ClipData.newPlainText("Firmware Log", firmwareLog.value))
         Toast.makeText(context, "Log copied", Toast.LENGTH_SHORT).show()
-    }
-    
-    private fun appendFirmwareLog(message: String) {
-        val timestamp = SimpleDateFormat("HH:mm:ss", Locale.US).format(Date())
-        _firmwareLog.value += "[$timestamp] $message\n"
     }
     
     /**

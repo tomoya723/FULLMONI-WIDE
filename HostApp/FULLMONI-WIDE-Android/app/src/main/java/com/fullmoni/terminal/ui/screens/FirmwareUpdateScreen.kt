@@ -33,6 +33,9 @@ fun FirmwareUpdateScreen(viewModel: MainViewModel) {
     val context = LocalContext.current
     val isConnected by viewModel.isConnected.collectAsState()
     val scrollState = rememberScrollState()
+    
+    // TCP Bridge/Simulatorモードではアップデート不可
+    val isRealUsbConnection = isConnected && !viewModel.isSimulationMode && !viewModel.isTcpBridgeMode
 
     val firmwareVersion by viewModel.firmwareVersion.collectAsState()
     val firmwarePath by viewModel.selectedFirmwarePath.collectAsState()
@@ -216,16 +219,34 @@ fun FirmwareUpdateScreen(viewModel: MainViewModel) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Start Update Button
-        Button(
-            onClick = { viewModel.startFirmwareUpdate() },
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            enabled = isConnected && firmwarePath.isNotEmpty() && !isUpdating,
-            colors = ButtonDefaults.buttonColors(containerColor = FullmoniPrimary)
+        // Start/Cancel Update Buttons
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(imageVector = Icons.Default.CloudUpload, contentDescription = null)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Start Firmware Update")
+            if (isUpdating) {
+                // Cancel button
+                Button(
+                    onClick = { viewModel.cancelFirmwareUpdate() },
+                    colors = ButtonDefaults.buttonColors(containerColor = WarnHigh)
+                ) {
+                    Icon(imageVector = Icons.Default.Cancel, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Cancel Update")
+                }
+            } else {
+                // Start button
+                Button(
+                    onClick = { viewModel.startFirmwareUpdate(context) },
+                    enabled = isRealUsbConnection && firmwarePath.isNotEmpty(),
+                    colors = ButtonDefaults.buttonColors(containerColor = FullmoniPrimary)
+                ) {
+                    Icon(imageVector = Icons.Default.CloudUpload, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Start Firmware Update")
+                }
+            }
         }
 
         // Warning text
@@ -237,6 +258,23 @@ fun FirmwareUpdateScreen(viewModel: MainViewModel) {
                 color = WarnFuel,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
+        } else if (viewModel.isSimulationMode || viewModel.isTcpBridgeMode) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "⚠ FW Update requires real USB connection\n(Not available via TCP Bridge or Simulator)",
+                style = MaterialTheme.typography.bodySmall,
+                color = WarnHigh,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
         }
+        
+        // Note about .bin files
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Note: Use .bin file (not .mot)",
+            style = MaterialTheme.typography.bodySmall,
+            color = TextMuted,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
     }
 }

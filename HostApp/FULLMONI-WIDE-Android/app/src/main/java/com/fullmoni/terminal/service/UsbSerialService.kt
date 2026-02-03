@@ -371,4 +371,44 @@ class UsbSerialService(private val context: Context) {
     fun clearError() {
         _errorMessage.value = null
     }
+    
+    /**
+     * USBデバイスが接続されるのを待って自動接続（FW Update用）
+     * デバイスリブート後のBootloader再接続に使用
+     * 
+     * @param timeoutMs 待機タイムアウト（ミリ秒）
+     * @param pollIntervalMs ポーリング間隔（ミリ秒）
+     * @return 接続成功したらtrue
+     */
+    suspend fun waitForDeviceAndConnect(timeoutMs: Long = 15000, pollIntervalMs: Long = 500): Boolean {
+        Log.d(TAG, "waitForDeviceAndConnect: Waiting for USB device...")
+        val startTime = System.currentTimeMillis()
+        
+        while (System.currentTimeMillis() - startTime < timeoutMs) {
+            val drivers = refreshDevices()
+            if (drivers.isNotEmpty()) {
+                Log.d(TAG, "waitForDeviceAndConnect: Found ${drivers.size} device(s)")
+                
+                // 最初に見つかったデバイスに接続を試みる
+                val driver = drivers[0]
+                val usbManager = context.getSystemService(Context.USB_SERVICE) as UsbManager
+                
+                // 許可があれば接続
+                if (usbManager.hasPermission(driver.device)) {
+                    if (connect(driver)) {
+                        Log.d(TAG, "waitForDeviceAndConnect: Connected successfully")
+                        return true
+                    }
+                } else {
+                    Log.d(TAG, "waitForDeviceAndConnect: Device found but no permission yet")
+                    // 許可がない場合は少し待ってリトライ（ユーザーが許可ダイアログを承認するのを待つ）
+                }
+            }
+            
+            kotlinx.coroutines.delay(pollIntervalMs)
+        }
+        
+        Log.e(TAG, "waitForDeviceAndConnect: Timeout waiting for device")
+        return false
+    }
 }
