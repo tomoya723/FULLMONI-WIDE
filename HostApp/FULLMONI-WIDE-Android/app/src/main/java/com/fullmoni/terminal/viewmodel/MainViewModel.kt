@@ -445,11 +445,21 @@ class MainViewModel(private val context: Context) : ViewModel() {
     
     fun syncRtc() {
         viewModelScope.launch {
-            val sdf = SimpleDateFormat("yyyy,MM,dd,HH,mm,ss", Locale.US)
+            // キー送信でパラメータモードに入る
+            sendCommand("")
+            delay(500)
+            
+            // Android時刻を取得してrtcコマンド発行 (フォーマット: yy MM dd HH mm ss)
+            val sdf = SimpleDateFormat("yy MM dd HH mm ss", Locale.US)
             val dateStr = sdf.format(Date())
-            sendCommand("set rtc $dateStr")
+            sendCommand("rtc $dateStr")
             delay(300)
+            
+            // RTC値を再取得
             loadParameters()
+            
+            // exitコマンドで通信待ちを終了
+            sendCommand("exit")
         }
     }
     
