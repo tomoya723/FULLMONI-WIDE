@@ -106,10 +106,10 @@ fun CanConfigScreen(viewModel: MainViewModel) {
             initialExpanded = true
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                canChannels.chunked(3).forEach { rowChannels ->
+                canChannels.chunked(2).forEach { rowChannels ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         rowChannels.forEach { channel ->
                             CanChannelInput(
@@ -123,8 +123,12 @@ fun CanConfigScreen(viewModel: MainViewModel) {
                                 labelColor = if (channel.number <= 3) ShiftBlue else ShiftGreen
                             )
                         }
+                        // 奇数の場合、空のスペースを追加
+                        if (rowChannels.size == 1) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
             }
         }
@@ -407,7 +411,27 @@ private fun CanFieldEditDialog(
     onSave: (CanField) -> Unit
 ) {
     var editField by remember { mutableStateOf(field) }
+    var validationError by remember { mutableStateOf<String?>(null) }
     val scrollState = rememberScrollState()
+    
+    // バリデーション関数
+    fun validateField(): String? {
+        if (editField.enabled) {
+            if (editField.channel !in 1..6) return "チャンネルは1～6の範囲で入力してください"
+            if (editField.startByte !in 0..7) return "開始バイトは0～7の範囲で入力してください"
+            if (editField.byteCount !in 1..4) return "バイト数は1～4の範囲で入力してください"
+            if (editField.startByte + editField.byteCount > 8) return "開始バイト+バイト数は8以下にしてください"
+            if (editField.dataType !in listOf("U", "S")) return "タイプはUまたはSを入力してください"
+            if (editField.endian !in listOf("B", "L")) return "エンディアンはBまたはLを入力してください"
+            if (editField.targetVar.isBlank()) return "ターゲット変数を入力してください"
+            if (editField.divisor == 0f) return "除数は0以外を入力してください"
+            if (editField.decimals !in 0..3) return "小数点以下桁数は0～3の範囲で入力してください"
+            if (editField.warnLowEnabled && editField.warnHighEnabled && editField.warnLow >= editField.warnHigh) {
+                return "警告しきい値: Low < High の関係にしてください"
+            }
+        }
+        return null
+    }
     
     Dialog(onDismissRequest = onDismiss) {
         Card(

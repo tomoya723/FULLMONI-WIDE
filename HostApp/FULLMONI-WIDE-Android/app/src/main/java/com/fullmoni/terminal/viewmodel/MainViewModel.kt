@@ -229,6 +229,10 @@ class MainViewModel(private val context: Context) : ViewModel() {
     private val _selectedReleaseTag = MutableStateFlow("")
     val selectedReleaseTag: StateFlow<String> = _selectedReleaseTag.asStateFlow()
     
+    // Validation
+    private val _validationErrors = MutableStateFlow<List<String>>(emptyList())
+    val validationErrors: StateFlow<List<String>> = _validationErrors.asStateFlow()
+    
     private val _selectedVariant = MutableStateFlow<com.fullmoni.terminal.model.FirmwareVariant?>(null)
     val selectedVariant: StateFlow<com.fullmoni.terminal.model.FirmwareVariant?> = _selectedVariant.asStateFlow()
     
@@ -535,7 +539,14 @@ class MainViewModel(private val context: Context) : ViewModel() {
         }
     }
     
-    fun saveParameters() {
+    fun saveParameters(): Boolean {
+        val errors = validateAllParameters()
+        _validationErrors.value = errors
+        
+        if (errors.isNotEmpty()) {
+            return false
+        }
+        
         viewModelScope.launch {
             _tyreWidth.value.takeIf { it.isNotBlank() }?.let { sendCommand("set tyre_width $it"); delay(100) }
             _tyreAspect.value.takeIf { it.isNotBlank() }?.let { sendCommand("set tyre_aspect $it"); delay(100) }
@@ -558,6 +569,11 @@ class MainViewModel(private val context: Context) : ViewModel() {
             sendCommand("save")
             Toast.makeText(context, "Parameters saved", Toast.LENGTH_SHORT).show()
         }
+        return true
+    }
+    
+    fun clearValidationErrors() {
+        _validationErrors.value = emptyList()
     }
     
     fun defaultParameters() {
@@ -1075,6 +1091,96 @@ class MainViewModel(private val context: Context) : ViewModel() {
                 }
             }
         }
+    }
+    
+    // ========== Validation ==========
+    
+    private fun validateAllParameters(): List<String> {
+        val errors = mutableListOf<String>()
+        
+        // === タイヤ設定バリデーション ===
+        if (!validatePositiveInt(_tyreWidth.value, 1, 500))
+            errors.add("【タイヤ幅】正の整数で1～500の範囲で入力してください")
+        if (!validatePositiveInt(_tyreAspect.value, 1, 500))
+            errors.add("【扁平率】正の整数で1～500の範囲で入力してください")
+        if (!validatePositiveInt(_wheelDia.value, 1, 500))
+            errors.add("【リム径】正の整数で1～500の範囲で入力してください")
+        
+        // === 警告設定バリデーション ===
+        val waterLow = _waterTempLow.value.toIntOrNull()
+        val waterHigh = _waterTempHigh.value.toIntOrNull()
+        if (!validateInt(_waterTempLow.value, -40, 200))
+            errors.add("【水温低温】-40～200の整数で入力してください")
+        if (!validateInt(_waterTempHigh.value, -40, 200))
+            errors.add("【水温高温】-40～200の整数で入力してください")
+        if (waterLow != null && waterHigh != null && waterLow >= waterHigh)
+            errors.add("【水温警告】水温低温 < 水温高温 の関係にしてください")
+        if (!validatePositiveInt(_fuelWarn.value, 0, 1000))
+            errors.add("【燃料警告】0～1000の整数で入力してください")
+        
+        // === ギア比バリデーション ===
+        val g1 = _gear1.value.toDoubleOrNull()
+        val g2 = _gear2.value.toDoubleOrNull()
+        val g3 = _gear3.value.toDoubleOrNull()
+        val g4 = _gear4.value.toDoubleOrNull()
+        val g5 = _gear5.value.toDoubleOrNull()
+        val g6 = _gear6.value.toDoubleOrNull()
+        
+        if (!validatePositiveDecimal(_gear1.value)) errors.add("【1速】正の小数で入力してください")
+        if (!validatePositiveDecimal(_gear2.value)) errors.add("【2速】正の小数で入力してください")
+        if (!validatePositiveDecimal(_gear3.value)) errors.add("【3速】正の小数で入力してください")
+        if (!validatePositiveDecimal(_gear4.value)) errors.add("【4速】正の小数で入力してください")
+        if (!validatePositiveDecimal(_gear5.value)) errors.add("【5速】正の小数で入力してください")
+        // 6速は0許可（5速車の場合）
+        if (_gear6.value.isNotBlank() && _gear6.value != "0" && !validatePositiveDecimal(_gear6.value))
+            errors.add("【6速】正の小数で入力してください（5速車は0）")
+        if (!validatePositiveDecimal(_finalGear.value)) errors.add("【ファイナル】正の小数で入力してください")
+        
+        // ギア比の大小関係チェック
+        if (g1 != null && g2 != null && g1 <= g2) errors.add("【ギア比】1速 > 2速 の関係にしてください")
+        if (g2 != null && g3 != null && g2 <= g3) errors.add("【ギア比】2速 > 3速 の関係にしてください")
+        if (g3 != null && g4 != null && g3 <= g4) errors.add("【ギア比】3速 > 4速 の関係にしてください")
+        if (g4 != null && g5 != null && g4 <= g5) errors.add("【ギア比】4速 > 5速 の関係にしてください")
+        if (g5 != null && g6 != null && g6 > 0 && g5 <= g6) errors.add("【ギア比】5速 > 6速 の関係にしてください")
+        
+        // === シフトインジケータバリデーション ===
+        val rpm1 = _shiftRpm1.value.toIntOrNull()
+        val rpm2 = _shiftRpm2.value.toIntOrNull()
+        val rpm3 = _shiftRpm3.value.toIntOrNull()
+        val rpm4 = _shiftRpm4.value.toIntOrNull()
+        val rpm5 = _shiftRpm5.value.toIntOrNull()
+        
+        if (!validatePositiveInt(_shiftRpm1.value, 1, 15000)) errors.add("【青2灯】正の整数で1～15000の範囲で入力してください")
+        if (!validatePositiveInt(_shiftRpm2.value, 1, 15000)) errors.add("【青4灯】正の整数で1～15000の範囲で入力してください")
+        if (!validatePositiveInt(_shiftRpm3.value, 1, 15000)) errors.add("【緑6灯】正の整数で1～15000の範囲で入力してください")
+        if (!validatePositiveInt(_shiftRpm4.value, 1, 15000)) errors.add("【赤8灯】正の整数で1～15000の範囲で入力してください")
+        if (!validatePositiveInt(_shiftRpm5.value, 1, 15000)) errors.add("【白点滅】正の整数で1～15000の範囲で入力してください")
+        
+        // シフトRPMの大小関係チェック
+        if (rpm1 != null && rpm2 != null && rpm1 >= rpm2) errors.add("【シフトインジケータ】青2灯 < 青4灯 の関係にしてください")
+        if (rpm2 != null && rpm3 != null && rpm2 >= rpm3) errors.add("【シフトインジケータ】青4灯 < 緑6灯 の関係にしてください")
+        if (rpm3 != null && rpm4 != null && rpm3 >= rpm4) errors.add("【シフトインジケータ】緑6灯 < 赤8灯 の関係にしてください")
+        if (rpm4 != null && rpm5 != null && rpm4 >= rpm5) errors.add("【シフトインジケータ】赤8灯 < 白点滅 の関係にしてください")
+        
+        return errors
+    }
+    
+    private fun validatePositiveInt(value: String, min: Int, max: Int): Boolean {
+        if (value.isBlank()) return false
+        val num = value.toIntOrNull() ?: return false
+        return num in min..max
+    }
+    
+    private fun validateInt(value: String, min: Int, max: Int): Boolean {
+        if (value.isBlank()) return false
+        val num = value.toIntOrNull() ?: return false
+        return num in min..max
+    }
+    
+    private fun validatePositiveDecimal(value: String): Boolean {
+        if (value.isBlank()) return false
+        val num = value.toDoubleOrNull() ?: return false
+        return num > 0
     }
     
     /**

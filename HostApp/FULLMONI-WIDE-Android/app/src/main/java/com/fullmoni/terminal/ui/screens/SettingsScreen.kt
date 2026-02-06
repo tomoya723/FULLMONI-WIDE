@@ -27,6 +27,46 @@ fun SettingsScreen(viewModel: MainViewModel) {
     val isConnected by viewModel.isConnected.collectAsState()
     val scrollState = rememberScrollState()
     
+    // Validation errors
+    val validationErrors by viewModel.validationErrors.collectAsState()
+    var showValidationDialog by remember { mutableStateOf(false) }
+    
+    // Update dialog visibility when validation errors change
+    LaunchedEffect(validationErrors) {
+        if (validationErrors.isNotEmpty()) {
+            showValidationDialog = true
+        }
+    }
+    
+    // Validation Error Dialog
+    if (showValidationDialog && validationErrors.isNotEmpty()) {
+        AlertDialog(
+            onDismissRequest = {
+                showValidationDialog = false
+                viewModel.clearValidationErrors()
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showValidationDialog = false
+                    viewModel.clearValidationErrors()
+                }) {
+                    Text("OK")
+                }
+            },
+            title = { Text("入力エラー") },
+            icon = { Icon(Icons.Default.Warning, contentDescription = null, tint = WarnHigh) },
+            text = {
+                Column {
+                    Text("以下の項目を確認してください:")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    validationErrors.forEach { error ->
+                        Text("• $error", style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+            }
+        )
+    }
+    
     // 画面表示時にパラメータを読み込み
     LaunchedEffect(isConnected) {
         if (isConnected) {
