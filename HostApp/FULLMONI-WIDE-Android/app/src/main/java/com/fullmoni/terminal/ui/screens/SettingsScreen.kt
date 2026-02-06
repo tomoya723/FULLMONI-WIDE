@@ -26,18 +26,18 @@ import com.fullmoni.terminal.viewmodel.MainViewModel
 fun SettingsScreen(viewModel: MainViewModel) {
     val isConnected by viewModel.isConnected.collectAsState()
     val scrollState = rememberScrollState()
-    
+
     // Validation errors
     val validationErrors by viewModel.validationErrors.collectAsState()
     var showValidationDialog by remember { mutableStateOf(false) }
-    
+
     // Update dialog visibility when validation errors change
     LaunchedEffect(validationErrors) {
         if (validationErrors.isNotEmpty()) {
             showValidationDialog = true
         }
     }
-    
+
     // Validation Error Dialog
     if (showValidationDialog && validationErrors.isNotEmpty()) {
         AlertDialog(
@@ -66,7 +66,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
             }
         )
     }
-    
+
     // 画面表示時にパラメータを読み込み
     LaunchedEffect(isConnected) {
         if (isConnected) {
@@ -167,7 +167,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
                 // Preset Dropdown
                 var presetExpanded by remember { mutableStateOf(false) }
                 val presets = listOf("-- Select --", "NA/NB 5-speed", "NB 6-speed")
-                
+
                 ExposedDropdownMenuBox(
                     expanded = presetExpanded,
                     onExpandedChange = { presetExpanded = it }

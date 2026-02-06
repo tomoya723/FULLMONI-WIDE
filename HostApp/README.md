@@ -1,14 +1,20 @@
 # FULLMONI-WIDE Host Applications
 
-FULLMONI-WIDEファームウェアと通信するWindowsホストアプリケーション集です。
+FULLMONI-WIDEファームウェアと通信するホストアプリケーション集です。
 
 ## アプリケーション一覧
 
-### FULLMONI-WIDE Terminal
+### FULLMONI-WIDE Terminal (Windows)
 
 UARTターミナルアプリケーション。ファームウェアのパラメータコンソールと対話するためのGUIツールです。
 
 - 詳細: [FULLMONI-WIDE-Terminal/README.md](FULLMONI-WIDE-Terminal/README.md)
+
+### FULLMONI-WIDE Terminal (Android)
+
+USB Serial通信によるモバイル版ターミナルアプリケーション。Jetpack Compose + Material 3で構築。
+
+- 詳細: [FULLMONI-WIDE-Android/README.md](FULLMONI-WIDE-Android/README.md)
 
 ## 必要環境
 

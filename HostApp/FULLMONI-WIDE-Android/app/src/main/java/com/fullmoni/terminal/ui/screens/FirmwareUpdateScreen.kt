@@ -43,7 +43,7 @@ fun FirmwareUpdateScreen(viewModel: MainViewModel) {
     val context = LocalContext.current
     val isConnected by viewModel.isConnected.collectAsState()
     val scrollState = rememberScrollState()
-    
+
     // TCP Bridge/Simulatorモードではアップデート不可
     val isRealUsbConnection = isConnected && !viewModel.isSimulationMode && !viewModel.isTcpBridgeMode
 
@@ -53,7 +53,7 @@ fun FirmwareUpdateScreen(viewModel: MainViewModel) {
     val firmwareProgressText by viewModel.firmwareProgressText.collectAsState()
     val firmwareLog by viewModel.firmwareLog.collectAsState()
     val isUpdating by viewModel.isFirmwareUpdating.collectAsState()
-    
+
     // Online Update
     val availableReleases by viewModel.onlineReleases.collectAsState()
     val currentManifest by viewModel.onlineManifest.collectAsState()
@@ -62,10 +62,10 @@ fun FirmwareUpdateScreen(viewModel: MainViewModel) {
     val downloadProgress by viewModel.onlineDownloadProgress.collectAsState()
     val onlineStatus by viewModel.onlineStatusMessage.collectAsState()
     val isOnlineLoading by viewModel.isOnlineLoading.collectAsState()
-    
+
     // Local file mode vs Online mode
     var useLocalFile by remember { mutableStateOf(false) }
-    
+
     // Dropdown expanded state
     var releaseDropdownExpanded by remember { mutableStateOf(false) }
 
@@ -118,7 +118,7 @@ fun FirmwareUpdateScreen(viewModel: MainViewModel) {
         }
 
         Spacer(modifier = Modifier.height(12.dp))
-        
+
         // Mode Selection Tabs
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -138,9 +138,9 @@ fun FirmwareUpdateScreen(viewModel: MainViewModel) {
                 leadingIcon = { Icon(Icons.Default.FolderOpen, contentDescription = null, modifier = Modifier.size(18.dp)) }
             )
         }
-        
+
         Spacer(modifier = Modifier.height(12.dp))
-        
+
         if (useLocalFile) {
             // Local File Selection Card
             ExpandableCard(
@@ -194,7 +194,7 @@ fun FirmwareUpdateScreen(viewModel: MainViewModel) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text("Release:", modifier = Modifier.width(80.dp))
-                        
+
                         ExposedDropdownMenuBox(
                             expanded = releaseDropdownExpanded,
                             onExpandedChange = { releaseDropdownExpanded = it },
@@ -214,7 +214,7 @@ fun FirmwareUpdateScreen(viewModel: MainViewModel) {
                                     unfocusedBorderColor = TextMuted
                                 )
                             )
-                            
+
                             ExposedDropdownMenu(
                                 expanded = releaseDropdownExpanded,
                                 onDismissRequest = { releaseDropdownExpanded = false }
@@ -230,9 +230,9 @@ fun FirmwareUpdateScreen(viewModel: MainViewModel) {
                                 }
                             }
                         }
-                        
+
                         Spacer(modifier = Modifier.width(8.dp))
-                        
+
                         Button(
                             onClick = { viewModel.fetchOnlineReleases() },
                             enabled = !isOnlineLoading && !isUpdating,
@@ -249,9 +249,9 @@ fun FirmwareUpdateScreen(viewModel: MainViewModel) {
                             }
                         }
                     }
-                    
+
                     Spacer(modifier = Modifier.height(16.dp))
-                    
+
                     // Status message
                     if (onlineStatus.isNotEmpty()) {
                         Text(
@@ -261,7 +261,7 @@ fun FirmwareUpdateScreen(viewModel: MainViewModel) {
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                     }
-                    
+
                     // Manifest info and variant selection
                     currentManifest?.let { manifest ->
                         // Release info
@@ -293,9 +293,9 @@ fun FirmwareUpdateScreen(viewModel: MainViewModel) {
                                 }
                             }
                         }
-                        
+
                         Spacer(modifier = Modifier.height(12.dp))
-                        
+
                         // Firmware Variants
                         Text(
                             text = "Firmware Variants",
@@ -303,7 +303,7 @@ fun FirmwareUpdateScreen(viewModel: MainViewModel) {
                             fontWeight = FontWeight.SemiBold
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        
+
                         manifest.firmware?.variants?.forEach { variant ->
                             FirmwareVariantCard(
                                 variant = variant,
@@ -313,7 +313,7 @@ fun FirmwareUpdateScreen(viewModel: MainViewModel) {
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
-                    
+
                     // Download progress
                     if (downloadProgress in 1..99) {
                         Spacer(modifier = Modifier.height(8.dp))
@@ -398,12 +398,12 @@ fun FirmwareUpdateScreen(viewModel: MainViewModel) {
                         .padding(8.dp)
                 ) {
                     val logScrollState = rememberScrollState()
-                    
+
                     // Auto-scroll to bottom when log changes
                     LaunchedEffect(firmwareLog) {
                         logScrollState.animateScrollTo(logScrollState.maxValue)
                     }
-                    
+
                     Text(
                         text = firmwareLog.ifEmpty { "> Ready for firmware update" },
                         style = MaterialTheme.typography.bodySmall.copy(
@@ -442,9 +442,9 @@ fun FirmwareUpdateScreen(viewModel: MainViewModel) {
                 } else {
                     isRealUsbConnection && selectedVariant != null
                 }
-                
+
                 Button(
-                    onClick = { 
+                    onClick = {
                         if (useLocalFile) {
                             viewModel.startFirmwareUpdate(context)
                         } else {
@@ -479,7 +479,7 @@ fun FirmwareUpdateScreen(viewModel: MainViewModel) {
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         }
-        
+
         // Note about .bin files
         Spacer(modifier = Modifier.height(8.dp))
         Text(
@@ -502,7 +502,7 @@ fun FirmwareVariantCard(
 ) {
     val borderColor = if (isSelected) FullmoniPrimary else TextMuted.copy(alpha = 0.3f)
     val backgroundColor = if (isSelected) FullmoniPrimary.copy(alpha = 0.1f) else SurfaceLight
-    
+
     Card(
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
         modifier = Modifier
@@ -534,7 +534,7 @@ fun FirmwareVariantCard(
                     contentScale = ContentScale.FillWidth
                 )
             }
-            
+
             // Content row with radio button and text
             Row(
                 modifier = Modifier
@@ -548,9 +548,9 @@ fun FirmwareVariantCard(
                     onClick = onClick,
                     colors = RadioButtonDefaults.colors(selectedColor = FullmoniPrimary)
                 )
-                
+
                 Spacer(modifier = Modifier.width(8.dp))
-                
+
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = variant.name,

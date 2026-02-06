@@ -1,6 +1,9 @@
 package com.fullmoni.terminal.ui.screens
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,18 +17,38 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.fullmoni.terminal.R
 import com.fullmoni.terminal.ui.theme.*
 import com.fullmoni.terminal.viewmodel.MainViewModel
+import kotlinx.coroutines.delay
 
-// デバッグビルドかどうかを判定する定数（BuildConfigが生成されない場合のフォールバック）
-private val IS_DEBUG_BUILD = true  // リリースビルド時はfalseに変更
+/**
+ * エミュレーターかどうかを判定
+ */
+private fun isEmulator(): Boolean {
+    return (android.os.Build.FINGERPRINT.startsWith("generic")
+            || android.os.Build.FINGERPRINT.startsWith("unknown")
+            || android.os.Build.MODEL.contains("google_sdk")
+            || android.os.Build.MODEL.contains("Emulator")
+            || android.os.Build.MODEL.contains("Android SDK built for x86")
+            || android.os.Build.MANUFACTURER.contains("Genymotion")
+            || android.os.Build.BRAND.startsWith("generic")
+            || android.os.Build.DEVICE.startsWith("generic")
+            || android.os.Build.PRODUCT == "google_sdk"
+            || android.os.Build.PRODUCT.startsWith("sdk")
+            || android.os.Build.HARDWARE.contains("goldfish")
+            || android.os.Build.HARDWARE.contains("ranchu"))
+}
 
 /**
  * ホーム画面（ダッシュボード）
@@ -209,6 +232,29 @@ private fun HeroBanner(
     onSimulatorClick: () -> Unit,
     onTcpBridgeClick: () -> Unit
 ) {
+    // 背景画像切り替え用の状態
+    var showingImage1 by remember { mutableStateOf(true) }
+    
+    // 5秒間隔で画像を切り替え
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(5000)
+            showingImage1 = !showingImage1
+        }
+    }
+    
+    // フェードアニメーション（1.5秒）
+    val image1Alpha by animateFloatAsState(
+        targetValue = if (showingImage1) 0.35f else 0f,
+        animationSpec = tween(durationMillis = 1500),
+        label = "image1Alpha"
+    )
+    val image2Alpha by animateFloatAsState(
+        targetValue = if (showingImage1) 0f else 0.35f,
+        animationSpec = tween(durationMillis = 1500),
+        label = "image2Alpha"
+    )
+    
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -217,19 +263,55 @@ private fun HeroBanner(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(
-                            FullmoniPrimary,
-                            FullmoniPrimary,
-                            FullmoniPrimaryDark,
-                            Color(0xFF06475F)
+                .clip(RoundedCornerShape(16.dp))
+        ) {
+            // 背景画像1 (FM3 - CAD)
+            Image(
+                painter = painterResource(id = R.drawable.fm3),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(280.dp)
+                    .alpha(image1Alpha),
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.CenterEnd
+            )
+            
+            // 背景画像2 (FM2 - 実機)
+            Image(
+                painter = painterResource(id = R.drawable.fm2),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(280.dp)
+                    .alpha(image2Alpha),
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.CenterEnd
+            )
+            
+            // グラデーションオーバーレイ
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(280.dp)
+                    .background(
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(
+                                FullmoniPrimary.copy(alpha = 0.95f),
+                                FullmoniPrimary.copy(alpha = 0.85f),
+                                FullmoniPrimaryDark.copy(alpha = 0.6f),
+                                Color(0xFF06475F).copy(alpha = 0.3f)
+                            )
                         )
                     )
-                )
-                .padding(24.dp)
-        ) {
-            Column {
+            )
+            
+            // コンテンツ
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp)
+            ) {
                 // ステータスバッジ
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -308,8 +390,8 @@ private fun HeroBanner(
                     )
                 }
                 
-                // シミュレーターボタン（デバッグビルドのみ）
-                if (IS_DEBUG_BUILD && !isConnected) {
+                // シミュレーター/TCPブリッジボタン（エミュレーターのみ表示）
+                if (isEmulator() && !isConnected) {
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedButton(
                         onClick = onSimulatorClick,

@@ -18,48 +18,48 @@ import java.net.URL
  * GitHub Releases からファームウェアカタログを取得し、ダウンロードするサービス
  */
 class OnlineUpdateService(private val context: Context) {
-    
+
     companion object {
         private const val TAG = "OnlineUpdateService"
-        
+
         // GitHub リポジトリ情報
         private const val REPO_OWNER = "tomoya723"
         private const val REPO_NAME = "FULLMONI-WIDE"
-        
+
         // GitHub API のベースURL
         private const val API_BASE_URL = "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME"
-        
+
         // GitHub Releases ダウンロードURL
         private fun getDownloadUrl(tag: String, fileName: String): String {
             return "https://github.com/$REPO_OWNER/$REPO_NAME/releases/download/$tag/$fileName"
         }
-        
+
         // タイムアウト設定
         private const val CONNECT_TIMEOUT_MS = 30000
         private const val READ_TIMEOUT_MS = 60000
     }
-    
-    private val json = Json { 
-        ignoreUnknownKeys = true 
+
+    private val json = Json {
+        ignoreUnknownKeys = true
         isLenient = true
     }
-    
+
     // 状態
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
-    
+
     private val _downloadProgress = MutableStateFlow(0)
     val downloadProgress: StateFlow<Int> = _downloadProgress.asStateFlow()
-    
+
     private val _statusMessage = MutableStateFlow("")
     val statusMessage: StateFlow<String> = _statusMessage.asStateFlow()
-    
+
     private val _availableReleases = MutableStateFlow<List<String>>(emptyList())
     val availableReleases: StateFlow<List<String>> = _availableReleases.asStateFlow()
-    
+
     private val _currentManifest = MutableStateFlow<ReleaseManifest?>(null)
     val currentManifest: StateFlow<ReleaseManifest?> = _currentManifest.asStateFlow()
-    
+
     /**
      * 利用可能なリリースタグの一覧を取得
      */
@@ -67,7 +67,7 @@ class OnlineUpdateService(private val context: Context) {
         try {
             _isLoading.value = true
             updateStatus("Fetching available releases...")
-            
+
             val url = URL("$API_BASE_URL/releases?per_page=$limit")
             val connection = url.openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
@@ -75,13 +75,13 @@ class OnlineUpdateService(private val context: Context) {
             connection.setRequestProperty("User-Agent", "FULLMONI-WIDE-Android/1.0")
             connection.connectTimeout = CONNECT_TIMEOUT_MS
             connection.readTimeout = READ_TIMEOUT_MS
-            
+
             if (connection.responseCode == HttpURLConnection.HTTP_OK) {
                 val response = connection.inputStream.bufferedReader().readText()
                 // レスポンスからタグ名を抽出（簡易パース）
                 val tagPattern = """"tag_name"\s*:\s*"([^"]+)"""".toRegex()
                 val tags = tagPattern.findAll(response).map { it.groupValues[1] }.toList()
-                
+
                 _availableReleases.value = tags
                 updateStatus("Found ${tags.size} releases")
                 Log.d(TAG, "Available releases: $tags")
@@ -99,7 +99,7 @@ class OnlineUpdateService(private val context: Context) {
             _isLoading.value = false
         }
     }
-    
+
     /**
      * 最新リリースのマニフェストを取得
      */
@@ -107,19 +107,19 @@ class OnlineUpdateService(private val context: Context) {
         try {
             _isLoading.value = true
             updateStatus("Fetching latest release...")
-            
+
             // リリース一覧を取得して最新タグを取得
             val releases = if (_availableReleases.value.isEmpty()) {
                 fetchAvailableReleases(1)
             } else {
                 _availableReleases.value
             }
-            
+
             if (releases.isEmpty()) {
                 updateStatus("No releases available")
                 return@withContext null
             }
-            
+
             fetchManifestForTag(releases.first())
         } catch (e: Exception) {
             Log.e(TAG, "Error fetching latest manifest: ${e.message}", e)
@@ -129,7 +129,7 @@ class OnlineUpdateService(private val context: Context) {
             _isLoading.value = false
         }
     }
-    
+
     /**
      * 特定タグのマニフェストを取得
      */
@@ -137,10 +137,10 @@ class OnlineUpdateService(private val context: Context) {
         try {
             _isLoading.value = true
             updateStatus("Fetching manifest for $tag...")
-            
+
             val manifestUrl = getDownloadUrl(tag, "release-manifest.json")
             Log.d(TAG, "Fetching manifest from: $manifestUrl")
-            
+
             val url = URL(manifestUrl)
             val connection = url.openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
@@ -149,19 +149,19 @@ class OnlineUpdateService(private val context: Context) {
             connection.connectTimeout = CONNECT_TIMEOUT_MS
             connection.readTimeout = READ_TIMEOUT_MS
             connection.instanceFollowRedirects = true
-            
+
             val responseCode = connection.responseCode
             Log.d(TAG, "Response code: $responseCode, URL after redirect: ${connection.url}")
-            
+
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 val response = connection.inputStream.bufferedReader().readText()
                 Log.d(TAG, "Response length: ${response.length}, first 100 chars: ${response.take(100)}")
-                
+
                 // BOMを除去
                 val cleanedResponse = response.trimStart('\uFEFF', '\u200B', ' ', '\n', '\r')
-                
+
                 val manifest = json.decodeFromString<ReleaseManifest>(cleanedResponse)
-                
+
                 // 各バリアントにダウンロードURLを設定
                 manifest.firmware?.variants?.forEach { variant ->
                     variant.downloadUrl = getDownloadUrl(tag, variant.file)
@@ -170,7 +170,7 @@ class OnlineUpdateService(private val context: Context) {
                         Log.d(TAG, "Variant ${variant.id}: thumbnailUrl=${variant.thumbnailUrl}")
                     }
                 }
-                
+
                 _currentManifest.value = manifest
                 updateStatus("Found ${manifest.firmware?.variants?.size ?: 0} firmware variant(s)")
                 Log.d(TAG, "Manifest loaded: version=${manifest.version}, variants=${manifest.firmware?.variants?.size}")
@@ -188,14 +188,14 @@ class OnlineUpdateService(private val context: Context) {
             _isLoading.value = false
         }
     }
-    
+
     /**
      * サムネイル画像をダウンロード
      */
     suspend fun downloadThumbnail(thumbnailUrl: String): ByteArray? = withContext(Dispatchers.IO) {
         try {
             if (thumbnailUrl.isEmpty()) return@withContext null
-            
+
             val url = URL(thumbnailUrl)
             val connection = url.openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
@@ -203,7 +203,7 @@ class OnlineUpdateService(private val context: Context) {
             connection.connectTimeout = CONNECT_TIMEOUT_MS
             connection.readTimeout = READ_TIMEOUT_MS
             connection.instanceFollowRedirects = true
-            
+
             if (connection.responseCode == HttpURLConnection.HTTP_OK) {
                 connection.inputStream.readBytes()
             } else {
@@ -215,7 +215,7 @@ class OnlineUpdateService(private val context: Context) {
             null
         }
     }
-    
+
     /**
      * ファームウェアをダウンロード
      * @return ダウンロードしたファイルのパス、失敗時はnull
@@ -226,10 +226,10 @@ class OnlineUpdateService(private val context: Context) {
                 updateStatus("Download URL not available")
                 return@withContext null
             }
-            
+
             updateStatus("Downloading ${variant.name}...")
             _downloadProgress.value = 0
-            
+
             val url = URL(variant.downloadUrl)
             val connection = url.openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
@@ -237,35 +237,35 @@ class OnlineUpdateService(private val context: Context) {
             connection.connectTimeout = CONNECT_TIMEOUT_MS
             connection.readTimeout = READ_TIMEOUT_MS * 5  // ファイルダウンロード用に長めに
             connection.instanceFollowRedirects = true
-            
+
             if (connection.responseCode != HttpURLConnection.HTTP_OK) {
                 Log.e(TAG, "Failed to download firmware: ${connection.responseCode}")
                 updateStatus("Download failed: ${connection.responseCode}")
                 return@withContext null
             }
-            
+
             val contentLength = connection.contentLength
             val downloadDir = File(context.cacheDir, "firmware")
             if (!downloadDir.exists()) {
                 downloadDir.mkdirs()
             }
-            
+
             val outputFile = File(downloadDir, variant.file)
-            
+
             connection.inputStream.use { input ->
                 outputFile.outputStream().use { output ->
                     val buffer = ByteArray(8192)
                     var bytesRead: Int
                     var totalRead = 0L
-                    
+
                     while (input.read(buffer).also { bytesRead = it } != -1) {
                         output.write(buffer, 0, bytesRead)
                         totalRead += bytesRead
-                        
+
                         if (contentLength > 0) {
                             val progress = (totalRead * 100 / contentLength).toInt()
                             _downloadProgress.value = progress
-                            
+
                             if (progress % 10 == 0) {
                                 updateStatus("Downloading: $progress%")
                             }
@@ -273,17 +273,17 @@ class OnlineUpdateService(private val context: Context) {
                     }
                 }
             }
-            
+
             _downloadProgress.value = 100
             updateStatus("Download complete: ${outputFile.name}")
             Log.d(TAG, "Firmware downloaded to: ${outputFile.absolutePath}")
-            
+
             // ファイルサイズ検証
             if (outputFile.length() != variant.size) {
                 Log.w(TAG, "Size mismatch: expected ${variant.size}, got ${outputFile.length()}")
                 // サイズ不一致でもファイルは返す（ダウンロード中に圧縮されている可能性）
             }
-            
+
             outputFile
         } catch (e: Exception) {
             Log.e(TAG, "Error downloading firmware: ${e.message}", e)
@@ -292,7 +292,7 @@ class OnlineUpdateService(private val context: Context) {
             null
         }
     }
-    
+
     /**
      * キャッシュをクリア
      */
@@ -304,7 +304,7 @@ class OnlineUpdateService(private val context: Context) {
         _currentManifest.value = null
         _availableReleases.value = emptyList()
     }
-    
+
     private fun updateStatus(message: String) {
         _statusMessage.value = message
     }

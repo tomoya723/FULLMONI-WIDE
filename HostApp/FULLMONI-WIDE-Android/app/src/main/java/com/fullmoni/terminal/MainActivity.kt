@@ -17,18 +17,18 @@ import com.fullmoni.terminal.ui.theme.FullmoniTheme
 import com.fullmoni.terminal.viewmodel.MainViewModel
 
 class MainActivity : ComponentActivity() {
-    
+
     companion object {
         private const val TAG = "MainActivity"
     }
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        
+
         // USBデバイス接続によるIntentをログ
         handleUsbIntent(intent)
-        
+
         setContent {
             FullmoniTheme {
                 Surface(
@@ -43,14 +43,14 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-    
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         // singleTopモードでUSBデバイス接続時に呼ばれる
         // Activityは再起動されず、このメソッドだけが呼ばれる
         handleUsbIntent(intent)
     }
-    
+
     private fun handleUsbIntent(intent: Intent?) {
         if (intent?.action == UsbManager.ACTION_USB_DEVICE_ATTACHED) {
             Log.d(TAG, "USB device attached via intent - Activity not restarted due to singleTop mode")

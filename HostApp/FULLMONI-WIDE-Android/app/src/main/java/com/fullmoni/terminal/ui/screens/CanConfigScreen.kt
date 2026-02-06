@@ -38,11 +38,11 @@ fun CanConfigScreen(viewModel: MainViewModel) {
 
     val canChannels by viewModel.canChannels.collectAsState()
     val canFields by viewModel.canFields.collectAsState()
-    
+
     // 編集ダイアログ用の状態
     var editingFieldIndex by remember { mutableStateOf<Int?>(null) }
     var editingField by remember { mutableStateOf<CanField?>(null) }
-    
+
     // 確認ダイアログ用の状態
     var showSaveConfirmDialog by remember { mutableStateOf(false) }
     var showDefaultConfirmDialog by remember { mutableStateOf(false) }
@@ -149,7 +149,7 @@ fun CanConfigScreen(viewModel: MainViewModel) {
                     color = TextMuted,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-                
+
                 // フィールドリスト（コンパクトカード形式）
                 canFields.forEachIndexed { index, field ->
                     CanFieldCard(
@@ -206,7 +206,7 @@ fun CanConfigScreen(viewModel: MainViewModel) {
             }
         }
     }
-    
+
     // フィールド編集ダイアログ
     if (editingFieldIndex != null && editingField != null) {
         CanFieldEditDialog(
@@ -223,7 +223,7 @@ fun CanConfigScreen(viewModel: MainViewModel) {
             }
         )
     }
-    
+
     // Save確認ダイアログ
     if (showSaveConfirmDialog) {
         AlertDialog(
@@ -248,7 +248,7 @@ fun CanConfigScreen(viewModel: MainViewModel) {
             }
         )
     }
-    
+
     // Default確認ダイアログ
     if (showDefaultConfirmDialog) {
         AlertDialog(
@@ -332,7 +332,7 @@ private fun CanFieldCard(
 ) {
     val backgroundColor = if (field.enabled) CardBackground else CardBackground.copy(alpha = 0.5f)
     val textColor = if (field.enabled) TextPrimary else TextMuted
-    
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -361,9 +361,9 @@ private fun CanFieldCard(
                     color = TextPrimary
                 )
             }
-            
+
             Spacer(modifier = Modifier.width(12.dp))
-            
+
             // フィールド情報
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -388,7 +388,7 @@ private fun CanFieldCard(
                     color = TextMuted
                 )
             }
-            
+
             // 編集アイコン
             Icon(
                 imageVector = Icons.Default.Edit,
@@ -413,7 +413,7 @@ private fun CanFieldEditDialog(
     var editField by remember { mutableStateOf(field) }
     var validationError by remember { mutableStateOf<String?>(null) }
     val scrollState = rememberScrollState()
-    
+
     // バリデーション関数
     fun validateField(): String? {
         if (editField.enabled) {
@@ -432,7 +432,7 @@ private fun CanFieldEditDialog(
         }
         return null
     }
-    
+
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
@@ -453,9 +453,9 @@ private fun CanFieldEditDialog(
                     fontWeight = FontWeight.Bold,
                     color = TextPrimary
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 // Enabled
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
@@ -465,9 +465,9 @@ private fun CanFieldEditDialog(
                     )
                     Text("Enabled", color = TextPrimary)
                 }
-                
+
                 Spacer(modifier = Modifier.height(12.dp))
-                
+
                 // 基本設定（2列）
                 Row(modifier = Modifier.fillMaxWidth()) {
                     EditTextField(
@@ -486,9 +486,9 @@ private fun CanFieldEditDialog(
                         keyboardType = KeyboardType.Number
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Row(modifier = Modifier.fillMaxWidth()) {
                     EditTextField(
                         modifier = Modifier.weight(1f),
@@ -505,9 +505,9 @@ private fun CanFieldEditDialog(
                         onValueChange = { editField = editField.copy(dataType = it.uppercase().take(1)) }
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Row(modifier = Modifier.fillMaxWidth()) {
                     EditTextField(
                         modifier = Modifier.weight(1f),
@@ -523,9 +523,9 @@ private fun CanFieldEditDialog(
                         onValueChange = { editField = editField.copy(targetVar = it.uppercase()) }
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(12.dp))
-                
+
                 // 変換設定
                 Text(
                     text = "Conversion",
@@ -533,9 +533,9 @@ private fun CanFieldEditDialog(
                     fontWeight = FontWeight.SemiBold,
                     color = TextSecondary
                 )
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Row(modifier = Modifier.fillMaxWidth()) {
                     EditTextField(
                         modifier = Modifier.weight(1f),
@@ -553,9 +553,9 @@ private fun CanFieldEditDialog(
                         keyboardType = KeyboardType.Decimal
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Row(modifier = Modifier.fillMaxWidth()) {
                     EditTextField(
                         modifier = Modifier.weight(1f),
@@ -573,9 +573,9 @@ private fun CanFieldEditDialog(
                         keyboardType = KeyboardType.Number
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(12.dp))
-                
+
                 // 表示設定
                 Text(
                     text = "Display",
@@ -583,9 +583,9 @@ private fun CanFieldEditDialog(
                     fontWeight = FontWeight.SemiBold,
                     color = TextSecondary
                 )
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Row(modifier = Modifier.fillMaxWidth()) {
                     EditTextField(
                         modifier = Modifier.weight(1f),
@@ -601,9 +601,9 @@ private fun CanFieldEditDialog(
                         onValueChange = { editField = editField.copy(unit = it) }
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(12.dp))
-                
+
                 // 警告設定
                 Text(
                     text = "Warnings",
@@ -611,9 +611,9 @@ private fun CanFieldEditDialog(
                     fontWeight = FontWeight.SemiBold,
                     color = TextSecondary
                 )
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 // Warning Low
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -632,7 +632,7 @@ private fun CanFieldEditDialog(
                         keyboardType = KeyboardType.Decimal
                     )
                 }
-                
+
                 // Warning High
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -651,9 +651,9 @@ private fun CanFieldEditDialog(
                         keyboardType = KeyboardType.Decimal
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(20.dp))
-                
+
                 // ボタン
                 Row(
                     modifier = Modifier.fillMaxWidth(),

@@ -11,19 +11,19 @@ import kotlinx.serialization.Serializable
 data class ReleaseManifest(
     @SerialName("schemaVersion")
     val schemaVersion: Int = 1,
-    
+
     @SerialName("version")
     val version: String = "",
-    
+
     @SerialName("releaseDate")
     val releaseDate: String = "",
-    
+
     @SerialName("releaseNotes")
     val releaseNotes: String? = null,
-    
+
     @SerialName("firmware")
     val firmware: FirmwareInfo? = null,
-    
+
     @SerialName("hostApps")
     val hostApps: HostAppsInfo? = null
 )
@@ -35,7 +35,7 @@ data class ReleaseManifest(
 data class FirmwareInfo(
     @SerialName("minimumBootloaderVersion")
     val minimumBootloaderVersion: String = "",
-    
+
     @SerialName("variants")
     val variants: List<FirmwareVariant> = emptyList()
 )
@@ -47,22 +47,22 @@ data class FirmwareInfo(
 data class FirmwareVariant(
     @SerialName("id")
     val id: String = "",
-    
+
     @SerialName("name")
     val name: String = "",
-    
+
     @SerialName("description")
     val description: String? = null,
-    
+
     @SerialName("file")
     val file: String = "",
-    
+
     @SerialName("thumbnail")
     val thumbnail: String? = null,
-    
+
     @SerialName("size")
     val size: Long = 0,
-    
+
     @SerialName("sha256")
     val sha256: String = ""
 ) {
@@ -71,13 +71,13 @@ data class FirmwareVariant(
      */
     @kotlinx.serialization.Transient
     var downloadUrl: String = ""
-    
+
     /**
      * サムネイルURL（実行時に設定）
      */
     @kotlinx.serialization.Transient
     var thumbnailUrl: String = ""
-    
+
     /**
      * サイズを読みやすい形式で表示
      */
@@ -98,7 +98,7 @@ data class FirmwareVariant(
 data class HostAppsInfo(
     @SerialName("android")
     val android: HostAppInfo? = null,
-    
+
     @SerialName("windows")
     val windows: HostAppInfo? = null
 )
@@ -110,13 +110,13 @@ data class HostAppsInfo(
 data class HostAppInfo(
     @SerialName("version")
     val version: String = "",
-    
+
     @SerialName("file")
     val file: String? = null,
-    
+
     @SerialName("size")
     val size: Long = 0,
-    
+
     @SerialName("sha256")
     val sha256: String = ""
 )
