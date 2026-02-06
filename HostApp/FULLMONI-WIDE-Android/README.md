@@ -2,99 +2,234 @@
 
 FULLMONI-WIDEファームウェアとUSB通信するためのAndroidアプリケーションです。
 
-## 概要
+## 📱 概要
 
 Windows版 FULLMONI-WIDE-Terminal と同等の機能を持つAndroid版アプリです。  
-USB OTGケーブル経由でファームウェアと直接通信し、パラメータ設定やファームウェア更新が可能です。
+USB OTGケーブル経由でFULLMONI-WIDEデバイスと直接通信し、パラメータ設定やファームウェア更新が可能です。
 
-## 機能
+**初リリース: v1.0.0**
 
-### 🏠 Home（ダッシュボード）
-- ヒーローバナーによる接続状態表示
-- クイックアクセスカードで各機能に素早くアクセス
-- 接続デバイス情報の表示
+### 主な特徴
 
-### 📊 Status（ステータス）
-- ODO/TRIP/DateTime のリアルタイム表示
-- TRIP リセット機能
-- RTC 同期機能（スマートフォンの時刻で同期）
+- 📶 **USB CDC直接通信**: USB OTGケーブルでデバイスと直接接続
+- 🎨 **Material 3 UI**: Windows版と統一されたダークテーマ
+- ⚡ **リアルタイム操作**: パラメータ変更が即座に反映
+- 🖼️ **起動画面カスタマイズ**: スマホの画像をデバイスに書き込み
+- 📦 **ファームウェア更新**: OTA的にファームウェアを更新
 
-### ⚙️ Settings（車両設定）
-- **タイヤサイズ**: 幅/扁平率/リム径
-- **ギア比**: 1〜6速およびファイナルギア（プリセット選択可能）
-- **警告設定**: 水温低温/高温、燃料警告閾値
-- **シフトインジケータ**: 5段階のシフトアップRPM設定
+---
 
-### 🔌 CAN Config（CAN設定）
-- Master Warning設定（有効/サウンド）
-- 6チャンネルの受信ID設定
-- 16フィールドのデータ定義（変数割り当て、係数設定、警告閾値）
+## 📲 インストール方法
 
-### 🖼️ Boot Screen（起動画面）
-- 765×256ピクセルの画像選択とプレビュー
-- デバイスへの書き込み/読み込み
-- ファイルへの保存
+### APKから直接インストール
 
-### 📥 FW Update（ファームウェア更新）
-- .motファイル選択
-- 転送進捗表示
-- 通信ログ表示
+1. GitHub Releases から `FULLMONI-WIDE-Terminal-android.apk` をダウンロード
+2. スマートフォンでダウンロードしたAPKファイルを開く
+3. 「提供元不明のアプリ」のインストールを許可
+4. インストールを完了
 
-### ℹ️ About（情報）
-- アプリバージョン情報
-- ハードウェア情報
+### ソースからビルド
+
+後述の「ビルド方法」セクションを参照してください。
+
+---
+
+## 🔌 接続方法
+
+### 必要なもの
+
+| 機材 | 説明 |
+|------|------|
+| USB OTGケーブル/アダプタ | スマートフォンのUSB端子に接続 |
+| USB Type-A to Micro-Bケーブル | FULLMONI-WIDEとの接続用 |
+| FULLMONI-WIDEデバイス | ファームウェアv1.0.0以上 |
+| Android端末 | Android 5.0以上、USB Host対応 |
+
+### 接続手順
+
+```
+┌─────────────┐    USB OTG     ┌─────────────┐    USB      ┌─────────────┐
+│             │    アダプタ     │             │   ケーブル   │             │
+│  Android    │◄──────────────►│   USB OTG   │◄───────────►│ FULLMONI    │
+│  スマホ     │                │   アダプタ   │             │  -WIDE      │
+│             │                │             │             │             │
+└─────────────┘                └─────────────┘             └─────────────┘
+```
+
+1. USB OTGアダプタをスマートフォンに接続
+2. FULLMONI-WIDEをUSBケーブルでOTGアダプタに接続
+3. アプリを起動
+4. **USB接続許可ダイアログ**が表示されたら「OK」をタップ
+5. Home画面の「**Connect Device**」ボタンをタップ
+6. 右上のインジケーターが🟢（緑）になれば接続完了
+
+### 接続状態の確認
+
+| インジケーター | 状態 |
+|---------------|------|
+| 🔴 赤 | 未接続 |
+| 🟢 緑 | 接続中 |
+
+---
+
+## 🏠 機能一覧
+
+### Home（ホーム）
+
+ダッシュボード画面です。接続状態と各機能へのクイックアクセスを提供します。
+
+- **ヒーローバナー**: 接続状態、デバイス名を表示
+  - 背景画像が5秒ごとにクロスフェードで切り替わります
+- **Quick Access カード**: Status, Settings, CAN Config, Boot Screen, FW Update, About への直接リンク
+- **接続ボタン**: Connect Device / Disconnect
+
+### Status（ステータス）
+
+車両のステータス情報を表示・管理します。
+
+| 項目 | 説明 | 操作 |
+|------|------|------|
+| ODO | 総走行距離 (km) | 表示のみ |
+| TRIP | トリップメーター (km) | リセット可能 |
+| Date/Time | デバイスの日時 | スマホ時刻と同期可能 |
+
+**操作方法**:
+- 「Reset TRIP」→ TRIPをゼロにリセット
+- 「Sync RTC」→ スマートフォンの現在時刻でデバイスの時計を同期
+
+### Settings（設定）
+
+車両パラメータを設定します。
+
+#### タイヤサイズ
+| パラメータ | 範囲 | 例 |
+|-----------|------|-----|
+| 幅 | 125-355 mm | 245 |
+| 扁平率 | 25-80 % | 40 |
+| リム径 | 12-22 インチ | 18 |
+
+#### ギア比
+- **プリセット選択**: MX-5, S2000, GR86等
+- **手動入力**: 1〜6速 + ファイナルギア
+
+#### 警告設定
+| 項目 | 説明 | デフォルト |
+|------|------|-----------|
+| 水温低温警告 | この温度以下で警告 | 60°C |
+| 水温高温警告 | この温度以上で警告 | 100°C |
+| 燃料警告 | この残量以下で警告 | 10L |
+
+#### シフトインジケーター
+エンジン回転数に応じて5段階でLEDが点灯します。
+各段階のRPM閾値を設定できます（例: 5000, 6000, 6500, 7000, 7500）。
+
+**操作方法**:
+1. 各項目を変更
+2. 「**Save to Device**」ボタンで保存
+3. 「Saved successfully」と表示されれば完了
+
+### CAN Config（CAN設定）
+
+CAN BUSからのデータ受信設定をカスタマイズします。
+
+#### Master Warning
+| 項目 | 説明 |
+|------|------|
+| Enable | マスターワーニング有効/無効 |
+| Sound | 警告音の有効/無効 |
+
+#### 受信チャンネル (6ch)
+各チャンネルで受信するCAN IDを16進数で設定（例: `0x201`）
+
+#### データフィールド (16個)
+各フィールドに以下を設定:
+- **変数**: Speed, RPM, WaterTemp, OilTemp, OilPress等
+- **開始バイト**: CAN データ内の位置 (0-7)
+- **バイト長**: 1, 2, or 4 bytes
+- **エンディアン**: Big/Little
+- **係数**: 生データに掛ける倍率
+- **オフセット**: 係数適用後に加算する値
+- **警告閾値**: この値を超えると警告（0=無効）
+
+### Boot Screen（起動画面）
+
+デバイス起動時に表示される画像をカスタマイズします。
+
+#### 画像仕様
+| 項目 | 値 |
+|------|-----|
+| 解像度 | 765 × 256 ピクセル |
+| 形式 | BMP, PNG, JPEG, WebP |
+| 内部形式 | RGB565 (16bit) |
+
+#### 操作
+
+| ボタン | 説明 |
+|--------|------|
+| **Select** | スマートフォンから画像を選択 |
+| **Read** | デバイスから現在の起動画像を読み込み |
+| **Save** | プレビュー画像をPNGファイルとして保存 |
+| **Upload** | 選択した画像をデバイスに書き込み |
+
+#### 書き込み手順
+1. 「Select」で画像を選択（自動的に765×256にリサイズ）
+2. プレビューで確認
+3. 「Upload」をタップ
+4. 進捗バーが100%になるまで待機（約30秒）
+5. 「Upload completed」と表示されれば成功
+6. デバイスを再起動して確認
+
+#### 読み込み手順
+1. 「Read」をタップ
+2. 進捗バーが100%になるまで待機（約5秒）
+3. プレビューに現在の起動画像が表示される
+4. 「Save」で画像をファイルに保存可能
+
+**注意**: 転送中は絶対に接続を切らないでください。
+
+### FW Update（ファームウェア更新）
+
+FULLMONI-WIDEのファームウェアを更新します。
+
+#### 更新手順
+1. 「Select .mot file」で更新ファイルを選択
+2. ファイル情報（サイズ等）を確認
+3. 「Start Update」をタップ
+4. 進捗バーが100%になるまで待機
+5. デバイスが自動的に再起動
+
+**注意**: 
+- 更新中は絶対に接続を切らないでください
+- 電源が安定していることを確認してください
+- 更新失敗時はBootloaderモードで復旧可能です
+
+### About（情報）
+
+アプリとデバイスの情報を表示します。
+
+- アプリバージョン
+- ファームウェアバージョン
 - ライセンス情報
-- GitHubリンク
+- GitHubリポジトリへのリンク
 
-## 動作環境
+---
 
-- Android 5.0 (API Level 21) 以上
-- USB Host機能対応端末
-- USB OTGケーブル
+## 🛠️ 動作環境
 
-## 技術スタック
+### 対応Android
+- **最小**: Android 5.0 (API Level 21)
+- **推奨**: Android 10.0以上
+- **必須**: USB Host (USB OTG) 対応
 
-- **言語**: Kotlin
-- **UI**: Jetpack Compose + Material 3
-- **USB通信**: usb-serial-for-android ライブラリ
-- **アーキテクチャ**: MVVM
-- **テーマ**: Windows版と統一されたダークテーマ（Cyan/Tealアクセント）
+### USB Host対応の確認方法
+1. 「USB Host Diagnostics」等のアプリをインストール
+2. USB OTG対応と表示されればOK
 
-## プロジェクト構成
+多くのAndroid端末がUSB Hostに対応していますが、一部の廉価端末では非対応の場合があります。
 
-```
-app/
-├── src/main/
-│   ├── java/com/fullmoni/terminal/
-│   │   ├── MainActivity.kt
-│   │   ├── ui/
-│   │   │   ├── theme/
-│   │   │   │   ├── Color.kt
-│   │   │   │   ├── Theme.kt
-│   │   │   │   └── Type.kt
-│   │   │   ├── screens/
-│   │   │   │   ├── MainScreen.kt
-│   │   │   │   ├── HomeScreen.kt
-│   │   │   │   ├── StatusScreen.kt
-│   │   │   │   ├── SettingsScreen.kt
-│   │   │   │   ├── CanConfigScreen.kt
-│   │   │   │   ├── BootScreenScreen.kt
-│   │   │   │   ├── FirmwareUpdateScreen.kt
-│   │   │   │   ├── AboutScreen.kt
-│   │   │   │   └── TerminalScreen.kt
-│   │   │   └── components/
-│   │   │       └── SharedComponents.kt
-│   │   ├── viewmodel/
-│   │   │   └── MainViewModel.kt
-│   │   └── service/
-│   │       └── UsbSerialService.kt
-│   ├── res/
-│   └── AndroidManifest.xml
-├── build.gradle.kts
-└── proguard-rules.pro
-```
+---
 
-## ビルド方法
+## 🔧 ビルド方法
 
 ### 必要環境
 - Android Studio Hedgehog (2023.1.1) 以降
@@ -102,87 +237,36 @@ app/
 - Android SDK (API Level 34)
 
 ### ビルド手順
-1. Android Studio でプロジェクトを開く
-2. Gradle Sync を実行
-3. Build > Make Project
 
-### デバッグ実行
-1. USB OTG対応のAndroid端末を接続
-2. Run > Run 'app'
+```powershell
+# リポジトリをクローン
+git clone https://github.com/tomoya723/FULLMONI-WIDE.git
+cd FULLMONI-WIDE/HostApp/FULLMONI-WIDE-Android
 
-### エミュレーターで実機テスト（TCP Bridge）
+# Gradleラッパーでビルド
+$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
+.\gradlew.bat assembleDebug
+```
+
+APKは `app/build/outputs/apk/debug/app-debug.apk` に生成されます。
+
+### リリースビルド
+
+```powershell
+.\gradlew.bat assembleRelease
+```
+
+**注意**: リリースビルドにはキーストアの設定が必要です。
+
+---
+
+## 🧪 エミュレーターでのテスト（TCP Bridge）
 
 Android エミュレーターではUSBデバイスにアクセスできませんが、**TCP Bridge** 機能を使うことで、PCに接続された実機FULLMONI-WIDEとエミュレーター上のアプリを通信させることができます。
 
-#### 前提条件
-- FULLMONI-WIDEがPCのCOMポート（例: COM19）に接続されている
-- Android Emulatorが起動している
-- ADBにパスが通っている（または `C:\Users\<user>\AppData\Local\Android\Sdk\platform-tools\adb.exe` を使用）
+この機能は**エミュレーター実行時のみ**表示されます。
 
-#### 手順
-
-**ターミナル1: TCPブリッジを起動**
-```powershell
-cd tools
-.\com_bridge.ps1 -ComPort COM19
-```
-出力例:
-```
-=== COM to TCP Bridge ===
-COM Port: COM19
-TCP Port: 9999
-
-[OK] Serial port opened
-[OK] TCP listener started on port 9999
-
-Waiting for connection...
-```
-
-**ターミナル2: ADB Reverseを設定してアプリをインストール**
-```powershell
-# エミュレーターのポート転送を設定（これにより127.0.0.1:9999がPCの9999に転送される）
-adb reverse tcp:9999 tcp:9999
-
-# APKをビルド＆インストール
-cd HostApp\FULLMONI-WIDE-Android
-.\gradlew assembleDebug
-adb install -r app\build\outputs\apk\debug\app-debug.apk
-
-# アプリを起動
-adb shell am start -n com.fullmoni.terminal/.MainActivity
-```
-
-**アプリ内で接続**
-1. アプリのHomeScreen で **「TCP Bridge (Real)」** ボタンをタップ
-2. ターミナル1に `[CONNECTED]` が表示される
-3. 実機のパラメータが読み込まれ、UIが接続状態になる
-
-#### 動作確認ログ例
-```
-[CONNECTED] Client connected from 127.0.0.1:54423
-[TX->DEVICE] 
-[RX<-DEVICE] ========================================
-  FULLMONI-WIDE Parameter Console
-========================================
->
-[TX->DEVICE] version
-[RX<-DEVICE] VERSION 1.0.0
->
-[TX->DEVICE] list
-[RX<-DEVICE] === Current Parameters ===
-ODO: 184692 km  TRIP: 114.7 km
-```
-
-#### トラブルシューティング
-
-| 問題 | 解決方法 |
-|------|----------|
-| `Access to port 'COM19' was denied` | 前のブリッジプロセスがポートを掴んでいる。PowerShellを全て閉じて再試行 |
-| 接続後すぐに切断される | `adb reverse tcp:9999 tcp:9999` を再実行 |
-| ボタンを押してもログが出ない | APKが古い可能性。再ビルド＆インストール |
-| エミュレーターが見つからない | `adb devices` で確認。`emulator-5554` が表示されるか確認 |
-
-#### 仕組み
+### 仕組み
 
 ```
 ┌─────────────────┐     TCP      ┌─────────────────┐    Serial    ┌─────────────┐
@@ -192,7 +276,6 @@ ODO: 184692 km  TRIP: 114.7 km
 └─────────────────┘              └─────────────────┘              └─────────────┘
          ▲
          │ adb reverse tcp:9999 tcp:9999
-         │ (エミュレーター内の127.0.0.1:9999をPCの9999に転送)
          ▼
 ┌─────────────────┐
 │ PC TCP:9999     │
@@ -200,25 +283,105 @@ ODO: 184692 km  TRIP: 114.7 km
 └─────────────────┘
 ```
 
-#### 自動テストスクリプト
+### 手順
 
-`tools/tcp_bridge_test.ps1` を使用すると、上記の手順を自動化できます:
-
+**1. TCPブリッジを起動**
 ```powershell
 cd tools
-.\tcp_bridge_test.ps1
+.\com_bridge.ps1 -ComPort COM19
 ```
 
-## 使用方法
+**2. ADB Reverseを設定**
+```powershell
+adb reverse tcp:9999 tcp:9999
+```
 
-1. USB OTGケーブルでFULLMONI-WIDEデバイスとスマートフォンを接続
-2. アプリを起動
-3. USB接続許可ダイアログで「許可」をタップ
-4. ナビゲーションドロワーを開き「Connect」ボタンをタップ
-5. 接続状態がグリーンに変わったらHomeを選択
-6. 各機能カードをタップして必要な画面に移動
+**3. APKをインストール＆起動**
+```powershell
+adb install -r app\build\outputs\apk\debug\app-debug.apk
+adb shell am start -n com.fullmoni.terminal/.MainActivity
+```
 
-## 対応コマンド
+**4. アプリ内で接続**
+- Home画面の「**TCP Bridge (Real)**」ボタンをタップ
+
+---
+
+## ❓ トラブルシューティング
+
+### 接続関連
+
+| 問題 | 原因 | 解決方法 |
+|------|------|----------|
+| Connect Deviceを押しても反応しない | USBデバイスが認識されていない | USB接続を確認、OTGアダプタを確認 |
+| USB許可ダイアログが出ない | 既に許可済み/デバイス未認識 | USBを抜き差し、アプリを再起動 |
+| 接続後すぐ切断される | シリアル設定の不一致 | デバイス側のボーレートを確認 |
+| 「Device not found」エラー | USBデバイスが見つからない | 他のUSBデバイスを外して再試行 |
+
+### Boot Screen関連
+
+| 問題 | 原因 | 解決方法 |
+|------|------|----------|
+| Upload中にタイムアウト | 通信エラー | 再接続して再試行 |
+| 画像が正しく表示されない | サイズが不正 | 765×256の画像を使用 |
+| Readで空データが返る | デバイスに画像がない | 一度Uploadしてから再試行 |
+
+### FW Update関連
+
+| 問題 | 原因 | 解決方法 |
+|------|------|----------|
+| 更新開始しない | .motファイルが不正 | 正しいファームウェアファイルを選択 |
+| 更新中にエラー | 通信切断 | 再接続してBootloaderモードで復旧 |
+| 更新後起動しない | ファームウェア破損 | Bootloaderモードでファームウェアを再書込 |
+
+---
+
+## 📂 プロジェクト構成
+
+```
+app/
+├── src/main/
+│   ├── java/com/fullmoni/terminal/
+│   │   ├── MainActivity.kt              # エントリーポイント
+│   │   ├── model/
+│   │   │   └── ReleaseManifest.kt       # リリースマニフェストモデル
+│   │   ├── ui/
+│   │   │   ├── theme/                   # テーマ定義
+│   │   │   │   ├── Color.kt
+│   │   │   │   ├── Theme.kt
+│   │   │   │   └── Type.kt
+│   │   │   ├── screens/                 # 各画面
+│   │   │   │   ├── MainScreen.kt        # メインナビゲーション
+│   │   │   │   ├── HomeScreen.kt        # ホーム
+│   │   │   │   ├── StatusScreen.kt      # ステータス
+│   │   │   │   ├── SettingsScreen.kt    # 設定
+│   │   │   │   ├── CanConfigScreen.kt   # CAN設定
+│   │   │   │   ├── BootScreenScreen.kt  # 起動画面
+│   │   │   │   ├── FirmwareUpdateScreen.kt # FW更新
+│   │   │   │   ├── AboutScreen.kt       # About
+│   │   │   │   └── TerminalScreen.kt    # ターミナル
+│   │   │   └── components/
+│   │   │       └── SharedComponents.kt  # 共通コンポーネント
+│   │   ├── viewmodel/
+│   │   │   └── MainViewModel.kt         # ビューモデル
+│   │   └── service/
+│   │       ├── UsbSerialService.kt      # USB通信
+│   │       ├── StartupImageService.kt   # 起動画像転送
+│   │       ├── FirmwareUpdateService.kt # FW更新
+│   │       └── AppWizardImageConverter.kt # 画像変換
+│   ├── res/
+│   │   ├── drawable-nodpi/              # 背景画像
+│   │   │   ├── fm2.png
+│   │   │   └── fm3.png
+│   │   └── values/
+│   └── AndroidManifest.xml
+├── build.gradle.kts
+└── proguard-rules.pro
+```
+
+---
+
+## 📋 対応コマンド
 
 Windows版と同一のコマンドセットに対応しています。
 
@@ -231,26 +394,76 @@ Windows版と同一のコマンドセットに対応しています。
 | `save` | EEPROMに保存 |
 | `load` | EEPROMから読込 |
 | `default` | デフォルト値にリセット |
+| `imgwrite` | 起動画像書き込みモード |
+| `imgread` | 起動画像読み取りモード |
+| `fwupdate` | ファームウェア更新モード |
 
-## Windows版との対応
+---
 
-| Windows機能 | Android対応 |
-|------------|------------|
-| Home | ✅ 実装済み |
-| Status | ✅ 実装済み |
-| Settings | ✅ 実装済み |
-| CAN Config | ✅ 実装済み |
-| Boot Screen | ✅ 実装済み |
-| FW Update | ✅ 実装済み |
-| About | ✅ 実装済み |
-| Terminal | ✅ 実装済み |
+## 🔄 Windows版との機能対応
 
-## ライセンス
+| 機能 | Windows | Android | 備考 |
+|------|---------|---------|------|
+| Home | ✅ | ✅ | 背景画像切替対応 |
+| Status | ✅ | ✅ | RTC同期対応 |
+| Settings | ✅ | ✅ | プリセット対応 |
+| CAN Config | ✅ | ✅ | 16フィールド対応 |
+| Boot Screen | ✅ | ✅ | Read/Write/Save対応 |
+| FW Update | ✅ | ✅ | .motファイル対応 |
+| About | ✅ | ✅ | |
+| Terminal | ✅ | ✅ | 開発用 |
+
+---
+
+## 📜 技術仕様
+
+### USB通信
+- **ライブラリ**: usb-serial-for-android
+- **ボーレート**: 115200 bps
+- **データビット**: 8
+- **パリティ**: なし
+- **ストップビット**: 1
+- **フロー制御**: なし
+
+### 起動画像転送プロトコル
+
+**書き込み (imgwrite)**:
+1. `imgwrite\r\n` コマンド送信
+2. `IMGWRITE_READY` 応答待ち
+3. サイズ送信 (4バイト、リトルエンディアン)
+4. データ送信 (256バイトチャンク、ACK応答待ち)
+5. CRC-16 送信
+6. 終端マーカー `0xED 0x0F 0xAA 0x55`
+7. `IMGWRITE_OK` 応答待ち
+
+**読み込み (imgread)**:
+1. `imgread\r\n` コマンド送信
+2. `IMGREAD_READY` 応答待ち
+3. サイズ受信 (4バイト)
+4. データ受信 (ストリーミング)
+5. CRC-16 受信・検証
+6. 終端マーカー確認
+
+---
+
+## 📄 ライセンス
 
 MIT License
 
-## 依存ライブラリ
+## 📚 依存ライブラリ
 
-- [usb-serial-for-android](https://github.com/mik3y/usb-serial-for-android) - Apache License 2.0
-- Jetpack Compose - Apache License 2.0
-- Material 3 - Apache License 2.0
+| ライブラリ | ライセンス | 用途 |
+|-----------|-----------|------|
+| [usb-serial-for-android](https://github.com/mik3y/usb-serial-for-android) | Apache 2.0 | USB CDC通信 |
+| Jetpack Compose | Apache 2.0 | UI フレームワーク |
+| Material 3 | Apache 2.0 | デザインシステム |
+| Kotlinx Serialization | Apache 2.0 | JSON パース |
+
+---
+
+## 🔗 関連リンク
+
+- [FULLMONI-WIDE GitHub](https://github.com/tomoya723/FULLMONI-WIDE)
+- [Windows Terminal README](../FULLMONI-WIDE-Terminal/README.md)
+- [Firmware README](../../Firmware/README.md)
+- [リリース手順書](../../docs/release_procedure.md)
