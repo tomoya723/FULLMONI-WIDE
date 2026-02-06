@@ -2,6 +2,7 @@ package com.fullmoni.terminal.ui.screens
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,10 +11,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.fullmoni.terminal.R
 import com.fullmoni.terminal.ui.theme.*
 
 /**
@@ -34,24 +38,16 @@ fun AboutScreen() {
     ) {
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Logo placeholder (アイコン代わり)
-        Card(
-            modifier = Modifier.size(120.dp),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = FullmoniPrimary)
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "FMW",
-                    style = MaterialTheme.typography.headlineLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = TextPrimary
-                )
-            }
-        }
+        // FULLMONI-WIDE Logo
+        Image(
+            painter = painterResource(id = R.drawable.fm1),
+            contentDescription = "FULLMONI-WIDE Logo",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .padding(horizontal = 32.dp),
+            contentScale = ContentScale.Fit
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
