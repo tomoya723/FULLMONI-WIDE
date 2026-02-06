@@ -41,7 +41,10 @@
     サムネイル生成をスキップ
 
 .PARAMETER SkipHostApp
-    ホストアプリビルドをスキップ（既存バージョンを維持）
+    Windowsホストアプリビルドをスキップ（既存バージョンを維持）
+
+.PARAMETER SkipAndroidApp
+    Androidアプリビルドをスキップ（既存バージョンを維持）
 #>
 
 param(
@@ -51,7 +54,8 @@ param(
     [switch]$Upload,
     [switch]$SkipFirmware,
     [switch]$SkipThumbnails,
-    [switch]$SkipHostApp
+    [switch]$SkipHostApp,
+    [switch]$SkipAndroidApp
 )
 
 $ErrorActionPreference = "Stop"
@@ -62,6 +66,7 @@ $RootDir = Resolve-Path "$ScriptDir\.."
 $OutputDir = "$RootDir\test-release"
 $FirmwareDir = "$RootDir\Firmware"
 $HostAppDir = "$RootDir\HostApp\FULLMONI-WIDE-Terminal"
+$AndroidAppDir = "$RootDir\HostApp\FULLMONI-WIDE-Android"
 
 # 色付きメッセージ
 function Write-Step { param($msg) Write-Host "`n=== $msg ===" -ForegroundColor Cyan }
@@ -218,7 +223,58 @@ if (-not $SkipHostApp) {
         Pop-Location
     }
 } else {
-    Write-Warn "ホストアプリビルドをスキップ（既存バージョンを引き継ぎ）"
+    Write-Warn "Windowsホストアプリビルドをスキップ（既存バージョンを引き継ぎ）"
+}
+
+#----------------------------------------------------------------------
+# Step 4.5: Androidアプリビルド
+#----------------------------------------------------------------------
+if (-not $SkipAndroidApp) {
+    Write-Step "Step 4.5: Androidアプリビルド"
+
+    Push-Location $AndroidAppDir
+    try {
+        # build.gradle.ktsのバージョンを更新
+        $gradlePath = "$AndroidAppDir\app\build.gradle.kts"
+        $gradleContent = Get-Content $gradlePath -Raw
+        $gradleContent = $gradleContent -replace 'versionName = "[^"]+"', "versionName = `"$Version`""
+        [System.IO.File]::WriteAllText($gradlePath, $gradleContent, [System.Text.Encoding]::UTF8)
+        Write-Success "build.gradle.kts バージョンを v$Version に更新"
+
+        # JAVA_HOME設定
+        $env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
+
+        # クリーンビルド
+        Write-Host "  Building Release APK..."
+        $buildResult = & .\gradlew.bat assembleRelease 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            Write-Fail "Androidアプリのビルドに失敗しました"
+            $buildResult | Write-Host
+            exit 1
+        }
+
+        # APKをコピー
+        $apkSource = "$AndroidAppDir\app\build\outputs\apk\release\app-release-unsigned.apk"
+        $apkDest = "$OutputDir\FULLMONI-WIDE-Terminal-android.apk"
+
+        if (-not (Test-Path $apkSource)) {
+            # unsigned APKがない場合は debug を使用
+            $apkSource = "$AndroidAppDir\app\build\outputs\apk\release\app-release.apk"
+            if (-not (Test-Path $apkSource)) {
+                $apkSource = "$AndroidAppDir\app\build\outputs\apk\debug\app-debug.apk"
+                Write-Warn "リリースAPKが見つからないため、デバッグAPKを使用"
+            }
+        }
+
+        Copy-Item $apkSource $apkDest -Force
+        $apkSize = (Get-Item $apkDest).Length
+        Write-Success "FULLMONI-WIDE-Terminal-android.apk: $([math]::Round($apkSize / 1MB, 1)) MB"
+
+    } finally {
+        Pop-Location
+    }
+} else {
+    Write-Warn "Androidアプリビルドをスキップ（既存バージョンを引き継ぎ）"
 }
 
 #----------------------------------------------------------------------
@@ -315,6 +371,32 @@ if ($SkipHostApp -and $existingManifest -and $existingManifest.hostApps.windows)
     }
 }
 
+# Androidアプリ情報
+$androidAppInfo = $null
+if ($SkipAndroidApp -and $existingManifest -and $existingManifest.hostApps.android) {
+    # 既存マニフェストからAndroidアプリ情報を引き継ぐ
+    $existingAndroidApp = $existingManifest.hostApps.android
+    $androidAppInfo = @{
+        version = $existingAndroidApp.version
+        file = $existingAndroidApp.file
+        size = $existingAndroidApp.size
+        minSdk = $existingAndroidApp.minSdk
+        sha256 = $existingAndroidApp.sha256
+    }
+    Write-Success "Androidアプリ v$($existingAndroidApp.version) を引き継ぎ"
+} else {
+    $androidApk = Get-Item "$OutputDir\FULLMONI-WIDE-Terminal-android.apk" -ErrorAction SilentlyContinue
+    if ($androidApk) {
+        $androidAppInfo = @{
+            version = $Version
+            file = $androidApk.Name
+            size = $androidApk.Length
+            minSdk = 21
+            sha256 = (Get-FileHash $androidApk.FullName -Algorithm SHA256).Hash.ToLower()
+        }
+    }
+}
+
 # マニフェスト構築
 $manifest = [ordered]@{
     schemaVersion = 1
@@ -328,9 +410,13 @@ $manifest = [ordered]@{
     }
 }
 
-if ($hostAppInfo) {
-    $manifest.hostApps = @{
-        windows = $hostAppInfo
+if ($hostAppInfo -or $androidAppInfo) {
+    $manifest.hostApps = @{}
+    if ($hostAppInfo) {
+        $manifest.hostApps.windows = $hostAppInfo
+    }
+    if ($androidAppInfo) {
+        $manifest.hostApps.android = $androidAppInfo
     }
 }
 
@@ -407,6 +493,29 @@ if ($manifest.hostApps.windows) {
     }
 }
 
+# Androidアプリ検証
+if ($manifest.hostApps.android) {
+    $androidApp = $manifest.hostApps.android
+    $filePath = "$OutputDir\$($androidApp.file)"
+    if (Test-Path $filePath) {
+        $actualHash = (Get-FileHash $filePath -Algorithm SHA256).Hash.ToLower()
+        $actualSize = (Get-Item $filePath).Length
+
+        if ($actualHash -ne $androidApp.sha256) {
+            Write-Fail "$($androidApp.file): SHA256不一致"
+            $allValid = $false
+        } elseif ($actualSize -ne $androidApp.size) {
+            Write-Fail "$($androidApp.file): サイズ不一致"
+            $allValid = $false
+        } else {
+            Write-Success "$($androidApp.file): OK ($([math]::Round($actualSize / 1MB, 1)) MB)"
+        }
+    } else {
+        Write-Fail "$($androidApp.file) が見つかりません"
+        $allValid = $false
+    }
+}
+
 if (-not $allValid) {
     Write-Fail "整合性検証に失敗しました"
     exit 1
@@ -459,6 +568,7 @@ $(foreach ($v in $manifest.firmware.variants) { "- $($v.file) - $($v.description
 
 ### ホストアプリ
 - FULLMONI-WIDE-Terminal (Windows x64)
+- FULLMONI-WIDE-Terminal (Android)
 "@
 
         gh release create $tag --title "v$Version" --notes $releaseNotes
@@ -485,6 +595,10 @@ $(foreach ($v in $manifest.firmware.variants) { "- $($v.file) - $($v.description
 
     if ($manifest.hostApps.windows) {
         $uploadFiles += "$OutputDir\$($manifest.hostApps.windows.file)"
+    }
+
+    if ($manifest.hostApps.android) {
+        $uploadFiles += "$OutputDir\$($manifest.hostApps.android.file)"
     }
 
     Write-Host "  Uploading assets..."
