@@ -50,7 +50,10 @@ ECUからCANバス経由で送られる車両情報を受信し、800×256ドッ
 
 ### Android Terminal（Jetpack Compose）
 - USB Serial通信によるパラメータ設定
-- PoC（Proof of Concept）版
+- CAN設定カスタマイズ（CAN ID、データフィールド）
+- 起動画面カスタマイズ（765×256画像、読み取り/書き込み/保存）
+- ファームウェア更新機能
+- Material 3 ダークテーマ
 
 詳細は [HostApp/README.md](HostApp/README.md) を参照。
 

@@ -14,6 +14,7 @@ val BackgroundMedium = Color(0xFF1B263B)        // Medium navy
 val SidebarBackground = Color(0xFF1A1A2E)       // Sidebar dark
 val SidebarGradientEnd = Color(0xFF16213E)      // Sidebar gradient end
 val CardBackground = Color(0xFF1E293B)          // Card/surface color
+val SurfaceLight = Color(0xFF2A3A50)            // Lighter surface for nested cards
 
 // Terminal Colors
 val TerminalBackground = Color(0xFF0C0C0C)

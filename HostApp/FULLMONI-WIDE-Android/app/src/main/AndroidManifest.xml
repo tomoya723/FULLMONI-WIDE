@@ -7,6 +7,9 @@
         android:name="android.hardware.usb.host"
         android:required="true" />
 
+    <!-- TCPブリッジモード用（エミュレーターから実機接続） -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -17,19 +20,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FULLMONIWIDEAndroid"
         tools:targetApi="31">
-        
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.FULLMONIWIDEAndroid"
-            android:configChanges="orientation|screenSize">
-            
+            android:configChanges="orientation|screenSize"
+            android:launchMode="singleTop">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            
+
             <!-- USB デバイス接続時に自動起動 -->
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />

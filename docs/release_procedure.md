@@ -165,6 +165,31 @@ Get-ChildItem "test-release/*.bin" | Select-Object Name, Length
 
 ---
 
+## 4.5 ホストアプリビルド
+
+### Windows Terminal
+
+```powershell
+cd HostApp/FULLMONI-WIDE-Terminal
+dotnet publish -c Debug -r win-x64 --self-contained true -o publish
+```
+
+出力: `test-release/FULLMONI-WIDE-Terminal-win-x64.zip`
+
+### Android Terminal
+
+```powershell
+cd HostApp/FULLMONI-WIDE-Android
+$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
+.\gradlew.bat assembleRelease
+```
+
+出力: `test-release/FULLMONI-WIDE-Terminal-android.apk`
+
+**注意**: 署名付きAPKを作成するには、キーストアの設定が必要です。
+
+---
+
 ## 5. ローカルテスト
 
 ### 5.1 Terminal アプリでのテスト

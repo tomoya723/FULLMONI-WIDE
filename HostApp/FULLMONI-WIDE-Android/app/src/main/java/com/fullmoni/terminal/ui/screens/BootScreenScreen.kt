@@ -42,13 +42,22 @@ fun BootScreenScreen(viewModel: MainViewModel) {
     val previewBitmap by viewModel.bootPreviewBitmap.collectAsState()
     val bootLog by viewModel.bootLog.collectAsState()
     val isUploading by viewModel.isBootUploading.collectAsState()
+    val isReading by viewModel.isBootReading.collectAsState()
     val uploadProgress by viewModel.bootUploadProgress.collectAsState()
+    val isTransferring = isUploading || isReading
 
-    // ファイル選択
+    // ファイル選択 (OpenDocumentでDocument Provider経由アクセス)
     val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
+        contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
         uri?.let { viewModel.selectBootImage(context, it) }
+    }
+
+    // ファイル保存 (CreateDocumentでPNGとして保存)
+    val saveImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("image/png")
+    ) { uri: Uri? ->
+        uri?.let { viewModel.saveBootImageToUri(context, it) }
     }
 
     Column(
@@ -99,32 +108,35 @@ fun BootScreenScreen(viewModel: MainViewModel) {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Buttons
+                // Buttons - 2行に分割
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     OutlinedButton(
-                        onClick = { imagePickerLauncher.launch("image/*") },
-                        enabled = !isUploading
+                        onClick = { imagePickerLauncher.launch(arrayOf("image/*")) },
+                        enabled = !isTransferring,
+                        modifier = Modifier.weight(1f)
                     ) {
                         Icon(imageVector = Icons.Default.PhotoLibrary, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Select Image", fontSize = 12.sp)
+                        Text("Select", fontSize = 12.sp)
                     }
                     OutlinedButton(
                         onClick = { viewModel.readBootImageFromDevice() },
-                        enabled = isConnected && !isUploading
+                        enabled = isConnected && !isTransferring,
+                        modifier = Modifier.weight(1f)
                     ) {
                         Icon(imageVector = Icons.Default.CloudDownload, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Read Device", fontSize = 12.sp)
+                        Text("Read", fontSize = 12.sp)
                     }
                     OutlinedButton(
-                        onClick = { viewModel.saveBootImageToFile(context) },
-                        enabled = previewBitmap != null && !isUploading
+                        onClick = { saveImageLauncher.launch("boot_screen.png") },
+                        enabled = previewBitmap != null && !isTransferring,
+                        modifier = Modifier.weight(1f)
                     ) {
-                        Icon(imageVector = Icons.Default.Save, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Icon(imageVector = Icons.Default.Save, contentDescription = "Save", modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("Save", fontSize = 12.sp)
                     }
@@ -178,8 +190,8 @@ fun BootScreenScreen(viewModel: MainViewModel) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Progress (shown during upload)
-        if (isUploading) {
+        // Progress (shown during upload or read)
+        if (isTransferring) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = CardBackground),
@@ -187,21 +199,21 @@ fun BootScreenScreen(viewModel: MainViewModel) {
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Upload Progress",
+                        text = if (isReading) "Download Progress" else "Upload Progress",
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold,
                         color = TextPrimary
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     LinearProgressIndicator(
-                        progress = uploadProgress,
+                        progress = { uploadProgress },
                         modifier = Modifier.fillMaxWidth().height(8.dp),
                         color = FullmoniPrimary,
                         trackColor = TextMuted.copy(alpha = 0.2f)
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "${(uploadProgress * 100).toInt()}%",
+                        text = "${(uploadProgress * 100).toInt()}%",  // 0-1を0-100%に変換
                         style = MaterialTheme.typography.bodySmall,
                         color = TextMuted
                     )
@@ -212,6 +224,13 @@ fun BootScreenScreen(viewModel: MainViewModel) {
         }
 
         // Log Card
+        val logScrollState = rememberScrollState()
+        
+        // Auto-scroll to bottom when log changes
+        LaunchedEffect(bootLog) {
+            logScrollState.animateScrollTo(logScrollState.maxValue)
+        }
+        
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -246,6 +265,7 @@ fun BootScreenScreen(viewModel: MainViewModel) {
                         .fillMaxSize()
                         .background(TerminalBackground, RoundedCornerShape(4.dp))
                         .padding(8.dp)
+                        .verticalScroll(logScrollState)
                 ) {
                     Text(
                         text = bootLog.ifEmpty { "> Ready" },

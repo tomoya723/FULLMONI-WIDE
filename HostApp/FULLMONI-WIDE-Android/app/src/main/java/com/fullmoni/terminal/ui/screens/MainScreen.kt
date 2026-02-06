@@ -29,17 +29,17 @@ import kotlinx.coroutines.launch
 fun MainScreen(viewModel: MainViewModel) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    
+
     var currentScreen by remember { mutableStateOf("home") }
-    
+
     val isConnected by viewModel.isConnected.collectAsState()
     val firmwareVersion by viewModel.firmwareVersion.collectAsState()
     val availableDrivers by viewModel.availableDrivers.collectAsState()
     val selectedDriver by viewModel.selectedDriver.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
     val isBootloaderMode by viewModel.isBootloaderMode.collectAsState()
-    
-    // エラーダイアログ
+
+    // エラーダイアログ（FW Update中/成功後のUSBエラーはViewModel側でフィルタリング済み）
     errorMessage?.let { error ->
         AlertDialog(
             onDismissRequest = { viewModel.clearError() },
@@ -79,9 +79,9 @@ fun MainScreen(viewModel: MainViewModel) {
                             fontWeight = FontWeight.SemiBold,
                             color = FullmoniAccent
                         )
-                        
+
                         Spacer(modifier = Modifier.height(12.dp))
-                        
+
                         // Device dropdown
                         var expanded by remember { mutableStateOf(false) }
                         ExposedDropdownMenuBox(
@@ -96,7 +96,7 @@ fun MainScreen(viewModel: MainViewModel) {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .menuAnchor(),
-                                trailingIcon = { 
+                                trailingIcon = {
                                     if (!isConnected) ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                                 },
                                 colors = OutlinedTextFieldDefaults.colors(
@@ -121,9 +121,9 @@ fun MainScreen(viewModel: MainViewModel) {
                                 }
                             }
                         }
-                        
+
                         Spacer(modifier = Modifier.height(8.dp))
-                        
+
                         // Connect/Refresh buttons
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -156,9 +156,29 @@ fun MainScreen(viewModel: MainViewModel) {
                                 )
                             }
                         }
-                        
+
+                        // シミュレーター接続ボタン（未接続時のみ表示）
+                        if (!isConnected) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedButton(
+                                onClick = { viewModel.connectSimulator() },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = FullmoniAccent
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Computer,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Simulator", style = MaterialTheme.typography.labelSmall)
+                            }
+                        }
+
                         Spacer(modifier = Modifier.height(12.dp))
-                        
+
                         // Connection status
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(
@@ -174,7 +194,7 @@ fun MainScreen(viewModel: MainViewModel) {
                                 color = TextPrimary
                             )
                         }
-                        
+
                         if (isConnected && firmwareVersion != null) {
                             Text(
                                 text = "FW: v$firmwareVersion",
@@ -185,14 +205,14 @@ fun MainScreen(viewModel: MainViewModel) {
                         }
                     }
                 }
-                
+
                 HorizontalDivider(color = TextMuted.copy(alpha = 0.2f))
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 // Navigation Items
                 val isFirmwareMode = isConnected && !isBootloaderMode
-                
+
                 NavigationDrawerItem(
                     icon = Icons.Default.Home,
                     label = "Home",
@@ -251,9 +271,9 @@ fun MainScreen(viewModel: MainViewModel) {
                         scope.launch { drawerState.close() }
                     }
                 )
-                
+
                 Spacer(modifier = Modifier.weight(1f))
-                
+
                 NavigationDrawerItem(
                     icon = Icons.Default.Info,
                     label = "About",
@@ -263,7 +283,7 @@ fun MainScreen(viewModel: MainViewModel) {
                         scope.launch { drawerState.close() }
                     }
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
@@ -271,11 +291,11 @@ fun MainScreen(viewModel: MainViewModel) {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { 
+                    title = {
                         Text(
                             "FULLMONI-WIDE Terminal",
                             color = TextPrimary
-                        ) 
+                        )
                     },
                     navigationIcon = {
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
@@ -348,7 +368,7 @@ private fun NavigationDrawerItem(
         selected -> FullmoniPrimary
         else -> TextPrimary
     }
-    
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
