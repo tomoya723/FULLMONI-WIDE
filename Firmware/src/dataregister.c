@@ -185,26 +185,44 @@ static void process_can_fields(void)
 void init_data_store(void)
 {
 	float delta;
+	float gear_ratio[6];  /* g_paramから取得したギア比（float変換後） */
+	float final_gear;
+	int i;
 
-	// gear ratio table init
-	g_CALC_data.TyreCirc = ((table_tyre_spec[0] * table_tyre_spec[1] / 100) * 2 + table_tyre_spec[2] * 25.4) * PI / 1000;
+	// gear ratio table init (g_paramから取得、1000で割ってfloatに変換)
+	for (i = 0; i < 6; i++) {
+		gear_ratio[i] = g_param.gear_ratio[i] / 1000.0f;
+	}
+	final_gear = g_param.final_gear_ratio / 1000.0f;
 
-	delta = (table_gear_ratio[0] - table_gear_ratio[1]) / 2;
-	table_gear_ratio_range[0] = (table_gear_ratio[0] + delta) * 1000;
-	table_gear_ratio_range[1] = (table_gear_ratio[0] - delta) * 1000;
+	// タイヤ外周計算
+	g_CALC_data.TyreCirc = ((g_param.tyre_width * g_param.tyre_aspect / 100.0f) * 2 + g_param.tyre_rim * 25.4f) * PI / 1000.0f;
 
-	delta = (table_gear_ratio[1] - table_gear_ratio[2]) / 2;
-	table_gear_ratio_range[2] = (table_gear_ratio[1] - delta) * 1000;
+	// ギア比判定レンジを計算（隣接ギア間の中間値を閾値とする）
+	delta = (gear_ratio[0] - gear_ratio[1]) / 2;
+	table_gear_ratio_range[0] = (unsigned int)((gear_ratio[0] + delta) * 1000);
+	table_gear_ratio_range[1] = (unsigned int)((gear_ratio[0] - delta) * 1000);
 
-	delta = (table_gear_ratio[2] - table_gear_ratio[3]) / 2;
-	table_gear_ratio_range[3] = (table_gear_ratio[2] - delta) * 1000;
+	delta = (gear_ratio[1] - gear_ratio[2]) / 2;
+	table_gear_ratio_range[2] = (unsigned int)((gear_ratio[1] - delta) * 1000);
 
-	delta = (table_gear_ratio[3] - table_gear_ratio[4]) / 2;
-	table_gear_ratio_range[4] = (table_gear_ratio[3] - delta) * 1000;
+	delta = (gear_ratio[2] - gear_ratio[3]) / 2;
+	table_gear_ratio_range[3] = (unsigned int)((gear_ratio[2] - delta) * 1000);
 
-	delta = (table_gear_ratio[4] - table_gear_ratio[5]) / 2;
-	table_gear_ratio_range[5] = (table_gear_ratio[4] - delta) * 1000;
-	table_gear_ratio_range[6] = (table_gear_ratio[5] - delta) * 1000;
+	delta = (gear_ratio[3] - gear_ratio[4]) / 2;
+	table_gear_ratio_range[4] = (unsigned int)((gear_ratio[3] - delta) * 1000);
+
+	// 6速が設定されている場合のみ5-6速間の閾値を計算
+	if (gear_ratio[5] > 0.0f) {
+		delta = (gear_ratio[4] - gear_ratio[5]) / 2;
+		table_gear_ratio_range[5] = (unsigned int)((gear_ratio[4] - delta) * 1000);
+		table_gear_ratio_range[6] = (unsigned int)((gear_ratio[5] - delta) * 1000);
+	} else {
+		// 5速設定の場合：5速の下限を適切に設定（6速判定なし）
+		delta = (gear_ratio[3] - gear_ratio[4]) / 2;  /* 4-5速間のdeltaを流用 */
+		table_gear_ratio_range[5] = (unsigned int)((gear_ratio[4] - delta) * 1000);
+		table_gear_ratio_range[6] = 0;  /* 6速判定無効化 */
+	}
 }
 
 void data_store(void)
@@ -267,7 +285,7 @@ void data_store(void)
 	g_CALC_data.trip = ((float)(sp_int - tr_int)) / 2548;
 
 	// gear ratio & shift position
-	gear = (unsigned int)(g_CALC_data.rev * g_CALC_data.TyreCirc * 60 / g_CALC_data.sp / table_final_gear_ratio);
+	gear = (unsigned int)(g_CALC_data.rev * g_CALC_data.TyreCirc * 60 / g_CALC_data.sp / (g_param.final_gear_ratio / 1000.0f));
 	if		(( table_gear_ratio_range[0] >= gear ) && ( table_gear_ratio_range[1] <= gear ))
 	{
 		gear_pos = 1;
@@ -288,7 +306,8 @@ void data_store(void)
 	{
 		gear_pos = 5;
 	}
-	else if	(( table_gear_ratio_range[5] >= gear ) && ( table_gear_ratio_range[6] <= gear ))
+	else if	(( g_param.gear_ratio[5] > 0 ) &&  /* 6速ギア比が設定されている場合のみ判定 */
+			 ( table_gear_ratio_range[5] >= gear ) && ( table_gear_ratio_range[6] <= gear ))
 	{
 		gear_pos = 6;
 	}

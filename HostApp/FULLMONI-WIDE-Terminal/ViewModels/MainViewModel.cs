@@ -288,7 +288,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         if (string.IsNullOrEmpty(value) || value == "-- Select --") return;
 
-        if (value == "NA/NB5速")
+        if (value == "NA/NB 5-speed")
         {
             Gear1 = "3.163";
             Gear2 = "1.888";
@@ -297,7 +297,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             Gear5 = "0.814";
             Gear6 = "0";
         }
-        else if (value == "NB6速")
+        else if (value == "NB 6-speed")
         {
             Gear1 = "3.760";
             Gear2 = "2.269";
