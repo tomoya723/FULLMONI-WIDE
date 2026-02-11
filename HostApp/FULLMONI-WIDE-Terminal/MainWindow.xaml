@@ -619,7 +619,7 @@
                                        Command="{Binding SaveParametersCommand}"
                                        IsEnabled="{Binding IsOperationEnabled}"/>
                             <ui:Button Content="Default" Icon="{ui:SymbolIcon ArrowReset24}"
-                                       Command="{Binding DefaultParametersCommand}"
+                                       Command="{Binding ResetDefaultCommand}"
                                        IsEnabled="{Binding IsOperationEnabled}"/>
                         </StackPanel>
                     </StackPanel>
