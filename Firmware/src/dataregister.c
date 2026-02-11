@@ -35,6 +35,9 @@ const float table_final_gear_ratio		= 4.300;
 float fuel_per;
 unsigned int gear, gear_pos;
 
+/* CAN車速受信フラグ（MTU割り込みから参照） */
+unsigned char g_speed_from_can = 0;
+
 static APPW_PARA_ITEM aPara0[6] = {0};
 static APPW_PARA_ITEM aPara1[6] = {0};
 static APPW_PARA_ITEM aPara2[6] = {0};
@@ -188,6 +191,17 @@ void init_data_store(void)
 	float gear_ratio[6];  /* g_paramから取得したギア比（float変換後） */
 	float final_gear;
 	int i;
+
+	/* CAN車速受信判定（イニシャル時に1回だけ判定） */
+	g_speed_from_can = 0;
+	for (i = 0; i < CAN_FIELD_MAX; i++) {
+		if (g_can_config.fields[i].target_var == CAN_TARGET_SPEED &&
+		    g_can_config.fields[i].channel != 0 &&
+		    g_can_config.channels[g_can_config.fields[i].channel - 1].enabled) {
+			g_speed_from_can = 1;
+			break;
+		}
+	}
 
 	// gear ratio table init (g_paramから取得、1000で割ってfloatに変換)
 	for (i = 0; i < 6; i++) {

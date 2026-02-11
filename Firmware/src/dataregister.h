@@ -129,5 +129,6 @@ extern volatile CAN_data_t			g_CAN_data;
 extern volatile CALC_data_t			g_CALC_data,g_CALC_data_sm;
 extern volatile unsigned long		sp_int, tr_int;
 extern volatile unsigned int		g_sw_cnt, g_sw_int_flg;
+extern unsigned char				g_speed_from_can;	/* CAN車速受信フラグ (1: MTUパルス計測無効化) */
 
 #endif /* _DATAREGISTER_H_ */
