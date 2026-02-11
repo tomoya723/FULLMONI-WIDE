@@ -23,18 +23,18 @@
                                       {
                                           "id":  "aw001",
                                           "name":  "type1",
-                                          "size":  956196,
+                                          "size":  916952,
                                           "description":  "tomoya723 ver",
-                                          "sha256":  "43069a15214080344ff5711479c810057b4d7cf4e8a9ef22f7128f86834ddeaf",
+                                          "sha256":  "4fe82cc00b4a06cd9ae6a709b563ea3526708fac42ffe518d47d13ecc6e3c3af",
                                           "thumbnail":  "thumbnail_v1.0.0_aw001.png",
                                           "file":  "Firmware_v1.0.1_aw001.bin"
                                       },
                                       {
                                           "id":  "aw002",
                                           "name":  "type2",
-                                          "size":  916712,
+                                          "size":  916952,
                                           "description":  "chaketek ver",
-                                          "sha256":  "4e783bbaa5bfde21f50d3d2ed0282544d4db1eb01d2382d40607f6c45462ca6a",
+                                          "sha256":  "99a9a821e7306914e9bd026fe632df7044130f61e3b75ba0a12108497916cc89",
                                           "thumbnail":  "thumbnail_v1.0.0_aw002.png",
                                           "file":  "Firmware_v1.0.1_aw002.bin"
                                       }
