@@ -340,6 +340,7 @@ static void cmd_can_list(void)
                             f->warn_high_enabled ? 'Y' : 'N', hi_str);
     }
 }
+
 static void cmd_can_ch(uint8_t ch, uint16_t can_id, uint8_t enabled)
 {
     /* Issue #65: 値が変わる場合のみフラグを立てる */
