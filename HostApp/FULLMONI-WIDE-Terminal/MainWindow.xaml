@@ -29,6 +29,9 @@
         <SolidColorBrush x:Key="AccentBrushLight" Color="#1E90FF"/>
         <SolidColorBrush x:Key="SidebarBrush" Color="#1A1A2E"/>
         <SolidColorBrush x:Key="CardBorderBrush" Color="#2D2D44"/>
+
+        <!-- DataGrid内チェックボックスの縮小スケール -->
+        <ScaleTransform x:Key="DataGridCheckBoxScale" ScaleX="0.7" ScaleY="0.7"/>
     </ui:FluentWindow.Resources>
 
     <ui:FluentWindow.DataContext>
@@ -734,7 +737,16 @@
                                     </DataGrid.ColumnHeaderStyle>
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="30" IsReadOnly="True"/>
-                                        <DataGridCheckBoxColumn Header="EN" Binding="{Binding Enabled}" Width="35"/>
+                                        <DataGridTemplateColumn Header="EN" Width="35">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <CheckBox IsChecked="{Binding Enabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                              HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                              MinWidth="0" MinHeight="0" Padding="0" Margin="0"
+                                                              LayoutTransform="{StaticResource DataGridCheckBoxScale}"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
                                         <DataGridTextColumn Header="CH" Binding="{Binding Channel}" Width="35"/>
                                         <DataGridTextColumn Header="Byte" Binding="{Binding StartByte}" Width="40"/>
                                         <DataGridTextColumn Header="Size" Binding="{Binding ByteCount}" Width="40"/>
@@ -747,9 +759,27 @@
                                         <DataGridTextColumn Header="Dec" Binding="{Binding Decimals}" Width="35"/>
                                 <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="70"/>
                                         <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="45"/>
-                                        <DataGridCheckBoxColumn Header="WLo" Binding="{Binding WarnLowEnabled}" Width="40"/>
+                                        <DataGridTemplateColumn Header="WLo" Width="40">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <CheckBox IsChecked="{Binding WarnLowEnabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                              HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                              MinWidth="0" MinHeight="0" Padding="0" Margin="0"
+                                                              LayoutTransform="{StaticResource DataGridCheckBoxScale}"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
                                         <DataGridTextColumn Header="Lo" Binding="{Binding WarnLow}" Width="55"/>
-                                        <DataGridCheckBoxColumn Header="WHi" Binding="{Binding WarnHighEnabled}" Width="40"/>
+                                        <DataGridTemplateColumn Header="WHi" Width="40">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <CheckBox IsChecked="{Binding WarnHighEnabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                              HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                              MinWidth="0" MinHeight="0" Padding="0" Margin="0"
+                                                              LayoutTransform="{StaticResource DataGridCheckBoxScale}"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
                                         <DataGridTextColumn Header="Hi" Binding="{Binding WarnHigh}" Width="55"/>
                                     </DataGrid.Columns>
                                 </DataGrid>

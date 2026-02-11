@@ -56,7 +56,7 @@ void R_Config_MTU0_Create_UserInit(void)
 
 void r_Config_MTU0_tgia0_interrupt(void)
 {
-    
+
     /* Start user code for r_Config_MTU0_tgia0_interrupt. Do not edit comment generated here */
 
 	// --------------------------------------------------------------------
@@ -88,13 +88,17 @@ void r_Config_MTU0_tgia0_interrupt(void)
 	g_CALC_data.AD5 = 0.99   * g_CALC_data.AD5 + 0.01   * (float)S12AD.ADDR5;
 	g_CALC_data.AD6 = 0.5    * g_CALC_data.AD6 + 0.5    * (float)S12AD.ADDR6;
 	g_CALC_data.AD7 = 0.9999 * g_CALC_data.AD7 + 0.0001 * (float)S12AD.ADDR7;
-	g_CALC_data.sp  = 0.99   * g_CALC_data.sp  + 0.01   * (float)(704372/sp_TGRA);
 
-	g_sp_int_flg ++;
-	if(g_sp_int_flg > 100)
-	{
-		g_sp_int_flg = 100;
-		g_CALC_data.sp = 0;
+	/* CAN経由で車速を受信している場合はMTUパルス計測をスキップ */
+	if (!g_speed_from_can) {
+		g_CALC_data.sp  = 0.99   * g_CALC_data.sp  + 0.01   * (float)(704372/sp_TGRA);
+
+		g_sp_int_flg ++;
+		if(g_sp_int_flg > 100)
+		{
+			g_sp_int_flg = 100;
+			g_CALC_data.sp = 0;
+		}
 	}
 
 	// SW Input
