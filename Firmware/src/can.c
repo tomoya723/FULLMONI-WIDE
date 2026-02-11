@@ -505,13 +505,20 @@ static void can_int_demo(void)
         LED0 = LED_ON;
         nr_frames_rx++;
 
-        /* Read CAN data and show. */
-//        api_status = R_CAN_RxRead(g_can_channel, g_mb_mode, CANBOX_RX, &rx_dataframe);
+        /* Read CAN data from all mailboxes.
+         * Wait for INVALDATA=0 before reading to prevent data corruption
+         * when hardware is updating the mailbox with a new frame. */
+        while (CAN0.MCTL[CANBOX_RX1].BIT.RX.INVALDATA) { R_BSP_NOP(); }
         api_status = R_CAN_RxRead(g_can_channel, g_mb_mode, CANBOX_RX1, &rx_dataframe1);
+        while (CAN0.MCTL[CANBOX_RX2].BIT.RX.INVALDATA) { R_BSP_NOP(); }
         api_status = R_CAN_RxRead(g_can_channel, g_mb_mode, CANBOX_RX2, &rx_dataframe2);
+        while (CAN0.MCTL[CANBOX_RX3].BIT.RX.INVALDATA) { R_BSP_NOP(); }
         api_status = R_CAN_RxRead(g_can_channel, g_mb_mode, CANBOX_RX3, &rx_dataframe3);
+        while (CAN0.MCTL[CANBOX_RX4].BIT.RX.INVALDATA) { R_BSP_NOP(); }
         api_status = R_CAN_RxRead(g_can_channel, g_mb_mode, CANBOX_RX4, &rx_dataframe4);
+        while (CAN0.MCTL[CANBOX_RX5].BIT.RX.INVALDATA) { R_BSP_NOP(); }
         api_status = R_CAN_RxRead(g_can_channel, g_mb_mode, CANBOX_RX5, &rx_dataframe5);
+        while (CAN0.MCTL[CANBOX_RX6].BIT.RX.INVALDATA) { R_BSP_NOP(); }
         api_status = R_CAN_RxRead(g_can_channel, g_mb_mode, CANBOX_RX6, &rx_dataframe6);
 
         /* You can set BP here and check the received data in debugger. */
@@ -586,30 +593,34 @@ static uint32_t init_can_app(void)
     /* Issue #65: g_can_config の設定を使用 */
     if (FRAME_ID_MODE == STD_ID_MODE)
     {
-        /* 有効なチャンネルのみ設定 */
+        /* すべてのRXメールボックスのマスクを0x7FFで初期化（完全一致）
+         * マスクはメールボックスグループ単位で共有されるため、
+         * チャンネル有効/無効に関わらず常に設定する必要がある */
+        R_CAN_RxSetMask(g_can_channel, CANBOX_RX1, 0x7FF);
+        R_CAN_RxSetMask(g_can_channel, CANBOX_RX2, 0x7FF);
+        R_CAN_RxSetMask(g_can_channel, CANBOX_RX3, 0x7FF);
+        R_CAN_RxSetMask(g_can_channel, CANBOX_RX4, 0x7FF);
+        R_CAN_RxSetMask(g_can_channel, CANBOX_RX5, 0x7FF);
+        R_CAN_RxSetMask(g_can_channel, CANBOX_RX6, 0x7FF);
+
+        /* 有効なチャンネルのみメールボックスを設定 */
         if (g_can_config.channels[0].enabled) {
             api_status |= R_CAN_RxSet(g_can_channel, CANBOX_RX1, g_can_config.channels[0].can_id, DATA_FRAME);
-            R_CAN_RxSetMask(g_can_channel, CANBOX_RX1, 0x7FF);
         }
         if (g_can_config.channels[1].enabled) {
             api_status |= R_CAN_RxSet(g_can_channel, CANBOX_RX2, g_can_config.channels[1].can_id, DATA_FRAME);
-            R_CAN_RxSetMask(g_can_channel, CANBOX_RX2, 0x7FF);
         }
         if (g_can_config.channels[2].enabled) {
             api_status |= R_CAN_RxSet(g_can_channel, CANBOX_RX3, g_can_config.channels[2].can_id, DATA_FRAME);
-            R_CAN_RxSetMask(g_can_channel, CANBOX_RX3, 0x7FF);
         }
         if (g_can_config.channels[3].enabled) {
             api_status |= R_CAN_RxSet(g_can_channel, CANBOX_RX4, g_can_config.channels[3].can_id, DATA_FRAME);
-            R_CAN_RxSetMask(g_can_channel, CANBOX_RX4, 0x7FF);
         }
         if (g_can_config.channels[4].enabled) {
             api_status |= R_CAN_RxSet(g_can_channel, CANBOX_RX5, g_can_config.channels[4].can_id, DATA_FRAME);
-            R_CAN_RxSetMask(g_can_channel, CANBOX_RX5, 0x7FF);
         }
         if (g_can_config.channels[5].enabled) {
             api_status |= R_CAN_RxSet(g_can_channel, CANBOX_RX6, g_can_config.channels[5].can_id, DATA_FRAME);
-            R_CAN_RxSetMask(g_can_channel, CANBOX_RX6, 0x7FF);
         }
     }
     else
@@ -1114,17 +1125,25 @@ void can_update_rx_filters(void)
     /* CANモジュールをHALTモードにする（運用中の設定変更のため） */
     R_CAN_Control(g_can_channel, HALT_CANMODE);
 
-    /* すべてのチャンネルを再設定（有効/無効に関わらず） */
+    /* 
+     * 重要: MKRレジスタは4つのMailboxで共有される
+     *  - MKR[1]: Mailbox 4-7 (CANBOX_RX1-4)
+     *  - MKR[2]: Mailbox 8-11 (CANBOX_RX5-6)
+     * 無効チャンネルでマスク0x000を設定すると、同じMKRを共有する
+     * 他の有効チャンネルのマスクも0x000になってしまう！
+     * そのため、無効チャンネルでもマスクは0x7FFを維持し、
+     * 存在しないCAN ID (0x7FF) を設定することで受信しないようにする。
+     */
     for (i = 0; i < CAN_CHANNEL_MAX; i++) {
         if (g_can_config.channels[i].enabled) {
             /* 有効なチャンネル: 設定されたCAN IDで受信 */
             R_CAN_RxSet(g_can_channel, mbox_ids[i], g_can_config.channels[i].can_id, DATA_FRAME);
-            R_CAN_RxSetMask(g_can_channel, mbox_ids[i], 0x7FF);
         } else {
-            /* 無効なチャンネル: マスク0でどのIDにもマッチしないようにする */
+            /* 無効なチャンネル: 存在しないID 0x7FFを設定（マスク0x7FFなのでマッチしない） */
             R_CAN_RxSet(g_can_channel, mbox_ids[i], 0x7FF, DATA_FRAME);
-            R_CAN_RxSetMask(g_can_channel, mbox_ids[i], 0x000);
         }
+        /* 全チャンネル共通でマスク0x7FF（完全一致）を設定 */
+        R_CAN_RxSetMask(g_can_channel, mbox_ids[i], 0x7FF);
     }
 
     /* CANモジュールをOPERATEモードに戻す */

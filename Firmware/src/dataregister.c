@@ -59,6 +59,7 @@ extern can_frame_t rx_dataframe1, rx_dataframe2, rx_dataframe3,
 /* 物理値格納配列 (ターゲット変数用) */
 static float can_values[16];
 
+
 /**
  * @brief CANデータを物理値に変換（汎用処理）
  * @param field フィールド定義
