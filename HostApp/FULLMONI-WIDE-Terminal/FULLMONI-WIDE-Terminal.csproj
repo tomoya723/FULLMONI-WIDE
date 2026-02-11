@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -11,15 +11,15 @@
     <Description>FULLMONI-WIDE Terminal - Windows Host Application for UART communication with firmware</Description>
     <Product>FULLMONI-WIDE Terminal</Product>
     <AssemblyName>FULLMONI-WIDE-Terminal</AssemblyName>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <ApplicationIcon>Assets\FMW.ico</ApplicationIcon>
-    <!-- デフォルトはDebugビルド -->
+    <!-- 繝・ヵ繧ｩ繝ｫ繝医・Debug繝薙Ν繝・-->
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
   </PropertyGroup>
 
-  <!-- Releaseビルドを禁止 -->
+  <!-- Release繝薙Ν繝峨ｒ遖∵ｭ｢ -->
   <Target Name="PreventReleaseBuild" BeforeTargets="BeforeBuild" Condition="'$(Configuration)' == 'Release'">
-    <Error Text="Releaseビルドは禁止されています。Debugビルドを使用してください: dotnet build -c Debug" />
+    <Error Text="Release繝薙Ν繝峨・遖∵ｭ｢縺輔ｌ縺ｦ縺・∪縺吶・ebug繝薙Ν繝峨ｒ菴ｿ逕ｨ縺励※縺上□縺輔＞: dotnet build -c Debug" />
   </Target>
 
   <ItemGroup>
