@@ -205,6 +205,9 @@ void main(void)
 		printf("EEPROM CRC error, using defaults.\r\n");
 	}
 
+	// ギア比テーブル再初期化（パラメータロード後に実行）
+	init_data_store();
+
 	/*
 	 * メインループ
 	 *
