@@ -295,7 +295,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             Gear3 = "1.333";
             Gear4 = "1.000";
             Gear5 = "0.814";
-            Gear6 = "0";
+            Gear6 = "0.000";
         }
         else if (value == "NB 6-speed")
         {
