@@ -1186,8 +1186,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (!gear3Valid) errors.Add("【3速】正の小数で入力してください");
         if (!gear4Valid) errors.Add("【4速】正の小数で入力してください");
         if (!gear5Valid) errors.Add("【5速】正の小数で入力してください");
-        // 6速は0許可（5速車の場合）
-        if (!string.IsNullOrEmpty(Gear6) && !gear6Valid && Gear6 != "0")
+        // 6速は0許可（5速車の場合）- 数値として0かどうかをチェック
+        if (!string.IsNullOrEmpty(Gear6) && !gear6Valid && g6 != 0)
             errors.Add("【6速】正の小数で入力してください（5速車は0）");
 
         if (!ValidatePositiveDecimal(FinalGear, out _))
