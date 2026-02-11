@@ -1,0 +1,28 @@
+#!/bin/sh
+# pre-commit hook: linker_script.ldの構文エラーを事前にチェック
+
+LINKER_SCRIPT="Firmware/src/linker_script.ld"
+
+# linker_script.ldがステージングされている場合のみチェック
+if git diff --cached --name-only | grep -q "$LINKER_SCRIPT"; then
+    echo "[hook] Checking $LINKER_SCRIPT for syntax errors..."
+    
+    # よくある構文エラーをチェック
+    # 1. EXCLUDE_FILE(* xxx.o) のようにスペースが入っている
+    if git show :$LINKER_SCRIPT | grep -E 'EXCLUDE_FILE\(\* +[a-zA-Z]' >/dev/null 2>&1; then
+        echo "ERROR: EXCLUDE_FILE() contains space before filename"
+        echo "       Use EXCLUDE_FILE(*file.o) not EXCLUDE_FILE(* file.o)"
+        exit 1
+    fi
+    
+    # 2. *と.oファイルが別の行に分かれている（行頭が単独の*）  
+    if git show :$LINKER_SCRIPT | grep -E '^\s+\*\s*$' >/dev/null 2>&1; then
+        echo "ERROR: Standalone '*' found on its own line"
+        echo "       File reference should be *filename.o(...) on single line"
+        exit 1
+    fi
+    
+    echo "[hook] $LINKER_SCRIPT syntax OK"
+fi
+
+exit 0

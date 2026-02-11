@@ -1,0 +1,14 @@
+#!/bin/sh
+# post-merge hook: linker_script.ldを読み取り専用に設定してe2 studioによる破損を防ぐ
+
+LINKER_SCRIPT="Firmware/src/linker_script.ld"
+
+if [ -f "$LINKER_SCRIPT" ]; then
+    # 読み取り専用に設定 (Windows: attrib, Unix: chmod)
+    if command -v attrib >/dev/null 2>&1; then
+        attrib +r "$LINKER_SCRIPT"
+    else
+        chmod -w "$LINKER_SCRIPT"
+    fi
+    echo "[hook] Protected $LINKER_SCRIPT (read-only)"
+fi
