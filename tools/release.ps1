@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     FULLMONI-WIDE リリース自動化スクリプト
 
