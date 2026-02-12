@@ -8,10 +8,16 @@
     "version":  "1.0.1",
     "hostApps":  {
                      "windows":  {
-                                     "sha256":  "ea19d662b1b1e99a4f39ab02e89c82713f400f55e65bb3c7c265d485074904ca",
+                                     "sha256":  "70509dedea9f31325d013952d73beab29273c550992774a2011a37c00990c3e0",
                                      "version":  "1.0.1",
-                                     "size":  77170167,
+                                     "size":  146135798,
                                      "file":  "FULLMONI-WIDE-Terminal-win-x64.zip"
+                                 },
+                     "android":  {
+                                     "sha256":  "0e9988b0acfd43bb4e37acec7be701a3907e79d29602a808d5146d7dab44b125",
+                                     "version":  "1.0.1",
+                                     "size":  12124105,
+                                     "file":  "FULLMONI-WIDE-Android-v1.0.1.apk"
                                  }
                  },
     "releaseNotes":  "https://github.com/tomoya723/FULLMONI-WIDE/releases/tag/v1.0.1",

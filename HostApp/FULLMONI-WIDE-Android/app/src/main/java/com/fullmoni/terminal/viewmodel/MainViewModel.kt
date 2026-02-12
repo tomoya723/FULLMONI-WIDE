@@ -519,6 +519,10 @@ class MainViewModel(private val context: Context) : ViewModel() {
     fun loadParameters() {
         android.util.Log.d("MainViewModel", "loadParameters called")
         viewModelScope.launch {
+            // キー送信でパラメータモードに入る（Windows版と同様）
+            sendCommand("")
+            delay(500)
+            
             android.util.Log.d("MainViewModel", "loadParameters: clearing buffer")
             usbSerialService.clearBuffer()
             android.util.Log.d("MainViewModel", "loadParameters: sending 'list' command")
@@ -548,6 +552,18 @@ class MainViewModel(private val context: Context) : ViewModel() {
         }
     }
 
+    /**
+     * ギア比を1000倍した整数値に変換して送信
+     * ファームウェアは1000倍の整数値を期待している（例: 3.163 -> 3163）
+     */
+    private suspend fun sendGearRatioCommand(paramName: String, value: String) {
+        if (value.isBlank()) return
+        val ratio = value.toDoubleOrNull() ?: return
+        val intValue = (ratio * 1000).toInt()
+        sendCommand("set $paramName $intValue")
+        delay(100)
+    }
+
     fun saveParameters(): Boolean {
         val errors = validateAllParameters()
         _validationErrors.value = errors
@@ -560,13 +576,14 @@ class MainViewModel(private val context: Context) : ViewModel() {
             _tyreWidth.value.takeIf { it.isNotBlank() }?.let { sendCommand("set tyre_width $it"); delay(100) }
             _tyreAspect.value.takeIf { it.isNotBlank() }?.let { sendCommand("set tyre_aspect $it"); delay(100) }
             _wheelDia.value.takeIf { it.isNotBlank() }?.let { sendCommand("set tyre_rim $it"); delay(100) }
-            _gear1.value.takeIf { it.isNotBlank() }?.let { sendCommand("set gear1 $it"); delay(100) }
-            _gear2.value.takeIf { it.isNotBlank() }?.let { sendCommand("set gear2 $it"); delay(100) }
-            _gear3.value.takeIf { it.isNotBlank() }?.let { sendCommand("set gear3 $it"); delay(100) }
-            _gear4.value.takeIf { it.isNotBlank() }?.let { sendCommand("set gear4 $it"); delay(100) }
-            _gear5.value.takeIf { it.isNotBlank() }?.let { sendCommand("set gear5 $it"); delay(100) }
-            _gear6.value.takeIf { it.isNotBlank() }?.let { sendCommand("set gear6 $it"); delay(100) }
-            _finalGear.value.takeIf { it.isNotBlank() }?.let { sendCommand("set final $it"); delay(100) }
+            // ギア比は1000倍の整数値で送信（ファームウェアがatoi()で整数パースするため）
+            sendGearRatioCommand("gear1", _gear1.value)
+            sendGearRatioCommand("gear2", _gear2.value)
+            sendGearRatioCommand("gear3", _gear3.value)
+            sendGearRatioCommand("gear4", _gear4.value)
+            sendGearRatioCommand("gear5", _gear5.value)
+            sendGearRatioCommand("gear6", _gear6.value)
+            sendGearRatioCommand("final", _finalGear.value)
             _waterTempLow.value.takeIf { it.isNotBlank() }?.let { sendCommand("set water_low $it"); delay(100) }
             _waterTempHigh.value.takeIf { it.isNotBlank() }?.let { sendCommand("set water_high $it"); delay(100) }
             _fuelWarn.value.takeIf { it.isNotBlank() }?.let { sendCommand("set fuel_warn $it"); delay(100) }
@@ -576,6 +593,9 @@ class MainViewModel(private val context: Context) : ViewModel() {
             _shiftRpm4.value.takeIf { it.isNotBlank() }?.let { sendCommand("set shift_rpm4 $it"); delay(100) }
             _shiftRpm5.value.takeIf { it.isNotBlank() }?.let { sendCommand("set shift_rpm5 $it"); delay(100) }
             sendCommand("save")
+            delay(300)
+            // exitコマンドでパラメータモードを終了
+            sendCommand("exit")
             Toast.makeText(context, "Parameters saved", Toast.LENGTH_SHORT).show()
         }
         return true
