@@ -23,6 +23,7 @@ Includes
 #include "r_cg_macrodriver.h"
 #include "Config_MTU8.h"
 /* Start user code for include. Do not edit comment generated here */
+#include "dataregister.h"
 /* End user code. Do not edit comment generated here */
 #include "r_cg_userdefine.h"
 
@@ -56,6 +57,10 @@ void r_Config_MTU8_tgia8_interrupt(void)
 {
     
     /* Start user code for r_Config_MTU8_tgia8_interrupt. Do not edit comment generated here */
+	/* CAN経由で車速を受信している場合はMTUパルス積算をスキップ */
+	if (g_speed_from_can) {
+		return;
+	}
 	if(g_sp_int_flg == 200)
 	{
 		sp_TGRA = 0;

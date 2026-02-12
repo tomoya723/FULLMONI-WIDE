@@ -448,6 +448,7 @@ void ap_10ms(void)
 // 50ms scheduled application call
 void ap_50ms(void)
 {
+	can_speed_to_pulse();	/* CAN車速→仮想パルス積算 */
 	data_setLCD50ms();
 }
 

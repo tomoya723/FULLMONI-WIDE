@@ -178,6 +178,10 @@ static GUI_CONST_STORAGE APPW_ACTION_ITEM _aAction[] = {
     { ARG_V(0),
     }, 0, NULL
   },
+  { ID_VAR_SPEED,  WM_NOTIFICATION_VALUE_CHANGED,    ID_NUM_SPEED,  APPW_JOB_SETVALUE,       ID_SCREEN_01c__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_SPEED__APPW_JOB_SETVALUE,
+    { ARG_V(4109),
+    }, 65537, NULL
+  },
 };
 
 /*********************************************************************

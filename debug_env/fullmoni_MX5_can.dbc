@@ -1,0 +1,44 @@
+VERSION ""
+
+
+BU_:
+
+
+BO_ 1000 DataFrame1: 8 Vector__XXX
+ SG_ IntakeAirTemperature : 55|16@0+ (0.1,0) [0|6553.5] "degC" Vector__XXX
+ SG_ ManifolePressure : 39|16@0+ (0.1,0) [0|6553.5] "kPa" Vector__XXX
+ SG_ ThrottlePosition : 23|16@0+ (0.1,0) [0|6553.5] "%" Vector__XXX
+ SG_ RPM : 7|16@0+ (1,0) [0|65535] "rpm" Vector__XXX
+
+BO_ 1001 DataFrame2: 8 Vector__XXX
+ SG_ ExhaustMAP : 55|16@0+ (0.1,0) [0|6553.5] "kPa" Vector__XXX
+ SG_ Lambda2 : 39|16@0+ (0.0147,0) [0|963.365] "AFR" Vector__XXX
+ SG_ Lambda1 : 23|16@0+ (0.0147,0) [0|963.365] "AFR" Vector__XXX
+ SG_ EngineTemp : 7|16@0+ (0.1,0) [0|6553.5] "degC" Vector__XXX
+
+BO_ 1002 DataFrame3: 8 Vector__XXX
+ SG_ OilTemp : 55|16@0+ (0.1,0) [0|6553.5] "degC" Vector__XXX
+ SG_ FuelPressure : 39|16@0+ (0.1,0) [0|6553.5] "kPa" Vector__XXX
+ SG_ FuelTemp : 23|16@0+ (0.1,0) [0|6553.5] "degC" Vector__XXX
+ SG_ MassAirFlow : 7|16@0+ (0.1,0) [0|6553.5] "g/s" Vector__XXX
+
+BO_ 1003 DataFrame4: 8 Vector__XXX
+ SG_ BatteryVoltage : 55|16@0+ (0.01,0) [0|655.35] "V" Vector__XXX
+ SG_ ExhaustGasTemp2 : 39|16@0+ (0.1,0) [0|6553.5] "degC" Vector__XXX
+ SG_ ExhaustGasTemp1 : 23|16@0+ (0.1,0) [0|6553.5] "degC" Vector__XXX
+ SG_ OilPressure : 7|16@0+ (0.1,0) [0|6553.5] "kPa" Vector__XXX
+
+BO_ 1004 DataFrame5: 8 Vector__XXX
+ SG_ La2AimValue : 55|16@0+ (0.0147,0) [0|963.365] "AFR" Vector__XXX
+ SG_ La1AimValue : 39|16@0+ (0.0147,0) [0|963.365] "AFR" Vector__XXX
+ SG_ GroundSpeed : 23|16@0+ (1,0) [0|65535] "km/h" Vector__XXX
+ SG_ ECUinternalTemp : 7|16@0+ (0.1,0) [0|6553.5] "degC" Vector__XXX
+
+BO_ 1005 DataFrame6: 8 Vector__XXX
+ SG_ GearPosition : 39|16@0+ (1,0) [0|65535] "-" Vector__XXX
+ SG_ FuelInjDuty : 23|16@0+ (0.1,0) [0|6553.5] "%" Vector__XXX
+ SG_ IgnitionAdvance : 7|16@0+ (0.1,0) [0|6553.5] "degBTDC" Vector__XXX
+
+
+
+
