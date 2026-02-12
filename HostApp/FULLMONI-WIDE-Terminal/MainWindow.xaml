@@ -619,7 +619,7 @@
                                        Command="{Binding SaveParametersCommand}"
                                        IsEnabled="{Binding IsOperationEnabled}"/>
                             <ui:Button Content="Default" Icon="{ui:SymbolIcon ArrowReset24}"
-                                       Command="{Binding DefaultParametersCommand}"
+                                       Command="{Binding ResetDefaultCommand}"
                                        IsEnabled="{Binding IsOperationEnabled}"/>
                         </StackPanel>
                     </StackPanel>
@@ -991,7 +991,7 @@
 
                         <!-- Title -->
                         <TextBlock Text="FULLMONI-WIDE Terminal" FontSize="32" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        <TextBlock Text="Version 1.0.0" FontSize="14" Opacity="0.7" HorizontalAlignment="Center" Margin="0,8,0,0"/>
+                        <TextBlock Text="{Binding AppVersion, StringFormat='Version {0}'}" FontSize="14" Opacity="0.7" HorizontalAlignment="Center" Margin="0,8,0,0"/>
 
                         <!-- Description -->
                         <Border Background="{DynamicResource CardBackgroundBrush}" CornerRadius="8" Padding="20" Margin="0,32,0,0">

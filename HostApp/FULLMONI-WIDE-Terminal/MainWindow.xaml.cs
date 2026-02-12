@@ -475,7 +475,8 @@ namespace FullmoniTerminal
                 }
             }
 
-            CanFieldsGrid.Items.Refresh();
+            // INotifyPropertyChangedで自動更新されるため、Items.Refresh()は不要
+            // Items.Refresh()はTemplateColumnのバインディングと競合する可能性がある
         }
 
         /// <summary>

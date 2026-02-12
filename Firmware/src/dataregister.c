@@ -98,6 +98,7 @@ extern can_frame_t rx_dataframe1, rx_dataframe2, rx_dataframe3,
 /* 物理値格納配列 (ターゲット変数用) */
 static float can_values[16];
 
+
 /**
  * @brief CANデータを物理値に変換（汎用処理）
  * @param field フィールド定義
@@ -230,6 +231,17 @@ void init_data_store(void)
 	float gear_ratio[6];  /* g_paramから取得したギア比（float変換後） */
 	float final_gear;
 	int i;
+
+	/* CAN車速受信判定（イニシャル時に1回だけ判定） */
+	g_speed_from_can = 0;
+	for (i = 0; i < CAN_FIELD_MAX; i++) {
+		if (g_can_config.fields[i].target_var == CAN_TARGET_SPEED &&
+		    g_can_config.fields[i].channel != 0 &&
+		    g_can_config.channels[g_can_config.fields[i].channel - 1].enabled) {
+			g_speed_from_can = 1;
+			break;
+		}
+	}
 
 	/* CAN車速受信判定（イニシャル時に1回だけ判定） */
 	g_speed_from_can = 0;
