@@ -38,6 +38,45 @@ unsigned int gear, gear_pos;
 /* CAN車速受信フラグ（MTU割り込みから参照） */
 unsigned char g_speed_from_can = 0;
 
+/* CAN車速→仮想パルス変換用: 端数繰り越し */
+static float s_pulse_fraction = 0.0f;
+
+/* 仮想パルス換算定数: PULSE_PER_KM * (sample_period / 3600)
+ * = 2548 * (0.05 / 3600) = 0.035389 */
+#define CAN_SPEED_PULSE_FACTOR  (PULSE_PER_KM * 0.05f / 3600.0f)
+
+/**
+ * @brief CAN車速から仮想パルスを積算する（50ms周期で呼び出し）
+ *
+ * CAN経由で車速を受信している場合、車速[km/h]を仮想パルス数に変換し
+ * 既存のパルス積算変数(sp_int)に加算する。
+ * MTU8パルス割り込みの代替処理として機能する。
+ * 端数は次回呼び出しに繰り越し、長距離走行での累積誤差を防止する。
+ */
+void can_speed_to_pulse(void)
+{
+	float pulse_f;
+	unsigned long pulse_int;
+
+	/* CAN車速が無効な場合は何もしない */
+	if (!g_speed_from_can) {
+		return;
+	}
+
+	/* 車速[km/h] → 50msあたりのパルス数 */
+	pulse_f = g_CALC_data.sp * CAN_SPEED_PULSE_FACTOR;
+
+	/* 前回の端数を加算 */
+	pulse_f += s_pulse_fraction;
+
+	/* 整数部をパルスカウンタに加算 */
+	pulse_int = (unsigned long)pulse_f;
+	s_pulse_fraction = pulse_f - (float)pulse_int;
+
+	/* sp_int に加算（既存のODO/TRIP/EEPROM処理はそのまま動作） */
+	sp_int += pulse_int;
+}
+
 static APPW_PARA_ITEM aPara0[6] = {0};
 static APPW_PARA_ITEM aPara1[6] = {0};
 static APPW_PARA_ITEM aPara2[6] = {0};
@@ -295,8 +334,8 @@ void data_store(void)
 //	if(fuel4 > 100) fuel4 = 100;
 
 	// vehicle speed
-	g_CALC_data.odo = sp_int / 2548;
-	g_CALC_data.trip = ((float)(sp_int - tr_int)) / 2548;
+	g_CALC_data.odo = sp_int / PULSE_PER_KM;
+	g_CALC_data.trip = ((float)(sp_int - tr_int)) / PULSE_PER_KM;
 
 	// gear ratio & shift position
 	gear = (unsigned int)(g_CALC_data.rev * g_CALC_data.TyreCirc * 60 / g_CALC_data.sp / (g_param.final_gear_ratio / 1000.0f));
@@ -481,7 +520,8 @@ void data_setLCD100ms(void)
 	APPW_SetVarData(ID_VAR_BATT, g_CALC_data.bt * 10);
 	APPW_SetVarData(ID_VAR_FL1, gear * 10);
 	APPW_SetVarData(ID_VAR_BL1, g_CALC_data.AD5 * 10);
-	APPW_SetVarData(ID_VAR_SPEED, g_CALC_data.sp * 1.06);
+//	APPW_SetVarData(ID_VAR_SPEED, g_CALC_data.sp * 1.06);  /* 旧: 法規対応（高速側表示）のため+6%補正していた */
+	APPW_SetVarData(ID_VAR_SPEED, g_CALC_data.sp);
 	APPW_SetVarData(ID_VAR_ODO, g_CALC_data.odo);
 	APPW_SetVarData(ID_VAR_TRIP, g_CALC_data.trip * 10);
 	APPW_SetVarData(ID_VAR_FUEL, fuel_per);
