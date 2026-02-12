@@ -17,6 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.fullmoni.terminal.BuildConfig
 import com.fullmoni.terminal.R
 import com.fullmoni.terminal.ui.theme.*
 
@@ -63,7 +64,7 @@ fun AboutScreen() {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Version 1.0.0",
+            text = "Version ${BuildConfig.VERSION_NAME}",
             style = MaterialTheme.typography.bodyMedium,
             color = TextMuted
         )

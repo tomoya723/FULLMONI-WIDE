@@ -1,7 +1,7 @@
-/*
+﻿/*
  * firmware_version.h
  *
- * ファームウェアバージョン定義
+ * 繝輔ぃ繝ｼ繝繧ｦ繧ｧ繧｢繝舌・繧ｸ繝ｧ繝ｳ螳夂ｾｩ
  *
  *  Created on: 2026/01/07
  *      Author: FULLMONI-WIDE Project
@@ -10,7 +10,7 @@
 #ifndef FIRMWARE_VERSION_H_
 #define FIRMWARE_VERSION_H_
 
-/* バージョン定義 (ビルド時にカスタマイズ可能) */
+/* 繝舌・繧ｸ繝ｧ繝ｳ螳夂ｾｩ (繝薙Ν繝画凾縺ｫ繧ｫ繧ｹ繧ｿ繝槭う繧ｺ蜿ｯ閭ｽ) */
 #ifndef FW_VERSION_MAJOR
 #define FW_VERSION_MAJOR    1
 #endif
@@ -20,10 +20,10 @@
 #endif
 
 #ifndef FW_VERSION_PATCH
-#define FW_VERSION_PATCH    0
+#define FW_VERSION_PATCH    1
 #endif
 
-/* バージョン文字列マクロ */
+/* 繝舌・繧ｸ繝ｧ繝ｳ譁・ｭ怜・繝槭け繝ｭ */
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 #define FW_VERSION_STRING TOSTRING(FW_VERSION_MAJOR) "." TOSTRING(FW_VERSION_MINOR) "." TOSTRING(FW_VERSION_PATCH)

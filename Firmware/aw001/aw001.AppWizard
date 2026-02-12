@@ -1730,7 +1730,22 @@
         Value=0
       </Para>
     </SETVALUE>
+    <SETVALUE>
+      RootId=6148
+      IdSrc=ID_VAR_SPEED
+      NCode=WM_NOTIFICATION_VALUE_CHANGED
+      IdDst=ID_NUM_SPEED
+      Slot=ID_SCREEN_01c__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_SPEED__APPW_JOB_SETVALUE
+      Flags=65537
+      <Para>
+        Value=4109
+      </Para>
+    </SETVALUE>
   </Interactions>
+  <Selection>
+    Root=ID_SCREEN_01c
+    Object=2048
+  </Selection>
   <Terms>
   </Terms>
   <AnimItems>

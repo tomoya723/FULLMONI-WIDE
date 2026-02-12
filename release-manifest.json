@@ -1,43 +1,49 @@
 ﻿{
-    "schemaVersion": 1,
-    "version": "1.0.0",
-    "releaseDate": "2026-02-02",
-    "releaseNotes": "https://github.com/tomoya723/FULLMONI-WIDE/releases/tag/v1.0.0",
-    "bootloader": {
-        "version": "0.1.2",
-        "file": "Bootloader_v0.1.2.mot",
-        "size": 231944,
-        "sha256": "7075f2c54cc895bfcb61ad7b78dcf2e35c7796833aa1eeb38e4c11f43154864d"
-    },
-    "firmware": {
-        "minimumBootloaderVersion": "0.1.2",
-        "variants": [
-            {
-                "id": "aw001",
-                "name": "type1",
-                "description": "tomoya723 ver",
-                "file": "Firmware_v1.0.0_aw001.bin",
-                "thumbnail": "thumbnail_v1.0.0_aw001.png",
-                "size": 956266,
-                "sha256": "4a416e10e3c3bec20ec1029e8ce7a37a99ddebd1d385a3188fa6b444bd88fbe0"
-            },
-            {
-                "id": "aw002",
-                "name": "type2",
-                "description": "chaketek ver",
-                "file": "Firmware_v1.0.0_aw002.bin",
-                "thumbnail": "thumbnail_v1.0.0_aw002.png",
-                "size": 916782,
-                "sha256": "f2f9b9bbea159bcf2007937e1fa543248e3c26dc058e7a6306f4bb118ca8cc88"
-            }
-        ]
-    },
-    "hostApps": {
-        "windows": {
-            "version": "0.1.2",
-            "file": "FULLMONI-WIDE-Terminal-win-x64.zip",
-            "size": 73438779,
-            "sha256": "bd784feb69bc79936bef12bbe6eef77aeee5c74dbb70834f153e79f4ef7be53a"
-        }
-    }
+    "bootloader":  {
+                       "sha256":  "7075f2c54cc895bfcb61ad7b78dcf2e35c7796833aa1eeb38e4c11f43154864d",
+                       "version":  "0.1.2",
+                       "size":  231944,
+                       "file":  "Bootloader_v0.1.2.mot"
+                   },
+    "version":  "1.0.1",
+    "hostApps":  {
+                     "windows":  {
+                                     "sha256":  "70509dedea9f31325d013952d73beab29273c550992774a2011a37c00990c3e0",
+                                     "version":  "1.0.1",
+                                     "size":  146135798,
+                                     "file":  "FULLMONI-WIDE-Terminal-win-x64.zip"
+                                 },
+                     "android":  {
+                                     "sha256":  "0e9988b0acfd43bb4e37acec7be701a3907e79d29602a808d5146d7dab44b125",
+                                     "version":  "1.0.1",
+                                     "size":  12124105,
+                                     "file":  "FULLMONI-WIDE-Android-v1.0.1.apk"
+                                 }
+                 },
+    "releaseNotes":  "https://github.com/tomoya723/FULLMONI-WIDE/releases/tag/v1.0.1",
+    "releaseDate":  "2026-02-12",
+    "schemaVersion":  1,
+    "firmware":  {
+                     "minimumBootloaderVersion":  "0.1.2",
+                     "variants":  [
+                                      {
+                                          "id":  "aw001",
+                                          "name":  "type1",
+                                          "size":  956636,
+                                          "description":  "tomoya723 ver",
+                                          "sha256":  "5eda475a92676f0d51a85629bb2dcb7dfe1d4788e7598a06da4400771b0ff3ae",
+                                          "thumbnail":  "thumbnail_v1.0.0_aw001.png",
+                                          "file":  "Firmware_1.0.1_aw001.bin"
+                                      },
+                                      {
+                                          "id":  "aw002",
+                                          "name":  "type2",
+                                          "size":  912280,
+                                          "description":  "chaketek ver",
+                                          "sha256":  "61c83306c3302441ca7a19f6c6329ac23c28626b79fc6f293832e0810e240b01",
+                                          "thumbnail":  "thumbnail_v1.0.0_aw002.png",
+                                          "file":  "Firmware_1.0.1_aw002.bin"
+                                      }
+                                  ]
+                 }
 }

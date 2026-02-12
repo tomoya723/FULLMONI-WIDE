@@ -31,6 +31,17 @@ typedef struct {
 /* バージョン定義 (共通ヘッダから取得) */
 #include "firmware_version.h"
 
+/* バリアントID (build_variants.ps1が生成、存在しない場合はunknown) */
+#if __has_include("variant_id.h")
+  #include "variant_id.h"
+#else
+  #define BUILD_VARIANT_STRING "VARIANT:unknown"
+#endif
+
+/* バリアント識別文字列 (.rodataに配置 - ビルド検証用) */
+__attribute__((used))
+const char g_variant_string[] = BUILD_VARIANT_STRING;
+
 /* エントリポイント (アプリケーションのリセットハンドラ) */
 extern void PowerON_Reset(void);
 

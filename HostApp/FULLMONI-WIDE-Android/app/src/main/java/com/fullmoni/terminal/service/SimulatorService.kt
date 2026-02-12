@@ -20,13 +20,14 @@ class SimulatorService {
     private var tyreWidth: Int = 195      // 195/50 R15
     private var tyreAspect: Int = 50
     private var wheelDia: Int = 15
-    private var gear1: Float = 3.760f     // dataregister.c table_gear_ratio
-    private var gear2: Float = 2.269f
-    private var gear3: Float = 1.645f
-    private var gear4: Float = 1.257f
-    private var gear5: Float = 1.000f
-    private var gear6: Float = 0.843f
-    private var finalGear: Float = 4.300f // table_final_gear_ratio
+    // ギア比は1000倍の整数で保存（ファームウェアと同じ形式）
+    private var gear1: Int = 3760         // dataregister.c table_gear_ratio * 1000
+    private var gear2: Int = 2269
+    private var gear3: Int = 1645
+    private var gear4: Int = 1257
+    private var gear5: Int = 1000
+    private var gear6: Int = 843
+    private var finalGear: Int = 4300     // table_final_gear_ratio * 1000
     private var waterTempLow: Int = 60    // water_temp_low
     private var waterTempHigh: Int = 100  // water_temp_high
     private var fuelWarn: Int = 10        // fuel_warn_level
@@ -147,9 +148,9 @@ class SimulatorService {
             |
             |=== Current Parameters ===
             |Tyre: $tyreWidth/$tyreAspect R$wheelDia
-            |Gear1: ${"%.3f".format(gear1)}  Gear2: ${"%.3f".format(gear2)}  Gear3: ${"%.3f".format(gear3)}
-            |Gear4: ${"%.3f".format(gear4)}  Gear5: ${"%.3f".format(gear5)}  Gear6: ${"%.3f".format(gear6)}
-            |Final: ${"%.3f".format(finalGear)}
+            |Gear1: ${"%.3f".format(gear1 / 1000.0)}  Gear2: ${"%.3f".format(gear2 / 1000.0)}  Gear3: ${"%.3f".format(gear3 / 1000.0)}
+            |Gear4: ${"%.3f".format(gear4 / 1000.0)}  Gear5: ${"%.3f".format(gear5 / 1000.0)}  Gear6: ${"%.3f".format(gear6 / 1000.0)}
+            |Final: ${"%.3f".format(finalGear / 1000.0)}
             |Water Temp Warning: $waterTempLow - $waterTempHigh C
             |Fuel Warning: $fuelWarn %
             |Shift RPM: ${shiftRpm.joinToString(" / ")}
@@ -209,13 +210,14 @@ class SimulatorService {
             "tyre_width" -> value.toIntOrNull()?.let { tyreWidth = it }
             "tyre_aspect" -> value.toIntOrNull()?.let { tyreAspect = it }
             "tyre_rim" -> value.toIntOrNull()?.let { wheelDia = it }
-            "gear1" -> value.toFloatOrNull()?.let { gear1 = it }
-            "gear2" -> value.toFloatOrNull()?.let { gear2 = it }
-            "gear3" -> value.toFloatOrNull()?.let { gear3 = it }
-            "gear4" -> value.toFloatOrNull()?.let { gear4 = it }
-            "gear5" -> value.toFloatOrNull()?.let { gear5 = it }
-            "gear6" -> value.toFloatOrNull()?.let { gear6 = it }
-            "final" -> value.toFloatOrNull()?.let { finalGear = it }
+            // ギア比は1000倍の整数値で受け取る（ファームウェアと同じ形式）
+            "gear1" -> value.toIntOrNull()?.let { gear1 = it }
+            "gear2" -> value.toIntOrNull()?.let { gear2 = it }
+            "gear3" -> value.toIntOrNull()?.let { gear3 = it }
+            "gear4" -> value.toIntOrNull()?.let { gear4 = it }
+            "gear5" -> value.toIntOrNull()?.let { gear5 = it }
+            "gear6" -> value.toIntOrNull()?.let { gear6 = it }
+            "final" -> value.toIntOrNull()?.let { finalGear = it }
             "water_low" -> value.toIntOrNull()?.let { waterTempLow = it }
             "water_high" -> value.toIntOrNull()?.let { waterTempHigh = it }
             "fuel_warn" -> value.toIntOrNull()?.let { fuelWarn = it }
