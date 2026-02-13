@@ -256,6 +256,20 @@ foreach ($variant in $Variants) {
         }
     Write-Host "  Generated subdir.mk for $totalFiles source files"
 
+    # Step 3.5: makefile検証（aw/ subdir.mkインクルード行が存在するか確認）
+    $makefilePath = Join-Path $BuildDir "makefile"
+    if (Test-Path $makefilePath) {
+        $makefileContent = Get-Content $makefilePath -Raw
+        if ($makefileContent -notmatch 'aw/Source/Generated/subdir\.mk') {
+            Write-Host ""
+            Write-Host "ERROR: makefile に aw/ subdir.mk のインクルード行がありません。" -ForegroundColor Red
+            Write-Host "  e2 studio のプロジェクト設定 > パスおよびシンボル > ソース・ロケーション に" -ForegroundColor Red
+            Write-Host "  /Firmware/aw/Resource と /Firmware/aw/Source が含まれているか確認してください。" -ForegroundColor Red
+            Write-Host "  設定後、e2 studio で makefile を再生成してください。" -ForegroundColor Red
+            throw "makefile validation failed: aw/ source locations missing"
+        }
+    }
+
     # Step 4: ビルド
     Push-Location $BuildDir
     try {
