@@ -338,6 +338,9 @@ void param_storage_reset_trip(void)
 
     /* 即時保存（save内で再同期されるのでtr_intを先に設定） */
     param_storage_save();
+
+    /* レガシー領域（0x0000）にも保存 - 起動時に読まれるため必須 */
+    save_legacy_eeprom();
 }
 
 /* ============================================================
