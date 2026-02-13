@@ -1,4 +1,4 @@
-﻿# e² studio (Eclipse ベース) の不要ファイル
+# e² studio (Eclipse ベース) の不要ファイル
 *.o
 *.bin
 *.elf
@@ -75,6 +75,13 @@ HostApp/FULLMONI-WIDE-Android/local.properties
 # PR作成用一時ファイル
 pr_body.md
 
+# Android/Eclipse debug artifacts (誤コミット防止)
+*.apk
+**/ui.xml
+**/screen.png
+/.project
+**/.metadata/
+
 # Test release folder (local testing)
 test-release/
 
@@ -86,8 +93,11 @@ Firmware/aw*/Simulation/GUI_Lib/
 Firmware/aw*/Simulation/Exe/
 Firmware/aw*/Simulation/Output/
 *.hprof
+
 *.zip
+
 HostApp/FULLMONI-WIDE-Terminal/publish/
+
 HostApp/FULLMONI-WIDE-Desktop/.gradle/
 
 /.metadata/
