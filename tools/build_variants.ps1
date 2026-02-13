@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     AppWizardバリアント（aw001, aw002）のビルドを自動化
 
@@ -377,9 +377,12 @@ if ($Results.Count -eq 0) {
 } else {
     foreach ($key in $Results.Keys | Sort-Object) {
         $r = $Results[$key]
-        Write-Host "$key : $($r.File) ($($r.Size) bytes)"
-        Write-Host "       SHA256: $($r.SHA256.Substring(0, 16))..."
+        $sizeStr = "$($r.Size) bytes"
+        $shaStr = $r.SHA256.Substring(0, 16)
+        Write-Host "$key : $($r.File) ($sizeStr)"
+        Write-Host "       SHA256: ${shaStr}..."
     }
 }
 
-Write-Host "`nDone!" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Done!" -ForegroundColor Cyan

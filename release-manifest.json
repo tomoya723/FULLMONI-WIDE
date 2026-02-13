@@ -31,7 +31,7 @@
                                           "name":  "type1",
                                           "size":  956636,
                                           "description":  "tomoya723 ver",
-                                          "sha256":  "d62fc6c48f731156a08e010542f0415fe08ea29972f35043adc950433404f685",
+                                          "sha256":  "a37ad2ee3fcc30a645d9eb45902663c82c015703793377fd9b721cb3bc03ed7a",
                                           "thumbnail":  "thumbnail_v1.0.0_aw001.png",
                                           "file":  "Firmware_1.0.1_aw001.bin"
                                       },
@@ -40,7 +40,7 @@
                                           "name":  "type2",
                                           "size":  912280,
                                           "description":  "chaketek ver",
-                                          "sha256":  "771bb9b17ae540fb6e41685ee69e18f084842b19df16369f1cb9ec28422e6015",
+                                          "sha256":  "2c2ed899236adec81381071162fdb7f627898ac99749214be8df217eb47bb5e2",
                                           "thumbnail":  "thumbnail_v1.0.0_aw002.png",
                                           "file":  "Firmware_1.0.1_aw002.bin"
                                       }
