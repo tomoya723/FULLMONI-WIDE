@@ -1,6 +1,38 @@
 VERSION ""
 
 
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
 BU_:
 
 
@@ -31,7 +63,7 @@ BO_ 1003 DataFrame4: 8 Vector__XXX
 BO_ 1004 DataFrame5: 8 Vector__XXX
  SG_ La2AimValue : 55|16@0+ (0.0147,0) [0|963.365] "AFR" Vector__XXX
  SG_ La1AimValue : 39|16@0+ (0.0147,0) [0|963.365] "AFR" Vector__XXX
- SG_ GroundSpeed : 23|16@0+ (1,0) [0|65535] "km/h" Vector__XXX
+ SG_ GroundSpeed : 23|16@0+ (0.1,0) [0|65535] "km/h" Vector__XXX
  SG_ ECUinternalTemp : 7|16@0+ (0.1,0) [0|6553.5] "degC" Vector__XXX
 
 BO_ 1005 DataFrame6: 8 Vector__XXX
