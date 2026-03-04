@@ -21,6 +21,7 @@
 #include "usb_cdc.h"  /* USB CDC for parameter mode */
 #include "speaker.h"  /* Speaker output (DA1 + LM4861M) */
 #include "master_warning.h"  /* Issue #50: マスターワーニング */
+#include "pulse_out.h"  /* Issue #115: EPS駆動用タコ・車速パルス出力 */
 #include "GUI.h"               /* emWin GUI関数 */
 #include "TEXT.h"              /* TEXT Widget関数 */
 #include "WM.h"                /* Window Manager関数 */
@@ -207,6 +208,9 @@ void main(void)
 
 	// ギア比テーブル再初期化（パラメータロード後に実行）
 	init_data_store();
+
+	// パルス出力初期化（Issue #115: EPS駆動用タコ・車速パルス出力）
+	pulse_out_init();
 
 	/*
 	 * メインループ
@@ -443,6 +447,7 @@ void main(void)
 void ap_10ms(void)
 {
 	data_setLCD10ms();
+	pulse_out_set_tacho((uint16_t)g_CALC_data.rev);  /* Issue #115: タコパルス出力更新 */
 }
 
 // 50ms scheduled application call
@@ -450,6 +455,7 @@ void ap_50ms(void)
 {
 	can_speed_to_pulse();	/* CAN車速→仮想パルス積算 */
 	data_setLCD50ms();
+	pulse_out_set_speed((float)g_CALC_data.sp);  /* Issue #115: 車速パルス出力更新 */
 }
 
 // 100ms scheduled application call
