@@ -280,13 +280,21 @@ foreach ($variant in $Variants) {
         # stderrをstdoutにマージし、PowerShellのエラー検出を回避
         $buildOutput = cmd /c "$MakeExe -j8 all 2>&1"
         
-        # エラーチェック（リンカエラーのみ検出）
-        $hasError = $buildOutput | Where-Object { $_ -match "^.+: error:" -or $_ -match "collect2.*error" }
+        # エラーチェック（コンパイルエラー・リンカエラー・undefined reference を検出）
+        $hasError = $buildOutput | Where-Object {
+            $_ -match "^.+: error:" -or
+            $_ -match "collect2.*error" -or
+            $_ -match "undefined reference" -or
+            $_ -match "multiple definition"
+        }
 
         if (-not (Test-Path "Firmware.elf")) {
             Write-Host "Build failed for $variant" -ForegroundColor Red
             if ($hasError) {
-                $hasError | Select-Object -Last 5 | ForEach-Object { Write-Host "  $_" -ForegroundColor Red }
+                $hasError | Select-Object -Last 20 | ForEach-Object { Write-Host "  $_" -ForegroundColor Red }
+            } else {
+                # フィルターに引っかからなかった場合は末尾30行を表示
+                $buildOutput | Select-Object -Last 30 | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
             }
             continue
         }

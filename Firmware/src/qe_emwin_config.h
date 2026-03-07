@@ -32,7 +32,9 @@
 Configuration Options
 ***********************************************************************************************************************/
 
-#define EMWIN_GUI_NUM_BYTES           (112640u)
+/* Reduced from 112640 to 28672 (28KB): GUIConf is never called when LVGL_ENABLE=1.
+ * RAM2 layout: LVGL draw_buf(50KB) + LVGL heap(32KB) + GUIConf(28KB) = 110KB < 112KB. */
+#define EMWIN_GUI_NUM_BYTES           (28672u)
 #define EMWIN_XSIZE_PHYS              (800u)
 #define EMWIN_YSIZE_PHYS              (256u)
 #define EMWIN_BITS_PER_PIXEL          (16)

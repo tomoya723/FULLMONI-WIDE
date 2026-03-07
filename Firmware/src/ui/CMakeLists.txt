@@ -1,0 +1,22 @@
+SET(SOURCES components/ui_comp_barwatertemp.c
+    components/ui_comp.c
+    screens/ui_Screen1.c
+    ui.c
+    components/ui_comp_hook.c
+    ui_helpers.c
+    images/ui_img_back5_png.c
+    images/ui_img_back6_png.c
+    images/ui_img_ws_masterwarning_png.c
+    images/ui_img_ws_oilpresswarning_png.c
+    images/ui_img_ws_waterwarning_png.c
+    images/ui_img_ws_exhaustwarning_png.c
+    images/ui_img_ws_batterywarning_png.c
+    images/ui_img_ws_breakwarning_png.c
+    images/ui_img_ws_beltwarning_png.c
+    images/ui_img_ws_fuelcheck_png.c
+    images/ui_img_marker_red_bar_80x7s_png.c
+    images/ui_img_fuel1_png.c
+    images/ui_img_fuel2_png.c
+    fonts/ui_font_Font1.c)
+
+add_library(ui ${SOURCES})

@@ -81,7 +81,10 @@ Configuration Options
 ***********************************************************************************************************************/
 
 /* Basic */
-#define EMWIN_GUI_NUM_BYTES           (112640)
+/* Reduced from 112640 to 28672 (28KB) to fit alongside LVGL in RAM2.
+ * RAM2 layout: LVGL draw_buf(50KB) + LVGL heap(32KB) + GUIConf(28KB) = 110KB.
+ * GUIConf is linked but never called when LVGL_ENABLE=1 in main.c. */
+#define EMWIN_GUI_NUM_BYTES           (28672)
 
 #define EMWIN_XSIZE_PHYS              (800)
 #define EMWIN_YSIZE_PHYS              (256)

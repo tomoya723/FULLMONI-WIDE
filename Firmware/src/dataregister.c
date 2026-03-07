@@ -14,12 +14,16 @@
 #include "param_storage.h"      /* CAN設定 (Issue #65) */
 #include "master_warning.h"    /* Issue #50: マスターワーニング */
 #include "speaker.h"           /* 警告音再生 */
+#if !LVGL_ENABLE
 #include "GUI.h"               /* emWin GUI関数 */
 #include "TEXT.h"              /* TEXT Widget関数 */
 #include "WM.h"                /* Window Manager関数 */
 #include "../aw/Source/Generated/Resource.h"  /* AppWizard リソース定義 (Junction経由) */
 #include "../aw/Source/Generated/ID_SCREEN_01a.h"  /* ID_TEXT_ACC 定義 (Junction経由) */
 #include "../aw/Source/Generated/ID_SCREEN_Telltale.h"  /* ID_ICON_xx 定義 (Junction経由) */
+#else
+#include "ui_binding/ui_dashboard.h"  /* LVGL notify API */
+#endif
 
 #define PI 3.1415923
 
@@ -82,6 +86,7 @@ void can_speed_to_pulse(void)
 	sp_int += pulse_int;
 }
 
+#if !LVGL_ENABLE
 static APPW_PARA_ITEM aPara0[6] = {0};
 static APPW_PARA_ITEM aPara1[6] = {0};
 static APPW_PARA_ITEM aPara2[6] = {0};
@@ -91,6 +96,7 @@ static APPW_PARA_ITEM aPara5[6] = {0};
 static APPW_PARA_ITEM aPara6[6] = {0};
 static APPW_PARA_ITEM aPara7[6] = {0};
 static APPW_PARA_ITEM aPara8[6] = {0};
+#endif /* !LVGL_ENABLE */
 
 /* ============================================================
  * CAN データ変換 (Issue #65)
@@ -376,6 +382,7 @@ void data_store(void)
 		gear_pos = 0;
 	}
 
+#if !LVGL_ENABLE
 	// Set value to appWizard variables.
 	APPW_SetVarData(ID_VAR_REV_A, g_CALC_data.rev_angle);
 
@@ -398,6 +405,7 @@ void data_store(void)
 //	sprintf((void *) g_CALC_data.str_time,"%2x:%02x:%02x", (RTC.RHRCNT.BYTE & 0x3F), RTC.RMINCNT.BYTE, RTC.RSECCNT.BYTE);
 	sprintf((void *) g_CALC_data.str_time,"%2x:%02x", (RTC.RHRCNT.BYTE & 0x3F), RTC.RMINCNT.BYTE);
 	APPW_SetText(ID_SCREEN_01a,ID_NUM_TIME,	(void *) g_CALC_data.str_time	);
+#endif /* !LVGL_ENABLE */
 	// SW Input
 	if(g_sw_int_flg == 1)
 	{
@@ -425,15 +433,18 @@ void data_store(void)
 
 void data_setLCD10ms(void)
 {
+#if !LVGL_ENABLE
 	// Set value to appWizard variables.
-
 	APPW_SetVarData(ID_VAR_AF, g_CALC_data.af);
 	APPW_SetVarData(ID_VAR_REV, g_CALC_data.rev);
+#endif /* !LVGL_ENABLE */
 }
 
 void data_setLCD50ms(void)
 {
+#if !LVGL_ENABLE
 	APPW_SetVarData(ID_VAR_04, g_CALC_data_sm.num4); // MAP
+#endif /* !LVGL_ENABLE */
 }
 
 /* Issue #50: マスターワーニング表示状態 */
@@ -457,6 +468,18 @@ void master_warning_gui_update(void)
 	}
 	s_warning_gui_update_needed = 0;
 
+#if LVGL_ENABLE
+	if (master_warning_is_active()) {
+		const char *msg = master_warning_get_message();
+		ui_dashboard_set_notify(msg, 0xFF0000u);  /* 赤背景 */
+		s_warning_displayed = 1;
+	} else {
+		if (s_warning_displayed) {
+			ui_dashboard_clear_notify();
+			s_warning_displayed = 0;
+		}
+	}
+#else
 	if (master_warning_is_active()) {
 		WM_HWIN hWin = WM_GetDialogItem(ID_SCREEN_01a_RootInfo.hWin, ID_TEXT_ACC);
 		if (hWin) {
@@ -473,7 +496,6 @@ void master_warning_gui_update(void)
 		if (s_warning_displayed) {
 			WM_HWIN hWin = WM_GetDialogItem(ID_SCREEN_01a_RootInfo.hWin, ID_TEXT_ACC);
 			if (hWin) {
-				/* 警告解除時は緑に戻さず、テキストをクリアしてから非表示にする */
 				TEXT_SetText(hWin, "");
 			}
 			s_warning_displayed = 0;
@@ -482,6 +504,7 @@ void master_warning_gui_update(void)
 			APPW_SetVarData(ID_VAR_PRM, 0);
 		}
 	}
+#endif
 }
 
 void data_setLCD100ms(void)
@@ -500,9 +523,8 @@ void data_setLCD100ms(void)
 	master_warning_check();
 
 	if (master_warning_is_active()) {
-		/* 警告発報開始時のみ警告音を再生 */
-		if (!s_warning_displayed && s_warning_sound_cooldown == 0) {
-			/* 最初の警告時のみ警告音を再生（クールダウン中は抑制、sound_enabledで無効化可能）*/
+		/* 警告音をクールダウン間隔で繰り返し再生 */
+		if (s_warning_sound_cooldown == 0) {
 			if (g_can_config.sound_enabled) {
 				speaker_play_warning();
 			}
@@ -517,6 +539,7 @@ void data_setLCD100ms(void)
 		}
 	}
 
+#if !LVGL_ENABLE
 	APPW_SetVarData(ID_VAR_01, g_CALC_data.num1); //WaterTemp
 	APPW_SetVarData(ID_VAR_02, g_CALC_data.num2); //IAT
 	APPW_SetVarData(ID_VAR_03, g_CALC_data.num3); //OIL temp
@@ -532,6 +555,7 @@ void data_setLCD100ms(void)
 	APPW_SetVarData(ID_VAR_ODO, g_CALC_data.odo);
 	APPW_SetVarData(ID_VAR_TRIP, g_CALC_data.trip * 10);
 	APPW_SetVarData(ID_VAR_FUEL, fuel_per);
+#endif /* !LVGL_ENABLE */
 
 }
 
