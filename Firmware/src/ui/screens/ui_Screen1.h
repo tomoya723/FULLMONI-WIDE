@@ -41,6 +41,8 @@ extern lv_obj_t * ui_BarOilPress;
 extern lv_obj_t * ui_BarBattery;
 extern lv_obj_t * ui_LblRPM;
 extern lv_obj_t * ui_MAPChart;
+extern lv_obj_t * ui_NotifyBox;
+extern lv_obj_t * ui_NotifyLabel;
 // CUSTOM VARIABLES
 
 #ifdef __cplusplus

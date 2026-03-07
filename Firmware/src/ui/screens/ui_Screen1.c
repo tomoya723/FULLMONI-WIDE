@@ -33,6 +33,8 @@ lv_obj_t * ui_BarOilPress = NULL;
 lv_obj_t * ui_BarBattery = NULL;
 lv_obj_t * ui_LblRPM = NULL;
 lv_obj_t * ui_MAPChart = NULL;
+lv_obj_t * ui_NotifyBox = NULL;
+lv_obj_t * ui_NotifyLabel = NULL;
 // event funtions
 
 // build funtions
@@ -193,6 +195,7 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_x(ui_LblWaterTemp, -179);
     lv_obj_set_y(ui_LblWaterTemp, -98);
     lv_obj_set_align(ui_LblWaterTemp, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_LblWaterTemp, "999");
     lv_obj_set_style_text_align(ui_LblWaterTemp, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LblWaterTemp, &ui_font_Font1, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -202,6 +205,7 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_x(ui_LblIAT, -180);
     lv_obj_set_y(ui_LblIAT, -54);
     lv_obj_set_align(ui_LblIAT, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_LblIAT, "999");
     lv_obj_set_style_text_align(ui_LblIAT, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LblIAT, &ui_font_Font1, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -211,6 +215,7 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_x(ui_LblOilTemp, -180);
     lv_obj_set_y(ui_LblOilTemp, -12);
     lv_obj_set_align(ui_LblOilTemp, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_LblOilTemp, "999");
     lv_obj_set_style_text_align(ui_LblOilTemp, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LblOilTemp, &ui_font_Font1, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -220,6 +225,7 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_x(ui_LblMAP, -180);
     lv_obj_set_y(ui_LblMAP, 29);
     lv_obj_set_align(ui_LblMAP, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_LblMAP, "999");
     lv_obj_set_style_text_align(ui_LblMAP, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LblMAP, &ui_font_Font1, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -229,6 +235,7 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_x(ui_LblOilPress, -180);
     lv_obj_set_y(ui_LblOilPress, 66);
     lv_obj_set_align(ui_LblOilPress, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_LblOilPress, "999");
     lv_obj_set_style_text_align(ui_LblOilPress, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LblOilPress, &ui_font_Font1, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -238,6 +245,7 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_x(ui_LblBattery, -180);
     lv_obj_set_y(ui_LblBattery, 105);
     lv_obj_set_align(ui_LblBattery, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_LblBattery, "999");
     lv_obj_set_style_text_align(ui_LblBattery, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LblBattery, &ui_font_Font1, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -357,15 +365,39 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_align(ui_MAPChart, LV_ALIGN_CENTER);
     lv_chart_set_type(ui_MAPChart, LV_CHART_TYPE_LINE);
     lv_chart_set_point_count(ui_MAPChart, 30);
+    lv_chart_set_div_line_count(ui_MAPChart, 3, 0);
     lv_chart_set_axis_tick(ui_MAPChart, LV_CHART_AXIS_PRIMARY_X, 10, 5, 5, 2, true, 50);
     lv_chart_set_axis_tick(ui_MAPChart, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 5, 2, true, 50);
     lv_chart_set_axis_tick(ui_MAPChart, LV_CHART_AXIS_SECONDARY_Y, 10, 5, 5, 2, false, 25);
     lv_chart_series_t * ui_MAPChart_series_1 = lv_chart_add_series(ui_MAPChart, lv_color_hex(0x808080),
                                                                    LV_CHART_AXIS_PRIMARY_Y);
-    static lv_coord_t ui_MAPChart_series_1_array[] = { 0, 10, 20, 40, 80, 80, 40, 20, 10, 0 };
+    static lv_coord_t ui_MAPChart_series_1_array[] = { 0 };
     lv_chart_set_ext_y_array(ui_MAPChart, ui_MAPChart_series_1, ui_MAPChart_series_1_array);
     lv_obj_set_style_bg_color(ui_MAPChart, lv_color_hex(0x201E1E), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_MAPChart, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_NotifyBox = lv_obj_create(ui_Screen1);
+    lv_obj_set_width(ui_NotifyBox, 320);
+    lv_obj_set_height(ui_NotifyBox, 50);
+    lv_obj_set_x(ui_NotifyBox, 0);
+    lv_obj_set_y(ui_NotifyBox, -100);
+    lv_obj_set_align(ui_NotifyBox, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_NotifyBox, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_clear_flag(ui_NotifyBox, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_radius(ui_NotifyBox, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_NotifyBox, lv_color_hex(0xFF0000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_NotifyBox, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui_NotifyBox, 4, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_NotifyBox, 4, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_NotifyBox, 4, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_NotifyBox, 4, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_NotifyLabel = lv_label_create(ui_NotifyBox);
+    lv_obj_set_width(ui_NotifyLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_NotifyLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_NotifyLabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_NotifyLabel, "000");
+    lv_obj_set_style_text_font(ui_NotifyLabel, &lv_font_montserrat_32, LV_PART_MAIN | LV_STATE_DEFAULT);
 
 }
 
@@ -402,5 +434,7 @@ void ui_Screen1_screen_destroy(void)
     ui_BarBattery = NULL;
     ui_LblRPM = NULL;
     ui_MAPChart = NULL;
+    ui_NotifyBox = NULL;
+    ui_NotifyLabel = NULL;
 
 }

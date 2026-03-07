@@ -41,8 +41,6 @@ LV_IMG_DECLARE(ui_img_ws_breakwarning_png);    // assets/ws_breakwarning.png
 LV_IMG_DECLARE(ui_img_ws_beltwarning_png);    // assets/ws_beltwarning.png
 LV_IMG_DECLARE(ui_img_ws_fuelcheck_png);    // assets/ws_fuelcheck.png
 LV_IMG_DECLARE(ui_img_marker_red_bar_80x7s_png);    // assets/Marker_red_bar_80x7s.png
-LV_IMG_DECLARE(ui_img_fuel1_png);    // assets/fuel1.png
-LV_IMG_DECLARE(ui_img_fuel2_png);    // assets/fuel2.png
 
 // FONTS
 LV_FONT_DECLARE(ui_font_Font1);

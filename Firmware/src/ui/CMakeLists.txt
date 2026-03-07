@@ -15,8 +15,6 @@ SET(SOURCES components/ui_comp_barwatertemp.c
     images/ui_img_ws_beltwarning_png.c
     images/ui_img_ws_fuelcheck_png.c
     images/ui_img_marker_red_bar_80x7s_png.c
-    images/ui_img_fuel1_png.c
-    images/ui_img_fuel2_png.c
     fonts/ui_font_Font1.c)
 
 add_library(ui ${SOURCES})

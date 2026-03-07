@@ -32,9 +32,7 @@
 /* fuel_per is defined in dataregister.c but not declared in dataregister.h */
 extern float fuel_per;
 
-/* --- Notification overlay label ------------------------------------------- */
-static lv_obj_t *s_notify_box   = NULL;  /* colored background panel */
-static lv_obj_t *s_notify_label = NULL;  /* text label inside panel */
+/* Notification overlay widgets are SLS-generated: ui_NotifyBox / ui_NotifyLabel */
 
 /* --- MAP chart series ----------------------------------------------------- */
 static lv_chart_series_t *s_ser_map     = NULL;
@@ -113,20 +111,6 @@ void ui_dashboard_create(void)
     /* Initial needle position at 0 rpm */
     lv_img_set_angle(ui_imageRPM, (int16_t)rpm_to_angle(0));
 
-    /* --- Notification overlay (hidden at startup) -------------------------- */
-    s_notify_box = lv_obj_create(ui_Screen1);
-    lv_obj_set_size(s_notify_box, 320, 40);
-    lv_obj_align(s_notify_box, LV_ALIGN_TOP_MID, 0, 4);
-    lv_obj_set_style_border_width(s_notify_box, 0, LV_PART_MAIN);
-    lv_obj_set_style_pad_all(s_notify_box, 4, LV_PART_MAIN);
-    lv_obj_clear_flag(s_notify_box, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_add_flag(s_notify_box, LV_OBJ_FLAG_HIDDEN);
-
-    s_notify_label = lv_label_create(s_notify_box);
-    lv_obj_set_style_text_color(s_notify_label, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-    lv_obj_align(s_notify_label, LV_ALIGN_CENTER, 0, 0);
-    lv_label_set_text(s_notify_label, "");
-
     /* --- MAP chart recorder ------------------------------------------------ */
     lv_chart_set_update_mode(ui_MAPChart, LV_CHART_UPDATE_MODE_SHIFT);
     lv_chart_set_point_count(ui_MAPChart, CHART_POINTS);
@@ -140,21 +124,19 @@ void ui_dashboard_create(void)
 /* -------------------------------------------------------------------------- */
 void ui_dashboard_set_notify(const char *msg, uint32_t bg_color)
 {
-    if (s_notify_box == NULL || s_notify_label == NULL) return;
     if (msg == NULL || msg[0] == '\0') {
         ui_dashboard_clear_notify();
         return;
     }
-    lv_obj_set_style_bg_color(s_notify_box, lv_color_hex(bg_color), LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(s_notify_box, LV_OPA_COVER, LV_PART_MAIN);
-    lv_label_set_text(s_notify_label, msg);
-    lv_obj_clear_flag(s_notify_box, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_style_bg_color(ui_NotifyBox, lv_color_hex(bg_color), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(ui_NotifyBox, LV_OPA_COVER, LV_PART_MAIN);
+    lv_label_set_text(ui_NotifyLabel, msg);
+    lv_obj_clear_flag(ui_NotifyBox, LV_OBJ_FLAG_HIDDEN);
 }
 
 void ui_dashboard_clear_notify(void)
 {
-    if (s_notify_box == NULL) return;
-    lv_obj_add_flag(s_notify_box, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_NotifyBox, LV_OBJ_FLAG_HIDDEN);
 }
 
 /* -------------------------------------------------------------------------- */
