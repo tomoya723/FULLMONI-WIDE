@@ -598,7 +598,8 @@ void startup_image_write_mode(void)
     /* サイズ検証 */
     if (total_size < 1000 || total_size > STARTUP_IMAGE_MAX_SIZE) {
         param_console_printf("ERR: Invalid size %lu (max: %lu)\r\n", total_size, (uint32_t)STARTUP_IMAGE_MAX_SIZE);
-        param_console_print("Note: Image must be 765x256 24bit BMP\r\n");
+        param_console_print("Note: Send 765x256 RGB565 raw pixel data (no header), rows top-to-bottom.\r\n");
+        param_console_print("      Use tools/imgwrite.py to convert and send BMP files.\r\n");
         return;
     }
 

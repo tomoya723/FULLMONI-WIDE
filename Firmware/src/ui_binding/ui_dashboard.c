@@ -15,11 +15,11 @@
  *   Oil temp    : ≥ 130°C → (no dedicated icon, future use)
  *   Oil press   : ≤  50   → show ui_ImgWarnOilPress
  *   Battery     : ≤ 11.5V (115 in 0.1V) → show ui_ImgWarnBattery
- *   Exhaust     : ≥ 800°C (AD3 raw) → show ui_ImgWarnExhaust
- *   Brake       : AD2 high → show ui_ImgWarnBrake  (active-low: brake fluid low)
- *   Belt        : AD4 high → show ui_Image11 (seat belt)
- *   Master      : any of the above → show ui_ImgWarnMaster
- *   Fuel        : fuel_per ≤ 10% → show ui_ImgWarnFuel
+ *   Exhaust     : AD3 ≤ 100 (active-low) → show ui_ImgWarnExhaust
+ *   Brake       : AD2 ≤ 100 (active-low) → show ui_ImgWarnBrake
+ *   Belt        : AD4 ≤ 150 (active-low, #issue8) → show ui_ImageWarnBelt
+ *   Master      : any of the above (except water cold) → show ui_ImgWarnMaster
+ *   Fuel        : fuel_per < 5% → show / fuel_per > 10% → hide (hysteresis)
  */
 
 #include "platform.h"
@@ -49,22 +49,29 @@ extern unsigned int gear_pos;
 #define BAR_OILPRESS_MAX 500
 #define BAR_BATT_MIN     100   /* 0.1V → 10.0V */
 #define BAR_BATT_MAX     160   /* 0.1V → 16.0V */
+#define BAR_FUEL_MIN     0     /* % */
+#define BAR_FUEL_MAX     100   /* % */
 
 /* --- Warning thresholds --------------------------------------------------- */
 #define WARN_WATER_TEMP_COLD  60    /* °C: これ以下は冷間警告（青表示） */
 #define WARN_WATER_TEMP_HOT   100   /* °C: これ以上は過熱警告（通常色表示） */
 #define WARN_OIL_PRESS_LO     50
 #define WARN_BATT_LO          115   /* 0.1V = 11.5V */
-#define WARN_FUEL_LO          10    /* % */
-#define WARN_BRAKE_ADC_HI     2000  /* raw ADC value (brake fluid low) */
-#define WARN_EXHAUST_ADC_HI   3000  /* raw ADC value for exhaust temp warn */
-#define WARN_BELT_ADC_HI      2000  /* raw ADC value for seat belt */
+#define WARN_FUEL_SHOW        5     /* %: これ未満で燃料警告点灯 */
+#define WARN_FUEL_HIDE        10    /* %: これ超で燃料警告消灯（ヒステリシス） */
+#define WARN_BRAKE_ADC_LO     100   /* raw ADC: これ以下でブレーキ液警告 (active-low) */
+#define WARN_EXHAUST_ADC_LO   100   /* raw ADC: これ以下で排気温警告 (active-low) */
+#define WARN_BELT_ADC_LO      150   /* raw ADC: これ以下でシートベルト警告 (active-low, #issue8) */
 
 /* --- Startup telltale ----------------------------------------------------- */
 /* 法規要件: 起動直後に全警告灯を一定時間点灯しインジケータの動作確認を行う */
 #define STARTUP_TELLTALE_MS   3000u /* 全灯保持時間 (ms) */
 static uint32_t s_startup_ms    = 0;
 static bool     s_telltale_done = false;
+
+/* --- Fuel warning hysteresis state ---------------------------------------- */
+/* emWin互換: 5%未満で点灯、10%超で消灯、5〜10%の間は前状態を保持 */
+static bool s_warn_fuel = false;
 
 /* --- Needle angle formula ------------------------------------------------- */
 /* angle in 0.1° units. RPM 0→9000 maps to 95°→360° (265° sweep). */
@@ -84,11 +91,46 @@ static inline void set_visible(lv_obj_t *obj, bool visible)
     }
 }
 
+/* --- Opening → Dashboard フェードアニメーション ---------------------------- */
+#define FADE_DURATION_MS  500u  /* フェードアウト時間 (ms) */
+
+static void fade_opa_cb(void *obj, int32_t v)
+{
+    lv_obj_set_style_opa((lv_obj_t *)obj, (lv_opa_t)v, LV_PART_MAIN);
+}
+
+static void opening_fade_done_cb(lv_anim_t *a)
+{
+    /* フェード完了後: ContainerOpeningを非表示にしopacityをリセット */
+    lv_obj_t *obj = (lv_obj_t *)a->var;
+    set_visible(obj, false);
+    lv_obj_set_style_opa(obj, LV_OPA_COVER, LV_PART_MAIN);
+}
+
+static void start_opening_fade(void)
+{
+    /* ContainerDashboard をフェード前に表示 (ContainerOpening の背後でレンダリング) */
+    set_visible(ui_ContainerDashboard, true);
+
+    /* ContainerOpening をフェードアウト */
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, ui_ContainerOpening);
+    lv_anim_set_exec_cb(&a, fade_opa_cb);
+    lv_anim_set_values(&a, LV_OPA_COVER, LV_OPA_TRANSP);
+    lv_anim_set_time(&a, FADE_DURATION_MS);
+    lv_anim_set_ready_cb(&a, opening_fade_done_cb);
+    lv_anim_start(&a);
+}
+
 /* -------------------------------------------------------------------------- */
 void ui_dashboard_create(void)
 {
     /* Initialize SLS-generated screen */
     ui_init();
+
+    /* SLSのデフォルト背景色（白）を黒に上書きして白画面明滅を防止 */
+    lv_obj_set_style_bg_color(ui_Screen1, lv_color_black(), LV_PART_MAIN);
 
     /* Set bar ranges (SLS sets initial value=25 with default range 0-100) */
     lv_bar_set_range(ui_BarWaterTemp, BAR_WATER_MIN,    BAR_WATER_MAX);
@@ -97,6 +139,7 @@ void ui_dashboard_create(void)
     lv_bar_set_range(ui_BarMAP,       BAR_MAP_MIN,      BAR_MAP_MAX);
     lv_bar_set_range(ui_BarOilPress,  BAR_OILPRESS_MIN, BAR_OILPRESS_MAX);
     lv_bar_set_range(ui_BarBattery,   BAR_BATT_MIN,     BAR_BATT_MAX);
+    lv_bar_set_range(ui_BarFUEL,      BAR_FUEL_MIN,     BAR_FUEL_MAX);
 
     /* 法規要件: 起動時に全警告灯を点灯（テルテール動作確認）*/
     set_visible(ui_ImgWarnMaster,    true);
@@ -106,9 +149,10 @@ void ui_dashboard_create(void)
     set_visible(ui_ImgWarnExhaust,   true);
     set_visible(ui_ImgWarnBattery,   true);
     set_visible(ui_ImgWarnBrake,     true);
-    set_visible(ui_Image11,          true);
+    set_visible(ui_ImageWarnBelt,    true);
     set_visible(ui_ImgWarnFuel,      true);
-    set_visible(ui_Image9,           false);  /* off-screen、テルテールには含めない */
+    set_visible(ui_ContainerDashboard, false); /* オープニング期間中はダッシュボードを非表示 */
+    set_visible(ui_ContainerOpening,  true);  /* テルテール期間中はオープニング画面を表示 */
     s_startup_ms    = lv_tick_get();
     s_telltale_done = false;
 
@@ -137,6 +181,17 @@ void ui_dashboard_clear_notify(void)
 /* -------------------------------------------------------------------------- */
 void ui_dashboard_update(void)
 {
+    /* --- Startup telltale / Opening period check ----------------------- */
+    /* テルテール中は全ウィジェット更新をスキップ（全灯状態を維持）*/
+    if (!s_telltale_done) {
+        if ((uint32_t)(lv_tick_get() - s_startup_ms) >= STARTUP_TELLTALE_MS) {
+            s_telltale_done = true;
+            start_opening_fade(); /* フェードアウト開始 (完了後に ContainerOpening を隠す) */
+        } else {
+            return;
+        }
+    }
+
     /* Snapshot volatile data to locals for consistent frame */
     float  rev     = g_CALC_data.rev;
     float  num1    = g_CALC_data.num1;    /* water temp °C */
@@ -203,24 +258,21 @@ void ui_dashboard_update(void)
     lv_bar_set_value(ui_BarOilPress,  (int32_t)num5, LV_ANIM_OFF);
     /* battery bar: use 0.1V integer (bt * 10) */
     lv_bar_set_value(ui_BarBattery,   (int32_t)(bt * 10.0f), LV_ANIM_OFF);
+    lv_bar_set_value(ui_BarFUEL,      (int32_t)fuel_per,     LV_ANIM_OFF);
 
     /* --- Warning icons ----------------------------------------------------- */
-    /* 起動テルテール中はアイコン更新をスキップ（全灯状態を維持）*/
-    if (!s_telltale_done) {
-        if ((uint32_t)(lv_tick_get() - s_startup_ms) >= STARTUP_TELLTALE_MS) {
-            s_telltale_done = true;
-        }
-    }
-
-    if (s_telltale_done) {
+    {
         bool warn_water_cold = (num1 <= (float)WARN_WATER_TEMP_COLD);
         bool warn_water_hot  = (num1 >= (float)WARN_WATER_TEMP_HOT);
         bool warn_oilpress   = (rpm > 0u) && ((int32_t)num5 <= WARN_OIL_PRESS_LO);
         bool warn_batt       = ((int32_t)(bt * 10.0f) <= WARN_BATT_LO);
-        bool warn_exhaust    = (ad3 >= WARN_EXHAUST_ADC_HI);
-        bool warn_brake      = (ad2 >= WARN_BRAKE_ADC_HI);
-        bool warn_belt       = (ad4 >= WARN_BELT_ADC_HI);
-        bool warn_fuel       = (fuel_per <= (float)WARN_FUEL_LO);
+        bool warn_exhaust    = (ad3 <= (float)WARN_EXHAUST_ADC_LO);   /* active-low */
+        bool warn_brake      = (ad2 <= (float)WARN_BRAKE_ADC_LO);    /* active-low */
+        bool warn_belt       = (ad4 <= (float)WARN_BELT_ADC_LO);     /* active-low (#issue8) */
+        /* 燃料ヒステリシス: 5%未満で点灯、10%超で消灯、5〜10%は前状態保持 */
+        if (fuel_per > (float)WARN_FUEL_HIDE)      { s_warn_fuel = false; }
+        else if (fuel_per < (float)WARN_FUEL_SHOW) { s_warn_fuel = true;  }
+        bool warn_fuel       = s_warn_fuel;
         /* 冷間警告はマスター警告に含めない（過熱のみ） */
         bool warn_master     = warn_water_hot || warn_oilpress || warn_batt ||
                                warn_exhaust || warn_brake || warn_fuel;
@@ -232,7 +284,7 @@ void ui_dashboard_update(void)
         set_visible(ui_ImgWarnBattery,   warn_batt);
         set_visible(ui_ImgWarnExhaust,   warn_exhaust);
         set_visible(ui_ImgWarnBrake,     warn_brake);
-        set_visible(ui_Image11,          warn_belt);
+        set_visible(ui_ImageWarnBelt,    warn_belt);
         set_visible(ui_ImgWarnFuel,      warn_fuel);
     }
 

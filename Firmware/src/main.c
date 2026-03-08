@@ -21,6 +21,7 @@
 #include "usb_cdc.h"  /* USB CDC for parameter mode */
 #include "speaker.h"  /* Speaker output (DA1 + LM4861M) */
 #include "master_warning.h"  /* Issue #50: マスターワーニング */
+#include "pulse_out.h"       /* Issue #115: EPS駆動用タコ・車速パルス出力 */
 /* LVGL_ENABLE is defined in settings.h */
 #if LVGL_ENABLE
 #include "lvgl/lvgl.h"
@@ -146,7 +147,8 @@ void main(void)
 	lv_init();
 	lv_port_disp_init();
 	ui_dashboard_create();
-	/* Initial render */
+	/* 初回レンダリング: MTU3.TGRD=0でバックライトOFF中のため白画面は見えない。
+	 * LCD_FadeIN()前に1フレーム描画してフレームバッファを確定させる。 */
 	lv_timer_handler();
 #else
 	// Init Qe for Display (emWin)
@@ -223,6 +225,9 @@ void main(void)
 
 	// ギア比テーブル再初期化（パラメータロード後に実行）
 	init_data_store();
+
+	// パルス出力初期化（Issue #115: EPS駆動用タコ・車速パルス出力）
+	pulse_out_init();
 
 	/*
 	 * メインループ
@@ -477,6 +482,7 @@ void ap_10ms(void)
 #if LVGL_ENABLE
 	lv_port_tick_inc();  /* LVGL tick: 10ms increment */
 #endif
+	pulse_out_set_tacho((uint16_t)g_CALC_data.rev);  /* Issue #115: タコパルス出力更新 */
 }
 
 // 50ms scheduled application call
@@ -484,6 +490,7 @@ void ap_50ms(void)
 {
 	can_speed_to_pulse();	/* CAN車速→仮想パルス積算 */
 	data_setLCD50ms();
+	pulse_out_set_speed((float)g_CALC_data.sp);  /* Issue #115: 車速パルス出力更新 */
 }
 
 // 100ms scheduled application call

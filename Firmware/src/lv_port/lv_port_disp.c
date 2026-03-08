@@ -158,6 +158,12 @@ static void flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *colo
  *--------------------------------------------------------------------------*/
 void lv_port_disp_init(void)
 {
+    /* Clear frame buffer BEFORE GLCDC is opened.
+     * R_GLCDC_Open() may start sync signal output internally, so the
+     * framebuffer must be black before any GLCDC operation. */
+    memset((void *)LV_PORT_FB_BASE, 0,
+           (size_t)LV_PORT_HOR_RES * LV_PORT_VER_RES * sizeof(lv_color_t));
+
     /* Initialize GLCDC hardware.
      * With QE_DISPLAY_CONFIGURATION defined, R_GLCDC_Open() calls
      * r_glcdc_qe_parameters_setting() which fills cfg from r_lcd_timing.h:
@@ -170,10 +176,6 @@ void lv_port_disp_init(void)
         R_GLCDC_PinSet();            /* Configure LCD multiplex pins */
         R_GLCDC_Control(GLCDC_CMD_START_DISPLAY, NULL);  /* Start output */
     }
-
-    /* Clear old frame buffer content (e.g. residual emWin screen) */
-    memset((void *)LV_PORT_FB_BASE, 0,
-           (size_t)LV_PORT_HOR_RES * LV_PORT_VER_RES * sizeof(lv_color_t));
 
     /* Double draw buffer (16 lines each).
      * LVGL alternates between buf1 and buf2: renders into one while DMAC

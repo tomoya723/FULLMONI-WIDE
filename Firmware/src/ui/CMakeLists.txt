@@ -5,7 +5,11 @@ SET(SOURCES components/ui_comp_barwatertemp.c
     components/ui_comp_hook.c
     ui_helpers.c
     images/ui_img_back5_png.c
+    images/ui_img_marker_red_bar_80x7s_png.c
     images/ui_img_back6_png.c
+    images/ui_img_fuel2_png.c
+    images/ui_img_fuel1_png.c
+    images/ui_img_fmw_op0_png.c
     images/ui_img_ws_masterwarning_png.c
     images/ui_img_ws_oilpresswarning_png.c
     images/ui_img_ws_watarcool_png.c
@@ -15,8 +19,9 @@ SET(SOURCES components/ui_comp_barwatertemp.c
     images/ui_img_ws_breakwarning_png.c
     images/ui_img_ws_beltwarning_png.c
     images/ui_img_ws_fuelcheck_png.c
-    images/ui_img_marker_red_bar_80x7s_png.c
     fonts/ui_font_Font1.c
+    fonts/ui_font_FontHUDmid.c
+    fonts/ui_font_FontHUDsmall.c
     fonts/ui_font_FontLARGR.c)
 
 add_library(ui ${SOURCES})
