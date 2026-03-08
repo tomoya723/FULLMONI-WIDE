@@ -20,6 +20,7 @@ extern lv_obj_t * ui_ArcRPM;
 extern lv_obj_t * ui_LblRPM;
 extern lv_obj_t * ui_LblRPMUnit;
 extern lv_obj_t * ui_imageRPM;
+extern lv_obj_t * ui_ImagePeakRPM;
 extern lv_obj_t * ui_Image2;
 extern lv_obj_t * ui_BarWaterTemp;
 extern lv_obj_t * ui_LblWaterTemp;

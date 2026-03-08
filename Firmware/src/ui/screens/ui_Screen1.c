@@ -12,6 +12,7 @@ lv_obj_t * ui_ArcRPM = NULL;
 lv_obj_t * ui_LblRPM = NULL;
 lv_obj_t * ui_LblRPMUnit = NULL;
 lv_obj_t * ui_imageRPM = NULL;
+lv_obj_t * ui_ImagePeakRPM = NULL;
 lv_obj_t * ui_Image2 = NULL;
 lv_obj_t * ui_BarWaterTemp = NULL;
 lv_obj_t * ui_LblWaterTemp = NULL;
@@ -92,14 +93,14 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_y(ui_ArcRPM, -2);
     lv_obj_set_align(ui_ArcRPM, LV_ALIGN_CENTER);
     lv_arc_set_range(ui_ArcRPM, 0, 9000);
-    lv_arc_set_value(ui_ArcRPM, 9000);
+    lv_arc_set_value(ui_ArcRPM, 3000);
     lv_arc_set_bg_angles(ui_ArcRPM, 90, 0);
     lv_obj_set_style_arc_color(ui_ArcRPM, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(ui_ArcRPM, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_set_style_arc_color(ui_ArcRPM, lv_color_hex(0xFF0000), LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(ui_ArcRPM, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_width(ui_ArcRPM, 17, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_width(ui_ArcRPM, 19, LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_rounded(ui_ArcRPM, false, LV_PART_INDICATOR | LV_STATE_DEFAULT);
 
     lv_obj_set_style_bg_color(ui_ArcRPM, lv_color_hex(0x000000), LV_PART_KNOB | LV_STATE_DEFAULT);
@@ -137,6 +138,18 @@ void ui_Screen1_screen_init(void)
     lv_img_set_angle(ui_imageRPM, 2000);
     lv_obj_set_style_transform_angle(ui_imageRPM, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_ImagePeakRPM = lv_img_create(ui_ContainerDashboard);
+    lv_img_set_src(ui_ImagePeakRPM, &ui_img_marker_red_bar_20x7s_png);
+    lv_obj_set_width(ui_ImagePeakRPM, LV_SIZE_CONTENT);   /// 20
+    lv_obj_set_height(ui_ImagePeakRPM, LV_SIZE_CONTENT);    /// 7
+    lv_obj_set_x(ui_ImagePeakRPM, 136);
+    lv_obj_set_y(ui_ImagePeakRPM, -3);
+    lv_obj_set_align(ui_ImagePeakRPM, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_ImagePeakRPM, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_ImagePeakRPM, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_img_set_pivot(ui_ImagePeakRPM, -101, 3);
+    lv_img_set_angle(ui_ImagePeakRPM, 2000);
+
     ui_Image2 = lv_img_create(ui_ContainerDashboard);
     lv_img_set_src(ui_Image2, &ui_img_back6_png);
     lv_obj_set_width(ui_Image2, LV_SIZE_CONTENT);   /// 240
@@ -149,10 +162,10 @@ void ui_Screen1_screen_init(void)
 
     ui_BarWaterTemp = lv_bar_create(ui_ContainerDashboard);
     lv_bar_set_range(ui_BarWaterTemp, 0, 120);
-    lv_bar_set_value(ui_BarWaterTemp, 80, LV_ANIM_OFF);
+    lv_bar_set_value(ui_BarWaterTemp, 60, LV_ANIM_OFF);
     lv_bar_set_start_value(ui_BarWaterTemp, 0, LV_ANIM_OFF);
-    lv_obj_set_width(ui_BarWaterTemp, 102);
-    lv_obj_set_height(ui_BarWaterTemp, 18);
+    lv_obj_set_width(ui_BarWaterTemp, 90);
+    lv_obj_set_height(ui_BarWaterTemp, 10);
     lv_obj_set_x(ui_BarWaterTemp, -273);
     lv_obj_set_y(ui_BarWaterTemp, -100);
     lv_obj_set_align(ui_BarWaterTemp, LV_ALIGN_CENTER);
@@ -175,10 +188,10 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_style_text_font(ui_LblWaterTemp, &ui_font_Font1, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_BarIAT = lv_bar_create(ui_ContainerDashboard);
-    lv_bar_set_value(ui_BarIAT, 25, LV_ANIM_OFF);
+    lv_bar_set_value(ui_BarIAT, 50, LV_ANIM_OFF);
     lv_bar_set_start_value(ui_BarIAT, 0, LV_ANIM_OFF);
-    lv_obj_set_width(ui_BarIAT, 102);
-    lv_obj_set_height(ui_BarIAT, 18);
+    lv_obj_set_width(ui_BarIAT, 90);
+    lv_obj_set_height(ui_BarIAT, 10);
     lv_obj_set_x(ui_BarIAT, -273);
     lv_obj_set_y(ui_BarIAT, -56);
     lv_obj_set_align(ui_BarIAT, LV_ALIGN_CENTER);
@@ -201,10 +214,11 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_style_text_font(ui_LblIAT, &ui_font_Font1, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_BarOilTemp = lv_bar_create(ui_ContainerDashboard);
-    lv_bar_set_value(ui_BarOilTemp, 25, LV_ANIM_OFF);
+    lv_bar_set_range(ui_BarOilTemp, 0, 150);
+    lv_bar_set_value(ui_BarOilTemp, 75, LV_ANIM_OFF);
     lv_bar_set_start_value(ui_BarOilTemp, 0, LV_ANIM_OFF);
-    lv_obj_set_width(ui_BarOilTemp, 102);
-    lv_obj_set_height(ui_BarOilTemp, 18);
+    lv_obj_set_width(ui_BarOilTemp, 90);
+    lv_obj_set_height(ui_BarOilTemp, 10);
     lv_obj_set_x(ui_BarOilTemp, -273);
     lv_obj_set_y(ui_BarOilTemp, -16);
     lv_obj_set_align(ui_BarOilTemp, LV_ALIGN_CENTER);
@@ -227,10 +241,11 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_style_text_font(ui_LblOilTemp, &ui_font_Font1, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_BarMAP = lv_bar_create(ui_ContainerDashboard);
-    lv_bar_set_value(ui_BarMAP, 25, LV_ANIM_OFF);
+    lv_bar_set_range(ui_BarMAP, 0, 120);
+    lv_bar_set_value(ui_BarMAP, 60, LV_ANIM_OFF);
     lv_bar_set_start_value(ui_BarMAP, 0, LV_ANIM_OFF);
-    lv_obj_set_width(ui_BarMAP, 102);
-    lv_obj_set_height(ui_BarMAP, 18);
+    lv_obj_set_width(ui_BarMAP, 90);
+    lv_obj_set_height(ui_BarMAP, 10);
     lv_obj_set_x(ui_BarMAP, -273);
     lv_obj_set_y(ui_BarMAP, 24);
     lv_obj_set_align(ui_BarMAP, LV_ALIGN_CENTER);
@@ -253,10 +268,11 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_style_text_font(ui_LblMAP, &ui_font_Font1, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_BarOilPress = lv_bar_create(ui_ContainerDashboard);
-    lv_bar_set_value(ui_BarOilPress, 25, LV_ANIM_OFF);
+    lv_bar_set_range(ui_BarOilPress, 0, 80);
+    lv_bar_set_value(ui_BarOilPress, 40, LV_ANIM_OFF);
     lv_bar_set_start_value(ui_BarOilPress, 0, LV_ANIM_OFF);
-    lv_obj_set_width(ui_BarOilPress, 102);
-    lv_obj_set_height(ui_BarOilPress, 18);
+    lv_obj_set_width(ui_BarOilPress, 90);
+    lv_obj_set_height(ui_BarOilPress, 10);
     lv_obj_set_x(ui_BarOilPress, -273);
     lv_obj_set_y(ui_BarOilPress, 62);
     lv_obj_set_align(ui_BarOilPress, LV_ALIGN_CENTER);
@@ -279,10 +295,11 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_style_text_font(ui_LblOilPress, &ui_font_Font1, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_BarBattery = lv_bar_create(ui_ContainerDashboard);
-    lv_bar_set_value(ui_BarBattery, 25, LV_ANIM_OFF);
+    lv_bar_set_range(ui_BarBattery, 8, 16);
+    lv_bar_set_value(ui_BarBattery, 12, LV_ANIM_OFF);
     lv_bar_set_start_value(ui_BarBattery, 0, LV_ANIM_OFF);
-    lv_obj_set_width(ui_BarBattery, 102);
-    lv_obj_set_height(ui_BarBattery, 18);
+    lv_obj_set_width(ui_BarBattery, 90);
+    lv_obj_set_height(ui_BarBattery, 10);
     lv_obj_set_x(ui_BarBattery, -273);
     lv_obj_set_y(ui_BarBattery, 100);
     lv_obj_set_align(ui_BarBattery, LV_ALIGN_CENTER);
@@ -503,7 +520,7 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_width(ui_ImgWarnOilPress, LV_SIZE_CONTENT);   /// 25
     lv_obj_set_height(ui_ImgWarnOilPress, LV_SIZE_CONTENT);    /// 25
     lv_obj_set_x(ui_ImgWarnOilPress, 0);
-    lv_obj_set_y(ui_ImgWarnOilPress, -40);
+    lv_obj_set_y(ui_ImgWarnOilPress, -42);
     lv_obj_set_align(ui_ImgWarnOilPress, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_ImgWarnOilPress, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
     lv_obj_clear_flag(ui_ImgWarnOilPress, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
@@ -513,7 +530,7 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_width(ui_ImgWarnWaterCold, LV_SIZE_CONTENT);   /// 25
     lv_obj_set_height(ui_ImgWarnWaterCold, LV_SIZE_CONTENT);    /// 25
     lv_obj_set_x(ui_ImgWarnWaterCold, 0);
-    lv_obj_set_y(ui_ImgWarnWaterCold, -69);
+    lv_obj_set_y(ui_ImgWarnWaterCold, -72);
     lv_obj_set_align(ui_ImgWarnWaterCold, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_ImgWarnWaterCold, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
     lv_obj_clear_flag(ui_ImgWarnWaterCold, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
@@ -523,7 +540,7 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_width(ui_ImgWarnWaterHot, LV_SIZE_CONTENT);   /// 25
     lv_obj_set_height(ui_ImgWarnWaterHot, LV_SIZE_CONTENT);    /// 25
     lv_obj_set_x(ui_ImgWarnWaterHot, 0);
-    lv_obj_set_y(ui_ImgWarnWaterHot, -71);
+    lv_obj_set_y(ui_ImgWarnWaterHot, -74);
     lv_obj_set_align(ui_ImgWarnWaterHot, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_ImgWarnWaterHot, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
     lv_obj_clear_flag(ui_ImgWarnWaterHot, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
@@ -616,6 +633,7 @@ void ui_Screen1_screen_destroy(void)
     ui_LblRPM = NULL;
     ui_LblRPMUnit = NULL;
     ui_imageRPM = NULL;
+    ui_ImagePeakRPM = NULL;
     ui_Image2 = NULL;
     ui_BarWaterTemp = NULL;
     ui_LblWaterTemp = NULL;

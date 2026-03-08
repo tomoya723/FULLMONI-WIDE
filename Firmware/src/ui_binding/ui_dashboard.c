@@ -73,12 +73,20 @@ static bool     s_telltale_done = false;
 /* emWin互換: 5%未満で点灯、10%超で消灯、5〜10%の間は前状態を保持 */
 static bool s_warn_fuel = false;
 
+/* --- RPM Peak Hold state -------------------------------------------------- */
+#define PEAK_HOLD_MS              500u   /* ピーク保持時間 (ms) */
+#define PEAK_FALL_RPM_PER_FRAME   150u   /* 落下速度 (RPM/フレーム ≈ 30ms → ~5000 rpm/sec) */
+
+static uint32_t s_rpm_peak          = 0;
+static uint32_t s_peak_hold_start   = 0;  /* lv_tick_get() at peak freeze */
+static bool     s_peak_falling      = false;
+
 /* --- Needle angle formula ------------------------------------------------- */
-/* angle in 0.1° units. RPM 0→9000 maps to 95°→360° (265° sweep). */
+/* angle in 0.1° units. RPM 0→9000 maps to 90°→360° (260° sweep). */
 static inline int32_t rpm_to_angle(uint32_t rpm)
 {
     if (rpm > 9000u) rpm = 9000u;
-    return 950 + (int32_t)rpm * 2650 / 9000;
+    return 900 + (int32_t)rpm * 2600 / 9000;
 }
 
 /* --- Helper: show/hide widget --------------------------------------------- */
@@ -157,7 +165,11 @@ void ui_dashboard_create(void)
     s_telltale_done = false;
 
     /* Initial needle position at 0 rpm */
-    lv_img_set_angle(ui_imageRPM, (int16_t)rpm_to_angle(0));
+    lv_img_set_angle(ui_imageRPM,     (int16_t)rpm_to_angle(0));
+    lv_img_set_angle(ui_ImagePeakRPM, (int16_t)rpm_to_angle(0));
+    s_rpm_peak      = 0;
+    s_peak_falling  = false;
+    s_peak_hold_start = lv_tick_get();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -216,6 +228,34 @@ void ui_dashboard_update(void)
     uint32_t rpm = (rev > 0.0f) ? (uint32_t)rev : 0u;
     lv_img_set_angle(ui_imageRPM, (int16_t)rpm_to_angle(rpm));
     lv_arc_set_value(ui_ArcRPM, (int32_t)rpm);
+
+    /* --- RPM Peak Hold ---------------------------------------------------- */
+    /* RPMが上昇中: ピーク更新・保持タイマーリセット */
+    /* RPMが下降中: 500ms保持後、現在値へ向けて落下アニメーション */
+    {
+        uint32_t now = lv_tick_get();
+        if (rpm >= s_rpm_peak) {
+            s_rpm_peak        = rpm;
+            s_peak_hold_start = now;
+            s_peak_falling    = false;
+        } else {
+            if (!s_peak_falling) {
+                if ((uint32_t)(now - s_peak_hold_start) >= PEAK_HOLD_MS) {
+                    s_peak_falling = true;
+                }
+            }
+            if (s_peak_falling) {
+                uint32_t diff = s_rpm_peak - rpm;
+                if (diff > PEAK_FALL_RPM_PER_FRAME) {
+                    s_rpm_peak -= PEAK_FALL_RPM_PER_FRAME;
+                } else {
+                    s_rpm_peak     = rpm;
+                    s_peak_falling = false;
+                }
+            }
+        }
+        lv_img_set_angle(ui_ImagePeakRPM, (int16_t)rpm_to_angle(s_rpm_peak));
+    }
 
     /* --- RPM label --------------------------------------------------------- */
     lv_label_set_text_fmt(ui_LblRPM, "%5u", rpm);

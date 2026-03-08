@@ -32,6 +32,7 @@ extern lv_obj_t * ui____initial_actions0;
 // IMAGES AND IMAGE SETS
 LV_IMG_DECLARE(ui_img_back5_png);    // assets/Back5.png
 LV_IMG_DECLARE(ui_img_marker_red_bar_80x7s_png);    // assets/Marker_red_bar_80x7s.png
+LV_IMG_DECLARE(ui_img_marker_red_bar_20x7s_png);    // assets/Marker_red_bar_20x7s.png
 LV_IMG_DECLARE(ui_img_back6_png);    // assets/Back6.png
 LV_IMG_DECLARE(ui_img_fuel2_png);    // assets/fuel2.png
 LV_IMG_DECLARE(ui_img_fuel1_png);    // assets/fuel1.png
