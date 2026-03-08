@@ -16,7 +16,7 @@ void LCD_FadeIN(void)
 
 	for(z = 0; z <= 2999; z ++ )			// duty 0→100%
 	{
-		for(y = 0; y <= 500; y ++ )
+		for(y = 0; y <= 3500; y ++ )        // 起動時の白画面フラッシュ低減のため 500->3500へ H.takezoe
 		{
 			MTU3.TGRD = z & 0xFFFF;
 		}
@@ -30,7 +30,7 @@ void LCD_FadeOUT(void)
 {
 	static int y, z;
 
-	for(z = 2999; z >= 0; z -- )			// duty 0→100%
+	for(z = 2999; z >= 0; z -- )			// duty 100→0%
 	{
 		for(y = 0; y <= 2500; y ++ )
 		{

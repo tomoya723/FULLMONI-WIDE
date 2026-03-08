@@ -21,10 +21,11 @@ void ui_dashboard_create(void);
 void ui_dashboard_update(void);
 
 /* Show notification overlay (warning message, HOST ACCESS, etc.)
- *   msg      : text to display (NULL or "" to hide)
- *   bg_color : RGB888 color (e.g. 0xFF0000=red, 0x00AA00=green)
+ *   msg          : text to display (NULL or "" to hide)
+ *   accent_color : RGB888 (枠・文字色, e.g. 0xFF0000=赤警告, 0x00AA00=緑HOST ACCESS)
+ *                  背景は常に黒 (HUDスタイル)
  */
-void ui_dashboard_set_notify(const char *msg, uint32_t bg_color);
+void ui_dashboard_set_notify(const char *msg, uint32_t accent_color);
 
 /* Hide notification overlay */
 void ui_dashboard_clear_notify(void);

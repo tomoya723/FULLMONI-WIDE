@@ -147,8 +147,11 @@ void main(void)
 	lv_init();
 	lv_port_disp_init();
 	ui_dashboard_create();
-	/* 初回レンダリング: MTU3.TGRD=0でバックライトOFF中のため白画面は見えない。
-	 * LCD_FadeIN()前に1フレーム描画してフレームバッファを確定させる。 */
+	/* 初回レンダリング: バックライトOFF中 (TGRD=0) のため白画面は見えない。
+	 * 256行/16行バッファ=16バンド。非同期DMAを含む全バンドをフラッシュするため
+	 * 複数回呼び出してフレームバッファを確定させる。 */
+	lv_timer_handler();
+	lv_timer_handler();
 	lv_timer_handler();
 #else
 	// Init Qe for Display (emWin)

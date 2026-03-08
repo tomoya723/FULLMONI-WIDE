@@ -72,6 +72,8 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_y(ui_ContainerDashboard, 0);
     lv_obj_set_align(ui_ContainerDashboard, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_ContainerDashboard, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_ContainerDashboard, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_ContainerDashboard, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_ImgTacho = lv_img_create(ui_ContainerDashboard);
     lv_img_set_src(ui_ImgTacho, &ui_img_back5_png);
@@ -463,6 +465,8 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_align(ui_ContainerOpening, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_ContainerOpening, LV_OBJ_FLAG_HIDDEN);     /// Flags
     lv_obj_clear_flag(ui_ContainerOpening, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_ContainerOpening, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_ContainerOpening, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_ImgOpening = lv_img_create(ui_ContainerOpening);
     lv_img_set_src(ui_ImgOpening, &ui_img_fmw_op0_png);
@@ -471,6 +475,8 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_align(ui_ImgOpening, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_ImgOpening, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
     lv_obj_clear_flag(ui_ImgOpening, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_ImgOpening, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_ImgOpening, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_ContainerTelltale = lv_obj_create(ui_Screen1);
     lv_obj_remove_style_all(ui_ContainerTelltale);
@@ -573,7 +579,7 @@ void ui_Screen1_screen_init(void)
     lv_obj_clear_flag(ui_ImgWarnFuel, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_NotifyBox = lv_obj_create(ui_Screen1);
-    lv_obj_set_width(ui_NotifyBox, 320);
+    lv_obj_set_width(ui_NotifyBox, 696);
     lv_obj_set_height(ui_NotifyBox, 50);
     lv_obj_set_x(ui_NotifyBox, 0);
     lv_obj_set_y(ui_NotifyBox, -100);

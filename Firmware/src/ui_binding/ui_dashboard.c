@@ -161,14 +161,18 @@ void ui_dashboard_create(void)
 }
 
 /* -------------------------------------------------------------------------- */
-void ui_dashboard_set_notify(const char *msg, uint32_t bg_color)
+void ui_dashboard_set_notify(const char *msg, uint32_t accent_color)
 {
     if (msg == NULL || msg[0] == '\0') {
         ui_dashboard_clear_notify();
         return;
     }
-    lv_obj_set_style_bg_color(ui_NotifyBox, lv_color_hex(bg_color), LV_PART_MAIN);
+    /* HUD style: 黒背景 + アクセントカラー（枠・文字） */
+    lv_obj_set_style_bg_color(ui_NotifyBox, lv_color_hex(0x000000), LV_PART_MAIN);
     lv_obj_set_style_bg_opa(ui_NotifyBox, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_border_color(ui_NotifyBox, lv_color_hex(accent_color), LV_PART_MAIN);
+    lv_obj_set_style_border_width(ui_NotifyBox, 2, LV_PART_MAIN);
+    lv_obj_set_style_text_color(ui_NotifyLabel, lv_color_hex(accent_color), LV_PART_MAIN);
     lv_label_set_text(ui_NotifyLabel, msg);
     lv_obj_clear_flag(ui_NotifyBox, LV_OBJ_FLAG_HIDDEN);
 }
