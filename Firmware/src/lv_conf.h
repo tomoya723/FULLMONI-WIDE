@@ -161,7 +161,7 @@
 /* 1: Show CPU usage and FPS count */
 #define LV_USE_PERF_MONITOR 1
 #if LV_USE_PERF_MONITOR
-    #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
+    #define LV_USE_PERF_MONITOR_POS LV_ALIGN_TOP_RIGHT
 #endif
 
 /* 1: Show the used memory and the memory fragmentation */
@@ -230,8 +230,8 @@
 
 /* Montserrat fonts with ASCII range and some symbols using bpp = 4 */
 #define LV_FONT_MONTSERRAT_8  0
-#define LV_FONT_MONTSERRAT_10 0
-#define LV_FONT_MONTSERRAT_12 0
+#define LV_FONT_MONTSERRAT_10 1
+#define LV_FONT_MONTSERRAT_12 1
 #define LV_FONT_MONTSERRAT_14 1  /* Default font - enabled */
 #define LV_FONT_MONTSERRAT_16 1
 #define LV_FONT_MONTSERRAT_18 0

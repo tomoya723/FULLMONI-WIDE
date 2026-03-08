@@ -220,16 +220,28 @@ angle (0.1°単位) = 950 + rpm × 2650 / 9000
 
 **警告アイコン閾値**
 
-| 項目 | 条件 | アイコン |
-|---|---|---|
-| 水温 | ≥ 105°C | `ui_ImgWarnWater` |
-| 油圧 | ≤ 50 | `ui_ImgWarnOilPress` |
-| バッテリー | ≤ 11.5V | `ui_ImgWarnBattery` |
-| 排気温 | AD3 ≥ 3000 (raw) | `ui_ImgWarnExhaust` |
-| ブレーキ液 | AD2 ≥ 2000 (raw) | `ui_ImgWarnBrake` |
-| シートベルト | AD4 ≥ 2000 (raw) | `ui_Image11` |
-| 燃料 | fuel_per ≤ 10% | `ui_ImgWarnFuel` |
-| マスター | 上記いずれか | `ui_ImgWarnMaster` |
+| 項目 | 条件 | アイコン | 備考 |
+|---|---|---|---|
+| 水温 Cold | ≤ 60°C | `ui_ImgWarnWaterCold` | 冷間警告。マスター警告には含めない |
+| 水温 Hot | ≥ 100°C | `ui_ImgWarnWaterHot` | 過熱警告。マスター警告に含める |
+| 油圧 | rpm > 0 かつ ≤ 50 | `ui_ImgWarnOilPress` | エンジン停止中は抑制（停止時 num5=0 による誤検出防止） |
+| バッテリー | ≤ 11.5V | `ui_ImgWarnBattery` | |
+| 排気温 | AD3 ≥ 3000 (raw) | `ui_ImgWarnExhaust` | |
+| ブレーキ液 | AD2 ≥ 2000 (raw) | `ui_ImgWarnBrake` | |
+| シートベルト | AD4 ≥ 2000 (raw) | `ui_Image11` | |
+| 燃料 | fuel_per ≤ 10% | `ui_ImgWarnFuel` | |
+| マスター | 水温 Hot / 油圧 / バッテリー / 排気 / ブレーキ / 燃料 のいずれか | `ui_ImgWarnMaster` | |
+
+**起動テルテール（法規要件）**
+- `ui_dashboard_create()` で全警告アイコンを点灯してスタート
+- `STARTUP_TELLTALE_MS = 3000ms` 経過後にセンサー値に基づく通常制御へ移行
+- 移行タイミングは `ui_dashboard_update()` 内で `lv_tick_get()` により判定
+- emWin 版も起動直後から警告灯を描画していた（法規規制への対応）
+
+**水温 Cold/Hot アイコンの経緯**
+- emWin 版では `ID_ICON_02L`（Cold）と `ID_ICON_02H`（Hot）の 2 つの独立アイコンで実装
+- LVGL 初期実装では `ui_ImgWarnWater` 1 つで recoloring（青/通常色）により区別
+- SLS で Cold/Hot 専用画像を別途作成し `ui_ImgWarnWaterCold` / `ui_ImgWarnWaterHot` として配置、recoloring を廃止
 
 **MAP チャートレコーダ**
 - `LV_CHART_UPDATE_MODE_SHIFT` (スクロール方式)

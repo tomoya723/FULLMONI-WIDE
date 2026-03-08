@@ -402,10 +402,10 @@ void data_store(void)
 	if(fuel_per > 10)	{	aPara8[0].v = 0;	} else if (fuel_per < 5)	{ aPara8[0].v = 1;	}		APPW_DoJob(ID_SCREEN_Telltale, ID_ICON_07 , APPW_JOB_SETVIS, aPara8);	// Fuel Empty
 
 
-//	sprintf((void *) g_CALC_data.str_time,"%2x:%02x:%02x", (RTC.RHRCNT.BYTE & 0x3F), RTC.RMINCNT.BYTE, RTC.RSECCNT.BYTE);
-	sprintf((void *) g_CALC_data.str_time,"%2x:%02x", (RTC.RHRCNT.BYTE & 0x3F), RTC.RMINCNT.BYTE);
 	APPW_SetText(ID_SCREEN_01a,ID_NUM_TIME,	(void *) g_CALC_data.str_time	);
 #endif /* !LVGL_ENABLE */
+//	sprintf((void *) g_CALC_data.str_time,"%2x:%02x:%02x", (RTC.RHRCNT.BYTE & 0x3F), RTC.RMINCNT.BYTE, RTC.RSECCNT.BYTE);
+	sprintf((void *) g_CALC_data.str_time,"%2x:%02x", (RTC.RHRCNT.BYTE & 0x3F), RTC.RMINCNT.BYTE);
 	// SW Input
 	if(g_sw_int_flg == 1)
 	{

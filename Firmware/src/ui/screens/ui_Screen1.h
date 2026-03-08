@@ -18,7 +18,8 @@ extern lv_obj_t * ui_ImgTacho;
 extern lv_obj_t * ui_Image2;
 extern lv_obj_t * ui_ImgWarnMaster;
 extern lv_obj_t * ui_ImgWarnOilPress;
-extern lv_obj_t * ui_ImgWarnWater;
+extern lv_obj_t * ui_ImgWarnWaterCold;
+extern lv_obj_t * ui_ImgWarnWaterHot;
 extern lv_obj_t * ui_ImgWarnExhaust;
 extern lv_obj_t * ui_ImgWarnBattery;
 extern lv_obj_t * ui_ImgWarnBrake;
@@ -33,6 +34,7 @@ extern lv_obj_t * ui_LblOilTemp;
 extern lv_obj_t * ui_LblMAP;
 extern lv_obj_t * ui_LblOilPress;
 extern lv_obj_t * ui_LblBattery;
+extern lv_obj_t * ui_LblAFR;
 extern lv_obj_t * ui_BarWaterTemp;
 extern lv_obj_t * ui_BarIAT;
 extern lv_obj_t * ui_BarOilTemp;
@@ -40,9 +42,18 @@ extern lv_obj_t * ui_BarMAP;
 extern lv_obj_t * ui_BarOilPress;
 extern lv_obj_t * ui_BarBattery;
 extern lv_obj_t * ui_LblRPM;
-extern lv_obj_t * ui_MAPChart;
 extern lv_obj_t * ui_NotifyBox;
 extern lv_obj_t * ui_NotifyLabel;
+extern lv_obj_t * ui_LblTrip;
+extern lv_obj_t * ui_LblODO;
+extern lv_obj_t * ui_LblTIME;
+extern lv_obj_t * ui_LblGEAR;
+extern lv_obj_t * ui_LblSPD;
+extern lv_obj_t * ui_LblTripName;
+extern lv_obj_t * ui_LblTripUnit;
+extern lv_obj_t * ui_LblODOName;
+extern lv_obj_t * ui_LblODOUnit;
+extern lv_obj_t * ui_LblSPDUnit;
 // CUSTOM VARIABLES
 
 #ifdef __cplusplus

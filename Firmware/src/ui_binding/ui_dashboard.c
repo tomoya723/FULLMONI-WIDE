@@ -31,16 +31,10 @@
 
 /* fuel_per is defined in dataregister.c but not declared in dataregister.h */
 extern float fuel_per;
+/* gear_pos is defined in dataregister.c but not declared in dataregister.h */
+extern unsigned int gear_pos;
 
 /* Notification overlay widgets are SLS-generated: ui_NotifyBox / ui_NotifyLabel */
-
-/* --- MAP chart series ----------------------------------------------------- */
-static lv_chart_series_t *s_ser_map     = NULL;
-static uint32_t           s_chart_last_ms = 0;
-#define CHART_UPDATE_MS  50    /* push new sample every 50ms */
-#define CHART_POINTS     200   /* 200 × 50ms = 10 seconds of history */
-#define CHART_MAP_MIN    0
-#define CHART_MAP_MAX    300   /* kPa */
 
 /* --- Bar ranges ----------------------------------------------------------- */
 #define BAR_WATER_MIN    0
@@ -57,13 +51,20 @@ static uint32_t           s_chart_last_ms = 0;
 #define BAR_BATT_MAX     160   /* 0.1V → 16.0V */
 
 /* --- Warning thresholds --------------------------------------------------- */
-#define WARN_WATER_TEMP_HI    105   /* °C */
+#define WARN_WATER_TEMP_COLD  60    /* °C: これ以下は冷間警告（青表示） */
+#define WARN_WATER_TEMP_HOT   100   /* °C: これ以上は過熱警告（通常色表示） */
 #define WARN_OIL_PRESS_LO     50
 #define WARN_BATT_LO          115   /* 0.1V = 11.5V */
 #define WARN_FUEL_LO          10    /* % */
 #define WARN_BRAKE_ADC_HI     2000  /* raw ADC value (brake fluid low) */
 #define WARN_EXHAUST_ADC_HI   3000  /* raw ADC value for exhaust temp warn */
 #define WARN_BELT_ADC_HI      2000  /* raw ADC value for seat belt */
+
+/* --- Startup telltale ----------------------------------------------------- */
+/* 法規要件: 起動直後に全警告灯を一定時間点灯しインジケータの動作確認を行う */
+#define STARTUP_TELLTALE_MS   3000u /* 全灯保持時間 (ms) */
+static uint32_t s_startup_ms    = 0;
+static bool     s_telltale_done = false;
 
 /* --- Needle angle formula ------------------------------------------------- */
 /* angle in 0.1° units. RPM 0→9000 maps to 95°→360° (265° sweep). */
@@ -97,28 +98,22 @@ void ui_dashboard_create(void)
     lv_bar_set_range(ui_BarOilPress,  BAR_OILPRESS_MIN, BAR_OILPRESS_MAX);
     lv_bar_set_range(ui_BarBattery,   BAR_BATT_MIN,     BAR_BATT_MAX);
 
-    /* Hide all warning icons at startup */
-    set_visible(ui_ImgWarnMaster,   false);
-    set_visible(ui_ImgWarnOilPress, false);
-    set_visible(ui_ImgWarnWater,    false);
-    set_visible(ui_ImgWarnExhaust,  false);
-    set_visible(ui_ImgWarnBattery,  false);
-    set_visible(ui_ImgWarnBrake,    false);
-    set_visible(ui_Image11,         false);  /* belt warning */
-    set_visible(ui_ImgWarnFuel,     false);
-    set_visible(ui_Image9,          false);  /* belt warning (off-screen in SLS) */
+    /* 法規要件: 起動時に全警告灯を点灯（テルテール動作確認）*/
+    set_visible(ui_ImgWarnMaster,    true);
+    set_visible(ui_ImgWarnOilPress,  true);
+    set_visible(ui_ImgWarnWaterCold, true);
+    set_visible(ui_ImgWarnWaterHot,  true);
+    set_visible(ui_ImgWarnExhaust,   true);
+    set_visible(ui_ImgWarnBattery,   true);
+    set_visible(ui_ImgWarnBrake,     true);
+    set_visible(ui_Image11,          true);
+    set_visible(ui_ImgWarnFuel,      true);
+    set_visible(ui_Image9,           false);  /* off-screen、テルテールには含めない */
+    s_startup_ms    = lv_tick_get();
+    s_telltale_done = false;
 
     /* Initial needle position at 0 rpm */
     lv_img_set_angle(ui_imageRPM, (int16_t)rpm_to_angle(0));
-
-    /* --- MAP chart recorder ------------------------------------------------ */
-    lv_chart_set_update_mode(ui_MAPChart, LV_CHART_UPDATE_MODE_SHIFT);
-    lv_chart_set_point_count(ui_MAPChart, CHART_POINTS);
-    lv_chart_set_range(ui_MAPChart, LV_CHART_AXIS_PRIMARY_Y, CHART_MAP_MIN, CHART_MAP_MAX);
-    s_ser_map = lv_chart_add_series(ui_MAPChart, lv_color_hex(0x00CFFF),
-                                    LV_CHART_AXIS_PRIMARY_Y);
-    lv_chart_set_all_value(ui_MAPChart, s_ser_map, 0);
-    s_chart_last_ms = lv_tick_get();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -143,16 +138,20 @@ void ui_dashboard_clear_notify(void)
 void ui_dashboard_update(void)
 {
     /* Snapshot volatile data to locals for consistent frame */
-    float rev      = g_CALC_data.rev;
-    float num1     = g_CALC_data.num1;   /* water temp °C */
-    float num2     = g_CALC_data.num2;   /* IAT °C */
-    float num3     = g_CALC_data.num3;   /* oil temp °C */
-    float num4     = g_CALC_data_sm.num4; /* MAP kPa (50ms smoothed) */
-    float num5     = g_CALC_data_sm.num5; /* oil press (50ms smoothed) */
-    float bt       = g_CALC_data.bt;     /* battery V (float, e.g. 12.5) */
-    float ad2      = g_CALC_data.AD2;    /* brake ADC */
-    float ad3      = g_CALC_data.AD3;    /* exhaust ADC */
-    float ad4      = g_CALC_data.AD4;    /* belt ADC */
+    float  rev     = g_CALC_data.rev;
+    float  num1    = g_CALC_data.num1;    /* water temp °C */
+    float  num2    = g_CALC_data.num2;    /* IAT °C */
+    float  num3    = g_CALC_data.num3;    /* oil temp °C */
+    float  num4    = g_CALC_data_sm.num4; /* MAP kPa (50ms smoothed) */
+    float  num5    = g_CALC_data_sm.num5; /* oil press (50ms smoothed) */
+    float  bt      = g_CALC_data.bt;      /* battery V (float, e.g. 12.5) */
+    float  ad2     = g_CALC_data.AD2;     /* brake ADC */
+    float  ad3     = g_CALC_data.AD3;     /* exhaust ADC */
+    float  ad4     = g_CALC_data.AD4;     /* belt ADC */
+    float  af      = g_CALC_data.af;      /* air-fuel ratio */
+    float  sp      = g_CALC_data.sp;      /* vehicle speed km/h */
+    double odo     = g_CALC_data.odo;     /* odometer km */
+    double trip    = g_CALC_data.trip;    /* trip meter km */
 
     /* --- Tachometer needle + arc ----------------------------------------- */
     uint32_t rpm = (rev > 0.0f) ? (uint32_t)rev : 0u;
@@ -168,8 +167,33 @@ void ui_dashboard_update(void)
     lv_label_set_text_fmt(ui_LblOilTemp,   "%3d", (int)num3);
     lv_label_set_text_fmt(ui_LblMAP,       "%3d", (int)num4);
     lv_label_set_text_fmt(ui_LblOilPress,  "%3d", (int)num5);
-    /* Battery: convert float V to 0.1V integer for display (e.g. 12.5 → "12.5") */
-    lv_label_set_text_fmt(ui_LblBattery,   "%4.1f", (double)bt);
+    /* Battery: %f not supported by LVGL tiny_printf; use integer arithmetic */
+    {
+        int32_t bv = (int32_t)(bt * 10.0f + 0.5f);   /* e.g. 12.5V → 125 */
+        lv_label_set_text_fmt(ui_LblBattery, "%2d.%1d", bv / 10, bv % 10);
+    }
+    /* AFR: same %f restriction; 1 decimal (e.g. 14.7) */
+    {
+        int32_t av = (int32_t)(af * 10.0f + 0.5f);
+        lv_label_set_text_fmt(ui_LblAFR, "%2d.%1d", av / 10, av % 10);
+    }
+    /* Speed: integer km/h */
+    lv_label_set_text_fmt(ui_LblSPD, "%3d", (int)sp);
+    /* TIME: pre-formatted string "%2x:%02x" (HH:MM BCD) from dataregister.c */
+    lv_label_set_text(ui_LblTIME, (const char *)g_CALC_data.str_time);
+    /* ODO: integer km (double → int32) */
+    lv_label_set_text_fmt(ui_LblODO, "%6d", (int32_t)odo);
+    /* Trip: 1 decimal km (e.g. 123.4) */
+    {
+        int32_t tv = (int32_t)(trip * 10.0 + 0.5);
+        lv_label_set_text_fmt(ui_LblTrip, "%4d.%1d", tv / 10, tv % 10);
+    }
+    /* Gear: 0 = Neutral → "N", 1-6 = gear number */
+    if (gear_pos == 0u) {
+        lv_label_set_text(ui_LblGEAR, "N");
+    } else {
+        lv_label_set_text_fmt(ui_LblGEAR, "%u", gear_pos);
+    }
 
     /* --- Bar indicators ---------------------------------------------------- */
     lv_bar_set_value(ui_BarWaterTemp, (int32_t)num1, LV_ANIM_OFF);
@@ -181,31 +205,35 @@ void ui_dashboard_update(void)
     lv_bar_set_value(ui_BarBattery,   (int32_t)(bt * 10.0f), LV_ANIM_OFF);
 
     /* --- Warning icons ----------------------------------------------------- */
-    bool warn_water    = (num1 >= WARN_WATER_TEMP_HI);
-    bool warn_oilpress = (num5 <= WARN_OIL_PRESS_LO);
-    bool warn_batt     = ((int32_t)(bt * 10.0f) <= WARN_BATT_LO);
-    bool warn_exhaust  = (ad3 >= WARN_EXHAUST_ADC_HI);
-    bool warn_brake    = (ad2 >= WARN_BRAKE_ADC_HI);
-    bool warn_belt     = (ad4 >= WARN_BELT_ADC_HI);
-    bool warn_fuel     = (fuel_per <= (float)WARN_FUEL_LO);
-    bool warn_master   = warn_water || warn_oilpress || warn_batt ||
-                         warn_exhaust || warn_brake || warn_fuel;
-
-    set_visible(ui_ImgWarnMaster,   warn_master);
-    set_visible(ui_ImgWarnWater,    warn_water);
-    set_visible(ui_ImgWarnOilPress, warn_oilpress);
-    set_visible(ui_ImgWarnBattery,  warn_batt);
-    set_visible(ui_ImgWarnExhaust,  warn_exhaust);
-    set_visible(ui_ImgWarnBrake,    warn_brake);
-    set_visible(ui_Image11,         warn_belt);
-    set_visible(ui_ImgWarnFuel,     warn_fuel);
-
-    /* --- MAP chart (50ms push) --------------------------------------------- */
-    if (s_ser_map != NULL) {
-        uint32_t now = lv_tick_get();
-        if ((uint32_t)(now - s_chart_last_ms) >= CHART_UPDATE_MS) {
-            s_chart_last_ms = now;
-            lv_chart_set_next_value(ui_MAPChart, s_ser_map, (lv_coord_t)num4);
+    /* 起動テルテール中はアイコン更新をスキップ（全灯状態を維持）*/
+    if (!s_telltale_done) {
+        if ((uint32_t)(lv_tick_get() - s_startup_ms) >= STARTUP_TELLTALE_MS) {
+            s_telltale_done = true;
         }
     }
+
+    if (s_telltale_done) {
+        bool warn_water_cold = (num1 <= (float)WARN_WATER_TEMP_COLD);
+        bool warn_water_hot  = (num1 >= (float)WARN_WATER_TEMP_HOT);
+        bool warn_oilpress   = (rpm > 0u) && ((int32_t)num5 <= WARN_OIL_PRESS_LO);
+        bool warn_batt       = ((int32_t)(bt * 10.0f) <= WARN_BATT_LO);
+        bool warn_exhaust    = (ad3 >= WARN_EXHAUST_ADC_HI);
+        bool warn_brake      = (ad2 >= WARN_BRAKE_ADC_HI);
+        bool warn_belt       = (ad4 >= WARN_BELT_ADC_HI);
+        bool warn_fuel       = (fuel_per <= (float)WARN_FUEL_LO);
+        /* 冷間警告はマスター警告に含めない（過熱のみ） */
+        bool warn_master     = warn_water_hot || warn_oilpress || warn_batt ||
+                               warn_exhaust || warn_brake || warn_fuel;
+
+        set_visible(ui_ImgWarnMaster,    warn_master);
+        set_visible(ui_ImgWarnWaterCold, warn_water_cold);
+        set_visible(ui_ImgWarnWaterHot,  warn_water_hot);
+        set_visible(ui_ImgWarnOilPress,  warn_oilpress);
+        set_visible(ui_ImgWarnBattery,   warn_batt);
+        set_visible(ui_ImgWarnExhaust,   warn_exhaust);
+        set_visible(ui_ImgWarnBrake,     warn_brake);
+        set_visible(ui_Image11,          warn_belt);
+        set_visible(ui_ImgWarnFuel,      warn_fuel);
+    }
+
 }

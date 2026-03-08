@@ -34,6 +34,7 @@ LV_IMG_DECLARE(ui_img_back5_png);    // assets/Back5.png
 LV_IMG_DECLARE(ui_img_back6_png);    // assets/Back6.png
 LV_IMG_DECLARE(ui_img_ws_masterwarning_png);    // assets/ws_masterwarning.png
 LV_IMG_DECLARE(ui_img_ws_oilpresswarning_png);    // assets/ws_oilpresswarning.png
+LV_IMG_DECLARE(ui_img_ws_watarcool_png);    // assets/ws_watarcool.png
 LV_IMG_DECLARE(ui_img_ws_waterwarning_png);    // assets/ws_waterwarning.png
 LV_IMG_DECLARE(ui_img_ws_exhaustwarning_png);    // assets/ws_exhaustwarning.png
 LV_IMG_DECLARE(ui_img_ws_batterywarning_png);    // assets/ws_batterywarning.png
@@ -44,6 +45,7 @@ LV_IMG_DECLARE(ui_img_marker_red_bar_80x7s_png);    // assets/Marker_red_bar_80x
 
 // FONTS
 LV_FONT_DECLARE(ui_font_Font1);
+LV_FONT_DECLARE(ui_font_FontLARGR);
 
 // UI INIT
 void ui_init(void);
