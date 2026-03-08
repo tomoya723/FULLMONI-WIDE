@@ -83,7 +83,7 @@ void ap_100ms(void);
 
 #include <string.h>  /* memset */
 
-extern void LCD_FadeIN(void);
+extern void LCD_FadeIN(unsigned int target);
 
 /* bss2セクションの初期化用シンボル（linker_script.ldで定義） */
 extern char __attribute__((section(".bss2"))) _bss2_dummy;
@@ -162,7 +162,15 @@ void main(void)
 	APPW_Exec();
 #endif
 
-	LCD_FadeIN();
+	/* ディマーと同じ閾値でFadeIN収束値を決定 */
+	{
+		unsigned int fadein_target;
+		if (g_CALC_data.AD5 <= 50)
+			fadein_target = 600;
+		else
+			fadein_target = 2998;
+		LCD_FadeIN(fadein_target);
+	}
 
 	R_Config_RIIC0_Start();
 	R_Config_RIIC1_Start();

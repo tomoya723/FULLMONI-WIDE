@@ -11,7 +11,7 @@
 // --------------------------------------------------------------------
 // Prototype declaration
 // --------------------------------------------------------------------
-void LCD_FadeIn(void);
+void LCD_FadeIN(unsigned int target);  /* target: ディマー収束値 (e.g. 600=暗, 2998=明) */
 void LCD_FadeOUT(void);
 
 #endif /* TFTLCD102_HEADER_FILE */
