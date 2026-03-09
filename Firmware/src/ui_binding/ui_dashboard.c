@@ -86,7 +86,7 @@ static bool     s_peak_falling      = false;
 static inline int32_t rpm_to_angle(uint32_t rpm)
 {
     if (rpm > 9000u) rpm = 9000u;
-    return 900 + (int32_t)rpm * 2600 / 9000;
+    return 900 + (int32_t)rpm * 2700 / 9000;
 }
 
 /* --- Helper: show/hide widget --------------------------------------------- */
