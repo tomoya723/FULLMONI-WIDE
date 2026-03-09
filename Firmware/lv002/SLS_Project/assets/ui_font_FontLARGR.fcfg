@@ -1,0 +1,16 @@
+{
+  "codename": "FontLARGR",
+  "ttf_path": "/assets/x14y24pxHeadUpDaisy.ttf",
+  "bin_path": "/assets\\ui_font_FontLARGR.bin",
+  "c_path": "/assets\\ui_font_FontLARGR.c",
+  "cfg_path": "/assets\\ui_font_FontLARGR.fcfg",
+  "size": 54,
+  "bpp": 1,
+  "letters": 0,
+  "ranges": [
+    "0x20-0x7f"
+  ],
+  "symbols": "",
+  "customparams": "--no-compress --no-prefilter",
+  "uploaded": false
+}
