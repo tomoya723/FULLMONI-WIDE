@@ -7,21 +7,23 @@ namespace FullmoniTerminal.Services;
 /// BMP画像をSEGGER AppWizard/emWin形式に変換するコンバータ
 ///
 /// AppWizard形式 (emWin GUI_BITMAP_STREAM):
-/// - ヘッダ: 12バイト
+/// - ヘッダ: 16バイト
 ///   - [0-1]: "BM" (0x42, 0x4D) - BMPマジック互換
 ///   - [2-3]: 圧縮タイプ (0x0008 = 非圧縮RGB565)
 ///   - [4-5]: 幅 (little-endian)
 ///   - [6-7]: 高さ (little-endian)
 ///   - [8-9]: stride (幅 * 2 bytes/pixel)
 ///   - [10-11]: bits per pixel (16 = RGB565)
+///   - [12-13]: NumColors (0 = ダイレクトカラー)
+///   - [14-15]: NumTransPixels (0)
 /// - データ: 非圧縮のRGB565ピクセルデータ（上から下へ、左から右へ）
 /// </summary>
 public static class AppWizardImageConverter
 {
-    // AppWizardヘッダサイズ
-    private const int HeaderSize = 12;
+    // AppWizardヘッダサイズ (BM + Type + Width + Height + BytesPerLine + BPP + NumColors + NumTransPixels)
+    private const int HeaderSize = 16;
 
-    // 出力サイズ (acmtc配列に合わせる: 765 × 256 × 2 + 12 = 391692、パディング含め391696)
+    // 出力サイズ (acmtc配列に合わせる: 765 × 256 × 2 + 16 = 391696)
     private const int OutputSize = 391696;
 
     // 期待する画像サイズ
@@ -113,8 +115,8 @@ public static class AppWizardImageConverter
             }
         }
 
-        // 残りは0のまま（パディング）
-        // outputPosは 12 + 765*256*2 = 391692 のはず
+        // 残りは0のまま
+        // outputPosは 16 + 765*256*2 = 391696 のはず
 
         return output;
     }
