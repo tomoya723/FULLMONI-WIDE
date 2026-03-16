@@ -137,5 +137,5 @@ void OnTimer_incGearPos_1000( )
 {
 /* TODO */
 GEAR = GEAR +1;
-SPD = SPD +5;
+SPD = SPD +50;
 }/* End BUSMASTER generated function - OnTimer_incGearPos_1000 */
