@@ -18,10 +18,10 @@
     <Window_Position>
       <Visibility>SHOWNORMAL</Visibility>
       <WindowPlacement>HIDE</WindowPlacement>
-      <Top>613</Top>
-      <Left>0</Left>
-      <Bottom>818</Bottom>
-      <Right>1326</Right>
+      <Top>477</Top>
+      <Left>-12</Left>
+      <Bottom>682</Bottom>
+      <Right>1314</Right>
     </Window_Position>
   </Global_Configuration>
   <Module_Configuration>
@@ -207,7 +207,7 @@
         <Right>366</Right>
       </Window_Position>
       <Node>
-        <Name>ECU</Name>
+        <Name>1</Name>
         <Is_Enabled>TRUE</Is_Enabled>
         <File_Type>C_CPP_FILE</File_Type>
         <File_Path>nodesim.cpp</File_Path>
@@ -297,10 +297,10 @@
       <Interpretation_Window_Position>
         <Visibility>SHOWNORMAL</Visibility>
         <WindowPlacement>RESTORETOMAXIMIZED</WindowPlacement>
-        <Top>173</Top>
-        <Left>10</Left>
-        <Bottom>451</Bottom>
-        <Right>359</Right>
+        <Top>542</Top>
+        <Left>263</Left>
+        <Bottom>820</Bottom>
+        <Right>612</Right>
       </Interpretation_Window_Position>
     </CAN_Message_Window>
     <J1939_Message_Window>
@@ -397,10 +397,10 @@
       <Interpretation_Window_Position>
         <Visibility>SHOWNORMAL</Visibility>
         <WindowPlacement>RESTORETOMAXIMIZED</WindowPlacement>
-        <Top>173</Top>
-        <Left>10</Left>
-        <Bottom>451</Bottom>
-        <Right>359</Right>
+        <Top>542</Top>
+        <Left>263</Left>
+        <Bottom>820</Bottom>
+        <Right>612</Right>
       </Interpretation_Window_Position>
     </J1939_Message_Window>
     <LIN_Message_Window>
@@ -482,10 +482,10 @@
       <Interpretation_Window_Position>
         <Visibility>SHOWNORMAL</Visibility>
         <WindowPlacement>RESTORETOMAXIMIZED</WindowPlacement>
-        <Top>173</Top>
-        <Left>10</Left>
-        <Bottom>451</Bottom>
-        <Right>359</Right>
+        <Top>542</Top>
+        <Left>263</Left>
+        <Bottom>820</Bottom>
+        <Right>612</Right>
       </Interpretation_Window_Position>
     </LIN_Message_Window>
     <CAN_Tx_Window>
