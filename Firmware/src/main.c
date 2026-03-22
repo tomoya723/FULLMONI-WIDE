@@ -44,6 +44,8 @@ volatile uint8_t I2C1_TX_END_FLG = 0;
 volatile uint8_t I2C1_RX_END_FLG = 0;
 volatile uint8_t I2C1_RCV_ERR_FLG = 0;
 volatile MD_STATUS I2C1_md_status;
+volatile unsigned long g_i2c0_err_cnt = 0;
+volatile unsigned long g_i2c1_err_cnt = 0;
 
 // システムモード（通常/パラメータ変更）
 volatile SYSTEM_MODE g_system_mode = MODE_NORMAL;
@@ -208,6 +210,16 @@ void main(void)
 	// ギア比テーブル再初期化（パラメータロード後に実行）
 	init_data_store();
 
+	/* FPU非正規化数フラッシュ設定: FPSW DN=1
+	 * smooth()等のEMAが0に収束する際、非正規化浮動小数点数（denormalized float）が
+	 * 発生しFPUマイクロコード処理で数千サイクル/演算になる問題を防止。
+	 * DN=1により非正規化数をゼロにフラッシュし、メインループのフリーズを防止する。 */
+	{
+		uint32_t fpsw = R_BSP_GET_FPSW();
+		fpsw |= 0x00000100;  /* DN bit = bit 8 */
+		R_BSP_SET_FPSW(fpsw);
+	}
+
 	/*
 	 * メインループ
 	 *
@@ -289,7 +301,6 @@ void main(void)
 		GUI_Exec1();
 		APPW_Exec();
 
-		/* Issue #50: マスターワーニングGUI更新（メインループから呼ぶこと！）*/
 		master_warning_gui_update();
 
 		main_CAN();
@@ -309,11 +320,29 @@ void main(void)
 			I2C_WriteData[11] = ((tr_int >>  8) & 0x000000FF);
 			I2C_WriteData[12] = ((tr_int      ) & 0x000000FF);
 		//	R_Config_RIIC0_Master_Send(0x50,(void *) I2C_WriteData,10);		// odo write
+			I2C0_RCV_ERR_FLG = 0;
 			R_Config_RIIC0_Master_Send(0x50,(void *) I2C_WriteData,14);		// odo & trip write
-			while(I2C0_TX_END_FLG == 0); // I2C送信完了待ち
-			I2C0_TX_END_FLG = 0;
-			sp_int_old = sp_int;
-			wr_cnt ++;
+			{
+				volatile unsigned long timeout = 1000000;
+				while (I2C0_TX_END_FLG == 0 && I2C0_RCV_ERR_FLG == 0 && timeout > 0) {
+					timeout--;
+				}
+				if (timeout == 0 || I2C0_RCV_ERR_FLG) {
+					/* I2Cエラー: バスリセットして次回リトライ */
+					R_Config_RIIC0_Stop();
+					R_Config_RIIC0_Create();
+					R_Config_RIIC0_Start();
+					I2C0_TX_END_FLG = 0;
+					I2C0_RCV_ERR_FLG = 0;
+					g_i2c0_err_cnt++;
+				} else {
+					I2C0_TX_END_FLG = 0;
+					/* EEPROM write cycle完了待ち (24C16: tWR = 5-10ms) */
+					for (volatile int wait = 0; wait < 100000; wait++);
+					sp_int_old = sp_int;
+					wr_cnt++;
+				}
+			}
 		}
 
 		/* Issue #50: マスターワーニング発報中はワーニングLED表示（赤色じわじわ明滅） */

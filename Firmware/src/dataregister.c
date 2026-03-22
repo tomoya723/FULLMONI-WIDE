@@ -178,17 +178,14 @@ static void process_can_fields(void)
     for (i = 0; i < CAN_FIELD_MAX; i++) {
         field = &g_can_config.fields[i];
 
-        /* 無効なフィールドはスキップ */
         if (field->channel == 0 || field->target_var == CAN_TARGET_NONE) {
             continue;
         }
 
-        /* チャンネルが有効か確認 */
         if (!g_can_config.channels[field->channel - 1].enabled) {
             continue;
         }
 
-        /* 物理値に変換 */
         value = can_field_to_physical(field);
 
         /* ターゲット変数に代入 */
@@ -345,7 +342,11 @@ void data_store(void)
 	g_CALC_data.trip = ((float)(sp_int - tr_int)) / PULSE_PER_KM;
 
 	// gear ratio & shift position
-	gear = (unsigned int)(g_CALC_data.rev * g_CALC_data.TyreCirc * 60 / g_CALC_data.sp / (g_param.final_gear_ratio / 1000.0f));
+	if (g_CALC_data.sp > 1.0f && g_param.final_gear_ratio > 0) {
+		gear = (unsigned int)(g_CALC_data.rev * g_CALC_data.TyreCirc * 60 / g_CALC_data.sp / (g_param.final_gear_ratio / 1000.0f));
+	} else {
+		gear = 0;
+	}
 	if		(( table_gear_ratio_range[0] >= gear ) && ( table_gear_ratio_range[1] <= gear ))
 	{
 		gear_pos = 1;
@@ -496,19 +497,18 @@ void data_setLCD100ms(void)
 		return;
 	}
 
-	/* Issue #50: マスターワーニング処理（タイマー割り込みコンテキスト）*/
+	/* Issue #50: マスターワーニング処理（タイマー割り込みコンテキスト） */
 	master_warning_check();
 
 	if (master_warning_is_active()) {
-		/* 警告発報開始時のみ警告音を再生 */
+		/* 警告発生開始時のみ警告音を再生 */
 		if (!s_warning_displayed && s_warning_sound_cooldown == 0) {
-			/* 最初の警告時のみ警告音を再生（クールダウン中は抑制、sound_enabledで無効化可能）*/
 			if (g_can_config.sound_enabled) {
 				speaker_play_warning();
 			}
 			s_warning_sound_cooldown = WARNING_SOUND_COOLDOWN;
 		}
-		/* GUI更新は常に行う（値がリアルタイムで変わる場合に対応）*/
+		/* GUI更新は常に行う */
 		s_warning_gui_update_needed = 1;
 	} else {
 		/* 警告解除 */
@@ -527,11 +527,11 @@ void data_setLCD100ms(void)
 	APPW_SetVarData(ID_VAR_BATT, g_CALC_data.bt * 10);
 	APPW_SetVarData(ID_VAR_FL1, gear * 10);
 	APPW_SetVarData(ID_VAR_BL1, g_CALC_data.AD5 * 10);
-//	APPW_SetVarData(ID_VAR_SPEED, g_CALC_data.sp * 1.06);  /* 旧: 法規対応（高速側表示）のため+6%補正していた */
 	APPW_SetVarData(ID_VAR_SPEED, g_CALC_data.sp);
 	APPW_SetVarData(ID_VAR_ODO, g_CALC_data.odo);
 	APPW_SetVarData(ID_VAR_TRIP, g_CALC_data.trip * 10);
 	APPW_SetVarData(ID_VAR_FUEL, fuel_per);
 
 }
+
 

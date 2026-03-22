@@ -507,19 +507,22 @@ static void can_int_demo(void)
 
         /* Read CAN data from all mailboxes.
          * Wait for INVALDATA=0 before reading to prevent data corruption
-         * when hardware is updating the mailbox with a new frame. */
-        while (CAN0.MCTL[CANBOX_RX1].BIT.RX.INVALDATA) { R_BSP_NOP(); }
+         * when hardware is updating the mailbox with a new frame.
+         * タイムアウト付き: ハードウェア異常時のフリーズ防止 */
+        { volatile int t;
+        t = 1000; while (CAN0.MCTL[CANBOX_RX1].BIT.RX.INVALDATA && t > 0) { t--; }
         api_status = R_CAN_RxRead(g_can_channel, g_mb_mode, CANBOX_RX1, &rx_dataframe1);
-        while (CAN0.MCTL[CANBOX_RX2].BIT.RX.INVALDATA) { R_BSP_NOP(); }
+        t = 1000; while (CAN0.MCTL[CANBOX_RX2].BIT.RX.INVALDATA && t > 0) { t--; }
         api_status = R_CAN_RxRead(g_can_channel, g_mb_mode, CANBOX_RX2, &rx_dataframe2);
-        while (CAN0.MCTL[CANBOX_RX3].BIT.RX.INVALDATA) { R_BSP_NOP(); }
+        t = 1000; while (CAN0.MCTL[CANBOX_RX3].BIT.RX.INVALDATA && t > 0) { t--; }
         api_status = R_CAN_RxRead(g_can_channel, g_mb_mode, CANBOX_RX3, &rx_dataframe3);
-        while (CAN0.MCTL[CANBOX_RX4].BIT.RX.INVALDATA) { R_BSP_NOP(); }
+        t = 1000; while (CAN0.MCTL[CANBOX_RX4].BIT.RX.INVALDATA && t > 0) { t--; }
         api_status = R_CAN_RxRead(g_can_channel, g_mb_mode, CANBOX_RX4, &rx_dataframe4);
-        while (CAN0.MCTL[CANBOX_RX5].BIT.RX.INVALDATA) { R_BSP_NOP(); }
+        t = 1000; while (CAN0.MCTL[CANBOX_RX5].BIT.RX.INVALDATA && t > 0) { t--; }
         api_status = R_CAN_RxRead(g_can_channel, g_mb_mode, CANBOX_RX5, &rx_dataframe5);
-        while (CAN0.MCTL[CANBOX_RX6].BIT.RX.INVALDATA) { R_BSP_NOP(); }
+        t = 1000; while (CAN0.MCTL[CANBOX_RX6].BIT.RX.INVALDATA && t > 0) { t--; }
         api_status = R_CAN_RxRead(g_can_channel, g_mb_mode, CANBOX_RX6, &rx_dataframe6);
+        }
 
         /* You can set BP here and check the received data in debugger. */
         R_BSP_NOP();
@@ -1125,7 +1128,7 @@ void can_update_rx_filters(void)
     /* CANモジュールをHALTモードにする（運用中の設定変更のため） */
     R_CAN_Control(g_can_channel, HALT_CANMODE);
 
-    /* 
+    /*
      * 重要: MKRレジスタは4つのMailboxで共有される
      *  - MKR[1]: Mailbox 4-7 (CANBOX_RX1-4)
      *  - MKR[2]: Mailbox 8-11 (CANBOX_RX5-6)

@@ -20,7 +20,7 @@
 #endif
 
 #ifndef FW_VERSION_PATCH
-#define FW_VERSION_PATCH    1
+#define FW_VERSION_PATCH    2
 #endif
 
 /* 繝舌・繧ｸ繝ｧ繝ｳ譁・ｭ怜・繝槭け繝ｭ */
