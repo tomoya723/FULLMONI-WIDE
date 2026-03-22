@@ -1464,8 +1464,8 @@
       IdDst=ID_NUM_GEAR
       Slot=ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_GEAR__APPW_JOB_SETTEXT
       Comment=gear_pos=N
-      Flags=0
-      Condition=A,1,IS_VAR,ID_VAR_01,==,IS_VAL,0
+      Flags=65536
+      Condition=A,1,IS_VAR,ID_VAR_GEAR,==,IS_VAL,0
       <Para>
         Text=ID_RTEXT_GN
       </Para>
@@ -1743,7 +1743,7 @@
     </SETVALUE>
   </Interactions>
   <Selection>
-    Root=ID_SCREEN_01c
+    Root=ID_SCREEN_01a
     Object=2048
   </Selection>
   <Terms>

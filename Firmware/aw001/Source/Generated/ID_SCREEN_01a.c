@@ -226,7 +226,7 @@ static GUI_CONST_STORAGE APPW_SETUP_ITEM _aSetup[] = {
 *       Comparison(s)
 */
 static APPW_COND_COMP _aComparison_06[] = {
-  { { { APPW_IS_VAR, ID_VAR_01 }, { APPW_IS_VAL, 0 } }, APPW__CompareIsEqual },
+  { { { APPW_IS_VAR, ID_VAR_GEAR }, { APPW_IS_VAL, 0 } }, APPW__CompareIsEqual },
 };
 
 static APPW_COND_COMP _aComparison_07[] = {
@@ -311,7 +311,7 @@ static GUI_CONST_STORAGE APPW_ACTION_ITEM _aAction[] = {
   },
   { ID_VAR_GEAR,   WM_NOTIFICATION_VALUE_CHANGED,    ID_NUM_GEAR,   APPW_JOB_SETTEXT,        ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_GEAR__APPW_JOB_SETTEXT,
     { ARG_V(ID_RTEXT_GN),
-    }, 0, &_Condition_06
+    }, 65536, &_Condition_06
   },
   { ID_VAR_GEAR,   WM_NOTIFICATION_VALUE_CHANGED,    ID_NUM_GEAR,   APPW_JOB_SETTEXT,        ID_SCREEN_01__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_GEAR__APPW_JOB_SETTEXT_0,
     { ARG_V(ID_RTEXT_G1),

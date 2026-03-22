@@ -167,14 +167,14 @@ public class OnlineUpdateService : IDisposable
 
         try
         {
-            StatusChanged?.Invoke(this, $"Fetching manifest for {tag}...");
-
             var manifestUrl = GetDownloadUrl(tag, "release-manifest.json");
+            StatusChanged?.Invoke(this, $"Fetching manifest: {manifestUrl}");
+
             var response = await _httpClient.GetAsync(manifestUrl, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
-                StatusChanged?.Invoke(this, $"Manifest not found for {tag}");
+                StatusChanged?.Invoke(this, $"Manifest fetch failed: HTTP {(int)response.StatusCode} {response.ReasonPhrase} for {manifestUrl}");
                 return null;
             }
 
@@ -232,7 +232,7 @@ public class OnlineUpdateService : IDisposable
             foreach (var release in doc.RootElement.EnumerateArray())
             {
                 var tagName = release.GetProperty("tag_name").GetString();
-                if (!string.IsNullOrEmpty(tagName))
+                if (!string.IsNullOrEmpty(tagName) && IsVersionAtLeast(tagName, 1, 0, 0))
                 {
                     tags.Add(tagName);
                 }
@@ -289,7 +289,7 @@ public class OnlineUpdateService : IDisposable
             destinationPath = Path.Combine(dir, $"{baseName}_{DateTime.Now:yyyyMMddHHmmss}{ext}");
 
             // メモリに全体をダウンロードしてからファイルに書き込む（ロック問題回避）
-            StatusChanged?.Invoke(this, $"Downloading from GitHub...");
+            StatusChanged?.Invoke(this, $"Downloading from: {variant.DownloadUrl}");
             var data = await _httpClient.GetByteArrayAsync(variant.DownloadUrl, cancellationToken);
             
             DownloadProgressChanged?.Invoke(this, 50);
@@ -478,6 +478,25 @@ public class OnlineUpdateService : IDisposable
         await using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 81920, true);
         var hash = await SHA256.HashDataAsync(stream, cancellationToken);
         return Convert.ToHexString(hash).ToLowerInvariant();
+    }
+
+    /// <summary>
+    /// タグ名が指定バージョン以上かを判定（v1.0.0未満のpre-releaseを除外するため）
+    /// </summary>
+    private static bool IsVersionAtLeast(string tagName, int major, int minor, int patch)
+    {
+        var versionStr = tagName.TrimStart('v', 'V');
+        var parts = versionStr.Split('.', '-');
+        if (parts.Length >= 3
+            && int.TryParse(parts[0], out var maj)
+            && int.TryParse(parts[1], out var min)
+            && int.TryParse(parts[2], out var pat))
+        {
+            return (maj > major)
+                || (maj == major && min > minor)
+                || (maj == major && min == minor && pat >= patch);
+        }
+        return false;
     }
 
     public void Dispose()

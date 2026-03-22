@@ -56,7 +56,7 @@ void R_Config_MTU0_Create_UserInit(void)
 
 void r_Config_MTU0_tgia0_interrupt(void)
 {
-
+    
     /* Start user code for r_Config_MTU0_tgia0_interrupt. Do not edit comment generated here */
 
 	// --------------------------------------------------------------------
