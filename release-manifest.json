@@ -5,7 +5,7 @@
                        "size":  231944,
                        "file":  "Bootloader_v0.1.2.mot"
                    },
-    "version":  "1.0.1",
+    "version":  "1.0.2",
     "hostApps":  {
                      "windows":  {
                                      "sha256":  "396ba0b3ef53d8d5e215ff745f0da85c38cc41f61e2ff43462e5a3247662355d",
@@ -20,8 +20,8 @@
                                      "file":  "FULLMONI-WIDE-Android-v1.0.1.apk"
                                  }
                  },
-    "releaseNotes":  "https://github.com/tomoya723/FULLMONI-WIDE/releases/tag/v1.0.1",
-    "releaseDate":  "2026-02-12",
+    "releaseNotes":  "https://github.com/tomoya723/FULLMONI-WIDE/releases/tag/v1.0.2",
+    "releaseDate":  "2026-03-22",
     "schemaVersion":  1,
     "firmware":  {
                      "minimumBootloaderVersion":  "0.1.2",
@@ -29,20 +29,20 @@
                                       {
                                           "id":  "aw001",
                                           "name":  "type1",
-                                          "size":  956636,
+                                          "size":  956900,
                                           "description":  "tomoya723 ver",
-                                          "sha256":  "a37ad2ee3fcc30a645d9eb45902663c82c015703793377fd9b721cb3bc03ed7a",
+                                          "sha256":  "1e3cc5239c03a0de9228c6de7c56512071ebda60e6d34984d7a42f04ac2af1d5",
                                           "thumbnail":  "thumbnail_v1.0.0_aw001.png",
-                                          "file":  "Firmware_1.0.1_aw001.bin"
+                                          "file":  "Firmware_1.0.2_aw001.bin"
                                       },
                                       {
                                           "id":  "aw002",
                                           "name":  "type2",
-                                          "size":  912280,
+                                          "size":  912544,
                                           "description":  "chaketek ver",
-                                          "sha256":  "2c2ed899236adec81381071162fdb7f627898ac99749214be8df217eb47bb5e2",
+                                          "sha256":  "378a24344aab8b3fa8070c815177199fd3c182bf8e4ee38a5261cb846848ce9d",
                                           "thumbnail":  "thumbnail_v1.0.0_aw002.png",
-                                          "file":  "Firmware_1.0.1_aw002.bin"
+                                          "file":  "Firmware_1.0.2_aw002.bin"
                                       }
                                   ]
                  }
