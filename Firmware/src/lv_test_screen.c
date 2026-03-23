@@ -13,6 +13,9 @@
 
 #include "lv_test_screen.h"
 #include "lvgl/lvgl.h"
+
+#if LV_USE_METER
+
 #include <stdint.h>
 
 /* --- Left column: 6 sensor bars --- */
@@ -222,3 +225,10 @@ void lv_test_screen_update(uint32_t rpm)
         lv_label_set_text(s_lbl_speed, buf);
     }
 }
+
+#else /* LV_USE_METER == 0 */
+
+void lv_test_screen_create(void) { /* meter widget disabled */ }
+void lv_test_screen_update(uint32_t rpm) { (void)rpm; }
+
+#endif /* LV_USE_METER */

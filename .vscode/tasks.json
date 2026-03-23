@@ -2,33 +2,12 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Generate UI Code (EEZ→C)",
-            "type": "shell",
-            "command": "py",
-            "args": [
-                "${workspaceFolder}/tools/eez_to_c.py"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "silent",
-                "focus": false,
-                "panel": "shared"
-            },
-            "detail": "EEZ Studio .eez-projectからLVGL Cコードを自動生成"
-        },
-        {
             "label": "Build (GCC-RX)",
             "type": "shell",
             "command": "C:/Renesas/e2_studio/eclipse/plugins/com.renesas.ide.exttools.gnumake.win32.x86_64_4.3.1.v20240909-0854/mk/make.exe",
             "args": [
                 "-j8",
                 "all"
-            ],
-            "dependsOn": [
-                "Generate UI Code (EEZ→C)"
             ],
             "options": {
                 "cwd": "${workspaceFolder}/Firmware/HardwareDebug"
