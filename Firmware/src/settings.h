@@ -14,8 +14,8 @@
  * システム動作モード定義
  * ============================================================ */
 typedef enum {
-    MODE_NORMAL = 0,    /* 通常動作（emWin描画有効） */
-    MODE_PARAM  = 1     /* パラメータ変更モード（emWin停止） */
+    MODE_NORMAL = 0,    /* 通常動作 */
+    MODE_PARAM  = 1     /* パラメータ変更モード */
 } SYSTEM_MODE;
 
 /* グローバル変数宣言 */
@@ -23,21 +23,7 @@ extern volatile SYSTEM_MODE g_system_mode;
 extern volatile uint8_t g_param_mode_active;
 /* g_uart_rx_trigger は USB CDC化により削除 */
 
-/* ============================================================
- * グラフィックスバックエンド選択
- *   1: LVGL v8.3  0: emWin + AppWizard
- * ============================================================ */
-#define LVGL_ENABLE 1
 
-#if !LVGL_ENABLE
-// emwin display resource - Junction経由で切り替え
-// ビルド前に tools/build_variants.ps1 で aw Junctionを設定すること
-#include "../aw/Source/Generated/Resource.h"
-#include "../aw/Source/Generated/ID_SCREEN_Telltale.h"
-#include "../aw/Source/Generated/ID_SCREEN_01a.h"
-#include "../aw/Source/Generated/ID_SCREEN_01b.h"
-#include "../aw/Source/Generated/ID_SCREEN_01c.h"
-#endif /* !LVGL_ENABLE */
 
 extern void sch_10ms();
 

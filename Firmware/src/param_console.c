@@ -106,7 +106,7 @@ static void cmd_help(void)
     param_console_print("  can_ch <n> <id> <en> - Set CAN channel (n=1-6)\r\n");
     param_console_print("  can_field <n> <ch> <byte> <len> <type> <end> <var> <off> <mul> <div>\r\n");
     param_console_print("            <name> <unit> <dec_shift> <warn_lo_en> <warn_lo> <warn_hi_en> <warn_hi>\r\n");
-    param_console_print("                    - Set CAN field (n=0-15, dec_shift=AppWizard decimal)\r\n");
+    param_console_print("                    - Set CAN field (n=0-15)\r\n");
     param_console_print("  can_preset <name> - Apply preset (motec/link/aem)\r\n");
     param_console_print("  can_save          - Save CAN config to EEPROM\r\n");
     param_console_print("  can_load          - Load CAN config from EEPROM\r\n");

@@ -22,18 +22,10 @@
 #include "speaker.h"  /* Speaker output (DA1 + LM4861M) */
 #include "master_warning.h"  /* Issue #50: マスターワーニング */
 #include "pulse_out.h"       /* Issue #115: EPS駆動用タコ・車速パルス出力 */
-/* LVGL_ENABLE is defined in settings.h */
-#if LVGL_ENABLE
 #include "lvgl/lvgl.h"
 #include "lv_port/lv_port_disp.h"
 #include "lv_port/lv_port_tick.h"
 #include "ui_binding/ui_dashboard.h"
-#else
-#include "GUI.h"               /* emWin GUI関数 */
-#include "TEXT.h"              /* TEXT Widget関数 */
-#include "WM.h"                /* Window Manager関数 */
-#include "../aw/Source/Generated/ID_SCREEN_01a.h"  /* ID_TEXT_ACC 定義 (Junction経由) */
-#endif
 
 // --------------------------------------------------------------------
 // グローバル変数宣言
@@ -141,9 +133,7 @@ void main(void)
 
 	init_data_store();
 
-	// Graphics init
-#if LVGL_ENABLE
-	/* LVGL: lv_port_disp_init() initializes GLCDC and connects LVGL to GR2 (0x00800000). */
+	// Graphics init (LVGL)
 	lv_init();
 	lv_port_disp_init();
 	ui_dashboard_create();
@@ -153,14 +143,6 @@ void main(void)
 	lv_timer_handler();
 	lv_timer_handler();
 	lv_timer_handler();
-#else
-	// Init Qe for Display (emWin)
-	APPW_X_Setup();
-	APPW_Init(APPW_PROJECT_PATH);
-	APPW_CreateRoot(APPW_INITIAL_SCREEN, WM_HBKWIN);
-	GUI_Exec1();
-	APPW_Exec();
-#endif
 
 	/* ディマーと同じ閾値でFadeIN収束値を決定 */
 	{
@@ -269,16 +251,7 @@ void main(void)
 				usb_cdc_set_mode(USB_MODE_ACTIVE);  /* フル通信モードへ */
 
 				/* 緑背景表示に "HOST ACCESS" を表示 */
-#if LVGL_ENABLE
 				ui_dashboard_set_notify("HOST ACCESS", 0x00AA00u);  /* 緑背景 */
-#else
-				WM_HWIN hWin = WM_GetDialogItem(ID_SCREEN_01a_RootInfo.hWin, ID_TEXT_ACC);
-				if (hWin) {
-					TEXT_SetText(hWin, "HOST ACCESS");
-					TEXT_SetBkColor(hWin, 0xFF00AA00);  /* 緑背景 (ARGB) */
-				}
-				APPW_SetVarData(ID_VAR_PRM, 1);     /* パラメータモード画面表示 */
-#endif
 				param_console_enter();
 				continue;
 			}
@@ -292,20 +265,11 @@ void main(void)
 				g_system_mode = MODE_NORMAL;
 				g_param_mode_active = 0;
 				usb_cdc_set_mode(USB_MODE_STANDBY);  /* 最小監視モードへ */
-#if LVGL_ENABLE
 				ui_dashboard_clear_notify();
-#else
-				APPW_SetVarData(ID_VAR_PRM, 0);      /* 通常画面表示 */
-#endif
 				usb_cdc_print("Returned to normal mode.\r\n");
 			}
 
-#if LVGL_ENABLE
 			lv_timer_handler();
-#else
-			GUI_Exec1();
-			APPW_Exec();
-#endif
 			// CAN処理は継続
 			main_CAN();
 			continue;
@@ -322,20 +286,10 @@ void main(void)
 
 		// fps count
 		g_fps_cnt ++;
-#if !LVGL_ENABLE
-		APPW_SetVarData(ID_VAR_FPS, g_fps_max);
-#endif
-
 		data_store();
 
-#if LVGL_ENABLE
-		/* LVGL: センサーデータをダッシュボードUIに反映してレンダリング */
 		ui_dashboard_update();
 		lv_timer_handler();
-#else
-		GUI_Exec1();
-		APPW_Exec();
-#endif
 		/* Issue #50: マスターワーニングGUI更新（メインループから呼ぶこと！）*/
 		master_warning_gui_update();
 
@@ -490,9 +444,7 @@ void main(void)
 void ap_10ms(void)
 {
 	data_setLCD10ms();
-#if LVGL_ENABLE
 	lv_port_tick_inc();  /* LVGL tick: 10ms increment */
-#endif
 	pulse_out_set_tacho((uint16_t)g_CALC_data.rev);  /* Issue #115: タコパルス出力更新 */
 }
 

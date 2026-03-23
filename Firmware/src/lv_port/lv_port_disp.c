@@ -29,9 +29,7 @@
 
 /*---------------------------------------------------------------------------
  * Draw buffers (double buffer)
- *   Placed in .bss2 (RAM2 at 0x00864000, 114KB).
- *   RAM2 layout: buf1(25.6KB) + buf2(25.6KB) + heap(32KB) + GUIConf(28KB) = 111.2KB.
- *   GUIConf is always linked but never called when LVGL_ENABLE=1.
+ *   Placed in .bss2 (RAM2 at 0x00864000, 112KB).
  *   Size per buf: 800 × 16 lines × 2 bytes = 25,600 bytes
  *--------------------------------------------------------------------------*/
 static lv_color_t __attribute__((section(".bss2")))
@@ -151,6 +149,16 @@ static void flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *colo
     }
 
     lv_disp_flush_ready(drv);
+}
+
+/*---------------------------------------------------------------------------
+ * _VSYNC_ISR  – GLCDC line-detection callback (set via r_lcd_timing.h)
+ *   Previously lived in emWin LCDConf_glcdc_if.c.
+ *   LVGL uses DMAC for flush, so this just absorbs the interrupt.
+ *--------------------------------------------------------------------------*/
+void _VSYNC_ISR(void *p)
+{
+    (void)p;
 }
 
 /*---------------------------------------------------------------------------

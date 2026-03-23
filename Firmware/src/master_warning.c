@@ -543,7 +543,7 @@ bool master_warning_is_active(void)
 }
 
 /**
- * @brief AppWizardのワーニング表示を更新
+ * @brief ワーニング表示を更新
  */
 void master_warning_update_display(void)
 {

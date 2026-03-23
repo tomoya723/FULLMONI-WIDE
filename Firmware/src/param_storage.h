@@ -40,14 +40,14 @@ typedef struct __attribute__((packed)) {
     uint8_t  byte_count;            /* バイト数 (1, 2, 4) */
     uint8_t  data_type;             /* データ型: 0=unsigned, 1=signed */
     uint8_t  endian;                /* エンディアン: 0=Big, 1=Little */
-    uint8_t  target_var;            /* 代入先emWin変数ID (内部インデックス) */
+    uint8_t  target_var;            /* 代入先変数ID (内部インデックス) */
     int16_t  offset;                /* オフセット値 (変換前に加算) */
     uint16_t multiplier;            /* 乗算係数 (x1000) 例: 1000=x1, 100=x0.1 */
     uint16_t divisor;               /* 除算係数 (x1000) 例: 1000=/1, 10000=/10 */
     /* === 新規追加フィールド (Issue #50: 24 bytes) === */
     char     name[CAN_FIELD_NAME_MAX];  /* 名前文字列 (例: "WATER", "OIL") */
     char     unit[CAN_FIELD_UNIT_MAX];  /* 単位文字列 (例: "C", "kPa", "rpm") */
-    uint8_t  decimal_shift;         /* 小数点シフト量 (0=整数, 1=÷10, 2=÷100) AppWizard Maskに対応 */
+    uint8_t  decimal_shift;         /* 小数点シフト量 (0=整数, 1=÷10, 2=÷100) */
     uint8_t  warn_low_enabled;      /* 下限ワーニング有効: 0=無効, 1=有効 */
     uint8_t  warn_high_enabled;     /* 上限ワーニング有効: 0=無効, 1=有効 */
     uint8_t  reserved;              /* 予約 (アライメント用) */
@@ -78,7 +78,7 @@ typedef struct __attribute__((packed)) {
 #define CAN_PRESET_LINK_G4      2
 #define CAN_PRESET_AEM_EMS      3
 
-/* ターゲット変数インデックス (emWin ID_VAR_xxに対応) */
+/* ターゲット変数インデックス */
 #define CAN_TARGET_REV      0       /* ID_VAR_REV: エンジン回転数 */
 #define CAN_TARGET_AF       1       /* ID_VAR_AF: A/F比 */
 #define CAN_TARGET_NUM1     2       /* ID_VAR_01: 水温 */
