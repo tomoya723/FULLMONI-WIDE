@@ -208,6 +208,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="aw/Resource"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="aw/Source"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
