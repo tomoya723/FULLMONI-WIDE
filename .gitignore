@@ -91,3 +91,15 @@ HostApp/FULLMONI-WIDE-Terminal/publish/
 HostApp/FULLMONI-WIDE-Desktop/.gradle/
 
 /.metadata/
+
+# EEZ Studio project (user builds locally)
+Firmware/eez/
+**/.eez-project-build
+
+# Build logs
+build_log.txt
+build_lvgl.log
+Firmware/build_log.txt
+
+# Temp files
+tools/temp_verify/

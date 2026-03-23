@@ -24,8 +24,8 @@
 
 #include "platform.h"
 #include "lvgl/lvgl.h"
-#include "ui/ui.h"
-#include "ui/screens/ui_Screen1.h"
+#include "ui/screens.h"
+#include "ui/eez_compat.h"
 #include "dataregister.h"
 #include "ui_dashboard.h"
 
