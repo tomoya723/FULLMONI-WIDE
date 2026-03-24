@@ -12,6 +12,9 @@
 
 objects_t objects;
 
+static const char *screen_names[] = { "Screen1" };
+static const char *object_names[] = { "screen1", "ui_container_dashboard", "ui_img_tacho", "ui_arc_rpm", "ui_lbl_rpm", "ui_lbl_rpm_unit", "ui_image_rpm", "ui_image_peak_rpm", "ui_image2", "ui_bar_water_temp", "ui_lbl_water_temp", "ui_bar_iat", "ui_lbl_iat", "ui_bar_oil_temp", "ui_lbl_oil_temp", "ui_bar_map", "ui_lbl_map", "ui_bar_oil_press", "ui_lbl_oil_press", "ui_bar_battery", "ui_lbl_battery", "ui_lbl_afr", "ui_lbl_trip", "ui_lbl_odo", "ui_lbl_time", "ui_lbl_gear", "ui_lbl_spd", "ui_lbl_trip_name", "ui_lbl_trip_unit", "ui_lbl_odo_name", "ui_lbl_odo_unit", "ui_lbl_spd_unit", "ui_bar_fuel", "ui_lbl_empty", "ui_lbl_full", "ui_container_opening", "ui_img_opening", "ui_container_telltale", "ui_img_warn_master", "ui_img_warn_oil_press", "ui_img_warn_water_cold", "ui_img_warn_water_hot", "ui_img_warn_exhaust", "ui_img_warn_battery", "ui_img_warn_brake", "ui_image_warn_belt", "ui_img_warn_fuel", "ui_notify_box", "ui_notify_label" };
+
 //
 // Event handlers
 //
@@ -23,6 +26,8 @@ lv_obj_t *tick_value_change_obj;
 //
 
 void create_screen_screen1() {
+    void *flowState = getFlowState(0, 0);
+    (void)flowState;
     lv_obj_t *obj = lv_obj_create(0);
     objects.screen1 = obj;
     lv_obj_set_pos(obj, 0, 0);
@@ -94,7 +99,7 @@ void create_screen_screen1() {
                     lv_obj_set_style_text_font(obj, &ui_font_ui_font_font1, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_text_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-                    lv_label_set_text(obj, "9999");
+                    lv_label_set_text(obj, "{rpm}");
                 }
                 {
                     // ui_LblRPMUnit
@@ -726,6 +731,8 @@ void create_screen_screen1() {
 }
 
 void tick_screen_screen1() {
+    void *flowState = getFlowState(0, 0);
+    (void)flowState;
 }
 
 typedef void (*tick_screen_func_t)();
@@ -814,16 +821,12 @@ ext_font_desc_t fonts[] = {
 };
 
 //
-// Color themes
-//
-
-uint32_t active_theme_index = 0;
-
-//
 //
 //
 
 void create_screens() {
+    
+    eez_flow_init_fonts(fonts, sizeof(fonts) / sizeof(ext_font_desc_t));
 
 // Set default LVGL theme
     lv_disp_t *dispp = lv_disp_get_default();
@@ -831,6 +834,9 @@ void create_screens() {
     lv_disp_set_theme(dispp, theme);
     
     // Initialize screens
+    eez_flow_init_screen_names(screen_names, sizeof(screen_names) / sizeof(const char *));
+    eez_flow_init_object_names(object_names, sizeof(object_names) / sizeof(const char *));
+    
     // Create screens
     create_screen_screen1();
 }

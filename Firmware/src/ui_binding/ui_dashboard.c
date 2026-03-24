@@ -109,10 +109,9 @@ static void fade_opa_cb(void *obj, int32_t v)
 
 static void opening_fade_done_cb(lv_anim_t *a)
 {
-    /* フェード完了後: ContainerOpeningを非表示にしopacityをリセット */
+    /* フェード完了後: ContainerOpeningを子ウィジェットごと削除しRAMを解放 */
     lv_obj_t *obj = (lv_obj_t *)a->var;
-    set_visible(obj, false);
-    lv_obj_set_style_opa(obj, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_del(obj);
 }
 
 static void start_opening_fade(void)
