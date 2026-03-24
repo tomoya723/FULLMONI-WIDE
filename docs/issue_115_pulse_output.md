@@ -71,7 +71,7 @@ FIT CMT API（`r_cmt_rx`）を使用し、10 kHz（100 µs 周期）の割り込
 | API | `R_CMT_CreatePeriodic(10000, pulse_out_isr, &handle)` |
 | ベースクロック | PCLKA = 120 MHz |
 | 割り込み周期 | 100 µs（10 kHz） |
-| CMTチャンネル | 自動割り当て（emWin が CMT0 使用 → CMT1 が確保される） |
+| CMTチャネル | 自動割り当て（LVGL が CMT0 使用 → CMT1 が確保される） |
 | Smart Configurator 変更 | **不要** |
 
 **LCD 描画への影響**

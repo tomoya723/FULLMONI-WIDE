@@ -28,8 +28,8 @@ Firmware/build
 Firmware/HardwareDebug
 Firmware/trash
 
-# Junction (aw001/aw002切替用) - ビルド時のみ使用
-Firmware/aw/
+# 削除済み (AppWizardバリアント切替用, LVGL移行に伴い廃止)
+# Firmware/aw/
 Firmware/src/smc_gen/r_emwin_rx/tool
 Bootloader/build
 Bootloader/HardwareDebug
@@ -59,7 +59,7 @@ Firmware/.settings/
 debug_env/*.cfx
 debug_env/*.dll
 
-# emWin (SEGGER) は公開対象外
+# emWin/SEGGER (削除済み、万が一再追加された場合の安全策)
 Firmware/src/**/r_emwin_rx/**
 Firmware/src/**/SEGGER/**
 Firmware/src/**/GUI/**
@@ -81,7 +81,7 @@ test-release/
 # Visual Studio user-specific files
 **/.vs/
 
-# SEGGER GUI Library (licensed, not redistributable)
+# SEGGER GUI Library (削除済み、安全策として維持)
 Firmware/aw*/Simulation/GUI_Lib/
 Firmware/aw*/Simulation/Exe/
 Firmware/aw*/Simulation/Output/

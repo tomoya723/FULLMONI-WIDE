@@ -153,7 +153,6 @@ static void flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *colo
 
 /*---------------------------------------------------------------------------
  * _VSYNC_ISR  – GLCDC line-detection callback (set via r_lcd_timing.h)
- *   Previously lived in emWin LCDConf_glcdc_if.c.
  *   LVGL uses DMAC for flush, so this just absorbs the interrupt.
  *--------------------------------------------------------------------------*/
 void _VSYNC_ISR(void *p)
@@ -177,7 +176,7 @@ void lv_port_disp_init(void)
      * r_glcdc_qe_parameters_setting() which fills cfg from r_lcd_timing.h:
      *   GR2 base=0x00800000, hsize=800, vsize=256, offset=1600, RGB565.
      * _VSYNC_ISR (set as callback by r_lcd_timing.h) only manipulates
-     * s_pending_buffer — no emWin GUI calls, safe for LVGL. */
+     * s_pending_buffer, safe for LVGL. */
     {
         glcdc_cfg_t cfg;
         R_GLCDC_Open(&cfg);          /* QE params auto-fill cfg */

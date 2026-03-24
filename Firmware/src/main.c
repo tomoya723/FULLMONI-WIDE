@@ -298,6 +298,8 @@ void main(void)
 		// 通常モード処理
 		// ============================================================
 		// wait Reflesh Cycletime
+//		g_int10mscnt =  -1;		// peiod 10ms x  1 = 10ms  100fps
+//		g_int10mscnt =  -2;		// peiod 10ms x  2 = 20ms  50fps
 		g_int10mscnt =  -3;		// peiod 10ms x  3 = 30ms  33fps
 //		g_int10mscnt =  -4;		// peiod 10ms x  4 = 40ms  25fps
 //		g_int10mscnt =  -5;		// peiod 10ms x  5 = 50ms  20fps

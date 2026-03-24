@@ -112,7 +112,7 @@ void pulse_out_init(void)
     s_speed_cnt   = 0u;
     s_speed_level = 0u;
 
-    /* 10kHz CMT タイマー起動（emWin が CMT0 使用中 → CMT1 が自動選択される） */
+    /* 10kHz CMT タイマー起動（CMT0 は LVGL tick で使用中 → CMT1 が自動選択される） */
     R_CMT_CreatePeriodic(PULSE_OUT_TIMER_HZ, pulse_out_isr, &s_cmt_handle);
 }
 

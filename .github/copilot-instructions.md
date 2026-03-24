@@ -8,7 +8,6 @@
 以下のファイル/フォルダは Smart Configurator (e2 studio) が自動生成・管理するため、**絶対に直接編集しないこと**：
 - `src/smc_gen/` 配下のすべてのファイル
 - `src/smc_gen/r_config/` 配下の設定ファイル
-- `qe_emwin_config.h`
 - `*.scfg` ファイル
 
 これらのパラメータを変更する必要がある場合は、ユーザーに「Smart Configuratorで変更してください」と伝えること。
@@ -32,7 +31,7 @@
 ## 開発環境
 - MCU: Renesas RX72N
 - IDE: e2 studio (Smart Configurator)
-- GUI: emWin (AppWizard)
+- GUI: LVGL 8.3 (EEZ Studio)
 - ツールチェーン: GCC-RX
 
 ## AndroidアプリのPCデバッグ手順

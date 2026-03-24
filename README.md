@@ -10,7 +10,7 @@ ECUからCANバス経由で送られる車両情報を受信し、800×256ドッ
 ## 技術スタック
 - **マイコン:** ルネサスRX72N（RXv3コア、240MHz、4MB Flash、1MB SRAM、GLCDC内蔵）  
 - **IDE:** Renesas e²studio + GCC-RX / VS Code対応  
-- **グラフィック:** SEGGER emWin（QE for Display経由、AppWizard対応）  
+- **グラフィック:** LVGL 8.3（EEZ Studio）  
 - **ドライバ:** Smart Configurator生成コードとFITモジュール  
 - **通信:** USB CDC（ファームウェア更新・パラメータ設定）、CAN（車両データ）  
 - **周辺機能:** I²C、ADC、タイマ、外部EEPROM、Neopixel対応LED  

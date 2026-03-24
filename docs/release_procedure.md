@@ -79,17 +79,13 @@ powershell -ExecutionPolicy Bypass -File tools/capture_thumbnails.ps1 -Version "
 ```
 
 スクリプトは以下を自動で行います：
-- `Firmware/aw001`, `aw002`, ... フォルダを自動検出
-- GUI_Lib がない場合は AppWizard インストール先から自動コピー
-- GUISimulation.exe がない場合は MSBuild で自動ビルド
 - LCD領域（800×256）のみをキャプチャ
 
 ### 3.2 出力確認
 
 ```
 test-release/
-  thumbnail_v0.1.3_aw001.png  ← Standard Theme
-  thumbnail_v0.1.3_aw002.png  ← Racing Theme
+  thumbnail_v0.1.3.png
 ```
 
 ### 3.3 サムネイル仕様
@@ -105,7 +101,7 @@ test-release/
 
 - スクリプト実行中はGUISimulationウィンドウが表示されます（自動的に閉じます）
 - キャプチャ中に他のウィンドウを操作しないでください
-- GUI_Lib, Exe, Output フォルダは `.gitignore` で除外済み（SEGGER機密コード保護）
+- GUI_Lib, Exe, Output フォルダは `.gitignore` で除外済み
 
 ---
 

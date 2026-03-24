@@ -70,7 +70,7 @@ static uint32_t s_startup_ms    = 0;
 static bool     s_telltale_done = false;
 
 /* --- Fuel warning hysteresis state ---------------------------------------- */
-/* emWin互換: 5%未満で点灯、10%超で消灯、5〜10%の間は前状態を保持 */
+/* 5%未満で点灯、10%超で消灯、5〜10%の間は前状態を保持 */
 static bool s_warn_fuel = false;
 
 /* --- RPM Peak Hold state -------------------------------------------------- */

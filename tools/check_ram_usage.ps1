@@ -13,20 +13,20 @@ if (-not (Test-Path $MapFile)) {
 
 $map = Get-Content $MapFile
 
-# === メモリマップ定義 (qe_emwin_config.h より) ===
+# === メモリマップ定義 (linker_script.ld / lv_port_disp.c より) ===
 # フレームバッファサイズ: 800 x 256 x 2bytes = 409,600 bytes (0x64000)
 $FB_SIZE = 0x64000  # 409,600 bytes
 
 # 低位RAM (0x00000000-0x0007FFFF, 512KB)
 $LOWRAM_START = 0x00000000
 $LOWRAM_END   = 0x00080000
-$FB2_START    = 0x00000040  # EMWIN_GUI_FRAME_BUFFER2
+$FB2_START    = 0x00000040  # GLCDC Frame Buffer 2
 $FB2_END      = $FB2_START + $FB_SIZE  # 0x00064040
 
 # 高位RAM (0x00800000-0x0087FFFF, 512KB)  
 $HIGHRAM_START = 0x00800000
 $HIGHRAM_END   = 0x00880000
-$FB1_START     = 0x00800000  # EMWIN_GUI_FRAME_BUFFER1
+$FB1_START     = 0x00800000  # GLCDC Frame Buffer 1
 $FB1_END       = $FB1_START + $FB_SIZE  # 0x00864000
 
 # BSS領域 (リンカスクリプトより)

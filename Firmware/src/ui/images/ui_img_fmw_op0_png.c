@@ -19,10 +19,10 @@
 #include "../ui.h"
 
 /* ピクセルデータは imgwrite が書き込む固定アドレスを直接参照。
- * AppWizard形式は 12バイトヘッダ (BM magic + image info) の後にRGB565ピクセルが続く。
+ * 画像データは 12バイトヘッダ (BM magic + image info) の後にRGB565ピクセルが続く。
  * Terminal/Androidアプリが書き込むデータはこの形式のため、ヘッダをスキップする。 */
-#define APPWIZARD_HEADER_SIZE     12
-#define STARTUP_IMAGE_PIXEL_ADDR  ((const uint8_t *)(0xFFE00000UL + APPWIZARD_HEADER_SIZE))
+#define IMAGE_HEADER_SIZE     12
+#define STARTUP_IMAGE_PIXEL_ADDR  ((const uint8_t *)(0xFFE00000UL + IMAGE_HEADER_SIZE))
 
 const lv_img_dsc_t ui_img_fmw_op0_png = {
     .header.always_zero = 0,

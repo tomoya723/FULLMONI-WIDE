@@ -2,7 +2,7 @@
 
 ## 概要
 
-現在のFirmware内部処理では、CAN ID、物理値への変換式、emWin変数への代入などが**固定記述（ハードコード）**されています。
+現在のFirmware内部処理では、CAN ID、物理値への変換式、LVGL変数への代入などが**固定記述（ハードコード）**されています。
 本Issueでは、これらをHostAppを使ったパラメータ書き込み処理に変更し、**ユーザーカスタム化**を実現します。
 
 ---
@@ -74,7 +74,7 @@ typedef struct __attribute__((packed)) {
     uint8_t  byte_count;        /* バイト数 (1, 2, 4) */
     uint8_t  data_type;         /* データ型: 0=unsigned, 1=signed */
     uint8_t  endian;            /* エンディアン: 0=Big, 1=Little */
-    uint8_t  target_var;        /* 代入先emWin変数ID */
+    uint8_t  target_var;        /* 代入先変数ID */
     int16_t  offset;            /* オフセット値 (加算後) */
     uint16_t multiplier;        /* 乗算係数 (x1000) */
     uint16_t divisor;           /* 除算係数 (x1000) */

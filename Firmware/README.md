@@ -1,5 +1,5 @@
 ## FULLMONI-WIDE：Firmware
-Renesas e2Studio + GNU GCC-RX + SEGGER emWIN<br>
+Renesas e2Studio + GNU GCC-RX + LVGL 8.3 (EEZ Studio)<br>
 順次更新予定
 ***
 ## サードパーティライセンスについて
@@ -7,13 +7,9 @@ Renesas e2Studio + GNU GCC-RX + SEGGER emWIN<br>
 - ただし、以下の**第三者提供物**は各社の条件が優先されます（＝MITの適用外）:
   - **Renesas FIT / 生成コード**（`smc_gen` 等）
     - Renesas製品上での利用を前提とする無保証ライセンス。著作権表記・免責コメントを改変せず保持してください。
-  - **SEGGER emWin**（GUIライブラリ）
-    - 本リポジトリでは **再配布しません**。スマートコンフィグレータからコード生成を実行し`r_emwin_rx`をプロジェクトに追加してください。
-    - emWinは再配布禁止条項があり、SEGGERの明示許諾なしに第三者へ配布できません。
 ### ライセンスの適用範囲
 - **MIT**: オリジナルコード全般
 - **Renesasライセンス**: FIT/生成コード
-- **SEGGERライセンス**: emWin（再配布不可）
 
 詳細は `THIRD_PARTY_NOTICES.md` を参照してください。
 
@@ -21,13 +17,9 @@ Renesas e2Studio + GNU GCC-RX + SEGGER emWIN<br>
 - However, the following **third-party materials** are subject to the terms and conditions of each company (i.e., not covered by the MIT License):
 - **Renesas FIT / Generated Code** (e.g., `smc_gen`)
 - A no-warranty license intended for use on Renesas products. Please retain the copyright notices and disclaimer comments without modification.
-  - **SEGGER emWin** (GUI library)
-- This repository does not redistribute emWin. Please generate code using the Smart Configurator and add `r_emwin_rx` to your project.
-- emWin has a redistribution prohibition clause, and cannot be distributed to third parties without explicit permission from SEGGER.
 ### Scope of License Application
 - **MIT**: Original code in general
 - **Renesas License**: FIT/generated code
-- **SEGGER License**: emWin (redistribution prohibited)
 
 For details, refer to `THIRD_PARTY_NOTICES.md`.
 
@@ -227,7 +219,7 @@ FULLMONI-WIDEは、USB CDC経由で起動画面の読み取り・書き込みを
 |------|-----|
 | 解像度 | 765×256 ピクセル |
 | 色深度 | RGB565 (16bit/pixel) |
-| ヘッダ | 16バイト (SEGGER AppWizard形式) |
+| ヘッダ | 12バイト (BM magic + image info) |
 | 総サイズ | 391,696バイト |
 
 ### 転送プロトコル（書き込み: imgwrite）
@@ -278,26 +270,24 @@ uint16_t crc16_ccitt(const uint8_t *data, size_t len) {
 
 #### 固定アドレス配置について
 
-起動画像データ(acmtc配列)は、リンカスクリプトにより固定アドレス`0xFFE00000`に配置されます。
+起動画像データ(`fmw_op0.c`)はリンカスクリプトにより固定アドレス`0xFFE00000`に配置されます。
 これにより、**ファームウェア更新後もカスタム起動画像が保持されます**。
 
 ```
 フラッシュメモリ配置:
 0xFFC20000  ファームウェアヘッダ
 0xFFC20040  .text, .rodata等 (コード/データ)
-            ※ mtc.oは除外
+            ※ fmw_op0.oは除外
             :
 0xFFE00000  .startup_image セクション ← 起動画像固定領域
-            acmtc配列 (384KB)          imgwriteの書き込み先
+            acfmw_op0配列 (384KB)      imgwriteの書き込み先
             :
 0xFFFFFF80  .exvectors
 ```
 
 リンカスクリプト(`linker_script.ld`)の設定:
-- `EXCLUDE_FILE(*mtc.o)` で `.rodata` から除外
-- `.startup_image` セクションで `mtc.o` を固定アドレスに配置
-
-AppWizard生成の `mtc.c` は変更不要です。
+- `EXCLUDE_FILE(*fmw_op0.o)` で `.rodata` から除外
+- `.startup_image` セクションで `fmw_op0.o` を固定アドレスに配置
 
 ### 実装ファイル
 
