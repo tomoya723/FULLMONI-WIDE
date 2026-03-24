@@ -124,9 +124,8 @@ SECTIONS
 	.bss :
 	{
 		_bss = .;
-		/* GUIConf.o はRAM2(.bss2)に配置するため除外 */
-		EXCLUDE_FILE(*GUIConf.o) *(.bss)
-		EXCLUDE_FILE(*GUIConf.o) *(.bss.**)
+		*(.bss)
+		*(.bss.**)
 		*(COMMON)
 		*(B)
 		*(B_1)
@@ -135,16 +134,13 @@ SECTIONS
 		. = ALIGN(128);
 		_end = .;
 	} >RAM AT>RAM
-	/* Issue #65: CAN設定用の追加RAM領域 (高位RAM 0x00864000-0x0087FFFF) */
-	/* GUIConf.o (emWin設定、約80KB) もRAM2に配置してLow RAMの空きを確保 */
+	/* 高位RAM2: LVGL描画バッファ等を配置 */
 	/* NOLOAD: 初期化不要なBSSセクションはMOTファイルに含めない */
 	.bss2 (NOLOAD) :
 	{
 		_bss2 = .;
 		*(.bss2)
 		*(.bss2.*)
-		*GUIConf.o(.bss)
-		*GUIConf.o(.bss.*)
 		_ebss2 = .;
 	} >RAM2
 	.ofs1 0xFE7F5D00 : AT(0xFE7F5D00)
