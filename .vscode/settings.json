@@ -12,7 +12,10 @@
         "*.c": "c",
         "*.cfg": "ini",
         "*.scfg": "xml",
-        "*.ld": "ld-script"
+        "*.ld": "plaintext"
+    },
+    "[plaintext]": {
+        "editor.formatOnSave": false
     },
     "files.exclude": {
         "**/HardwareDebug/*.o": true,
@@ -44,5 +47,8 @@
                 }
             ]
         }
-    ]
+    ],
+    "files.readonlyInclude": {
+        "**/linker_script.ld": true
+    }
 }

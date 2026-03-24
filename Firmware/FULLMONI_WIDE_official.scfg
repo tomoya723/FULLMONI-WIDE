@@ -951,51 +951,6 @@
             <source description="Components supporting Firmware Integration Technology" display="Firmware Integration Technology" id="com.renesas.smc.tools.swcomponent.fit.source"/>
             <source description="Components supporting Firmware Integration Technology" display="Firmware Integration Technology" id="com.renesas.smc.tools.swcomponent.fit.source"/>
         </configuration>
-        <configuration inuse="true" name="r_emwin_rx">
-            <component description="依存モジュール: r_cmt_rx バージョン 5.40&#10;依存モジュール: r_gpio_rx バージョン 4.70&#10;emWin is designed to provide an efficient, processor- and display controller-independent graphical user interface for any application that operates with a graphical display. It is compatible with single-task and multitask environments, with a proprietary operating system or with any commercial RTOS. emWin is shipped as C source code. It may be adapted to any size physical and virtual display with any display controller and CPU.&#10;The version number 6.32a means the version of emWin library, and 1.00 means that of FIT module.&#10;This FIT module includes an installer of AppWizard v1.36a." detailDescription="Graphic Library with Graphical User Interface" display="r_emwin_rx" id="r_emwin_rx6.32.a.1.00" version="6.32.a.1.00">
-                <gridItem id="EMWIN_GUI_NUM_BYTES" selectedIndex="112640"/>
-                <gridItem id="EMWIN_XSIZE_PHYS" selectedIndex="800"/>
-                <gridItem id="EMWIN_YSIZE_PHYS" selectedIndex="256"/>
-                <gridItem id="EMWIN_BITS_PER_PIXEL" selectedIndex="3"/>
-                <gridItem id="EMWIN_DISPLAY_ORIENTATION" selectedIndex="0"/>
-                <gridItem id="EMWIN_USE_RUNTIME_ORIENTATION" selectedIndex="0"/>
-                <gridItem id="EMWIN_LCD_IF" selectedIndex="3"/>
-                <gridItem id="EMWIN_NUM_BUFFERS" selectedIndex="2"/>
-                <gridItem id="EMWIN_GUI_FRAME_BUFFER1" selectedIndex="0x00800000"/>
-                <gridItem id="EMWIN_GUI_FRAME_BUFFER2" selectedIndex="0x00840000"/>
-                <gridItem id="EMWIN_GUI_FRAME_BUFFER3" selectedIndex="0x00000000"/>
-                <gridItem id="EMWIN_USE_DRW2D" selectedIndex="1"/>
-                <gridItem id="EMWIN_DMAC_NUMBER" selectedIndex="0"/>
-                <gridItem id="EMWIN_DMAC_NUMBER2" selectedIndex="1"/>
-                <gridItem id="EMWIN_INIT_DMAC" selectedIndex="1"/>
-                <gridItem id="EMWIN_SELECT_DMAC_DTC" selectedIndex="2"/>
-                <gridItem id="EMWIN_LCD_IF_NUMBER" selectedIndex="0"/>
-                <gridItem id="EMWIN_LCD_DRIVER_IC" selectedIndex="0"/>
-                <gridItem id="EMWIN_LCD_BAUDRATE" selectedIndex="1000000"/>
-                <gridItem id="EMWIN_GUI_USE_CACHE" selectedIndex="0"/>
-                <gridItem id="EMWIN_USE_DISP_SIGNAL_PIN" selectedIndex="1"/>
-                <gridItem id="EMWIN_DISP_SIGNAL_PIN" selectedIndex="GPIO_PORT_B_PIN_3"/>
-                <gridItem id="EMWIN_USE_BACKLIGHT_PIN" selectedIndex="1"/>
-                <gridItem id="EMWIN_BACKLIGHT_PIN" selectedIndex="GPIO_PORT_6_PIN_7"/>
-                <gridItem id="EMWIN_USE_DATA_CMD_PIN" selectedIndex="1"/>
-                <gridItem id="EMWIN_DATA_CMD_PIN" selectedIndex="GPIO_PORT_B_PIN_7"/>
-                <gridItem id="EMWIN_USE_LCD_CS_PIN" selectedIndex="1"/>
-                <gridItem id="EMWIN_LCD_CS_PIN" selectedIndex="GPIO_PORT_B_PIN_1"/>
-                <gridItem id="EMWIN_USE_TOUCH" selectedIndex="1"/>
-                <gridItem id="EMWIN_TOUCH_IF" selectedIndex="3"/>
-                <gridItem id="EMWIN_TOUCH_IF_NUMBER" selectedIndex="0"/>
-                <gridItem id="EMWIN_SLAVE_ADDRESS" selectedIndex="0x00000038"/>
-                <gridItem id="EMWIN_TOUCH_BAUDRATE" selectedIndex="1000000"/>
-                <gridItem id="EMWIN_USE_MULTITOUCH" selectedIndex="0"/>
-                <gridItem id="EMWIN_MAX_NUM_TOUCHPOINTS" selectedIndex="10"/>
-                <gridItem id="EMWIN_USE_TOUCH_IC_RESET_PIN" selectedIndex="1"/>
-                <gridItem id="EMWIN_TOUCH_IC_RESET_PIN" selectedIndex="GPIO_PORT_6_PIN_6"/>
-                <gridItem id="EMWIN_USE_TOUCH_CS_PIN" selectedIndex="1"/>
-                <gridItem id="EMWIN_TOUCH_CS_PIN" selectedIndex="GPIO_PORT_9_PIN_3"/>
-            </component>
-            <source description="Components supporting Firmware Integration Technology" display="Firmware Integration Technology" id="com.renesas.smc.tools.swcomponent.fit.source"/>
-            <source description="Components supporting Firmware Integration Technology" display="Firmware Integration Technology" id="com.renesas.smc.tools.swcomponent.fit.source"/>
-        </configuration>
         <configuration inuse="true" name="r_gpio_rx">
             <component description="依存モジュール: r_bsp バージョン 7.40&#10;This code implements a General Purpose Input/Output driver. Common features such as reading, writing, and setting the direction of ports and pins is supported. Enabling features such as open-drain outputs and internal pull-ups are also supported." detailDescription="GPIO Driver" display="r_gpio_rx" id="r_gpio_rx5.00" version="5.00">
                 <gridItem id="GPIO_CFG_PARAM_CHECKING_ENABLE" selectedIndex="0"/>
