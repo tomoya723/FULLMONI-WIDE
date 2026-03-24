@@ -53,7 +53,7 @@
  *====================*/
 
 /* Default display refresh period in ms */
-#define LV_DISP_DEF_REFR_PERIOD 10  /* 10ms = max 100fps target */
+#define LV_DISP_DEF_REFR_PERIOD 16  /* 16ms ≈ max 60fps (LCD is 60Hz fixed) */
 
 /* Input device read period in ms */
 #define LV_INDEV_DEF_READ_PERIOD 30

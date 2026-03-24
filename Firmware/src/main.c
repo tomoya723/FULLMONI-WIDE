@@ -136,17 +136,26 @@ void main(void)
 
 	// Graphics init (LVGL)
 	lv_init();
+	lv_port_disp_init();
 
-	/* lv_init() が生成するデフォルトスクリーンは白背景。
-	 * ui_init() の FADE_IN 遷移中にこの白が描画されるのを防ぐため先に黒にする。 */
+	/* lv_port_disp_init() が登録したデフォルトスクリーンは白背景。
+	 * ui_init() の FADE_IN 遷移中にこの白が描画されるのを防ぐため黒にする。
+	 * ※ lv_port_disp_init() の後でなければ lv_scr_act() は NULL を返す。 */
 	lv_obj_set_style_bg_color(lv_scr_act(), lv_color_black(), LV_PART_MAIN);
 
-	lv_port_disp_init();
 	ui_dashboard_create();
 
-	/* ui_init() → loadScreen() が lv_scr_load_anim(FADE_IN, 200ms) を発行するが、
-	 * 起動時はバックライトON前にフレームバッファを確定させる必要がある。
-	 * アニメーションシステムを迂回し、即座にスクリーンを設定する。 */
+	/* ui_init() → loadScreen() が lv_scr_load_anim(FADE_IN, 200ms) を発行し
+	 * d->scr_to_load = screen1 がセットされる。
+	 * lv_disp_load_scr() は内部で scr_to_load == new_scr を検出して即 return するため
+	 * アニメーションを手動でキャンセルし、即座にスクリーンをロードする。 */
+	{
+		lv_disp_t *d = lv_disp_get_default();
+		lv_anim_del(d->act_scr, NULL);
+		lv_anim_del(objects.screen1, NULL);
+		lv_obj_remove_local_style_prop(objects.screen1, LV_STYLE_OPA, 0);
+		d->scr_to_load = NULL;
+	}
 	lv_disp_load_scr(objects.screen1);
 
 	/* 初回レンダリング: バックライトOFF中 (TGRD=0) のため白画面は見えない。
