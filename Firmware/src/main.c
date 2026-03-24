@@ -26,6 +26,7 @@
 #include "lv_port/lv_port_disp.h"
 #include "lv_port/lv_port_tick.h"
 #include "ui_binding/ui_dashboard.h"
+#include "ui/screens.h"
 
 // --------------------------------------------------------------------
 // グローバル変数宣言
@@ -137,6 +138,10 @@ void main(void)
 	lv_init();
 	lv_port_disp_init();
 	ui_dashboard_create();
+
+	/* 起動画像を表示 (Openingコンテナを可視化) */
+	lv_obj_clear_flag(objects.ui_container_opening, LV_OBJ_FLAG_HIDDEN);
+
 	/* 初回レンダリング: バックライトOFF中 (TGRD=0) のため白画面は見えない。
 	 * 256行/16行バッファ=16バンド。非同期DMAを含む全バンドをフラッシュするため
 	 * 複数回呼び出してフレームバッファを確定させる。 */
@@ -222,11 +227,15 @@ void main(void)
 	// パルス出力初期化（Issue #115: EPS駆動用タコ・車速パルス出力）
 	pulse_out_init();
 
+	/* 起動画像を非表示にしてダッシュボードに切り替え */
+	lv_obj_add_flag(objects.ui_container_opening, LV_OBJ_FLAG_HIDDEN);
+	lv_timer_handler();
+
 	/*
 	 * メインループ
 	 *
 	 * 通常動作時: USB最小監視（PARAM_ENTERのみ検出）
-	 *            → emWin/CAN処理に100%集中、33fps維持
+	 *            → LVGL/CAN処理に100%集中、33fps維持
 	 * パラメータモード時: USB CDC フル通信
 	 *            → 設定画面表示、コマンド処理
 	 */
