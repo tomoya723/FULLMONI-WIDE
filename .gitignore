@@ -92,9 +92,9 @@ HostApp/FULLMONI-WIDE-Desktop/.gradle/
 
 /.metadata/
 
-# EEZ Studio project (user builds locally)
-Firmware/eez/
+# EEZ Studio build artifacts & UI state
 **/.eez-project-build
+*-ui-state
 
 # Build logs
 build_log.txt
