@@ -17,7 +17,7 @@ namespace eez {
 void executeActionFunction(int actionId) {
 	eez::flow::executeLvglActionHook(actionId - 1);
 }
-} 
+}
 // -----------------------------------------------------------------------------
 // core/alloc.cpp
 // -----------------------------------------------------------------------------
@@ -73,7 +73,7 @@ void getAllocInfo(uint32_t &free, uint32_t &alloc) {
 	alloc = mon.total_size - mon.free_size - g_allocMemoryAtStart;
 #endif
 }
-} 
+}
 // -----------------------------------------------------------------------------
 // core/assets.cpp
 // -----------------------------------------------------------------------------
@@ -160,7 +160,7 @@ const uint16_t *getThemeColors(int themeIndex) {
 const uint16_t *getColors() {
 	return static_cast<uint16_t *>(g_mainAssets->colorsDefinition->colors.items);
 }
-} 
+}
 // -----------------------------------------------------------------------------
 // core/debug.cpp
 // -----------------------------------------------------------------------------
@@ -186,12 +186,12 @@ void Trace(TraceType traceType, const char *format, ...) {
         pushErrorTraceHook(buffer, strlen(buffer));
     }
 }
-} 
-} 
+}
+}
 extern "C" void debug_trace(const char *str, size_t len) {
     eez::debug::pushDebugTraceHook(str, len);
 }
-#endif 
+#endif
 // -----------------------------------------------------------------------------
 // core/memory.cpp
 // -----------------------------------------------------------------------------
@@ -219,7 +219,7 @@ uint8_t *allocBuffer(uint32_t size) {
     return (uint8_t *)lv_mem_alloc(size);
 #endif
 }
-} 
+}
 // -----------------------------------------------------------------------------
 // core/os.cpp
 // -----------------------------------------------------------------------------
@@ -234,122 +234,122 @@ uint32_t millis() {
     return lv_tick_get();
 #endif
 }
-} 
+}
 // -----------------------------------------------------------------------------
 // core/unit.cpp
 // -----------------------------------------------------------------------------
 #include <string.h>
 namespace eez {
 const char *g_unitNames[] = {
-    "", 
-    "V", 
-    "mV", 
-    "A", 
-    "mA", 
-    "uA", 
-    "W", 
-    "mW", 
-    "s", 
-    "ms", 
-    DEGREE_SYMBOL"C", 
-    "rpm", 
-    "\xb4", 
-    "K\xb4", 
-    "M\xb4", 
-    "%", 
-    "Hz", 
-    "mHz", 
-    "KHz", 
-    "MHz", 
-    "J", 
-    "F", 
-    "mF", 
-    "uF", 
-    "nF", 
-    "pF", 
-    "minutes", 
-    "VA", 
-    "VAR", 
-	DEGREE_SYMBOL, 
-	"Vpp", 
-	"mVpp", 
-	"App", 
-	"mApp", 
-	"uApp", 
+    "",
+    "V",
+    "mV",
+    "A",
+    "mA",
+    "uA",
+    "W",
+    "mW",
+    "s",
+    "ms",
+    DEGREE_SYMBOL"C",
+    "rpm",
+    "\xb4",
+    "K\xb4",
+    "M\xb4",
+    "%",
+    "Hz",
+    "mHz",
+    "KHz",
+    "MHz",
+    "J",
+    "F",
+    "mF",
+    "uF",
+    "nF",
+    "pF",
+    "minutes",
+    "VA",
+    "VAR",
+	DEGREE_SYMBOL,
+	"Vpp",
+	"mVpp",
+	"App",
+	"mApp",
+	"uApp",
 };
 const Unit g_baseUnit[] = {
-	UNIT_NONE, 
-	UNIT_VOLT, 
-	UNIT_VOLT, 
-	UNIT_AMPER, 
-	UNIT_AMPER, 
-	UNIT_AMPER, 
-	UNIT_WATT, 
-	UNIT_WATT, 
-	UNIT_SECOND, 
-	UNIT_SECOND, 
-	UNIT_CELSIUS, 
-	UNIT_RPM, 
-	UNIT_OHM, 
-	UNIT_OHM, 
-	UNIT_OHM, 
-	UNIT_PERCENT, 
-	UNIT_HERTZ, 
-	UNIT_HERTZ, 
-	UNIT_HERTZ, 
-	UNIT_HERTZ, 
-	UNIT_JOULE, 
-	UNIT_FARAD, 
-	UNIT_FARAD, 
-	UNIT_FARAD, 
-	UNIT_FARAD, 
-	UNIT_FARAD, 
-	UNIT_SECOND, 
-	UNIT_VOLT_AMPERE, 
-	UNIT_VOLT_AMPERE, 
-	UNIT_DEGREE, 
-	UNIT_VOLT_PP, 
-	UNIT_VOLT_PP, 
-	UNIT_AMPER_PP, 
-	UNIT_AMPER_PP, 
-	UNIT_AMPER_PP, 
+	UNIT_NONE,
+	UNIT_VOLT,
+	UNIT_VOLT,
+	UNIT_AMPER,
+	UNIT_AMPER,
+	UNIT_AMPER,
+	UNIT_WATT,
+	UNIT_WATT,
+	UNIT_SECOND,
+	UNIT_SECOND,
+	UNIT_CELSIUS,
+	UNIT_RPM,
+	UNIT_OHM,
+	UNIT_OHM,
+	UNIT_OHM,
+	UNIT_PERCENT,
+	UNIT_HERTZ,
+	UNIT_HERTZ,
+	UNIT_HERTZ,
+	UNIT_HERTZ,
+	UNIT_JOULE,
+	UNIT_FARAD,
+	UNIT_FARAD,
+	UNIT_FARAD,
+	UNIT_FARAD,
+	UNIT_FARAD,
+	UNIT_SECOND,
+	UNIT_VOLT_AMPERE,
+	UNIT_VOLT_AMPERE,
+	UNIT_DEGREE,
+	UNIT_VOLT_PP,
+	UNIT_VOLT_PP,
+	UNIT_AMPER_PP,
+	UNIT_AMPER_PP,
+	UNIT_AMPER_PP,
 };
 const float g_unitFactor[] = {
-	1.0f, 
-	1.0f, 
-	1E-3f, 
-	1.0f, 
-	1E-3f, 
-	1E-6f, 
-	1.0f, 
-	1E-3f, 
-	1.0f, 
-	1E-3f, 
-	1.0f, 
-	1.0f, 
-	1.0f, 
-	1E3f, 
-	1E6f, 
-	1.0f, 
-	1.0f, 
-	1E-3f, 
-	1E3f, 
-	1E6f, 
-	1.0f, 
-	1.0f, 
-	1E-3f, 
-	1E-6f, 
-	1E-9f, 
-	1E-12f, 
-	60.0f, 
-	1.0f, 
-	1.0f, 
-	1.0f, 
-	1.0f, 
-	1E-3f, 
-	1.0f, 
-	1E-3f, 
-	1E-6f, 
+	1.0f,
+	1.0f,
+	1E-3f,
+	1.0f,
+	1E-3f,
+	1E-6f,
+	1.0f,
+	1E-3f,
+	1.0f,
+	1E-3f,
+	1.0f,
+	1.0f,
+	1.0f,
+	1E3f,
+	1E6f,
+	1.0f,
+	1.0f,
+	1E-3f,
+	1E3f,
+	1E6f,
+	1.0f,
+	1.0f,
+	1E-3f,
+	1E-6f,
+	1E-9f,
+	1E-12f,
+	60.0f,
+	1.0f,
+	1.0f,
+	1.0f,
+	1.0f,
+	1E-3f,
+	1.0f,
+	1E-3f,
+	1E-6f,
 };
 Unit getUnitFromName(const char *unitName) {
 	if (unitName) {
@@ -453,7 +453,7 @@ Unit getSmallestUnit(Unit unit, float min, float precision) {
 	}
 	return UNIT_UNKNOWN;
 }
-} 
+}
 // -----------------------------------------------------------------------------
 // core/util.cpp
 // -----------------------------------------------------------------------------
@@ -604,9 +604,9 @@ void stringAppendLoad(char *str, size_t maxStrLength, float value) {
 uint32_t crc32(const uint8_t *mem_block, size_t block_size) {
     uint32_t crc = 0xFFFFFFFF;
     for (size_t i = 0; i < block_size; ++i) {
-        uint32_t byte = mem_block[i]; 
+        uint32_t byte = mem_block[i];
         crc = crc ^ byte;
-        for (int j = 0; j < 8; ++j) { 
+        for (int j = 0; j < 8; ++j) {
             uint32_t mask = -((int32_t)crc & 1);
             crc = (crc >> 1) ^ (0xEDB88320 & mask);
         }
@@ -999,7 +999,7 @@ void getBaseFileName(const char *path, char *baseName, unsigned baseNameSize) {
     }
     baseName[n] = 0;
 }
-} 
+}
 #if defined(M_PI)
 static const float PI_FLOAT = (float)M_PI;
 #else
@@ -1177,7 +1177,7 @@ EasingFuncType g_easingFuncs[] = {
     eez_easeOutBounce,
     eez_easeInOutBounce,
 };
-} 
+}
 // -----------------------------------------------------------------------------
 // core/value.cpp
 // -----------------------------------------------------------------------------
@@ -1328,7 +1328,7 @@ static void FLOAT_value_to_text(const Value &value, char *text, int count) {
             floatValue /= getUnitFactor(unit);
         }
     } else {
-        floatValue = 0; 
+        floatValue = 0;
     }
     if (!isNaN(floatValue)) {
         if ((value.getOptions() & FLOAT_OPTIONS_LESS_THEN) != 0) {
@@ -1407,7 +1407,7 @@ static void DOUBLE_value_to_text(const Value &value, char *text, int count) {
             doubleValue /= getUnitFactor(unit);
         }
     } else {
-        doubleValue = 0; 
+        doubleValue = 0;
     }
     if (!isNaN(doubleValue)) {
         if ((value.getOptions() & FLOAT_OPTIONS_LESS_THEN) != 0) {
@@ -1628,7 +1628,7 @@ static const char *DATE_value_type_name(const Value &value) {
     return "date";
 }
 static bool compare_VERSIONED_STRING_value(const Value &a, const Value &b) {
-    return a.type == b.type && a.unit == b.unit; 
+    return a.type == b.type && a.unit == b.unit;
 }
 static void VERSIONED_STRING_value_to_text(const Value &value, char *text, int count) {
     const char *str = value.getString();
@@ -1856,7 +1856,7 @@ Value MakeEnumDefinitionValue(uint8_t enumValue, uint8_t enumDefinition) {
     return value;
 }
 const char *Value::getString() const {
-    auto value = getValue(); 
+    auto value = getValue();
 	if (value.type == VALUE_TYPE_STRING_REF) {
 		return ((StringRef *)value.refValue)->str;
 	}
@@ -2451,7 +2451,7 @@ void setVar(int16_t id, const Value& value) {
         set(value.getString());
     }
 }
-} 
+}
 // -----------------------------------------------------------------------------
 // flow/components.cpp
 // -----------------------------------------------------------------------------
@@ -2515,35 +2515,35 @@ static ExecuteComponentFunctionType g_executeComponentFunctions[] = {
 	executeDelayComponent,
 	executeErrorComponent,
 	executeCatchErrorComponent,
-	executeCounterComponent, 
+	executeCounterComponent,
 	executeLoopComponent,
 	executeShowPageComponent,
-	nullptr, 
+	nullptr,
     nullptr,
     nullptr,
     nullptr,
-	executeNoopComponent, 
-	nullptr, 
-    executeSelectLanguageComponent, 
+	executeNoopComponent,
+	nullptr,
+    executeSelectLanguageComponent,
     nullptr,
-    executeAnimateComponent, 
-    executeOnEventComponent, 
-    executeLVGLComponent, 
+    executeAnimateComponent,
+    executeOnEventComponent,
+    executeLVGLComponent,
     nullptr,
-    executeSortArrayComponent, 
-    executeLVGLUserWidgetComponent, 
-    executeTestAndSetComponent, 
-    executeMQTTInitComponent, 
-    executeMQTTConnectComponent, 
-    executeMQTTDisconnectComponent, 
-    executeMQTTEventComponent, 
-    executeMQTTSubscribeComponent, 
-    executeMQTTUnsubscribeComponent, 
-    executeMQTTPublishComponent, 
-    executeLabelInComponent, 
-    executeLabelOutComponent, 
-    executeLVGLApiComponent, 
-    executeSetColorThemeComponent,  
+    executeSortArrayComponent,
+    executeLVGLUserWidgetComponent,
+    executeTestAndSetComponent,
+    executeMQTTInitComponent,
+    executeMQTTConnectComponent,
+    executeMQTTDisconnectComponent,
+    executeMQTTEventComponent,
+    executeMQTTSubscribeComponent,
+    executeMQTTUnsubscribeComponent,
+    executeMQTTPublishComponent,
+    executeLabelInComponent,
+    executeLabelOutComponent,
+    executeLVGLApiComponent,
+    executeSetColorThemeComponent,
 };
 void registerComponent(ComponentTypes componentType, ExecuteComponentFunctionType executeComponentFunction) {
 	if (componentType >= defs_v3::COMPONENT_TYPE_START_ACTION) {
@@ -2575,8 +2575,8 @@ void executeComponent(FlowState *flowState, unsigned componentIndex) {
 	snprintf(errorMessage, sizeof(errorMessage), "Unknown component at index = %d, type = %d\n", componentIndex, component->type);
 	throwError(flowState, componentIndex, errorMessage);
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/animate.cpp
 // -----------------------------------------------------------------------------
@@ -2649,8 +2649,8 @@ void executeAnimateComponent(FlowState *flowState, unsigned componentIndex) {
         }
     }
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/call_action.cpp
 // -----------------------------------------------------------------------------
@@ -2707,8 +2707,8 @@ void executeCallActionComponent(FlowState *flowState, unsigned componentIndex) {
 	}
     executeCallAction(flowState, componentIndex, flowIndex, Value());
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/catch_error.cpp
 // -----------------------------------------------------------------------------
@@ -2720,8 +2720,8 @@ void executeCatchErrorComponent(FlowState *flowState, unsigned componentIndex) {
     deallocateComponentExecutionState(flowState, componentIndex);
 	propagateValueThroughSeqout(flowState, componentIndex);
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/compare.cpp
 // -----------------------------------------------------------------------------
@@ -2750,8 +2750,8 @@ void executeCompareComponent(FlowState *flowState, unsigned componentIndex) {
     }
 	propagateValueThroughSeqout(flowState, componentIndex);
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/constant.cpp
 // -----------------------------------------------------------------------------
@@ -2766,8 +2766,8 @@ void executeConstantComponent(FlowState *flowState, unsigned componentIndex) {
 	propagateValue(flowState, componentIndex, 1, sourceValue);
 	propagateValueThroughSeqout(flowState, componentIndex);
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/counter.cpp
 // -----------------------------------------------------------------------------
@@ -2794,8 +2794,8 @@ void executeCounterComponent(FlowState *flowState, unsigned componentIndex) {
         propagateValue(flowState, componentIndex, 1);
     }
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/delay.cpp
 // -----------------------------------------------------------------------------
@@ -2833,8 +2833,8 @@ void executeDelayComponent(FlowState *flowState, unsigned componentIndex) {
 		}
 	}
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/end.cpp
 // -----------------------------------------------------------------------------
@@ -2850,8 +2850,8 @@ void executeEndComponent(FlowState *flowState, unsigned componentIndex) {
 		stopScriptHook();
 	}
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/error.cpp
 // -----------------------------------------------------------------------------
@@ -2864,8 +2864,8 @@ void executeErrorComponent(FlowState *flowState, unsigned componentIndex) {
 	}
 	throwError(flowState, componentIndex, FlowError::Plain(expressionValue.getString()));
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/expr_eval.cpp
 // -----------------------------------------------------------------------------
@@ -2879,8 +2879,8 @@ void executeEvalExprComponent(FlowState *flowState, unsigned componentIndex) {
 	propagateValue(flowState, componentIndex, 1, expressionValue);
 	propagateValueThroughSeqout(flowState, componentIndex);
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/input.cpp
 // -----------------------------------------------------------------------------
@@ -2934,8 +2934,8 @@ void executeInputComponent(FlowState *flowState, unsigned componentIndex) {
         inputActionComponentExecutionState->value = value;
     }
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/is_true.cpp
 // -----------------------------------------------------------------------------
@@ -2960,8 +2960,8 @@ void executeIsTrueComponent(FlowState *flowState, unsigned componentIndex) {
     }
 	propagateValueThroughSeqout(flowState, componentIndex);
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/label_in.cpp
 // -----------------------------------------------------------------------------
@@ -2971,8 +2971,8 @@ void executeLabelInComponent(FlowState *flowState, unsigned componentIndex) {
     EEZ_UNUSED(flowState);
     EEZ_UNUSED(componentIndex);
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/label_out.cpp
 // -----------------------------------------------------------------------------
@@ -2987,8 +2987,8 @@ void executeLabelOutComponent(FlowState *flowState, unsigned componentIndex) {
         propagateValueThroughSeqout(flowState, component->labelInComponentIndex);
     }
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/line_chart_widget.cpp
 // -----------------------------------------------------------------------------
@@ -3009,8 +3009,8 @@ void executeLogComponent(FlowState *flowState, unsigned componentIndex) {
     }
 	propagateValueThroughSeqout(flowState, componentIndex);
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/loop.cpp
 // -----------------------------------------------------------------------------
@@ -3086,8 +3086,8 @@ void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
         propagateValueThroughSeqout(flowState, componentIndex);
     }
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/lvgl.cpp
 // -----------------------------------------------------------------------------
@@ -3717,9 +3717,9 @@ ACTION_START(objStyleSetProperty)
             lv_obj_set_local_style_prop(obj, (lv_style_prop_t)property, style_value, part | state);
         } else {
             throwError(flowState, componentIndex, FlowError::NotFoundInAction("Font", str, "objStyleSetProperty", actionIndex));
-        }        
+        }
     } else if (
-#if LVGL_VERSION_MAJOR >= 9        
+#if LVGL_VERSION_MAJOR >= 9
         property == LV_STYLE_BG_IMAGE_SRC ||
         property == LV_STYLE_ARC_IMAGE_SRC
 #else
@@ -3737,11 +3737,11 @@ ACTION_START(objStyleSetProperty)
             lv_obj_set_local_style_prop(obj, (lv_style_prop_t)property, style_value, part | state);
         } else {
             throwError(flowState, componentIndex, FlowError::NotFoundInAction("Font", str, "objStyleSetProperty", actionIndex));
-        }        
+        }
     } else if (
         property == LV_STYLE_BG_COLOR ||
         property == LV_STYLE_BG_GRAD_COLOR ||
-#if LVGL_VERSION_MAJOR >= 9        
+#if LVGL_VERSION_MAJOR >= 9
         property == LV_STYLE_BG_IMAGE_RECOLOR ||
 #else
         property == LV_STYLE_BG_IMG_RECOLOR ||
@@ -4205,8 +4205,8 @@ void executeLVGLApiComponent(FlowState *flowState, unsigned componentIndex) {
     }
     propagateValueThroughSeqout(flowState, componentIndex);
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/lvgl_user_widget.cpp
 // -----------------------------------------------------------------------------
@@ -4270,8 +4270,8 @@ void executeLVGLUserWidgetComponent(FlowState *flowState, unsigned componentInde
         }
     }
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/mqtt.cpp
 // -----------------------------------------------------------------------------
@@ -4679,8 +4679,8 @@ void executeMQTTPublishComponent(FlowState *flowState, unsigned componentIndex) 
     }
     propagateValueThroughSeqout(flowState, componentIndex);
 }
-} 
-} 
+}
+}
 #ifndef EEZ_MQTT_ADAPTER
 int eez_mqtt_init(const char *protocol, const char *host, int port, const char *username, const char *password, void **handle) {
     EEZ_UNUSED(protocol);
@@ -4728,8 +4728,8 @@ namespace flow {
 void executeNoopComponent(FlowState *flowState, unsigned componentIndex) {
 	propagateValueThroughSeqout(flowState, componentIndex);
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/on_event.cpp
 // -----------------------------------------------------------------------------
@@ -4739,8 +4739,8 @@ void executeOnEventComponent(FlowState *flowState, unsigned componentIndex) {
     propagateValue(flowState, componentIndex, 1, flowState->eventValue);
 	propagateValueThroughSeqout(flowState, componentIndex);
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/output.cpp
 // -----------------------------------------------------------------------------
@@ -4773,8 +4773,8 @@ void executeOutputComponent(FlowState *flowState, unsigned componentIndex) {
     }
     propagateValue(flowState->parentFlowState, flowState->parentComponentIndex, parentComponentOutputIndex, value);
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/select_language.cpp
 // -----------------------------------------------------------------------------
@@ -4800,8 +4800,8 @@ void executeSelectLanguageComponent(FlowState *flowState, unsigned componentInde
     snprintf(message, sizeof(message), "Unknown language %s", language);
     throwError(flowState, componentIndex, FlowError::Plain(message));
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/set_color_theme.cpp
 // -----------------------------------------------------------------------------
@@ -4817,8 +4817,8 @@ void executeSetColorThemeComponent(FlowState *flowState, unsigned componentIndex
 	const char *theme = themeValue.getString();
     lvglSetColorThemeHook(theme);
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/set_variable.cpp
 // -----------------------------------------------------------------------------
@@ -4841,8 +4841,8 @@ void executeSetVariableComponent(FlowState *flowState, unsigned componentIndex) 
     }
 	propagateValueThroughSeqout(flowState, componentIndex);
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/show_page.cpp
 // -----------------------------------------------------------------------------
@@ -4856,8 +4856,8 @@ void executeShowPageComponent(FlowState *flowState, unsigned componentIndex) {
 	replacePageHook(component->page, 0, 0, 0);
 	propagateValueThroughSeqout(flowState, componentIndex);
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/sort_array.cpp
 // -----------------------------------------------------------------------------
@@ -4945,8 +4945,8 @@ void executeSortArrayComponent(FlowState *flowState, unsigned componentIndex) {
     sortArray(component, array);
 	propagateValue(flowState, componentIndex, component->outputs.count - 1, arrayValue);
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/start.cpp
 // -----------------------------------------------------------------------------
@@ -4955,8 +4955,8 @@ namespace flow {
 void executeStartComponent(FlowState *flowState, unsigned componentIndex) {
 	propagateValueThroughSeqout(flowState, componentIndex);
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/switch.cpp
 // -----------------------------------------------------------------------------
@@ -4988,8 +4988,8 @@ void executeSwitchComponent(FlowState *flowState, unsigned componentIndex) {
     }
 	propagateValueThroughSeqout(flowState, componentIndex);
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/test_and_set.cpp
 // -----------------------------------------------------------------------------
@@ -5011,8 +5011,8 @@ void executeTestAndSetComponent(FlowState *flowState, unsigned componentIndex) {
         addToQueue(flowState, componentIndex, -1, -1, -1, true);
     }
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/components/watch_variable.cpp
 // -----------------------------------------------------------------------------
@@ -5041,8 +5041,8 @@ void executeWatchVariableComponent(FlowState *flowState, unsigned componentIndex
 		}
 	}
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/date.cpp
 // -----------------------------------------------------------------------------
@@ -5069,9 +5069,9 @@ static struct {
     TimeChangeRule dstStart;
     TimeChangeRule dstEnd;
 } g_dstRules[] = {
-    { { Last, Sun, Mar, 2 }, { Last, Sun, Oct, 3 } },    
-    { { Second, Sun, Mar, 2 }, { First, Sun, Nov, 2 } }, 
-    { { First, Sun, Oct, 2 }, { First, Sun, Apr, 3 } },  
+    { { Last, Sun, Mar, 2 }, { Last, Sun, Oct, 3 } },
+    { { Second, Sun, Mar, 2 }, { First, Sun, Nov, 2 } },
+    { { First, Sun, Oct, 2 }, { First, Sun, Apr, 3 } },
 };
 Format g_localeFormat = FORMAT_DMY_24;
 int g_timeZone = 0;
@@ -5115,14 +5115,14 @@ Date makeDate(int year, int month, int day, int hours, int minutes, int seconds,
     Date time = year * 365 * SECONDS_PER_DAY;
     for (int i = 0; i < year; i++) {
         if (LEAP_YEAR(i)) {
-            time += SECONDS_PER_DAY; 
+            time += SECONDS_PER_DAY;
         }
     }
     for (int i = 1; i < month; i++) {
         if ((i == 2) && LEAP_YEAR(year)) {
             time += SECONDS_PER_DAY * 29;
         } else {
-            time += SECONDS_PER_DAY * monthDays[i - 1]; 
+            time += SECONDS_PER_DAY * monthDays[i - 1];
         }
     }
     time += (day - 1) * SECONDS_PER_DAY;
@@ -5138,26 +5138,26 @@ void breakDate(Date time, int &result_year, int &result_month, int &result_day, 
     uint8_t month, monthLength;
     uint32_t days;
     result_milliseconds = time % 1000;
-    time /= 1000; 
+    time /= 1000;
     result_seconds = time % 60;
-    time /= 60; 
+    time /= 60;
     result_minutes = time % 60;
-    time /= 60; 
+    time /= 60;
     result_hours = time % 24;
-    time /= 24; 
+    time /= 24;
     year = 0;
     days = 0;
     while ((unsigned)(days += (LEAP_YEAR(year) ? 366 : 365)) <= time) {
         year++;
     }
-    result_year = year + 1970; 
+    result_year = year + 1970;
     days -= LEAP_YEAR(year) ? 366 : 365;
-    time -= days; 
+    time -= days;
     days = 0;
     month = 0;
     monthLength = 0;
     for (month = 0; month < 12; ++month) {
-        if (month == 1) { 
+        if (month == 1) {
             if (LEAP_YEAR(year)) {
                 monthLength = 29;
             } else {
@@ -5172,8 +5172,8 @@ void breakDate(Date time, int &result_year, int &result_month, int &result_day, 
             break;
         }
     }
-    result_month = month + 1; 
-    result_day = time + 1;    
+    result_month = month + 1;
+    result_day = time + 1;
 }
 int getYear(Date time) {
     int year, month, day, hours, minutes, seconds, milliseconds;
@@ -5258,24 +5258,24 @@ static uint8_t dayOfWeek(int y, int m, int d) {
 static Date timeChangeRuleToLocal(TimeChangeRule &r, int year) {
     uint8_t month = r.month;
     uint8_t week = r.week;
-    if (week == 0) {        
-        if (++month > 12) { 
+    if (week == 0) {
+        if (++month > 12) {
             month = 1;
             ++year;
         }
-        week = 1; 
+        week = 1;
     }
     Date time = makeDate(year, month, 1, r.hours, 0, 0, 0);
     uint8_t dow = dayOfWeek(year, month, 1);
     time += (7 * (week - 1) + (r.dow - dow + 7) % 7) * SECONDS_PER_DAY;
     if (r.week == 0) {
-        time -= 7 * SECONDS_PER_DAY; 
+        time -= 7 * SECONDS_PER_DAY;
     }
     return time;
 }
-} 
-} 
-} 
+}
+}
+}
 // -----------------------------------------------------------------------------
 // flow/debugger.cpp
 // -----------------------------------------------------------------------------
@@ -5287,31 +5287,31 @@ namespace eez {
 namespace flow {
 #define MAX_ARRAY_SIZE_TRANSFERRED_IN_DEBUGGER 1000
 enum MessagesToDebugger {
-    MESSAGE_TO_DEBUGGER_STATE_CHANGED, 
-    MESSAGE_TO_DEBUGGER_ADD_TO_QUEUE, 
-    MESSAGE_TO_DEBUGGER_REMOVE_FROM_QUEUE, 
-    MESSAGE_TO_DEBUGGER_GLOBAL_VARIABLE_INIT, 
-    MESSAGE_TO_DEBUGGER_LOCAL_VARIABLE_INIT, 
-    MESSAGE_TO_DEBUGGER_COMPONENT_INPUT_INIT, 
-    MESSAGE_TO_DEBUGGER_VALUE_CHANGED, 
-    MESSAGE_TO_DEBUGGER_FLOW_STATE_CREATED, 
-    MESSAGE_TO_DEBUGGER_FLOW_STATE_TIMELINE_CHANGED, 
-    MESSAGE_TO_DEBUGGER_FLOW_STATE_DESTROYED, 
-	MESSAGE_TO_DEBUGGER_FLOW_STATE_ERROR, 
-    MESSAGE_TO_DEBUGGER_LOG, 
-	MESSAGE_TO_DEBUGGER_PAGE_CHANGED, 
-    MESSAGE_TO_DEBUGGER_COMPONENT_EXECUTION_STATE_CHANGED, 
-    MESSAGE_TO_DEBUGGER_COMPONENT_ASYNC_STATE_CHANGED 
+    MESSAGE_TO_DEBUGGER_STATE_CHANGED,
+    MESSAGE_TO_DEBUGGER_ADD_TO_QUEUE,
+    MESSAGE_TO_DEBUGGER_REMOVE_FROM_QUEUE,
+    MESSAGE_TO_DEBUGGER_GLOBAL_VARIABLE_INIT,
+    MESSAGE_TO_DEBUGGER_LOCAL_VARIABLE_INIT,
+    MESSAGE_TO_DEBUGGER_COMPONENT_INPUT_INIT,
+    MESSAGE_TO_DEBUGGER_VALUE_CHANGED,
+    MESSAGE_TO_DEBUGGER_FLOW_STATE_CREATED,
+    MESSAGE_TO_DEBUGGER_FLOW_STATE_TIMELINE_CHANGED,
+    MESSAGE_TO_DEBUGGER_FLOW_STATE_DESTROYED,
+	MESSAGE_TO_DEBUGGER_FLOW_STATE_ERROR,
+    MESSAGE_TO_DEBUGGER_LOG,
+	MESSAGE_TO_DEBUGGER_PAGE_CHANGED,
+    MESSAGE_TO_DEBUGGER_COMPONENT_EXECUTION_STATE_CHANGED,
+    MESSAGE_TO_DEBUGGER_COMPONENT_ASYNC_STATE_CHANGED
 };
 enum MessagesFromDebugger {
-    MESSAGE_FROM_DEBUGGER_RESUME, 
-    MESSAGE_FROM_DEBUGGER_PAUSE, 
-    MESSAGE_FROM_DEBUGGER_SINGLE_STEP, 
-    MESSAGE_FROM_DEBUGGER_ADD_BREAKPOINT, 
-    MESSAGE_FROM_DEBUGGER_REMOVE_BREAKPOINT, 
-    MESSAGE_FROM_DEBUGGER_ENABLE_BREAKPOINT, 
-    MESSAGE_FROM_DEBUGGER_DISABLE_BREAKPOINT, 
-    MESSAGE_FROM_DEBUGGER_MODE 
+    MESSAGE_FROM_DEBUGGER_RESUME,
+    MESSAGE_FROM_DEBUGGER_PAUSE,
+    MESSAGE_FROM_DEBUGGER_SINGLE_STEP,
+    MESSAGE_FROM_DEBUGGER_ADD_BREAKPOINT,
+    MESSAGE_FROM_DEBUGGER_REMOVE_BREAKPOINT,
+    MESSAGE_FROM_DEBUGGER_ENABLE_BREAKPOINT,
+    MESSAGE_FROM_DEBUGGER_DISABLE_BREAKPOINT,
+    MESSAGE_FROM_DEBUGGER_MODE
 };
 enum LogItemType {
 	LOG_ITEM_TYPE_FATAL,
@@ -5917,8 +5917,8 @@ void onPageChanged(int previousPageId, int activePageId, bool activePageIsFromSt
         writeDebuggerBufferHook(buffer, strlen(buffer));
     }
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/expression.cpp
 // -----------------------------------------------------------------------------
@@ -6114,8 +6114,8 @@ bool evalAssignableProperty(FlowState *flowState, int componentIndex, int proper
     }
     return evalAssignableExpression(flowState, componentIndex, component->properties[propertyIndex]->evalInstructions, result, errorMessage, numInstructionBytes, iterators);
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/flow.cpp
 // -----------------------------------------------------------------------------
@@ -6346,8 +6346,8 @@ void onArrayValueFree(ArrayValue *arrayValue) {
         onFreeMQTTConnection(arrayValue);
     }
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/hooks.cpp
 // -----------------------------------------------------------------------------
@@ -6480,8 +6480,8 @@ double (*getDateNowHook)() = getDateNowDefaultImplementation;
 double (*getDateNowHook)() = nullptr;
 #endif
 void (*onFlowErrorHook)(FlowState *flowState, int componentIndex, const char *errorMessage) = nullptr;
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/lvgl_api.cpp
 // -----------------------------------------------------------------------------
@@ -6957,9 +6957,9 @@ extern "C" int compareRollerOptions(lv_roller_t *roller, const char *new_val, co
         }
     }
 #if LVGL_VERSION_MAJOR >= 9
-    return lv_roller_get_option_count((const lv_obj_t *)roller) == new_option_count ? 0 : 1;    
+    return lv_roller_get_option_count((const lv_obj_t *)roller) == new_option_count ? 0 : 1;
 #else
-    return lv_roller_get_option_cnt((const lv_obj_t *)roller) == new_option_count ? 0 : 1;    
+    return lv_roller_get_option_cnt((const lv_obj_t *)roller) == new_option_count ? 0 : 1;
 #endif
 }
 uint32_t eez_flow_get_selected_theme_index() {
@@ -9084,8 +9084,8 @@ EvalOperation g_evalOperations[] = {
     do_OPERATION_TYPE_FLOW_THEMES,
     do_OPERATION_TYPE_FLOW_GET_THEME_COLOR,
 };
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/private.cpp
 // -----------------------------------------------------------------------------
@@ -9709,8 +9709,8 @@ void throwError(FlowState *flowState, int componentIndex, const FlowError &error
 void enableThrowError(bool enable) {
     g_enableThrowError = enable;
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/queue.cpp
 // -----------------------------------------------------------------------------
@@ -9824,8 +9824,8 @@ void removeTasksFromQueueForFlowState(FlowState *flowState) {
         }
 	}
 }
-} 
-} 
+}
+}
 // -----------------------------------------------------------------------------
 // flow/watch_list.cpp
 // -----------------------------------------------------------------------------
@@ -9909,5 +9909,5 @@ void removeWatchesForFlowState(FlowState *flowState) {
 unsigned getWatchListSize() {
     return g_watchList.size;
 }
-} 
-} 
+}
+}

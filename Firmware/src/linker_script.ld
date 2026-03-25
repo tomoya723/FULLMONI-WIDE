@@ -5,7 +5,7 @@ MEMORY
 	ECCRAM : ORIGIN = 0x00FF8000, LENGTH = 0x8000
 	FW_HEADER : ORIGIN = 0xFFC20000, LENGTH = 64
 	ROM : ORIGIN = 0xFFC20040, LENGTH = 0x3DFFC0 /* 全ROM領域（論理的に使用） */
-	STARTUP_IMAGE : ORIGIN = 0xFFE00000, LENGTH = 0x60000 /* 起動画像用固定領域 (384KB, acmtc配置用) */
+	STARTUP_IMAGE : ORIGIN = 0xFFE20000, LENGTH = 0x60000 /* 起動画像用固定領域 (384KB, acmtc配置用) */
 	OFS : ORIGIN = 0xFE7F5D00, LENGTH = 128
 }
 SECTIONS
@@ -72,7 +72,7 @@ SECTIONS
 	/* 起動画像用セクション (固定アドレス 0xFFE00000) */
 	/* ファームウェア更新後も画像データを保持するため、別領域に配置 */
 	/* fmw_op0.o内のacfmw_op0配列(.rodata.acfmw_op0)をここに配置 */
-	.startup_image 0xFFE00000 : AT(0xFFE00000)
+	.startup_image 0xFFE20000 : AT(0xFFE20000)
 	{
 		_startup_image_start = .;
 		*fmw_op0.o(.rodata.*)

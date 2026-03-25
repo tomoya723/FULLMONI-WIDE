@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+"""Replace EEZ-generated ui_image_ui_img_fmw_op0_png.c with flash redirect."""
+import pathlib
+
+TARGET = pathlib.Path(__file__).resolve().parent.parent / "Firmware" / "src" / "ui" / "images" / "ui_image_ui_img_fmw_op0_png.c"
+
+CONTENT = """\
 /*
  * ui_image_ui_img_fmw_op0_png.c  - PATCHED (flash redirect)
  *
@@ -17,8 +24,8 @@
 #include "../ui.h"
 
 /* Startup image is written to flash by imgwrite command.
- * Data format: 12-byte BMP header + 4-byte padding, then BGR565→RGB565 pixels. */
-#define IMAGE_HEADER_SIZE     16
+ * Data format: 12-byte header (BM magic + info) followed by RGB565 pixels. */
+#define IMAGE_HEADER_SIZE     12
 #define STARTUP_IMAGE_PIXEL_ADDR  ((const uint8_t *)(0xFFE20000UL + IMAGE_HEADER_SIZE))
 
 const lv_img_dsc_t img_ui_img_fmw_op0_png = {
@@ -30,3 +37,8 @@ const lv_img_dsc_t img_ui_img_fmw_op0_png = {
     .data_size          = 765u * 256u * 2u,
     .data               = STARTUP_IMAGE_PIXEL_ADDR,
 };
+"""
+
+if __name__ == "__main__":
+    TARGET.write_text(CONTENT, encoding="utf-8")
+    print(f"Patched: {TARGET} ({TARGET.stat().st_size} bytes)")
