@@ -693,6 +693,9 @@ void startup_image_write_mode(void)
     program_offset = write_padding;  /* パディング分だけオフセット */
     write_addr = aligned_write_addr;
 
+    /* BMPヘッダー検出フラグ（HostアプリはBGR565+BMPヘッダーで送信） */
+    bool need_rb_swap = false;
+
     while (received_bytes < total_size) {
         /* チャンクサイズ計算 */
         uint32_t remaining = total_size - received_bytes;
@@ -702,6 +705,23 @@ void startup_image_write_mode(void)
         if (!receive_bytes(rx_buffer, chunk_size, IMG_TIMEOUT_MS)) {
             param_console_printf("ERR: Timeout at offset %lu\r\n", received_bytes);
             return;
+        }
+
+        /* 最初のチャンクでBMPヘッダーを検出 → BGR565なのでR/Bスワップが必要 */
+        if (received_bytes == 0 && chunk_size >= 2
+            && rx_buffer[0] == 0x42 && rx_buffer[1] == 0x4D) {
+            need_rb_swap = true;
+        }
+
+        /* BGR565 → RGB565 R/Bスワップ（ピクセルデータのみ、16バイトヘッダー+パディングは除外） */
+        if (need_rb_swap) {
+            uint32_t swap_start = (received_bytes < 16) ? (16 - received_bytes) : 0;
+            for (i = swap_start; i + 1 < chunk_size; i += 2) {
+                uint16_t px = (uint16_t)rx_buffer[i] | ((uint16_t)rx_buffer[i + 1] << 8);
+                uint16_t swapped = ((px & 0x001F) << 11) | (px & 0x07E0) | ((px >> 11) & 0x001F);
+                rx_buffer[i]     = (uint8_t)(swapped);
+                rx_buffer[i + 1] = (uint8_t)(swapped >> 8);
+            }
         }
 
         /* プログラムバッファに追加 */

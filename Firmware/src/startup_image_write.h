@@ -23,7 +23,7 @@
 #define STARTUP_IMAGE_MAX_SIZE  (391696UL)  /* acmtc配列の実サイズ */
 
 /* 起動画像の固定配置アドレス (linker_script.ldで定義) */
-#define STARTUP_IMAGE_ADDR      0xFFE00000UL
+#define STARTUP_IMAGE_ADDR      0xFFE20000UL
 
 /* 通信プロトコル */
 #define IMG_ACK_CHAR            0x06    /* ASCII ACK制御文字（ログの'.'と衝突防止）*/
