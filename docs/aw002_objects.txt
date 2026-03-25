@@ -1,0 +1,213 @@
+================================================================================
+emWin AppWizard Object Dump: aw002.AppWizard
+================================================================================
+
+## Display Settings
+  xSizeDisplay = 800
+  ySizeDisplay = 256
+  ColorConv = GUICC_565
+  MultibufEnable = 1
+  MinTimePerFrame = 40
+
+## Variables
+     ID  Name                  Default
+  ─────  ────────────────────  ───────
+   4096  ID_VAR_GEAR                 0
+   4097  ID_VAR_01                 805
+   4098  ID_VAR_02                 201
+   4099  ID_VAR_03                   0
+   4100  ID_VAR_04                   0
+   4101  ID_VAR_05                   0
+   4102  ID_VAR_06                   0
+   4103  ID_VAR_AF                 147
+   4104  ID_VAR_REV                  0
+   4105  ID_VAR_BT                   0
+   4106  ID_VAR_FL1                  0
+   4107  ID_VAR_BL1                  0
+   4108  ID_VAR_BATT                 0
+   4109  ID_VAR_SPEED                0
+   4110  ID_VAR_FPS                  0
+   4111  ID_VAR_ODO                  0
+   4112  ID_VAR_TRIP                 0
+   4113  ID_VAR_SW                   0
+   4114  ID_VAR_REV_A                0
+   4115  ID_VAR_FUEL                 0
+   4116  ID_VAR_AD1                  0
+   4117  ID_VAR_AD2                  0
+   4118  ID_VAR_AD3                  0
+   4119  ID_VAR_AD4                  0
+   4120  ID_VAR_PRM                  0
+   4121  ID_VAR_WARNING              0
+   4127  ID_VAR_SPEED_CAN            0
+
+## Animations
+   2048  ID_ANIM_000           params=10000,-1,1
+
+## Screens & Objects
+
+### ID_SCREEN_00
+    Size: 0 x 0  |  Position: X0=35, Y0=0  |  RootId=6144
+
+    Type       IdString                            Size  X0_Off  Y0_Off  Properties
+    ────────── ──────────────────────────── ─────────── ─────── ───────  ────────────────────────────────────────
+    Image      ID_IMAGE_01                    765x256         0       0  SetSbitmap.Image=fmw_op0.bmp
+    Timer      ID_TIMER_00                      ?x?                      SetPeriod.Period=1500
+
+### ID_SCREEN_Telltale
+    Size: 0 x 0  |  Position: X0=0, Y0=0  |  RootId=6147
+
+    Type       IdString                            Size  X0_Off  Y0_Off  Properties
+    ────────── ──────────────────────────── ─────────── ─────── ───────  ────────────────────────────────────────
+    Image      ID_IMAGE_00                     35x256         0       0  SetSbitmap.Image=w_back.png
+    Image      ID_ICON_00                      25x25          5      10  SetSbitmap.Image=ws_masterwarning.png
+    Image      ID_ICON_01                      25x25          5      40  SetSbitmap.Image=ws_oilpresswarning.png
+    Image      ID_ICON_02L                     25x25          5      70  SetSbitmap.Image=ws_watarcool.png
+    Image      ID_ICON_02H                     25x25          5      70  SetSbitmap.Image=ws_waterwarning.png
+    Image      ID_ICON_03                      25x25          5     100  SetSbitmap.Image=ws_exhaustwarning.png
+    Image      ID_ICON_04                      25x25          5     130  SetSbitmap.Image=ws_batterywarning.png
+    Image      ID_ICON_05                      25x25          5     160  SetSbitmap.Image=ws_breakwarning.png
+    Image      ID_ICON_06                      25x25          5     190  SetSbitmap.Image=ws_beltwarning.png
+    Image      ID_ICON_07                      25x25          5     220  SetSbitmap.Image=ws_fuelcheck.png
+
+### ID_SCREEN_01a
+    Size: 340 x 256  |  Position: X0=275, Y0=0  |  RootId=6145
+
+    Type       IdString                            Size  X0_Off  Y0_Off  Properties
+    ────────── ──────────────────────────── ─────────── ─────── ───────  ────────────────────────────────────────
+    Image      ID_IMAGE_00                    340x256         0       0  SetSbitmap.Image=Back5.bmp
+    Gauge      ID_GAUGE_00                    256x256        -3       0  SetColors.Color1=fffc0004, SetRadius.Radius=107, SetRange.Max=2700, SetRange.Min=0, SetValue.Value=500
+    Rotary     ID_ROTARY_00                   256x256        -3       0  SetOffset.Offset=2700, SetPos.Pos=78, SetRotate.Rotate=true, SetSbitmaps.Index1=Marker_red_bar_80x7s.bmp, SetValue.Value=3450
+    Rotary     ID_ROTARY_01                   256x256        -3       0  SetOffset.Offset=2700, SetPos.Pos=108, SetRotate.Rotate=true, SetSbitmaps.Index1=Marker_red_bar_20x7s.bmp, SetValue.Value=2700
+    Text       ID_NUM_AF                      130x39        193     193  SetColor.Color=ffffffff, SetDecMode.Len=5, SetDecMode.Shift=1, SetDecMode.Signed=0, SetDecMode.Space=1
+    Text       ID_NUM_GEAR                    100x100       256      72  SetColor.Color=ffffffff, SetFont.Font=x14y24pxHeadUpDaisy_72_Bold_EXT.xbf, SetTextAlign.Alignment=14, SetTextAlign.xOff=0, SetTextAlign.yOff=0
+    Text       ID_NUM_RV                      100x28        125     145  SetColor.Color=ffffffff, SetDecMode.Len=4, SetDecMode.Shift=0, SetDecMode.Signed=0, SetDecMode.Space=1
+    Text       ID_NUM_TIME                     94x31        270       0  SetColor.Color=ffc0c0c0, SetFont.Font=x14y24pxHeadUpDaisy_18_Normal_EXT.xbf, SetTextId.Id=17
+    Progbar    ID_PROGBAR_AFR_WARN            139x3         187     237  SetColor.Color=ff2c2c30, SetColors.Color0=ff0055ff, SetColors.Color1=ff323232, SetRange.Max=20, SetRange.Min=10
+    Progbar    ID_PROGBAR_AFR                 139x6         187     230  SetColor.Color=ffffffff, SetColors.Color0=ffaaaaaa, SetColors.Color1=ff323232, SetRange.Max=200, SetRange.Min=100
+    Timer      ID_TIMER_00                      ?x?                      SetPeriod.Period=3000
+    Text       ID_TEXT_ACC                    253x32          0       0  SetBkColor.BkColor=ff00aa00, SetColor.Color=ffffffff, SetFont.Font=51_20_Normal_EXT_AA2.xbf, SetTextAlign.Alignment=14, SetTextAlign.xOff=0
+
+### ID_SCREEN_01b
+    Size: 240 x 256  |  Position: X0=35, Y0=0  |  RootId=6148
+
+    Type       IdString                            Size  X0_Off  Y0_Off  Properties
+    ────────── ──────────────────────────── ─────────── ─────── ───────  ────────────────────────────────────────
+    Image      ID_IMAGE_00                    240x256         0       0  SetSbitmap.Image=Back6.bmp
+    Progbar    ID_PROGBAR_WT                   80x10         43      21  SetColor.Color=ffffffff, SetColors.Color0=ffaaaaaa, SetColors.Color1=ff323232, SetRange.Max=120, SetRange.Min=0
+    Progbar    ID_PROGBAR_WT_WARN              80x2          43      33  SetColor.Color=ff2c2c30, SetColors.Color0=ff323232, SetColors.Color1=ffaa0000, SetRange.Max=120, SetRange.Min=0
+    Progbar    ID_PROGBAR_IAT                  80x10         43      64  SetColor.Color=ffffffff, SetColors.Color0=ffaaaaaa, SetColors.Color1=ff323232, SetRange.Max=100, SetRange.Min=0
+    Progbar    ID_PROGBAR_IAT_WARN             80x2          43      76  SetColor.Color=ff2c2c30, SetColors.Color0=ff323232, SetColors.Color1=ffaa0000, SetRange.Max=100, SetRange.Min=0
+    Progbar    ID_PROGBAR_MAP                  80x10         43     146  SetColor.Color=ffffffff, SetColors.Color0=ffaaaaaa, SetColors.Color1=ff323232, SetRange.Max=120, SetRange.Min=20
+    Progbar    ID_PROGBAR_OT                   80x10         43     107  SetColor.Color=ffffffff, SetColors.Color0=ffaaaaaa, SetColors.Color1=ff323232, SetRange.Max=150, SetRange.Min=0
+    Progbar    ID_PROGBAR_OT_WARN              80x2          43     119  SetColor.Color=ff2c2c30, SetColors.Color0=ff323232, SetColors.Color1=ffaa0000, SetRange.Max=150, SetRange.Min=0
+    Progbar    ID_PROGBAR_OILP                 80x10         43     185  SetColor.Color=ffffffff, SetColors.Color0=ffaaaaaa, SetColors.Color1=ff323232, SetRange.Max=80, SetRange.Min=0
+    Progbar    ID_PROGBAR_OP_WARN              80x2          43     197  SetColor.Color=ff2c2c30, SetColors.Color0=ffaa0000, SetColors.Color1=ff323232, SetRange.Max=800, SetRange.Min=0
+    Progbar    ID_PROGBAR_BATV                 80x10         43     224  SetColor.Color=ffffffff, SetColors.Color0=ffaaaaaa, SetColors.Color1=ff323232, SetRange.Max=160, SetRange.Min=80
+    Progbar    ID_PROGBAR_BATTV_WARN           80x2          43     236  SetColor.Color=ff2c2c30, SetColors.Color0=ffaa0000, SetColors.Color1=ff323232, SetRange.Max=16, SetRange.Min=8
+    Text       ID_NUM_01                       60x28        135      21  SetColor.Color=ffffffff, SetDecMode.Len=3, SetDecMode.Shift=0, SetDecMode.Signed=0, SetDecMode.Space=1
+    Text       ID_NUM_02                       60x28        135      61  SetColor.Color=ffffffff, SetDecMode.Len=3, SetDecMode.Shift=0, SetDecMode.Signed=0, SetDecMode.Space=1
+    Text       ID_NUM_03                       60x28        135     103  SetColor.Color=ffffffff, SetDecMode.Len=3, SetDecMode.Shift=0, SetDecMode.Signed=0, SetDecMode.Space=1
+    Text       ID_NUM_04                       60x28        135     143  SetColor.Color=ffffffff, SetDecMode.Len=4, SetDecMode.Shift=0, SetDecMode.Signed=0, SetDecMode.Space=1
+    Text       ID_NUM_05                       67x28        128     180  SetColor.Color=ffffffff, SetDecMode.Len=3, SetDecMode.Shift=1, SetDecMode.Signed=0, SetDecMode.Space=1
+    Text       ID_NUM_06                       68x32        127     215  SetColor.Color=ffffffff, SetDecMode.Len=5, SetDecMode.Shift=1, SetDecMode.Signed=0, SetDecMode.Space=1
+
+### ID_SCREEN_01c
+    Size: 185 x 256  |  Position: X0=0, Y0=0  |  RootId=6149
+
+    Type       IdString                            Size  X0_Off  Y0_Off  Properties
+    ────────── ──────────────────────────── ─────────── ─────── ───────  ────────────────────────────────────────
+    Image      ID_IMAGE_00                    185x256                 0  SetSbitmap.Image=Back7.bmp
+    Text       ID_NUM_FPS                      32x17                  0  SetColor.Color=ffc0c0c0, SetDecMode.Len=3, SetDecMode.Shift=0, SetDecMode.Signed=0, SetDecMode.Space=1
+    Text       ID_NUM_SPEED                   100x28                150  SetColor.Color=ffffffff, SetDecMode.Len=3, SetDecMode.Shift=0, SetDecMode.Signed=0, SetDecMode.Space=1
+    Text       ID_NUM_TRIP                     50x20                190  SetColor.Color=ffc8c8c8, SetDecMode.Len=6, SetDecMode.Shift=1, SetDecMode.Signed=0, SetDecMode.Space=1
+    Text       ID_NUM_ODO                      60x20                209  SetColor.Color=ffc8c8c8, SetDecMode.Len=6, SetDecMode.Shift=0, SetDecMode.Signed=0, SetDecMode.Space=1
+    Progbar    ID_PROGBAR_00                  100x15                234  SetSbitmaps.Index0=fuel1.bmp, SetSbitmaps.Index1=fuel2.bmp, SetValue.Value=40
+
+## Interactions (Variable → Widget Slots)
+
+  [ID_SCREEN_00]
+    → ID_SCREEN_00__APPW_NOTIFICATION_INITDIALOG__ID_TIMER_00__APPW_JOB_START
+    → ID_SCREEN_00__APPW_NOTIFICATION_INITDIALOG_0
+
+  [ID_TIMER_00]
+    → ID_SCREEN_00__ID_TIMER_00__APPW_NOTIFICATION_TIMER [SWAP]
+    → ID_SCREEN_01a__ID_TIMER_00__APPW_NOTIFICATION_TIMER__ID_ROTARY_01__APPW_JOB_SETVALUE
+
+  [ID_SCREEN_01a]
+    → ID_SCREEN_02__APPW_NOTIFICATION_INITDIALOG
+    → ID_SCREEN_01_Copy__APPW_NOTIFICATION_INITDIALOG__ID_NUM_AD_04__APPW_JOB_SETVIS
+    → ID_SCREEN_01_Copy__APPW_NOTIFICATION_INITDIALOG
+    → ID_SCREEN_01a__APPW_NOTIFICATION_INITDIALOG__ID_TEXT_ACC__APPW_JOB_SETVIS
+
+  [ID_VAR_REV_A]
+    → ID_SCREEN_01_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_ROTARY_00__APPW_JOB_SETVALUE
+    → ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_ROTARY_01__APPW_JOB_SETVALUE
+
+  [ID_VAR_REV]
+    → ID_SCREEN_01_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_GAUGE_00__APPW_JOB_SETVALUE
+    → ID_SCREEN_01_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_RV__APPW_JOB_SETVALUE
+
+  [ID_VAR_AF]
+    → ID_SCREEN_01_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_AF__APPW_JOB_SETVALUE
+    → ID_SCREEN_02__WM_NOTIFICATION_VALUE_CHANGED__ID_PROGBAR_AFR__APPW_JOB_SETVALUE
+
+  [ID_VAR_GEAR]
+    → ID_SCREEN_01_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_GEAR__APPW_JOB_SETTEXT
+    → ID_SCREEN_01_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_GEAR__APPW_JOB_SETTEXT_0
+    → ID_SCREEN_01_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_GEAR__APPW_JOB_SETTEXT_1
+    → ID_SCREEN_01_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_GEAR__APPW_JOB_SETTEXT_2
+    → ID_SCREEN_01_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_GEAR__APPW_JOB_SETTEXT_3
+    → ID_SCREEN_01_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_GEAR__APPW_JOB_SETTEXT_4
+    → ID_SCREEN_01_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_GEAR__APPW_JOB_SETTEXT_5
+
+  [ID_ROTARY_01]
+    → ID_SCREEN_01a__ID_ROTARY_01__WM_NOTIFICATION_VALUE_CHANGED__ID_TIMER_00__APPW_JOB_START
+
+  [ID_VAR_PRM]
+    → ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_TEXT_ACC__APPW_JOB_SETVIS
+    → ID_SCREEN_01a__WM_NOTIFICATION_VALUE_CHANGED__ID_TEXT_ACC__APPW_JOB_SETVIS_0
+
+  [ID_SCREEN_01b]
+    → ID_SCREEN_02_Copy__APPW_NOTIFICATION_INITDIALOG
+
+  [ID_VAR_01]
+    → ID_SCREEN_02_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_PROGBAR_WT__APPW_JOB_SETVALUE
+    → ID_SCREEN_02_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_01__APPW_JOB_SETVALUE
+
+  [ID_VAR_02]
+    → ID_SCREEN_02_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_PROGBAR_IAT__APPW_JOB_SETVALUE
+    → ID_SCREEN_02_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_02__APPW_JOB_SETVALUE
+
+  [ID_VAR_03]
+    → ID_SCREEN_02_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_PROGBAR_OT__APPW_JOB_SETVALUE
+    → ID_SCREEN_02_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_03__APPW_JOB_SETVALUE
+
+  [ID_VAR_04]
+    → ID_SCREEN_02_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_PROGBAR_MAP__APPW_JOB_SETVALUE
+    → ID_SCREEN_02_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_04__APPW_JOB_SETVALUE
+
+  [ID_VAR_05]
+    → ID_SCREEN_02_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_PROGBAR_OILP__APPW_JOB_SETVALUE
+    → ID_SCREEN_02_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_05__APPW_JOB_SETVALUE
+
+  [ID_VAR_06]
+    → ID_SCREEN_02_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_PROGBAR_BATV__APPW_JOB_SETVALUE
+    → ID_SCREEN_02_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_06__APPW_JOB_SETVALUE
+
+  [ID_VAR_FPS]
+    → ID_SCREEN_02_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_FPS__APPW_JOB_SETVALUE
+
+  [ID_VAR_SPEED]
+    → ID_SCREEN_02_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_SPEED__APPW_JOB_SETVALUE
+
+  [ID_VAR_ODO]
+    → ID_SCREEN_02_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_ODO__APPW_JOB_SETVALUE
+
+  [ID_VAR_TRIP]
+    → ID_SCREEN_02_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_NUM_TRIP__APPW_JOB_SETVALUE
+
+  [ID_SCREEN_01c]
+    → ID_SCREEN_02_Copy__APPW_NOTIFICATION_INITDIALOG_0
+
+  [ID_VAR_FUEL]
+    → ID_SCREEN_02_Copy__WM_NOTIFICATION_VALUE_CHANGED__ID_PROGBAR_00__APPW_JOB_SETVALUE

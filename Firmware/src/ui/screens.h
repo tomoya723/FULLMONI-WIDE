@@ -18,10 +18,10 @@ enum ScreensEnum {
 typedef struct _objects_t {
     lv_obj_t *screen1;
     lv_obj_t *ui_container_dashboard;
+    lv_obj_t *ui_img_back7;
     lv_obj_t *ui_img_tacho;
     lv_obj_t *ui_arc_rpm;
     lv_obj_t *ui_lbl_rpm;
-    lv_obj_t *ui_lbl_rpm_unit;
     lv_obj_t *ui_image_rpm;
     lv_obj_t *ui_image_peak_rpm;
     lv_obj_t *ui_image2;
@@ -43,17 +43,11 @@ typedef struct _objects_t {
     lv_obj_t *ui_lbl_time;
     lv_obj_t *ui_lbl_gear;
     lv_obj_t *ui_lbl_spd;
-    lv_obj_t *ui_lbl_trip_name;
-    lv_obj_t *ui_lbl_trip_unit;
-    lv_obj_t *ui_lbl_odo_name;
-    lv_obj_t *ui_lbl_odo_unit;
-    lv_obj_t *ui_lbl_spd_unit;
     lv_obj_t *ui_bar_fuel;
-    lv_obj_t *ui_lbl_empty;
-    lv_obj_t *ui_lbl_full;
     lv_obj_t *ui_container_opening;
     lv_obj_t *ui_img_opening;
     lv_obj_t *ui_container_telltale;
+    lv_obj_t *ui_img_telltale;
     lv_obj_t *ui_img_warn_master;
     lv_obj_t *ui_img_warn_oil_press;
     lv_obj_t *ui_img_warn_water_cold;

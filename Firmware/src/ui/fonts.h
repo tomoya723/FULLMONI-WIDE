@@ -11,6 +11,8 @@ extern const lv_font_t ui_font_ui_font_font1;
 extern const lv_font_t ui_font_ui_font_font_hu_dmid;
 extern const lv_font_t ui_font_ui_font_font_hu_dsmall;
 extern const lv_font_t ui_font_ui_font_font_largr;
+extern const lv_font_t ui_font_ui_font_font_hud36;
+extern const lv_font_t ui_font_ui_font_font_hud30;
 
 #ifndef EXT_FONT_DESC_T
 #define EXT_FONT_DESC_T
