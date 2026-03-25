@@ -19,6 +19,13 @@ def upload_firmware(port, firmware_path, baudrate=115200):
     print(f"Firmware: {firmware_path}")
     print(f"Size: {file_size:,} bytes ({file_size/1024:.1f} KB)")
 
+    # Bootloader application area limit: 0xFFC20000-0xFFE1FFFF = 2MB
+    BL_APP_MAX_SIZE = 0x200000  # 2,097,152 bytes
+    if file_size > BL_APP_MAX_SIZE:
+        print(f"Error: Firmware too large! Max={BL_APP_MAX_SIZE:,} bytes, Got={file_size:,} bytes")
+        print(f"  Exceeds limit by {file_size - BL_APP_MAX_SIZE:,} bytes")
+        return False
+
     try:
         ser = serial.Serial(port, baudrate, timeout=2, write_timeout=5)
         print(f"Connected to {port}")

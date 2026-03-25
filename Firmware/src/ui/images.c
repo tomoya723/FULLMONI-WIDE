@@ -1,7 +1,6 @@
 #include "images.h"
 
 const ext_img_desc_t images[18] = {
-    { "ui_img_back5_png", &img_ui_img_back5_png },
     { "ui_img_back6_png", &img_ui_img_back6_png },
     { "ui_img_marker_red_bar_80x7s_png", &img_ui_img_marker_red_bar_80x7s_png },
     { "ui_img_marker_red_bar_20x7s_png", &img_ui_img_marker_red_bar_20x7s_png },
@@ -19,4 +18,5 @@ const ext_img_desc_t images[18] = {
     { "ui_img_ws_fuelcheck_png", &img_ui_img_ws_fuelcheck_png },
     { "ui_img_w_back_png", &img_ui_img_w_back_png },
     { "ui_img_back7_png", &img_ui_img_back7_png },
+    { "ui_img_back5_png", &img_ui_img_back5_png },
 };

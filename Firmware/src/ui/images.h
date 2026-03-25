@@ -7,7 +7,6 @@
 extern "C" {
 #endif
 
-extern const lv_img_dsc_t img_ui_img_back5_png;
 extern const lv_img_dsc_t img_ui_img_back6_png;
 extern const lv_img_dsc_t img_ui_img_marker_red_bar_80x7s_png;
 extern const lv_img_dsc_t img_ui_img_marker_red_bar_20x7s_png;
@@ -25,6 +24,7 @@ extern const lv_img_dsc_t img_ui_img_ws_beltwarning_png;
 extern const lv_img_dsc_t img_ui_img_ws_fuelcheck_png;
 extern const lv_img_dsc_t img_ui_img_w_back_png;
 extern const lv_img_dsc_t img_ui_img_back7_png;
+extern const lv_img_dsc_t img_ui_img_back5_png;
 
 #ifndef EXT_IMG_DESC_T
 #define EXT_IMG_DESC_T

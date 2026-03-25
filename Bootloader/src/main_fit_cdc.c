@@ -19,9 +19,9 @@
 
 /* Bootloader Configuration - same as boot_loader.c */
 #define BL_APP_START        (0xFFC20000UL)   /* Application start address */
-#define BL_APP_END          (0xFFDFFFFFUL)   /* Application end address (startup_image領域を除外) */
+#define BL_APP_END          (0xFFE1FFFFUL)   /* Application end address (startup_image領域 0xFFE20000～の直前) */
 #define BL_FLASH_BLOCK_SIZE (0x8000UL)       /* 32KB per block */
-#define BL_APP_BLOCKS       (56)             /* 56 x 32KB = 1.75MB (0xFFC20000-0xFFDFFFFF) */
+#define BL_APP_BLOCKS       (64)             /* 64 x 32KB = 2MB (0xFFC20000-0xFFE1FFFF) */
 #define BL_FW_HEADER_ADDR   (0xFFC20000UL)   /* Firmware header at app start */
 #define BL_FW_MAGIC         (0x52584657UL)   /* "RXFW" */
 #define BL_FLASH_WRITE_SIZE (128)            /* Flash write unit */
@@ -372,6 +372,7 @@ void main(void)
                             if (s_write_addr > BL_APP_END - BL_FLASH_WRITE_SIZE + 1) {
                                 write_error = true;
                                 s_last_error = 99;  /* Address overflow */
+                                s_error_addr = s_write_addr;
                             } else {
                                 flash_err_t ret = ram_flash_write((uint32_t)s_flash_buf, s_write_addr, BL_FLASH_WRITE_SIZE);
                                 if (ret != FLASH_SUCCESS) {

@@ -265,15 +265,20 @@ void ui_dashboard_update(void)
     lv_label_set_text_fmt(ui_LblIAT,       "%3d", (int)num2);
     lv_label_set_text_fmt(ui_LblOilTemp,   "%3d", (int)num3);
     lv_label_set_text_fmt(ui_LblMAP,       "%3d", (int)num4);
-    lv_label_set_text_fmt(ui_LblOilPress,  "%3d", (int)num5);
+    /* 油圧: CAN変換後の内部値は decimal_shift=1 で10倍 (39→3.9) */
+    {
+        int32_t op = (int32_t)(num5 + 0.5f);
+        lv_label_set_text_fmt(ui_LblOilPress, "%2d.%1d", op / 10, op % 10);
+    }
     /* Battery: %f not supported by LVGL tiny_printf; use integer arithmetic */
     {
         int32_t bv = (int32_t)(bt * 10.0f + 0.5f);   /* e.g. 12.5V → 125 */
         lv_label_set_text_fmt(ui_LblBattery, "%2d.%1d", bv / 10, bv % 10);
     }
     /* AFR: same %f restriction; 1 decimal (e.g. 14.7) */
+    /* CAN変換後の内部値は decimal_shift=1 で10倍 (147.0→14.7) */
     {
-        int32_t av = (int32_t)(af * 10.0f + 0.5f);
+        int32_t av = (int32_t)(af + 0.5f);
         lv_label_set_text_fmt(ui_LblAFR, "%2d.%1d", av / 10, av % 10);
     }
     /* Speed: integer km/h */

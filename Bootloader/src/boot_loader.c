@@ -350,7 +350,7 @@ static void buf_init(void)
 
 /**********************************************************************************************************************
  * Function Name: erase_app_area
- * Description  : Erase application area (120 blocks x 32KB = 3.75MB)
+ * Description  : Erase application area (64 blocks x 32KB = 2MB)
  * Return Value : BL_SUCCESS or BL_ERR_FLASH
  *********************************************************************************************************************/
 static e_bl_err_t erase_app_area(void)

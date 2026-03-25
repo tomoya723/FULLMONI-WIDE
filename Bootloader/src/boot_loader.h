@@ -10,7 +10,7 @@
  * Modified     : 2026-01-06
  *              : - Hardware: 2-wire UART only (TX/RX, no RTS/CTS)
  *              : - Buffer: 256KB ring buffer instead of RTS/CTS flow control
- *              : - Memory: Bootloader 256KB, Application 3.75MB
+ *              : - Memory: Bootloader 256KB, Application 2MB
  ***********************************************************************************************************************/
 
 #ifndef BOOT_LOADER_H_
@@ -59,7 +59,8 @@
 /*
  * Block Map:
  *   Block 0-7:     0xFFC00000 - 0xFFC1FFFF  Bootloader  (128KB = 4 x 32KB)
- *   Block 8-127:   0xFFC20000 - 0xFFFFFFFF  Application (3.875MB = 124 x 32KB)
+ *   Block 8-71:    0xFFC20000 - 0xFFE1FFFF  Application (2MB = 64 x 32KB)
+ *   Block 72+:     0xFFE20000 - 0xFFFFFFFF  Startup Image + System (reserved)
  *
  * Application Layout:
  *   Firmware Header: 0xFFC20000 (64 bytes at app area start)
@@ -70,9 +71,9 @@
 #define BL_BOOTLOADER_SIZE          (0x20000UL)      /* 128KB */
 
 #define BL_APP_START                (0xFFC20000UL)
-#define BL_APP_END                  (0xFFDFFFFFUL)  /* startup_image領域(0xFFE00000～)を除外 */
-#define BL_APP_SIZE                 (0x3E0000UL)     /* 3.875MB = 4,063,232 bytes */
-#define BL_APP_BLOCKS               (124)            /* 124 x 32KB blocks */
+#define BL_APP_END                  (0xFFE1FFFFUL)  /* startup_image領域(0xFFE20000～)の直前まで */
+#define BL_APP_SIZE                 (0x200000UL)     /* 2MB = 2,097,152 bytes */
+#define BL_APP_BLOCKS               (64)             /* 64 x 32KB blocks (0xFFC20000-0xFFE1FFFF) */
 
 /* Firmware Header (for application validity check) */
 #define BL_FW_HEADER_ADDR           (0xFFC20000UL)   /* Firmware header at app start */
