@@ -185,7 +185,7 @@ draw.text((sx(535), 23), "RPM", fill=GRAY, font=font_xs)
 # GEAR (large red, centered below tacho bars)
 # ═══════════════════════════════════════════════════════════════════
 try:
-    font_gear = ImageFont.truetype(os.path.join(SCRIPT_DIR, "..", "Firmware", "eez", "eez003", "ui", "fonts", "Micro Technic Extended Outline Bold.ttf"), 75)
+    font_gear = ImageFont.truetype(os.path.join(SCRIPT_DIR, "..", "Firmware", "eez", "eez003", "FontsFree-Net-Apice-BoldOutline.ttf"), 112)
 except:
     font_gear = font_lg
 # Center "N" horizontally and vertically on tacho area
