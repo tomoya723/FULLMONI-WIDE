@@ -24,7 +24,7 @@ DataFrame6 sMsgStruct_Frame6;
 
 
 /* Start BUSMASTER Function Prototype  */
-GCC_EXTERN void GCC_EXPORT OnTimer_updateTimeTick10ms_10( );
+GCC_EXTERN void GCC_EXPORT OnTimer_updateTimeTick16ms_16( );
 void OnMsgName_DataFrame1(DataFrame1 RxMsg);
 GCC_EXTERN void GCC_EXPORT OnMsgName_DataFrame1_Wrapper(STCAN_MSG RxMsg);
 GCC_EXTERN void GCC_EXPORT OnTimer_incGearPos_1000( );
@@ -35,8 +35,8 @@ void OnMsgName_DataFrame1_Wrapper(STCAN_MSG RxMsg){ OnMsgName_DataFrame1(&RxMsg)
 /* End BUSMASTER Function Wrapper Prototype  */
 
 
-/* Start BUSMASTER generated function - OnTimer_updateTimeTick10ms_10 */
-void OnTimer_updateTimeTick10ms_10( )
+/* Start BUSMASTER generated function - OnTimer_updateTimeTick16ms_16 */
+void OnTimer_updateTimeTick16ms_16( )
 {
 /* TODO */
 
@@ -126,7 +126,7 @@ OP = 1000;
 		i=0;
 	}
 }
-}/* End BUSMASTER generated function - OnTimer_updateTimeTick10ms_10 */
+}/* End BUSMASTER generated function - OnTimer_updateTimeTick16ms_16 */
 /* Start BUSMASTER generated function - OnMsgName_DataFrame1 */
 void OnMsgName_DataFrame1(DataFrame1 RxMsg)
 {

@@ -96,6 +96,10 @@ HostApp/FULLMONI-WIDE-Desktop/.gradle/
 **/.eez-project-build
 *-ui-state
 
+# Design junction symlinks (created by tools/switch_design.ps1)
+Firmware/src/ui
+Firmware/src/ui_binding
+
 # Build logs
 build_log.txt
 build_lvgl.log
