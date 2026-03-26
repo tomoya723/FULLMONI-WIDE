@@ -15,7 +15,7 @@
 #>
 param(
     [Parameter(Mandatory)]
-    [ValidateSet('eez001', 'eez002')]
+    [ValidateSet('eez001', 'eez002', 'eez003')]
     [string]$Design
 )
 
@@ -63,6 +63,7 @@ cmd /c "mklink /J `"$ubJunction`" `"$ubTarget`""
 $variantMap = @{
     'eez001' = 'aw001'
     'eez002' = 'aw002'
+    'eez003' = 'aw003'
 }
 $variantId = $variantMap[$Design]
 $variantHeader = Join-Path $srcDir 'variant_id.h'

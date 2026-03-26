@@ -255,6 +255,18 @@
                 "panel": "shared"
             },
             "detail": "デザインをeez002 (Racing) に切り替え"
+        },
+        {
+            "label": "Switch to eez003",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy", "Bypass",
+                "-File", "${workspaceFolder}/tools/switch_design.ps1",
+                "-Design", "eez003"
+            ],
+            "group": "build",
+            "detail": "デザインをeez003 (Prodrive) に切り替え"
         }
     ]
 }
