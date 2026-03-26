@@ -31,12 +31,13 @@ WARN_RED = (220, 40, 40)
 try:
     font_lg  = ImageFont.truetype("arial.ttf", 48)
     font_big = ImageFont.truetype("arial.ttf", 27)
+    font_gauge = ImageFont.truetype("arial.ttf", 22)
     font_spd = ImageFont.truetype("arial.ttf", 36)
     font_med = ImageFont.truetype("arial.ttf", 18)
     font_sm  = ImageFont.truetype("arial.ttf", 11)
     font_xs  = ImageFont.truetype("arial.ttf", 9)
 except:
-    font_lg = font_big = font_spd = font_med = font_sm = font_xs = ImageFont.load_default()
+    font_lg = font_big = font_gauge = font_spd = font_med = font_sm = font_xs = ImageFont.load_default()
 
 img = Image.new("RGB", (W, H), BLACK)
 draw = ImageDraw.Draw(img)
@@ -90,7 +91,7 @@ for name, val, bw, pct, yb in left_rows:
     ns = max(6, int(bw / 10))
     wedge_bar_seg(14, yb, bw, 3, 20, pct, num_segs=ns)
     draw.text((sx(14), yb + 2), name, fill=GRAY, font=font_xs)
-    draw.text((sx(162), yb - 22), val, fill=WHITE, font=font_big)
+    draw.text((sx(195), yb - 18), val, fill=WHITE, font=font_gauge, anchor="rt")
 
 # ═══════════════════════════════════════════════════════════════════
 # RIGHT SENSORS (3 rows) — WEDGE BARS: left-origin (same as left side)
@@ -106,7 +107,7 @@ for name, val, bw, pct, yb in right_rows:
     ns = max(6, int(bw / 10))
     wedge_bar_seg(right_bar_x, yb, bw, 3, 20, pct, num_segs=ns)
     draw.text((sx(right_bar_x), yb + 2), name, fill=GRAY, font=font_xs)
-    draw.text((sx(right_bar_x + bw + 4), yb - 22), val, fill=WHITE, font=font_big)
+    draw.text((sx(right_bar_x + bw + 50), yb - 18), val, fill=WHITE, font=font_gauge, anchor="rt")
 
 # ═══════════════════════════════════════════════════════════════════
 # BOOST GAUGE — arc-shaped segmented bars (concentric with tacho arc)
