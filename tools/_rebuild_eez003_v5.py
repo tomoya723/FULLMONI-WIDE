@@ -175,6 +175,7 @@ F1  = "ui_font_Font1"          # 27px — sensor values
 F24 = "ui_font_FontHUD24"      # 24px — sensor values (native pixel size)
 FM  = "ui_font_FontHUDmid"     # 18px — medium text
 FS  = "ui_font_FontHUDsmall"   # ~10px — small labels
+F12 = "ui_font_FontDenki12"    # 12px — DenkiChip native size (ODO/Trip/Range)
 FL  = "ui_font_FontGear"       # 75px — gear (Micro Technic)
 F36 = "ui_font_FontHUD36"      # 36px — speed
 F30 = "ui_font_FontHUD30"      # 30px — ALS
@@ -317,12 +318,12 @@ def build_dashboard():
 
     # LEFT SENSOR VALUES (right-aligned, after bar end)
     left_vals = [
-        ("80",   "ui_LblWaterTemp",  24, 24),
-        ("72",   "ui_LblOilTemp",    68, 24),
-        ("53",   "ui_LblChargeTemp", 112, 24),
+        ("80",   "ui_LblWaterTemp",  14, 24),
+        ("72",   "ui_LblOilTemp",    58, 24),
+        ("53",   "ui_LblChargeTemp", 102, 24),
     ]
     for val_text, val_id, y, h in left_vals:
-        l, t = c2c(172, y, 50, h)
+        l, t = c2c(142, y, 50, h)
         kids.append(_lbl(l, t, 50, h, val_text, val_id, F24, W,
                          align="CENTER", ta="RIGHT", lm="CLIP"))
 
@@ -341,12 +342,12 @@ def build_dashboard():
 
     # RIGHT SENSOR VALUES (anchored to dashboard right edge)
     right_vals = [
-        ("5.8",  "ui_LblOilPress",   24, 24),
-        ("3.5",  "ui_LblFuelPress",  68, 24),
-        ("14.4", "ui_LblBattery",    112, 24),
+        ("5.8",  "ui_LblOilPress",   14, 24),
+        ("3.5",  "ui_LblFuelPress",  58, 24),
+        ("14.4", "ui_LblBattery",    102, 24),
     ]
     for val_text, val_id, y, h in right_vals:
-        l, t = c2rm(700, y, 63, h)
+        l, t = c2rm(690, y, 63, h)
         kids.append(_lbl(l, t, 63, h, val_text, val_id, F24, W,
                          align="RIGHT_MID", ta="RIGHT", lm="CLIP"))
 
@@ -439,7 +440,7 @@ def build_dashboard():
     ]
     for val_text, val_id, y, h in info_vals:
         l, t = c2rm(665, y, 95, h)
-        kids.append(_lbl(l, t, 95, h, val_text, val_id, FM, W,
+        kids.append(_lbl(l, t, 95, h, val_text, val_id, F12, W,
                          align="RIGHT_MID", ta="RIGHT", lm="CLIP"))
 
     return kids
@@ -524,6 +525,25 @@ def main():
             "lvglSymbols": "",
         })
         print("  +font: ui_font_FontGear (75px Micro Technic)")
+
+    # Ensure FontDenki12 (12px = native pixel size for DenkiChip) exists
+    if "ui_font_FontDenki12" not in font_names:
+        proj.setdefault("fonts", []).append({
+            "objID": str(uuid.uuid4()),
+            "name": "ui_font_FontDenki12",
+            "renderingEngine": "LVGL",
+            "source": {
+                "objID": str(uuid.uuid4()),
+                "filePath": "x8y12pxDenkiChip.ttf",
+                "size": 12,
+            },
+            "bpp": 1,
+            "threshold": 128,
+            "glyphs": [],
+            "lvglRanges": "32-127",
+            "lvglSymbols": "",
+        })
+        print("  +font: ui_font_FontDenki12 (12px DenkiChip native)")
 
     # Ensure all required bitmaps exist
     required_imgs = {
