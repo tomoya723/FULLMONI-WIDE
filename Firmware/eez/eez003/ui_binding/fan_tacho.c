@@ -21,9 +21,10 @@
 
 /* ── Configuration ─────────────────────────────────────────────────────── */
 
-/* Fan geometry – all coordinates relative to the container */
-#define FAN_CX          50      /* Centre X of the sweep arc (left of visible) */
-#define FAN_CY          420     /* Centre Y (well below the container bottom) */
+/* Fan geometry – all coordinates relative to the dashboard container */
+/* eez003 places the tachometer on the right side of the 765x256 dashboard. */
+#define FAN_CX          365     /* Sweep centre X (aligned to right tachometer area) */
+#define FAN_CY          420     /* Sweep centre Y (below visible area to create fan shape) */
 #define FAN_R_INNER     250     /* Inner radius where segments start */
 
 /* Angular sweep (degrees × 10, LVGL convention) */

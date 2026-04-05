@@ -24,6 +24,7 @@
 
 #include "platform.h"
 #include "lvgl/lvgl.h"
+#include "ui/ui.h"
 #include "ui/screens.h"
 #include "ui/eez_compat.h"
 #include "dataregister.h"
@@ -92,6 +93,9 @@ static inline int32_t rpm_to_angle(uint32_t rpm)
 /* --- Helper: show/hide widget --------------------------------------------- */
 static inline void set_visible(lv_obj_t *obj, bool visible)
 {
+    if (!obj) {
+        return;
+    }
     if (visible) {
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_HIDDEN);
     } else {
@@ -104,6 +108,9 @@ static inline void set_visible(lv_obj_t *obj, bool visible)
 
 static void fade_opa_cb(void *obj, int32_t v)
 {
+    if (!obj) {
+        return;
+    }
     lv_obj_set_style_opa((lv_obj_t *)obj, (lv_opa_t)v, LV_PART_MAIN);
 }
 
@@ -112,6 +119,9 @@ static void opening_fade_done_cb(lv_anim_t *a)
     /* フェード完了後: ContainerOpeningを非表示にしopacityをリセット */
     lv_obj_t *obj = (lv_obj_t *)a->var;
     set_visible(obj, false);
+    if (!obj) {
+        return;
+    }
     lv_obj_set_style_opa(obj, LV_OPA_COVER, LV_PART_MAIN);
 }
 
@@ -137,17 +147,18 @@ void ui_dashboard_create(void)
     /* Initialize SLS-generated screen */
     ui_init();
 
+    if (!ui_Screen1) {
+        return;
+    }
+
     /* SLSのデフォルト背景色（白）を黒に上書きして白画面明滅を防止 */
     lv_obj_set_style_bg_color(ui_Screen1, lv_color_black(), LV_PART_MAIN);
 
     /* Set bar ranges (SLS sets initial value=25 with default range 0-100) */
-    lv_bar_set_range(ui_BarWaterTemp, BAR_WATER_MIN,    BAR_WATER_MAX);
-    lv_bar_set_range(ui_BarIAT,       BAR_IAT_MIN,      BAR_IAT_MAX);
-    lv_bar_set_range(ui_BarOilTemp,   BAR_OILTEMP_MIN,  BAR_OILTEMP_MAX);
-    lv_bar_set_range(ui_BarMAP,       BAR_MAP_MIN,      BAR_MAP_MAX);
-    lv_bar_set_range(ui_BarOilPress,  BAR_OILPRESS_MIN, BAR_OILPRESS_MAX);
-    lv_bar_set_range(ui_BarBattery,   BAR_BATT_MIN,     BAR_BATT_MAX);
-    lv_bar_set_range(ui_BarFUEL,      BAR_FUEL_MIN,     BAR_FUEL_MAX);
+    /* Legacy bar widgets were removed in current EEZ layout. */
+    if (ui_BarFUEL) {
+        lv_bar_set_range(ui_BarFUEL, BAR_FUEL_MIN, BAR_FUEL_MAX);
+    }
 
     /* 法規要件: 起動時に全警告灯を点灯（テルテール動作確認）*/
     set_visible(ui_ImgWarnMaster,    true);
@@ -164,9 +175,7 @@ void ui_dashboard_create(void)
     s_startup_ms    = lv_tick_get();
     s_telltale_done = false;
 
-    /* Initial needle position at 0 rpm */
-    lv_img_set_angle(ui_imageRPM,     (int16_t)rpm_to_angle(0));
-    lv_img_set_angle(ui_ImagePeakRPM, (int16_t)rpm_to_angle(0));
+    /* RPM needle widgets were removed from the current EEZ layout. */
     s_rpm_peak      = 0;
     s_peak_falling  = false;
     s_peak_hold_start = lv_tick_get();
@@ -177,6 +186,9 @@ void ui_dashboard_set_notify(const char *msg, uint32_t accent_color)
 {
     if (msg == NULL || msg[0] == '\0') {
         ui_dashboard_clear_notify();
+        return;
+    }
+    if (!ui_NotifyBox || !ui_NotifyLabel) {
         return;
     }
     /* HUD style: 黒背景 + アクセントカラー（枠・文字） */
@@ -191,6 +203,9 @@ void ui_dashboard_set_notify(const char *msg, uint32_t accent_color)
 
 void ui_dashboard_clear_notify(void)
 {
+    if (!ui_NotifyBox) {
+        return;
+    }
     lv_obj_add_flag(ui_NotifyBox, LV_OBJ_FLAG_HIDDEN);
 }
 
@@ -226,8 +241,6 @@ void ui_dashboard_update(void)
 
     /* --- Tachometer needle + arc ----------------------------------------- */
     uint32_t rpm = (rev > 0.0f) ? (uint32_t)rev : 0u;
-    lv_img_set_angle(ui_imageRPM, (int16_t)rpm_to_angle(rpm));
-    lv_arc_set_value(ui_ArcRPM, (int32_t)rpm);
 
     /* --- RPM Peak Hold ---------------------------------------------------- */
     /* RPMが上昇中: ピーク更新・保持タイマーリセット */
@@ -254,60 +267,71 @@ void ui_dashboard_update(void)
                 }
             }
         }
-        lv_img_set_angle(ui_ImagePeakRPM, (int16_t)rpm_to_angle(s_rpm_peak));
     }
 
-    /* --- RPM label --------------------------------------------------------- */
-    lv_label_set_text_fmt(ui_LblRPM, "%5u", rpm);
-
     /* --- Sensor labels ----------------------------------------------------- */
-    lv_label_set_text_fmt(ui_LblWaterTemp, "%3d", (int)num1);
-    lv_label_set_text_fmt(ui_LblIAT,       "%3d", (int)num2);
-    lv_label_set_text_fmt(ui_LblOilTemp,   "%3d", (int)num3);
-    lv_label_set_text_fmt(ui_LblMAP,       "%3d", (int)num4);
+    if (ui_LblWaterTemp) {
+        lv_label_set_text_fmt(ui_LblWaterTemp, "%3d", (int)num1);
+    }
+    if (objects.ui_lbl_charge_temp) {
+        lv_label_set_text_fmt(objects.ui_lbl_charge_temp, "%3d", (int)num2);
+    }
+    if (ui_LblOilTemp) {
+        lv_label_set_text_fmt(ui_LblOilTemp, "%3d", (int)num3);
+    }
+    if (objects.ui_lbl_boost_val) {
+        lv_label_set_text_fmt(objects.ui_lbl_boost_val, "%3d", (int)num4);
+    }
     /* 油圧: CAN変換後の内部値は decimal_shift=1 で10倍 (39→3.9) */
     {
         int32_t op = (int32_t)(num5 + 0.5f);
-        lv_label_set_text_fmt(ui_LblOilPress, "%2d.%1d", op / 10, op % 10);
+        if (ui_LblOilPress) {
+            lv_label_set_text_fmt(ui_LblOilPress, "%2d.%1d", op / 10, op % 10);
+        }
     }
     /* Battery: %f not supported by LVGL tiny_printf; use integer arithmetic */
     {
         int32_t bv = (int32_t)(bt * 10.0f + 0.5f);   /* e.g. 12.5V → 125 */
-        lv_label_set_text_fmt(ui_LblBattery, "%2d.%1d", bv / 10, bv % 10);
+        if (ui_LblBattery) {
+            lv_label_set_text_fmt(ui_LblBattery, "%2d.%1d", bv / 10, bv % 10);
+        }
     }
-    /* AFR: same %f restriction; 1 decimal (e.g. 14.7) */
-    /* CAN変換後の内部値は decimal_shift=1 で10倍 (147.0→14.7) */
+    /* AFR: show on available range label in current layout. */
     {
         int32_t av = (int32_t)(af + 0.5f);
-        lv_label_set_text_fmt(ui_LblAFR, "%2d.%1d", av / 10, av % 10);
+        if (objects.ui_lbl_range) {
+            lv_label_set_text_fmt(objects.ui_lbl_range, "%2d.%1d", av / 10, av % 10);
+        }
     }
     /* Speed: integer km/h */
-    lv_label_set_text_fmt(ui_LblSPD, "%3d", (int)sp);
-    /* TIME: pre-formatted string "%2x:%02x" (HH:MM BCD) from dataregister.c */
-    lv_label_set_text(ui_LblTIME, (const char *)g_CALC_data.str_time);
+    if (ui_LblSPD) {
+        lv_label_set_text_fmt(ui_LblSPD, "%3d", (int)sp);
+    }
+    /* TIME label does not exist in current layout. */
     /* ODO: integer km (double → int32) */
-    lv_label_set_text_fmt(ui_LblODO, "%6d", (int32_t)odo);
+    if (ui_LblODO) {
+        lv_label_set_text_fmt(ui_LblODO, "%6d", (int32_t)odo);
+    }
     /* Trip: 1 decimal km (e.g. 123.4) */
     {
         int32_t tv = (int32_t)(trip * 10.0 + 0.5);
-        lv_label_set_text_fmt(ui_LblTrip, "%4d.%1d", tv / 10, tv % 10);
+        if (ui_LblTrip) {
+            lv_label_set_text_fmt(ui_LblTrip, "%4d.%1d", tv / 10, tv % 10);
+        }
     }
     /* Gear: 0 = Neutral → "N", 1-6 = gear number */
-    if (gear_pos == 0u) {
-        lv_label_set_text(ui_LblGEAR, "N");
-    } else {
-        lv_label_set_text_fmt(ui_LblGEAR, "%u", gear_pos);
+    if (ui_LblGEAR) {
+        if (gear_pos == 0u) {
+            lv_label_set_text(ui_LblGEAR, "N");
+        } else {
+            lv_label_set_text_fmt(ui_LblGEAR, "%u", gear_pos);
+        }
     }
 
     /* --- Bar indicators ---------------------------------------------------- */
-    lv_bar_set_value(ui_BarWaterTemp, (int32_t)num1, LV_ANIM_OFF);
-    lv_bar_set_value(ui_BarIAT,       (int32_t)num2, LV_ANIM_OFF);
-    lv_bar_set_value(ui_BarOilTemp,   (int32_t)num3, LV_ANIM_OFF);
-    lv_bar_set_value(ui_BarMAP,       (int32_t)num4, LV_ANIM_OFF);
-    lv_bar_set_value(ui_BarOilPress,  (int32_t)num5, LV_ANIM_OFF);
-    /* battery bar: use 0.1V integer (bt * 10) */
-    lv_bar_set_value(ui_BarBattery,   (int32_t)(bt * 10.0f), LV_ANIM_OFF);
-    lv_bar_set_value(ui_BarFUEL,      (int32_t)fuel_per,     LV_ANIM_OFF);
+    if (ui_BarFUEL) {
+        lv_bar_set_value(ui_BarFUEL, (int32_t)fuel_per, LV_ANIM_OFF);
+    }
 
     /* --- Warning icons ----------------------------------------------------- */
     {
@@ -337,4 +361,20 @@ void ui_dashboard_update(void)
         set_visible(ui_ImgWarnFuel,      warn_fuel);
     }
 
+}
+
+/* EEZ native variable accessors (declared in ui/vars.h) */
+int32_t get_var_rpm(void)
+{
+    float rev = g_CALC_data.rev;
+    if (rev <= 0.0f) {
+        return 0;
+    }
+    return (int32_t)(rev + 0.5f);
+}
+
+void set_var_rpm(int32_t value)
+{
+    (void)value;
+    /* Read-only binding in current design. */
 }
