@@ -32,7 +32,7 @@
 /* Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB) */
 /* Placed in RAM2 region (0x00864000) via .bss2 section attribute in lv_port */
 #define LV_MEM_CUSTOM 0
-#define LV_MEM_SIZE (48U * 1024U)  /* 48KB - LVGL heap (eez003: 153 widgets) */
+#define LV_MEM_SIZE (56U * 1024U)  /* 56KB - LVGL heap (eez003: 153 widgets + bar draw overrides) */
 
 /* Set an address for the memory pool instead of allocating it as a global array.
  * Can be in external SRAM too. 0: unused */

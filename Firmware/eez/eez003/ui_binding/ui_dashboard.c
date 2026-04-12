@@ -82,6 +82,92 @@ static uint32_t s_rpm_peak          = 0;
 static uint32_t s_peak_hold_start   = 0;  /* lv_tick_get() at peak freeze */
 static bool     s_peak_falling      = false;
 
+/* --- Tachometer bar count ------------------------------------------------- */
+#define TACHO_BAR_COUNT  25
+
+/* --- Tachometer bar horizontal-fill draw override ------------------------- */
+/* LVGL determines bar fill direction from aspect ratio (vertical bar = bottom→top).
+ * We intercept DRAW_PART_BEGIN to recalculate the indicator area for left→right fill
+ * while keeping the original vertical bar dimensions unchanged in EEZ Studio.       */
+static void tacho_bar_draw_cb(lv_event_t *e)
+{
+    lv_obj_draw_part_dsc_t *dsc = lv_event_get_param(e);
+    if (dsc == NULL || dsc->type != LV_BAR_DRAW_PART_INDICATOR) return;
+
+    lv_obj_t *bar = lv_event_get_target(e);
+
+    int32_t val     = lv_bar_get_value(bar);
+    int32_t min_val = lv_bar_get_min_value(bar);
+    int32_t max_val = lv_bar_get_max_value(bar);
+    int32_t range   = max_val - min_val;
+    if (range <= 0) return;
+
+    lv_area_t coords;
+    lv_obj_get_coords(bar, &coords);
+    lv_coord_t bw = lv_obj_get_style_border_width(bar, LV_PART_MAIN);
+
+    /* Content area (inside border) — LVGL coords are inclusive */
+    lv_coord_t cy1 = coords.y1 + bw;
+    lv_coord_t cy2 = coords.y2 - bw;
+
+    /* Use full bar width (including side borders) for fill calculation
+     * so that border-to-border transitions between adjacent bars are smooth.
+     * Border and indicator share the same color, so filling through the
+     * side-border area is visually seamless. */
+    lv_coord_t total_px = (coords.x2 - coords.x1) + 1;  /* full bar width */
+    lv_coord_t fill_px;
+    if (val >= max_val)      fill_px = total_px;
+    else if (val <= min_val) fill_px = 0;
+    else                     fill_px = (lv_coord_t)((int32_t)total_px * (val - min_val) / range);
+
+    /* Draw horizontal fill — spans from bar left edge through border area */
+    if (fill_px > 0) {
+        lv_draw_rect_dsc_t fill_dsc;
+        lv_draw_rect_dsc_init(&fill_dsc);
+        fill_dsc.bg_color = lv_obj_get_style_bg_color(bar, LV_PART_INDICATOR);
+        fill_dsc.bg_opa   = lv_obj_get_style_bg_opa(bar, LV_PART_INDICATOR);
+        fill_dsc.radius   = 0;
+
+        lv_area_t fill_area;
+        fill_area.x1 = coords.x1;                     /* from bar left edge */
+        fill_area.x2 = coords.x1 + fill_px - 1;       /* inclusive end */
+        fill_area.y1 = cy1;                            /* inside top border */
+        fill_area.y2 = cy2;                            /* inside bottom border */
+        lv_draw_rect(dsc->draw_ctx, &fill_dsc, &fill_area);
+    }
+
+    /* Draw border on top so it is always visible */
+    {
+        lv_draw_rect_dsc_t border_dsc;
+        lv_draw_rect_dsc_init(&border_dsc);
+        border_dsc.bg_opa       = LV_OPA_TRANSP;
+        border_dsc.border_color = lv_obj_get_style_border_color(bar, LV_PART_MAIN);
+        border_dsc.border_width = bw;
+        border_dsc.border_opa   = lv_obj_get_style_border_opa(bar, LV_PART_MAIN);
+        border_dsc.radius       = 0;
+        lv_draw_rect(dsc->draw_ctx, &border_dsc, &coords);
+    }
+
+    /* Suppress LVGL's default indicator drawing */
+    if (dsc->rect_dsc) {
+        dsc->rect_dsc->bg_opa = LV_OPA_TRANSP;
+    }
+
+    /* Set indicator area for LVGL internals (masks etc.) — empty when no fill */
+    if (fill_px > 0) {
+        dsc->draw_area->x1 = coords.x1;
+        dsc->draw_area->x2 = coords.x1 + fill_px - 1;
+        dsc->draw_area->y1 = cy1;
+        dsc->draw_area->y2 = cy2;
+    } else {
+        /* Make area invalid so LVGL draws nothing */
+        dsc->draw_area->x1 = coords.x1;
+        dsc->draw_area->x2 = coords.x1 - 1;
+        dsc->draw_area->y1 = cy1;
+        dsc->draw_area->y2 = cy2;
+    }
+}
+
 /* --- Needle angle formula ------------------------------------------------- */
 /* angle in 0.1° units. RPM 0→9000 maps to 90°→360° (260° sweep). */
 static inline int32_t rpm_to_angle(uint32_t rpm)
@@ -160,6 +246,25 @@ void ui_dashboard_create(void)
         lv_bar_set_range(ui_BarFUEL, BAR_FUEL_MIN, BAR_FUEL_MAX);
     }
 
+    /* Register horizontal-fill draw override on tachometer bars (obj0..obj24) */
+    {
+        lv_obj_t **const bars[] = {
+            &objects.obj0,  &objects.obj1,  &objects.obj2,  &objects.obj3,
+            &objects.obj4,  &objects.obj5,  &objects.obj6,  &objects.obj7,
+            &objects.obj8,  &objects.obj9,  &objects.obj10, &objects.obj11,
+            &objects.obj12, &objects.obj13, &objects.obj14, &objects.obj15,
+            &objects.obj16, &objects.obj17, &objects.obj18, &objects.obj19,
+            &objects.obj20, &objects.obj21, &objects.obj22, &objects.obj23,
+            &objects.obj24
+        };
+        for (int i = 0; i < TACHO_BAR_COUNT; i++) {
+            if (*bars[i]) {
+                lv_obj_add_event_cb(*bars[i], tacho_bar_draw_cb,
+                                    LV_EVENT_DRAW_PART_BEGIN, NULL);
+            }
+        }
+    }
+
     /* 法規要件: 起動時に全警告灯を点灯（テルテール動作確認）*/
     set_visible(ui_ImgWarnMaster,    true);
     set_visible(ui_ImgWarnOilPress,  true);
@@ -175,7 +280,6 @@ void ui_dashboard_create(void)
     s_startup_ms    = lv_tick_get();
     s_telltale_done = false;
 
-    /* RPM needle widgets were removed from the current EEZ layout. */
     s_rpm_peak      = 0;
     s_peak_falling  = false;
     s_peak_hold_start = lv_tick_get();
@@ -265,6 +369,32 @@ void ui_dashboard_update(void)
                     s_rpm_peak     = rpm;
                     s_peak_falling = false;
                 }
+            }
+        }
+    }
+
+    /* --- Tachometer bars (obj0..obj24 = 25 columns, 360 RPM each) -------- */
+    {
+        static lv_obj_t **const tacho_bars[] = {
+            &objects.obj0,  &objects.obj1,  &objects.obj2,  &objects.obj3,
+            &objects.obj4,  &objects.obj5,  &objects.obj6,  &objects.obj7,
+            &objects.obj8,  &objects.obj9,  &objects.obj10, &objects.obj11,
+            &objects.obj12, &objects.obj13, &objects.obj14, &objects.obj15,
+            &objects.obj16, &objects.obj17, &objects.obj18, &objects.obj19,
+            &objects.obj20, &objects.obj21, &objects.obj22, &objects.obj23,
+            &objects.obj24
+        };
+
+        for (int i = 0; i < TACHO_BAR_COUNT; i++) {
+            lv_obj_t *bar = *tacho_bars[i];
+            if (bar) {
+                uint32_t lo = (uint32_t)(i * 360);
+                uint32_t hi = lo + 360u;
+                int32_t val;
+                if (rpm >= hi)      val = 100;
+                else if (rpm <= lo) val = 0;
+                else                val = (int32_t)((rpm - lo) * 100u / 360u);
+                lv_bar_set_value(bar, val, LV_ANIM_OFF);
             }
         }
     }
