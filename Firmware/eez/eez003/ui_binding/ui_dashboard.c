@@ -82,8 +82,28 @@ static uint32_t s_rpm_peak          = 0;
 static uint32_t s_peak_hold_start   = 0;  /* lv_tick_get() at peak freeze */
 static bool     s_peak_falling      = false;
 
-/* --- Tachometer bar count ------------------------------------------------- */
-#define TACHO_BAR_COUNT  25
+/* --- Bar counts ----------------------------------------------------------- */
+#define TACHO_BAR_COUNT   25
+#define BOOST_BAR_COUNT   10
+#define GAUGE_BAR_COUNT   13   /* per gauge: water, oil_t, iat, oil_p, fuel_p, batt */
+#define NUM_GAUGES         6
+
+/* --- Gauge bar ranges ---------------------------------------------------- */
+/* Each gauge has 13 bars; the full sensor range is split equally across them. */
+#define GAUGE_WATER_MIN    0
+#define GAUGE_WATER_MAX    130     /* °C */
+#define GAUGE_OILTEMP_MIN  0
+#define GAUGE_OILTEMP_MAX  160     /* °C */
+#define GAUGE_IAT_MIN      0
+#define GAUGE_IAT_MAX      70      /* °C */
+#define GAUGE_OILPRESS_MIN 0
+#define GAUGE_OILPRESS_MAX 80      /* 0.1bar unit: 80 = 8.0bar */
+#define GAUGE_AFR_MIN      100     /* 0.1 unit: 100 = 10.0 */
+#define GAUGE_AFR_MAX      200     /* 0.1 unit: 200 = 20.0 */
+#define GAUGE_BATT_MIN     100     /* 0.1V = 10.0V */
+#define GAUGE_BATT_MAX     160     /* 0.1V = 16.0V */
+#define GAUGE_BOOST_MIN    0
+#define GAUGE_BOOST_MAX    300     /* kPa */
 
 /* --- Tachometer bar horizontal-fill draw override ------------------------- */
 /* LVGL determines bar fill direction from aspect ratio (vertical bar = bottom→top).
@@ -246,20 +266,56 @@ void ui_dashboard_create(void)
         lv_bar_set_range(ui_BarFUEL, BAR_FUEL_MIN, BAR_FUEL_MAX);
     }
 
-    /* Register horizontal-fill draw override on tachometer bars (obj0..obj24) */
+    /* Register horizontal-fill draw override on ALL stepped-bar widgets.
+     * A single callback function is shared across all 113 bars. */
     {
-        lv_obj_t **const bars[] = {
+        lv_obj_t **const all_bars[] = {
+            /* Tachometer: obj0..obj24 (25 bars) */
             &objects.obj0,  &objects.obj1,  &objects.obj2,  &objects.obj3,
             &objects.obj4,  &objects.obj5,  &objects.obj6,  &objects.obj7,
             &objects.obj8,  &objects.obj9,  &objects.obj10, &objects.obj11,
             &objects.obj12, &objects.obj13, &objects.obj14, &objects.obj15,
             &objects.obj16, &objects.obj17, &objects.obj18, &objects.obj19,
             &objects.obj20, &objects.obj21, &objects.obj22, &objects.obj23,
-            &objects.obj24
+            &objects.obj24,
+            /* Boost: obj25..obj34 (10 bars) */
+            &objects.obj25, &objects.obj26, &objects.obj27, &objects.obj28,
+            &objects.obj29, &objects.obj30, &objects.obj31, &objects.obj32,
+            &objects.obj33, &objects.obj34,
+            /* Water temp: obj35..obj47 (13 bars) */
+            &objects.obj35, &objects.obj36, &objects.obj37, &objects.obj38,
+            &objects.obj39, &objects.obj40, &objects.obj41, &objects.obj42,
+            &objects.obj43, &objects.obj44, &objects.obj45, &objects.obj46,
+            &objects.obj47,
+            /* Oil temp: obj48..obj60 (13 bars) */
+            &objects.obj48, &objects.obj49, &objects.obj50, &objects.obj51,
+            &objects.obj52, &objects.obj53, &objects.obj54, &objects.obj55,
+            &objects.obj56, &objects.obj57, &objects.obj58, &objects.obj59,
+            &objects.obj60,
+            /* IAT/Charge temp: obj61..obj73 (13 bars) */
+            &objects.obj61, &objects.obj62, &objects.obj63, &objects.obj64,
+            &objects.obj65, &objects.obj66, &objects.obj67, &objects.obj68,
+            &objects.obj69, &objects.obj70, &objects.obj71, &objects.obj72,
+            &objects.obj73,
+            /* Oil pressure: obj74..obj86 (13 bars) */
+            &objects.obj74, &objects.obj75, &objects.obj76, &objects.obj77,
+            &objects.obj78, &objects.obj79, &objects.obj80, &objects.obj81,
+            &objects.obj82, &objects.obj83, &objects.obj84, &objects.obj85,
+            &objects.obj86,
+            /* Fuel pressure: obj87..obj99 (13 bars) */
+            &objects.obj87, &objects.obj88, &objects.obj89, &objects.obj90,
+            &objects.obj91, &objects.obj92, &objects.obj93, &objects.obj94,
+            &objects.obj95, &objects.obj96, &objects.obj97, &objects.obj98,
+            &objects.obj99,
+            /* Battery: obj100..obj112 (13 bars) */
+            &objects.obj100, &objects.obj101, &objects.obj102, &objects.obj103,
+            &objects.obj104, &objects.obj105, &objects.obj106, &objects.obj107,
+            &objects.obj108, &objects.obj109, &objects.obj110, &objects.obj111,
+            &objects.obj112
         };
-        for (int i = 0; i < TACHO_BAR_COUNT; i++) {
-            if (*bars[i]) {
-                lv_obj_add_event_cb(*bars[i], tacho_bar_draw_cb,
+        for (int i = 0; i < (int)(sizeof(all_bars) / sizeof(all_bars[0])); i++) {
+            if (*all_bars[i]) {
+                lv_obj_add_event_cb(*all_bars[i], tacho_bar_draw_cb,
                                     LV_EVENT_DRAW_PART_BEGIN, NULL);
             }
         }
@@ -403,11 +459,13 @@ void ui_dashboard_update(void)
     if (ui_LblWaterTemp) {
         lv_label_set_text_fmt(ui_LblWaterTemp, "%3d", (int)num1);
     }
-    if (objects.ui_lbl_charge_temp) {
-        lv_label_set_text_fmt(objects.ui_lbl_charge_temp, "%3d", (int)num2);
-    }
+    /* 左中: IAT (num2) — EEZ widget名は oil_temp だが位置的に IAT を表示 */
     if (ui_LblOilTemp) {
-        lv_label_set_text_fmt(ui_LblOilTemp, "%3d", (int)num3);
+        lv_label_set_text_fmt(ui_LblOilTemp, "%3d", (int)num2);
+    }
+    /* 左下: Oil Temp (num3) — EEZ widget名は charge_temp だが位置的に OIL TEMP を表示 */
+    if (objects.ui_lbl_charge_temp) {
+        lv_label_set_text_fmt(objects.ui_lbl_charge_temp, "%3d", (int)num3);
     }
     if (objects.ui_lbl_boost_val) {
         lv_label_set_text_fmt(objects.ui_lbl_boost_val, "%3d", (int)num4);
@@ -426,11 +484,11 @@ void ui_dashboard_update(void)
             lv_label_set_text_fmt(ui_LblBattery, "%2d.%1d", bv / 10, bv % 10);
         }
     }
-    /* AFR: show on available range label in current layout. */
+    /* A/F: 右中ゲージ — EEZ widget名は fuel_press だが位置的に A/F を表示 */
     {
         int32_t av = (int32_t)(af + 0.5f);
-        if (objects.ui_lbl_range) {
-            lv_label_set_text_fmt(objects.ui_lbl_range, "%2d.%1d", av / 10, av % 10);
+        if (objects.ui_lbl_fuel_press) {
+            lv_label_set_text_fmt(objects.ui_lbl_fuel_press, "%2d.%1d", av / 10, av % 10);
         }
     }
     /* Speed: integer km/h */
@@ -462,6 +520,111 @@ void ui_dashboard_update(void)
     if (ui_BarFUEL) {
         lv_bar_set_value(ui_BarFUEL, (int32_t)fuel_per, LV_ANIM_OFF);
     }
+
+    /* --- Stepped-bar gauge binding ---------------------------------------- */
+    /* Helper macro: update N stepped bars given a sensor value & range.
+     * Each bar covers (range / N) of the sensor range.                     */
+    #define UPDATE_STEPPED_BARS(bar_arr, count, sensor_val, s_min, s_max) \
+        do { \
+            float _range = (float)((s_max) - (s_min)); \
+            float _val   = (sensor_val); \
+            for (int _i = 0; _i < (count); _i++) { \
+                lv_obj_t *_b = *(bar_arr)[_i]; \
+                if (!_b) continue; \
+                float _lo = (float)(s_min) + _range * _i / (count); \
+                float _hi = (float)(s_min) + _range * (_i + 1) / (count); \
+                int32_t _v; \
+                if (_val >= _hi)      _v = 100; \
+                else if (_val <= _lo) _v = 0; \
+                else                  _v = (int32_t)((_val - _lo) * 100.0f / (_hi - _lo)); \
+                lv_bar_set_value(_b, _v, LV_ANIM_OFF); \
+            } \
+        } while (0)
+
+    /* Boost: obj25..obj34 (10 bars, 0-300 kPa) */
+    {
+        static lv_obj_t **const boost_bars[] = {
+            &objects.obj25, &objects.obj26, &objects.obj27, &objects.obj28,
+            &objects.obj29, &objects.obj30, &objects.obj31, &objects.obj32,
+            &objects.obj33, &objects.obj34
+        };
+        UPDATE_STEPPED_BARS(boost_bars, BOOST_BAR_COUNT, num4,
+                            GAUGE_BOOST_MIN, GAUGE_BOOST_MAX);
+    }
+
+    /* Water temp: obj35..obj47 (13 bars, 0-130 °C) */
+    {
+        static lv_obj_t **const water_bars[] = {
+            &objects.obj35, &objects.obj36, &objects.obj37, &objects.obj38,
+            &objects.obj39, &objects.obj40, &objects.obj41, &objects.obj42,
+            &objects.obj43, &objects.obj44, &objects.obj45, &objects.obj46,
+            &objects.obj47
+        };
+        UPDATE_STEPPED_BARS(water_bars, GAUGE_BAR_COUNT, num1,
+                            GAUGE_WATER_MIN, GAUGE_WATER_MAX);
+    }
+
+    /* 左中: IAT (num2): obj48..obj60 (13 bars, 0-70 °C) */
+    {
+        static lv_obj_t **const iat_bars[] = {
+            &objects.obj48, &objects.obj49, &objects.obj50, &objects.obj51,
+            &objects.obj52, &objects.obj53, &objects.obj54, &objects.obj55,
+            &objects.obj56, &objects.obj57, &objects.obj58, &objects.obj59,
+            &objects.obj60
+        };
+        UPDATE_STEPPED_BARS(iat_bars, GAUGE_BAR_COUNT, num2,
+                            GAUGE_IAT_MIN, GAUGE_IAT_MAX);
+    }
+
+    /* 左下: Oil Temp (num3): obj61..obj73 (13 bars, 0-160 °C) */
+    {
+        static lv_obj_t **const oilt_bars[] = {
+            &objects.obj61, &objects.obj62, &objects.obj63, &objects.obj64,
+            &objects.obj65, &objects.obj66, &objects.obj67, &objects.obj68,
+            &objects.obj69, &objects.obj70, &objects.obj71, &objects.obj72,
+            &objects.obj73
+        };
+        UPDATE_STEPPED_BARS(oilt_bars, GAUGE_BAR_COUNT, num3,
+                            GAUGE_OILTEMP_MIN, GAUGE_OILTEMP_MAX);
+    }
+
+    /* Oil pressure: obj74..obj86 (13 bars, 0-500) */
+    {
+        static lv_obj_t **const oilp_bars[] = {
+            &objects.obj74, &objects.obj75, &objects.obj76, &objects.obj77,
+            &objects.obj78, &objects.obj79, &objects.obj80, &objects.obj81,
+            &objects.obj82, &objects.obj83, &objects.obj84, &objects.obj85,
+            &objects.obj86
+        };
+        UPDATE_STEPPED_BARS(oilp_bars, GAUGE_BAR_COUNT, num5,
+                            GAUGE_OILPRESS_MIN, GAUGE_OILPRESS_MAX);
+    }
+
+    /* 右中: A/F (af): obj87..obj99 (13 bars, 10.0-20.0) */
+    {
+        static lv_obj_t **const afr_bars[] = {
+            &objects.obj87, &objects.obj88, &objects.obj89, &objects.obj90,
+            &objects.obj91, &objects.obj92, &objects.obj93, &objects.obj94,
+            &objects.obj95, &objects.obj96, &objects.obj97, &objects.obj98,
+            &objects.obj99
+        };
+        UPDATE_STEPPED_BARS(afr_bars, GAUGE_BAR_COUNT, af,
+                            GAUGE_AFR_MIN, GAUGE_AFR_MAX);
+    }
+
+    /* Battery: obj100..obj112 (13 bars, 10.0-16.0V as 100-160 in 0.1V) */
+    {
+        static lv_obj_t **const batt_bars[] = {
+            &objects.obj100, &objects.obj101, &objects.obj102, &objects.obj103,
+            &objects.obj104, &objects.obj105, &objects.obj106, &objects.obj107,
+            &objects.obj108, &objects.obj109, &objects.obj110, &objects.obj111,
+            &objects.obj112
+        };
+        UPDATE_STEPPED_BARS(batt_bars, GAUGE_BAR_COUNT, (bt * 10.0f),
+                            GAUGE_BATT_MIN, GAUGE_BATT_MAX);
+    }
+
+    #undef UPDATE_STEPPED_BARS
 
     /* --- Warning icons ----------------------------------------------------- */
     {

@@ -51,9 +51,9 @@ draw = ImageDraw.Draw(img)
 # LEFT SENSORS — name labels only (gauge segments are EEZ widgets)
 # ═══════════════════════════════════════════════════════════════════
 left_rows = [
-    ("WATER TEMP",   36),
-    ("OIL TEMP",     80),
-    ("CHARGE TEMP",  124),
+    ("WATER TEMP",     36),
+    ("INLET AIR TEMP", 80),
+    ("OIL TEMP",       124),
 ]
 for name, yb in left_rows:
     draw.text((14, yb + 2), name, fill=GRAY, font=font_xs)
@@ -63,7 +63,7 @@ for name, yb in left_rows:
 # ═══════════════════════════════════════════════════════════════════
 right_rows = [
     ("OIL PRESSURE",   36),
-    ("FUEL PRESSURE",  80),
+    ("A/F",            80),
     ("BATTERY VOLT",   124),
 ]
 for name, yb in right_rows:

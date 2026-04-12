@@ -135,32 +135,8 @@ static void fan_tacho_draw_cb(lv_event_t *e)
                 color = COL_SEG_INACTIVE;
             }
 
-            /* Draw a small rectangle rotated by col_angle.
-             * For simplicity, we draw an axis-aligned rectangle at the segment centre.
-             * The "rotation" effect comes from the radial placement offset along
-             * different angles, which combined with short/wide segments looks like
-             * a fan pattern. Exact rotation would require polygon drawing. */
-
-            /* Perpendicular offset for segment width */
-            float perp_dx = -sin_a * (float)SEG_WIDTH * 0.5f;
-            float perp_dy = -cos_a * (float)SEG_WIDTH * 0.5f;
-
-            /* Radial offset for segment height */
-            float rad_dx = cos_a * (float)SEG_HEIGHT * 0.5f;
-            float rad_dy = -sin_a * (float)SEG_HEIGHT * 0.5f;
-
-            /* Four corners of the rotated rectangle */
-            lv_point_t pts[4];
-            pts[0].x = (lv_coord_t)(seg_cx - rad_dx - perp_dx);
-            pts[0].y = (lv_coord_t)(seg_cy - rad_dy + perp_dy);
-            pts[1].x = (lv_coord_t)(seg_cx + rad_dx - perp_dx);
-            pts[1].y = (lv_coord_t)(seg_cy + rad_dy + perp_dy);
-            pts[2].x = (lv_coord_t)(seg_cx + rad_dx + perp_dx);
-            pts[2].y = (lv_coord_t)(seg_cy + rad_dy - perp_dy);
-            pts[3].x = (lv_coord_t)(seg_cx - rad_dx + perp_dx);
-            pts[3].y = (lv_coord_t)(seg_cy - rad_dy - perp_dy);
-
-            /* Draw as filled polygon (LVGL 8 API uses lv_draw_rect_dsc_t) */
+            /* Draw axis-aligned rectangle at the radially-placed segment centre.
+             * The "fan" visual comes from radial placement along different angles. */
             lv_draw_rect_dsc_t rect_dsc;
             lv_draw_rect_dsc_init(&rect_dsc);
             rect_dsc.bg_color = lv_color_hex(color);
@@ -168,17 +144,14 @@ static void fan_tacho_draw_cb(lv_event_t *e)
             rect_dsc.border_width = 0;
             rect_dsc.radius = 0;
 
-#if LV_DRAW_COMPLEX
-            lv_draw_polygon(draw_ctx, &rect_dsc, pts, 4);
-#else
-            /* Fallback: axis-aligned approximation */
-            lv_area_t seg_area;
-            seg_area.x1 = (lv_coord_t)(seg_cx - SEG_WIDTH / 2);
-            seg_area.y1 = (lv_coord_t)(seg_cy - SEG_HEIGHT / 2);
-            seg_area.x2 = seg_area.x1 + SEG_WIDTH - 1;
-            seg_area.y2 = seg_area.y1 + SEG_HEIGHT - 1;
-            lv_draw_rect(draw_ctx, &rect_dsc, &seg_area);
-#endif
+            {
+                lv_area_t seg_area;
+                seg_area.x1 = (lv_coord_t)(seg_cx - SEG_WIDTH / 2);
+                seg_area.y1 = (lv_coord_t)(seg_cy - SEG_HEIGHT / 2);
+                seg_area.x2 = seg_area.x1 + SEG_WIDTH - 1;
+                seg_area.y2 = seg_area.y1 + SEG_HEIGHT - 1;
+                lv_draw_rect(draw_ctx, &rect_dsc, &seg_area);
+            }
         }
     }
 
@@ -218,6 +191,7 @@ static void fan_tacho_draw_cb(lv_event_t *e)
 
 void fan_tacho_init(lv_obj_t *container)
 {
+    if (!container) return;
     s_container = container;
     lv_obj_add_event_cb(container, fan_tacho_draw_cb, LV_EVENT_DRAW_POST_BEGIN, NULL);
 }
