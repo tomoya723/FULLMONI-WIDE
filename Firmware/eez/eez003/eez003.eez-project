@@ -7776,8 +7776,8 @@
                   "eventHandlers": [],
                   "leftUnit": "px",
                   "topUnit": "px",
-                  "widthUnit": "px",
-                  "heightUnit": "px",
+                  "widthUnit": "content",
+                  "heightUnit": "content",
                   "identifier": "ui_NotifyLabel",
                   "text": "",
                   "localStyles": {
@@ -7786,9 +7786,10 @@
                       "MAIN": {
                         "DEFAULT": {
                           "align": "CENTER",
-                          "text_font": "ui_font_FontGear",
+                          "text_align": "CENTER",
+                          "text_font": "ui_font_FontLARGR",
                           "text_color": "#FFFFFF",
-                          "text_align": "CENTER"
+                          "text_opa": 255
                         }
                       }
                     }

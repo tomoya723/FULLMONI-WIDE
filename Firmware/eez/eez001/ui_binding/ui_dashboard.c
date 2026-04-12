@@ -338,3 +338,22 @@ void ui_dashboard_update(void)
     }
 
 }
+
+/* --- EEZ Flow native variable stubs ------------------------------------ */
+/* vars.h が宣言する get/set_var_rpm() の実装。
+ * eez003 は独自実装を持つが、eez001/eez002 では Flow から直接呼ばれた場合に
+ * リンクエラーを防止するためスタブを提供する。 */
+int32_t get_var_rpm(void)
+{
+	float rev = g_CALC_data.rev;
+	if (rev <= 0.0f) {
+		return 0;
+	}
+	return (int32_t)(rev + 0.5f);
+}
+
+void set_var_rpm(int32_t value)
+{
+	(void)value;
+	/* Read-only binding */
+}

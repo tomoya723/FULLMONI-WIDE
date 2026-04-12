@@ -1,14 +1,13 @@
 /*
- * eez_compat.h
+ * eez_compat.h  —  eez003 (Prodrive) 専用版
  *
  * Compatibility macros: maps old SquareLine Studio naming convention
  * (extern lv_obj_t *ui_WidgetName) to EEZ Studio naming convention
  * (objects.ui_widget_name).
  *
- * This allows ui_dashboard.c and other hand-written binding code to
- * keep using the SLS-style names without modification.
- *
- * AUTO-GENERATED MAPPING — update when widgets are added/removed in EEZ Studio.
+ * eez003 は水平バータコメーター等の独自レイアウトのため、eez001/eez002 に存在する
+ * 一部ウィジェットが objects_t に含まれない。該当マクロは NULL にマップし、
+ * 使用側で NULL チェックにより安全にスキップできるようにする。
  */
 #ifndef EEZ_COMPAT_H
 #define EEZ_COMPAT_H
@@ -21,48 +20,50 @@
 /* --- Containers --- */
 #define ui_ContainerDashboard   (objects.ui_container_dashboard)
 #define ui_ContainerOpening     (objects.ui_container_opening)
-#define ui_ContainerTelltale    (objects.ui_container_telltale)
+#define ui_ContainerTelltale    ((lv_obj_t *)NULL)  /* eez003: not present */
 
 /* --- Tacho / RPM cluster --- */
-#define ui_ImgTacho             (objects.ui_img_tacho)
-#define ui_ArcRPM               (objects.ui_arc_rpm)
-#define ui_LblRPM               (objects.ui_lbl_rpm)
-#define ui_LblRPMUnit           (objects.ui_lbl_rpm_unit)
-#define ui_imageRPM             (objects.ui_image_rpm)
-#define ui_ImagePeakRPM         (objects.ui_image_peak_rpm)
-#define ui_Image2               (objects.ui_image2)
+/* eez003 は水平バー (obj0-24) で表現。針タコ系は存在しない */
+#define ui_ImgTacho             ((lv_obj_t *)NULL)  /* eez003: not present */
+#define ui_ArcRPM               ((lv_obj_t *)NULL)  /* eez003: not present */
+#define ui_LblRPM               ((lv_obj_t *)NULL)  /* eez003: not present */
+#define ui_LblRPMUnit           ((lv_obj_t *)NULL)  /* eez003: not present */
+#define ui_imageRPM             ((lv_obj_t *)NULL)  /* eez003: not present */
+#define ui_ImagePeakRPM         ((lv_obj_t *)NULL)  /* eez003: not present */
+#define ui_Image2               ((lv_obj_t *)NULL)  /* eez003: not present */
 
 /* --- Bar gauges --- */
-#define ui_BarWaterTemp         (objects.ui_bar_water_temp)
+/* eez003 は水平セグメントバー (objNN) で表現。lv_bar 系は存在しない */
+#define ui_BarWaterTemp         ((lv_obj_t *)NULL)  /* eez003: not present */
 #define ui_LblWaterTemp         (objects.ui_lbl_water_temp)
-#define ui_BarIAT               (objects.ui_bar_iat)
-#define ui_LblIAT               (objects.ui_lbl_iat)
-#define ui_BarOilTemp           (objects.ui_bar_oil_temp)
+#define ui_BarIAT               ((lv_obj_t *)NULL)  /* eez003: not present */
+#define ui_LblIAT               ((lv_obj_t *)NULL)  /* eez003: not present */
+#define ui_BarOilTemp           ((lv_obj_t *)NULL)  /* eez003: not present */
 #define ui_LblOilTemp           (objects.ui_lbl_oil_temp)
-#define ui_BarMAP               (objects.ui_bar_map)
-#define ui_LblMAP               (objects.ui_lbl_map)
-#define ui_BarOilPress          (objects.ui_bar_oil_press)
+#define ui_BarMAP               ((lv_obj_t *)NULL)  /* eez003: not present */
+#define ui_LblMAP               ((lv_obj_t *)NULL)  /* eez003: not present */
+#define ui_BarOilPress          ((lv_obj_t *)NULL)  /* eez003: not present */
 #define ui_LblOilPress          (objects.ui_lbl_oil_press)
-#define ui_BarBattery           (objects.ui_bar_battery)
+#define ui_BarBattery           ((lv_obj_t *)NULL)  /* eez003: not present */
 #define ui_LblBattery           (objects.ui_lbl_battery)
 
 /* --- Info labels --- */
-#define ui_LblAFR               (objects.ui_lbl_afr)
+#define ui_LblAFR               ((lv_obj_t *)NULL)  /* eez003: not present */
 #define ui_LblTrip              (objects.ui_lbl_trip)
 #define ui_LblODO               (objects.ui_lbl_odo)
-#define ui_LblTIME              (objects.ui_lbl_time)
+#define ui_LblTIME              ((lv_obj_t *)NULL)  /* eez003: not present */
 #define ui_LblGEAR              (objects.ui_lbl_gear)
 #define ui_LblSPD               (objects.ui_lbl_spd)
-#define ui_LblTripName          (objects.ui_lbl_trip_name)
-#define ui_LblTripUnit          (objects.ui_lbl_trip_unit)
-#define ui_LblODOName           (objects.ui_lbl_odo_name)
-#define ui_LblODOUnit           (objects.ui_lbl_odo_unit)
+#define ui_LblTripName          ((lv_obj_t *)NULL)  /* eez003: not present */
+#define ui_LblTripUnit          ((lv_obj_t *)NULL)  /* eez003: not present */
+#define ui_LblODOName           ((lv_obj_t *)NULL)  /* eez003: not present */
+#define ui_LblODOUnit           ((lv_obj_t *)NULL)  /* eez003: not present */
 #define ui_LblSPDUnit           (objects.ui_lbl_spd_unit)
 
 /* --- Fuel gauge --- */
 #define ui_BarFUEL              (objects.ui_bar_fuel)
-#define ui_LblEmpty             (objects.ui_lbl_empty)
-#define ui_LblFull              (objects.ui_lbl_full)
+#define ui_LblEmpty             ((lv_obj_t *)NULL)  /* eez003: not present */
+#define ui_LblFull              ((lv_obj_t *)NULL)  /* eez003: not present */
 
 /* --- Opening screen --- */
 #define ui_ImgOpening           (objects.ui_img_opening)

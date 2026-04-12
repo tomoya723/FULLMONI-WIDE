@@ -27,6 +27,7 @@
 #include "lv_port/lv_port_tick.h"
 #include "ui_binding/ui_dashboard.h"
 #include "ui/screens.h"
+#include "ui/eez_compat.h"
 
 // --------------------------------------------------------------------
 // グローバル変数宣言
@@ -152,11 +153,11 @@ void main(void)
 	{
 		lv_disp_t *d = lv_disp_get_default();
 		lv_anim_del(d->act_scr, NULL);
-		lv_anim_del(objects.screen1, NULL);
-		lv_obj_remove_local_style_prop(objects.screen1, LV_STYLE_OPA, 0);
+		lv_anim_del(ui_Screen1, NULL);
+		lv_obj_remove_local_style_prop(ui_Screen1, LV_STYLE_OPA, 0);
 		d->scr_to_load = NULL;
 	}
-	lv_disp_load_scr(objects.screen1);
+	lv_disp_load_scr(ui_Screen1);
 
 	/* 初回レンダリング: バックライトOFF中 (TGRD=0) のため白画面は見えない。
 	 * 非同期DMAフラッシュのため、lv_timer_handler() 1回で1バンド(16行)のみ処理。

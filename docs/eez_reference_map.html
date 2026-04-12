@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>FULLMONI-WIDE EEZ 参照関係マップ</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; color: #e0e0e0; font-family: 'Segoe UI', 'Meiryo', sans-serif; padding: 32px; }
+  h1 { text-align: center; color: #00d4ff; font-size: 22px; margin-bottom: 8px; }
+  .subtitle { text-align: center; color: #888; font-size: 13px; margin-bottom: 32px; }
+  svg { display: block; margin: 0 auto; }
+  .section-title { color: #00d4ff; font-size: 16px; margin: 32px 0 12px 0; border-bottom: 1px solid #333; padding-bottom: 4px; }
+
+  table.issues { border-collapse: collapse; width: 100%; max-width: 900px; margin: 16px auto; }
+  table.issues th { background: #16213e; color: #00d4ff; padding: 8px 12px; text-align: left; font-size: 13px; }
+  table.issues td { background: #0f3460; padding: 8px 12px; border-bottom: 1px solid #1a1a2e; font-size: 13px; }
+  table.issues .warn { color: #ffa726; font-weight: bold; }
+  table.issues .resolved { color: #66bb6a; font-weight: bold; }
+  table.issues .loc { color: #aaa; font-family: monospace; font-size: 12px; }
+  table.issues tr.done td { opacity: 0.7; }
+
+  .annot { max-width: 960px; margin: 0 auto; }
+  .annot h3 { color: #42a5f5; font-size: 14px; margin: 20px 0 6px 0; }
+  .annot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; margin-bottom: 8px; }
+  .annot-card { background: #16213e; border: 1px solid #0f3460; border-radius: 6px; padding: 10px 14px; }
+  .annot-card .name { color: #4db6ac; font-weight: bold; font-size: 13px; font-family: monospace; }
+  .annot-card .desc { color: #ccc; font-size: 12px; margin-top: 4px; line-height: 1.5; }
+  .annot-card .desc em { color: #ffa726; font-style: normal; }
+  .annot-wide { grid-column: 1 / -1; }
+</style>
+</head>
+<body>
+
+<h1>FULLMONI-WIDE EEZ 参照関係マップ</h1>
+<p class="subtitle">src/ (共用コード) &harr; eez/eezXXX/ (デザイン別コード) 依存関係図</p>
+
+<!-- ===== Component Annotations ===== -->
+<div class="annot">
+
+<h3>共用コード (src/) &mdash; 全デザインで同一のソースを使用</h3>
+<div class="annot-grid">
+  <div class="annot-card">
+    <div class="name">main.c</div>
+    <div class="desc">
+      システム起動・メインループ。ペリフェラル初期化後に <code>ui_dashboard_create()</code> で画面生成し、
+      メインループ内で毎フレーム <code>ui_dashboard_update()</code> を呼んで表示更新。
+      USB CDC のモード遷移時に <code>set_notify</code> / <code>clear_notify</code> で通知オーバーレイを制御。
+    </div>
+  </div>
+  <div class="annot-card">
+    <div class="name">dataregister.c</div>
+    <div class="desc">
+      CAN バスから受信した生データを物理値に変換・蓄積するデータ処理層。
+      <code>g_CALC_data</code> / <code>g_CALC_data_sm</code> 構造体にリアルタイム値を格納。
+      エラー検出時に <code>set_notify</code> で警告オーバーレイを表示。
+    </div>
+  </div>
+</div>
+
+<h3>シンボリックリンク層 (src/ui/, src/ui_binding/) &mdash; アクティブデザインの実体を参照</h3>
+<div class="annot-grid">
+  <div class="annot-card">
+    <div class="name">ui_dashboard.h</div>
+    <div class="desc">
+      UI バインディングの<em>公開インターフェース</em>。4 関数のみ公開し、共用コード (main.c, dataregister.c) との契約を定義。
+      全デザインで同一シグネチャを保証する抽象化レイヤー。
+    </div>
+  </div>
+  <div class="annot-card">
+    <div class="name">ui_dashboard.c</div>
+    <div class="desc">
+      <em>デザイン別の実装本体</em>。g_CALC_data の各フィールドを読み取り、LVGL ウィジェットに値をバインド。
+      タコメーター駆動、センサー値表示、バーゲージ更新、警告アイコン制御、テルテール演出などを実行。
+    </div>
+  </div>
+  <div class="annot-card">
+    <div class="name">screens.h</div>
+    <div class="desc">
+      EEZ Studio が自動生成。<code>objects_t</code> 構造体で全 LVGL ウィジェットのポインタを保持。
+      デザインごとに構造体メンバーが異なる（eez003 は水平バー用 obj0-112 等の独自メンバーを持つ）。
+    </div>
+  </div>
+  <div class="annot-card">
+    <div class="name">eez_compat.h</div>
+    <div class="desc">
+      <em>ウィジェット名の変換マクロ</em>。旧 SquareLine Studio 形式の名前 (<code>ui_LblRPM</code> 等) を
+      EEZ Studio 形式 (<code>objects.ui_lbl_rpm</code>) にマップ。
+      デザインに存在しないウィジェットは <code>NULL</code> にマップし、使用側で安全にスキップ。
+    </div>
+  </div>
+  <div class="annot-card">
+    <div class="name">vars.h</div>
+    <div class="desc">
+      EEZ Studio が自動生成する<em>ネイティブ変数アクセサ宣言</em>。
+      EEZ Flow ランタイムが呼び出す <code>get_var_rpm()</code> / <code>set_var_rpm()</code> を宣言。
+      実装は各デザインの ui_dashboard.c 内に配置。
+    </div>
+  </div>
+</div>
+
+<h3>デザイン別コード (eez/eezXXX/) &mdash; switch_design.ps1 で切替</h3>
+<div class="annot-grid">
+  <div class="annot-card">
+    <div class="name">eez001 (Standard / 青テーマ)</div>
+    <div class="desc">
+      <em>円形アナログ針</em>タコメーター + Arc ゲージ。6 本の lv_bar でセンサー値を表示。
+      時計・RPM 数値ラベル・AFR 等すべてのラベルを持つフル装備レイアウト。
+    </div>
+  </div>
+  <div class="annot-card">
+    <div class="name">eez002 (Racing / 赤テーマ)</div>
+    <div class="desc">
+      eez001 と<em>同一のウィジェット構成</em>。配色・フォント・背景画像がレーシングテーマに変更。
+      screens.h の objects_t 構造体は eez001 と完全一致。
+    </div>
+  </div>
+  <div class="annot-card annot-wide">
+    <div class="name">eez003 (Prodrive)</div>
+    <div class="desc">
+      <em>水平セグメントバー</em>方式のタコメーター (obj0-24 = 25 本、各 360 RPM 幅)。
+      6 ゲージも水平バー化 (obj25-112)。針タコ・Arc・従来の lv_bar は廃止し、
+      ラベル名も独自 (charge_temp / boost_val / range)。
+      eez_compat.h で廃止ウィジェットを NULL にマップし、ui_dashboard.c 内で NULL ガード付きで処理。
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- ===== Main Architecture Diagram ===== -->
+<h2 class="section-title">アーキテクチャ図</h2>
+<svg viewBox="0 0 960 620" width="960" height="620" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#888"/>
+    </marker>
+    <marker id="arr-red" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#ff5252"/>
+    </marker>
+    <marker id="arr-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#66bb6a"/>
+    </marker>
+    <marker id="arr-dash" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#00bcd4"/>
+    </marker>
+  </defs>
+
+  <!-- Background regions -->
+  <rect x="20" y="16" width="920" height="200" rx="10" fill="#16213e" stroke="#0f3460" stroke-width="2"/>
+  <text x="36" y="38" fill="#00d4ff" font-size="13" font-weight="bold">src/  (共用コード -- デザイン分岐禁止)</text>
+
+  <rect x="20" y="240" width="920" height="150" rx="10" fill="#1a1a3e" stroke="#0f3460" stroke-width="2"/>
+  <text x="36" y="262" fill="#00bcd4" font-size="13" font-weight="bold">src/ui/ &amp; src/ui_binding/  (アクティブデザインへのシンボリックリンク)</text>
+
+  <rect x="20" y="420" width="920" height="185" rx="10" fill="#0f3460" stroke="#1a4a8e" stroke-width="2"/>
+  <text x="36" y="442" fill="#ffa726" font-size="13" font-weight="bold">eez/eezXXX/  (デザイン別、switch_design.ps1 で切替)</text>
+
+  <!-- ===== Shared boxes ===== -->
+  <!-- main.c -->
+  <rect x="80" y="60" width="160" height="90" rx="6" fill="#233" stroke="#4db6ac" stroke-width="2"/>
+  <text x="160" y="80" text-anchor="middle" fill="#4db6ac" font-size="13" font-weight="bold">main.c</text>
+  <text x="160" y="96" text-anchor="middle" fill="#888" font-size="9">起動・メインループ制御</text>
+  <text x="160" y="114" text-anchor="middle" fill="#aaa" font-size="11">ui_dashboard_create()</text>
+  <text x="160" y="128" text-anchor="middle" fill="#aaa" font-size="11">ui_dashboard_update()</text>
+  <text x="160" y="144" text-anchor="middle" fill="#66bb6a" font-size="10">ui_Screen1 マクロ経由 (修正済)</text>
+
+  <!-- dataregister.c -->
+  <rect x="320" y="60" width="200" height="90" rx="6" fill="#233" stroke="#4db6ac" stroke-width="2"/>
+  <text x="420" y="80" text-anchor="middle" fill="#4db6ac" font-size="13" font-weight="bold">dataregister.c</text>
+  <text x="420" y="96" text-anchor="middle" fill="#888" font-size="9">CAN受信データ変換・蓄積</text>
+  <text x="420" y="114" text-anchor="middle" fill="#aaa" font-size="11">ui_dashboard_set_notify()</text>
+  <text x="420" y="128" text-anchor="middle" fill="#aaa" font-size="11">ui_dashboard_clear_notify()</text>
+
+  <!-- Legend -->
+  <rect x="620" y="55" width="300" height="80" rx="6" fill="#111" stroke="#333" stroke-width="1"/>
+  <text x="636" y="74" fill="#ccc" font-size="11" font-weight="bold">凡例</text>
+  <line x1="636" y1="88" x2="680" y2="88" stroke="#66bb6a" stroke-width="2" marker-end="url(#arr-green)"/>
+  <text x="690" y="92" fill="#aaa" font-size="11">正常な参照</text>
+  <line x1="636" y1="106" x2="680" y2="106" stroke="#00bcd4" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arr-dash)"/>
+  <text x="690" y="110" fill="#aaa" font-size="11">シンボリックリンク</text>
+  <rect x="636" y="120" width="36" height="12" rx="2" fill="#ffa726" opacity="0.3"/>
+  <text x="656" y="130" text-anchor="middle" fill="#ffa726" font-size="9">NULL</text>
+  <text x="690" y="130" fill="#aaa" font-size="11">NULL マップ (安全にスキップ)</text>
+
+  <!-- ===== Symlink boxes ===== -->
+  <!-- ui_dashboard.h -->
+  <rect x="60" y="275" width="220" height="55" rx="6" fill="#1a2a4a" stroke="#42a5f5" stroke-width="2"/>
+  <text x="170" y="293" text-anchor="middle" fill="#42a5f5" font-size="12" font-weight="bold">ui_dashboard.h</text>
+  <text x="170" y="307" text-anchor="middle" fill="#888" font-size="9">UI バインディング公開 IF</text>
+  <text x="170" y="325" text-anchor="middle" fill="#66bb6a" font-size="10">共通インターフェース (全3デザイン同一)</text>
+
+  <!-- ui_dashboard.c -->
+  <rect x="60" y="340" width="220" height="45" rx="6" fill="#1a2a4a" stroke="#42a5f5" stroke-width="2"/>
+  <text x="170" y="358" text-anchor="middle" fill="#42a5f5" font-size="12" font-weight="bold">ui_dashboard.c</text>
+  <text x="170" y="378" text-anchor="middle" fill="#888" font-size="9">データ→ウィジェット バインド実装</text>
+
+  <!-- screens.h -->
+  <rect x="370" y="275" width="180" height="55" rx="6" fill="#1a2a4a" stroke="#42a5f5" stroke-width="2"/>
+  <text x="460" y="293" text-anchor="middle" fill="#42a5f5" font-size="12" font-weight="bold">screens.h</text>
+  <text x="460" y="307" text-anchor="middle" fill="#888" font-size="9">EEZ自動生成: ウィジェット定義</text>
+  <text x="460" y="322" text-anchor="middle" fill="#aaa" font-size="10">objects_t struct</text>
+
+  <!-- eez_compat.h -->
+  <rect x="600" y="275" width="180" height="55" rx="6" fill="#1a2a4a" stroke="#42a5f5" stroke-width="2"/>
+  <text x="690" y="293" text-anchor="middle" fill="#42a5f5" font-size="12" font-weight="bold">eez_compat.h</text>
+  <text x="690" y="307" text-anchor="middle" fill="#888" font-size="9">SLS名→EEZ名 変換マクロ</text>
+  <text x="690" y="322" text-anchor="middle" fill="#aaa" font-size="10">未実装=NULL マップ</text>
+
+  <!-- vars.h -->
+  <rect x="820" y="275" width="100" height="55" rx="6" fill="#1a2a4a" stroke="#42a5f5" stroke-width="2"/>
+  <text x="870" y="293" text-anchor="middle" fill="#42a5f5" font-size="12" font-weight="bold">vars.h</text>
+  <text x="870" y="307" text-anchor="middle" fill="#888" font-size="9">EEZ Flow 変数</text>
+  <text x="870" y="322" text-anchor="middle" fill="#aaa" font-size="10">get/set_var_rpm</text>
+
+  <!-- ===== Design boxes ===== -->
+  <!-- eez001 -->
+  <rect x="40" y="460" width="270" height="130" rx="6" fill="#0a2540" stroke="#ffa726" stroke-width="2"/>
+  <text x="175" y="480" text-anchor="middle" fill="#ffa726" font-size="13" font-weight="bold">eez001 (Standard)</text>
+  <text x="175" y="496" text-anchor="middle" fill="#888" font-size="9">青テーマ / アナログ針タコ</text>
+  <text x="175" y="514" text-anchor="middle" fill="#aaa" font-size="11">針タコ + Arc + 6本バー</text>
+  <text x="175" y="530" text-anchor="middle" fill="#aaa" font-size="11">全ラベル完備 (RPM/IAT/MAP/AFR/TIME)</text>
+  <text x="175" y="548" text-anchor="middle" fill="#66bb6a" font-size="11">eez_compat.h: 全マクロ有効</text>
+  <text x="175" y="564" text-anchor="middle" fill="#66bb6a" font-size="11">get_var_rpm(): スタブ実装済</text>
+  <text x="175" y="580" text-anchor="middle" fill="#888" font-size="10">screens.h = eez002 と同一</text>
+
+  <!-- eez002 -->
+  <rect x="340" y="460" width="270" height="130" rx="6" fill="#0a2540" stroke="#ffa726" stroke-width="2"/>
+  <text x="475" y="480" text-anchor="middle" fill="#ffa726" font-size="13" font-weight="bold">eez002 (Racing)</text>
+  <text x="475" y="496" text-anchor="middle" fill="#888" font-size="9">赤テーマ / eez001と同一構成</text>
+  <text x="475" y="514" text-anchor="middle" fill="#aaa" font-size="11">針タコ + Arc + 6本バー</text>
+  <text x="475" y="530" text-anchor="middle" fill="#aaa" font-size="11">全ラベル完備 (RPM/IAT/MAP/AFR/TIME)</text>
+  <text x="475" y="548" text-anchor="middle" fill="#66bb6a" font-size="11">eez_compat.h: 全マクロ有効</text>
+  <text x="475" y="564" text-anchor="middle" fill="#66bb6a" font-size="11">get_var_rpm(): スタブ実装済</text>
+  <text x="475" y="580" text-anchor="middle" fill="#888" font-size="10">screens.h = eez001 と同一</text>
+
+  <!-- eez003 -->
+  <rect x="640" y="460" width="280" height="130" rx="6" fill="#0a2540" stroke="#ffa726" stroke-width="2"/>
+  <text x="780" y="480" text-anchor="middle" fill="#ffa726" font-size="13" font-weight="bold">eez003 (Prodrive)</text>
+  <text x="780" y="496" text-anchor="middle" fill="#888" font-size="9">独自レイアウト / 水平セグメントバー</text>
+  <text x="780" y="514" text-anchor="middle" fill="#aaa" font-size="11">水平バータコ (obj0-24, 各360RPM)</text>
+  <text x="780" y="530" text-anchor="middle" fill="#aaa" font-size="11">独自ラベル名 (charge/boost/range)</text>
+  <text x="780" y="548" text-anchor="middle" fill="#66bb6a" font-size="11">eez_compat.h: 未実装マクロはNULL化済</text>
+  <text x="780" y="564" text-anchor="middle" fill="#66bb6a" font-size="11">get_var_rpm(): 実装あり</text>
+  <text x="780" y="580" text-anchor="middle" fill="#888" font-size="10">screens.h: obj0-112 独自メンバー</text>
+
+  <!-- ===== Arrows: shared -> symlink ===== -->
+  <path d="M160,150 L160,175 L170,175 L170,275" fill="none" stroke="#66bb6a" stroke-width="2" marker-end="url(#arr-green)"/>
+  <path d="M240,110 L290,110 L290,185 L690,185 L690,275" fill="none" stroke="#66bb6a" stroke-width="2" marker-end="url(#arr-green)"/>
+  <text x="300" y="180" fill="#66bb6a" font-size="10">ui_Screen1 マクロ経由 (修正済)</text>
+  <path d="M370,148 L370,175 L170,175 L170,273" fill="none" stroke="#66bb6a" stroke-width="1.5" marker-end="url(#arr-green)"/>
+
+  <!-- ===== Arrows: symlink internal ===== -->
+  <path d="M280,365 L690,365 L690,330" fill="none" stroke="#888" stroke-width="1.5" marker-end="url(#arr)"/>
+  <path d="M280,360 L460,360 L460,330" fill="none" stroke="#888" stroke-width="1.5" marker-end="url(#arr)"/>
+  <path d="M600,300 L550,300" fill="none" stroke="#888" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="556" y="294" fill="#888" font-size="9">マクロ展開</text>
+
+  <!-- ===== Arrows: symlink -> designs (dashed cyan) ===== -->
+  <path d="M170,385 L170,415 L175,460" fill="none" stroke="#00bcd4" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arr-dash)"/>
+  <path d="M170,385 L170,415 L475,415 L475,460" fill="none" stroke="#00bcd4" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arr-dash)"/>
+  <path d="M170,385 L170,415 L780,415 L780,460" fill="none" stroke="#00bcd4" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arr-dash)"/>
+  <text x="400" y="411" fill="#00bcd4" font-size="10">switch_design.ps1</text>
+</svg>
+
+<!-- ===== Widget Compatibility Matrix ===== -->
+<h2 class="section-title">ウィジェット互換性マトリクス</h2>
+
+<svg viewBox="0 0 960 540" width="960" height="540" xmlns="http://www.w3.org/2000/svg">
+  <!-- Header -->
+  <rect x="20" y="10" width="920" height="36" rx="4" fill="#16213e"/>
+  <text x="220" y="33" text-anchor="middle" fill="#00d4ff" font-size="12" font-weight="bold">ウィジェット (objects_t メンバー)</text>
+  <text x="500" y="33" text-anchor="middle" fill="#888" font-size="10">用途</text>
+  <text x="610" y="33" text-anchor="middle" fill="#ffa726" font-size="12" font-weight="bold">eez001</text>
+  <text x="720" y="33" text-anchor="middle" fill="#ffa726" font-size="12" font-weight="bold">eez002</text>
+  <text x="850" y="33" text-anchor="middle" fill="#ffa726" font-size="12" font-weight="bold">eez003</text>
+
+  <!-- Group: Common -->
+  <rect x="20" y="52" width="920" height="22" rx="2" fill="#0a2a40"/>
+  <text x="36" y="68" fill="#66bb6a" font-size="11" font-weight="bold">共通 (全デザイン)</text>
+
+  <g font-size="11" fill="#ccc">
+    <text x="60" y="90">screen1</text>
+    <text x="500" y="90" text-anchor="middle" fill="#666" font-size="10">メインスクリーン</text>
+    <text x="610" y="90" text-anchor="middle" fill="#66bb6a">OK</text><text x="720" y="90" text-anchor="middle" fill="#66bb6a">OK</text><text x="850" y="90" text-anchor="middle" fill="#66bb6a">OK</text>
+
+    <text x="60" y="108">ui_container_dashboard / opening</text>
+    <text x="500" y="108" text-anchor="middle" fill="#666" font-size="10">画面切替コンテナ</text>
+    <text x="610" y="108" text-anchor="middle" fill="#66bb6a">OK</text><text x="720" y="108" text-anchor="middle" fill="#66bb6a">OK</text><text x="850" y="108" text-anchor="middle" fill="#66bb6a">OK</text>
+
+    <text x="60" y="126">ui_lbl_water_temp / oil_temp / oil_press</text>
+    <text x="500" y="126" text-anchor="middle" fill="#666" font-size="10">水温・油温・油圧 数値</text>
+    <text x="610" y="126" text-anchor="middle" fill="#66bb6a">OK</text><text x="720" y="126" text-anchor="middle" fill="#66bb6a">OK</text><text x="850" y="126" text-anchor="middle" fill="#66bb6a">OK</text>
+
+    <text x="60" y="144">ui_lbl_battery / gear / spd / odo / trip</text>
+    <text x="500" y="144" text-anchor="middle" fill="#666" font-size="10">電圧・ギア・速度・距離</text>
+    <text x="610" y="144" text-anchor="middle" fill="#66bb6a">OK</text><text x="720" y="144" text-anchor="middle" fill="#66bb6a">OK</text><text x="850" y="144" text-anchor="middle" fill="#66bb6a">OK</text>
+
+    <text x="60" y="162">ui_bar_fuel</text>
+    <text x="500" y="162" text-anchor="middle" fill="#666" font-size="10">燃料残量バー</text>
+    <text x="610" y="162" text-anchor="middle" fill="#66bb6a">OK</text><text x="720" y="162" text-anchor="middle" fill="#66bb6a">OK</text><text x="850" y="162" text-anchor="middle" fill="#66bb6a">OK</text>
+
+    <text x="60" y="180">ui_img_warn_* (9 icons)</text>
+    <text x="500" y="180" text-anchor="middle" fill="#666" font-size="10">警告灯アイコン</text>
+    <text x="610" y="180" text-anchor="middle" fill="#66bb6a">OK</text><text x="720" y="180" text-anchor="middle" fill="#66bb6a">OK</text><text x="850" y="180" text-anchor="middle" fill="#66bb6a">OK</text>
+
+    <text x="60" y="198">ui_notify_box / label</text>
+    <text x="500" y="198" text-anchor="middle" fill="#666" font-size="10">通知オーバーレイ</text>
+    <text x="610" y="198" text-anchor="middle" fill="#66bb6a">OK</text><text x="720" y="198" text-anchor="middle" fill="#66bb6a">OK</text><text x="850" y="198" text-anchor="middle" fill="#66bb6a">OK</text>
+  </g>
+
+  <!-- Group: eez001/002 only -->
+  <rect x="20" y="212" width="920" height="22" rx="2" fill="#2a1a0a"/>
+  <text x="36" y="228" fill="#ffa726" font-size="11" font-weight="bold">eez001 / eez002 のみ (eez003 では NULL マップ)</text>
+
+  <g font-size="11" fill="#ccc">
+    <text x="60" y="248">ui_arc_rpm / ui_image_rpm / ui_image_peak_rpm</text>
+    <text x="500" y="248" text-anchor="middle" fill="#666" font-size="10">針タコ+ピーク針+円弧</text>
+    <text x="610" y="248" text-anchor="middle" fill="#66bb6a">OK</text><text x="720" y="248" text-anchor="middle" fill="#66bb6a">OK</text><text x="850" y="248" text-anchor="middle" fill="#ffa726">NULL</text>
+
+    <text x="60" y="266">ui_lbl_rpm</text>
+    <text x="500" y="266" text-anchor="middle" fill="#666" font-size="10">RPM 数値表示</text>
+    <text x="610" y="266" text-anchor="middle" fill="#66bb6a">OK</text><text x="720" y="266" text-anchor="middle" fill="#66bb6a">OK</text><text x="850" y="266" text-anchor="middle" fill="#ffa726">NULL</text>
+
+    <text x="60" y="284">ui_bar_water/iat/oil_temp/map/oil_press/battery</text>
+    <text x="500" y="284" text-anchor="middle" fill="#666" font-size="10">6ゲージ lv_bar</text>
+    <text x="610" y="284" text-anchor="middle" fill="#66bb6a">OK</text><text x="720" y="284" text-anchor="middle" fill="#66bb6a">OK</text><text x="850" y="284" text-anchor="middle" fill="#ffa726">NULL</text>
+
+    <text x="60" y="302">ui_lbl_iat / ui_lbl_map / ui_lbl_afr</text>
+    <text x="500" y="302" text-anchor="middle" fill="#666" font-size="10">吸気温・MAP・AFR 数値</text>
+    <text x="610" y="302" text-anchor="middle" fill="#66bb6a">OK</text><text x="720" y="302" text-anchor="middle" fill="#66bb6a">OK</text><text x="850" y="302" text-anchor="middle" fill="#ffa726">NULL</text>
+
+    <text x="60" y="320">ui_lbl_time</text>
+    <text x="500" y="320" text-anchor="middle" fill="#666" font-size="10">時計 (HH:MM)</text>
+    <text x="610" y="320" text-anchor="middle" fill="#66bb6a">OK</text><text x="720" y="320" text-anchor="middle" fill="#66bb6a">OK</text><text x="850" y="320" text-anchor="middle" fill="#ffa726">NULL</text>
+
+    <text x="60" y="338">ui_container_telltale / ui_img_telltale</text>
+    <text x="500" y="338" text-anchor="middle" fill="#666" font-size="10">テルテール画像</text>
+    <text x="610" y="338" text-anchor="middle" fill="#66bb6a">OK</text><text x="720" y="338" text-anchor="middle" fill="#66bb6a">OK</text><text x="850" y="338" text-anchor="middle" fill="#ffa726">NULL</text>
+  </g>
+
+  <!-- Group: eez003 only -->
+  <rect x="20" y="352" width="920" height="22" rx="2" fill="#0a2a2a"/>
+  <text x="36" y="368" fill="#00bcd4" font-size="11" font-weight="bold">eez003 のみ</text>
+
+  <g font-size="11" fill="#ccc">
+    <text x="60" y="388">obj0 - obj24</text>
+    <text x="500" y="388" text-anchor="middle" fill="#666" font-size="10">タコ水平バー (各360RPM)</text>
+    <text x="610" y="388" text-anchor="middle" fill="#ff5252">--</text><text x="720" y="388" text-anchor="middle" fill="#ff5252">--</text><text x="850" y="388" text-anchor="middle" fill="#66bb6a">OK</text>
+
+    <text x="60" y="406">obj25 - obj112</text>
+    <text x="500" y="406" text-anchor="middle" fill="#666" font-size="10">6ゲージ水平バー</text>
+    <text x="610" y="406" text-anchor="middle" fill="#ff5252">--</text><text x="720" y="406" text-anchor="middle" fill="#ff5252">--</text><text x="850" y="406" text-anchor="middle" fill="#66bb6a">OK</text>
+
+    <text x="60" y="424">ui_lbl_charge_temp</text>
+    <text x="500" y="424" text-anchor="middle" fill="#666" font-size="10">吸気温 (= IAT 相当)</text>
+    <text x="610" y="424" text-anchor="middle" fill="#ff5252">--</text><text x="720" y="424" text-anchor="middle" fill="#ff5252">--</text><text x="850" y="424" text-anchor="middle" fill="#66bb6a">OK</text>
+
+    <text x="60" y="442">ui_lbl_boost_val</text>
+    <text x="500" y="442" text-anchor="middle" fill="#666" font-size="10">ブースト圧 (= MAP 相当)</text>
+    <text x="610" y="442" text-anchor="middle" fill="#ff5252">--</text><text x="720" y="442" text-anchor="middle" fill="#ff5252">--</text><text x="850" y="442" text-anchor="middle" fill="#66bb6a">OK</text>
+
+    <text x="60" y="460">ui_lbl_range</text>
+    <text x="500" y="460" text-anchor="middle" fill="#666" font-size="10">AFR (= 空燃比 相当)</text>
+    <text x="610" y="460" text-anchor="middle" fill="#ff5252">--</text><text x="720" y="460" text-anchor="middle" fill="#ff5252">--</text><text x="850" y="460" text-anchor="middle" fill="#66bb6a">OK</text>
+
+    <text x="60" y="478">ui_lbl_fuel_press / als / parking / spd_unit</text>
+    <text x="500" y="478" text-anchor="middle" fill="#666" font-size="10">燃圧・ALS・駐車・速度単位</text>
+    <text x="610" y="478" text-anchor="middle" fill="#ff5252">--</text><text x="720" y="478" text-anchor="middle" fill="#ff5252">--</text><text x="850" y="478" text-anchor="middle" fill="#66bb6a">OK</text>
+  </g>
+
+  <!-- Divider lines -->
+  <line x1="460" y1="52" x2="460" y2="500" stroke="#333" stroke-width="1"/>
+  <line x1="560" y1="52" x2="560" y2="500" stroke="#333" stroke-width="1"/>
+  <line x1="670" y1="52" x2="670" y2="500" stroke="#333" stroke-width="1"/>
+  <line x1="780" y1="52" x2="780" y2="500" stroke="#333" stroke-width="1"/>
+  <line x1="920" y1="52" x2="920" y2="500" stroke="#333" stroke-width="1"/>
+</svg>
+
+<!-- ===== Issues ===== -->
+<h2 class="section-title">検出された問題と対応状況</h2>
+<table class="issues">
+  <tr>
+    <th>#</th><th>状態</th><th>箇所</th><th>内容</th>
+  </tr>
+  <tr class="done">
+    <td>1</td>
+    <td class="resolved">解消</td>
+    <td class="loc">src/main.c:156-160</td>
+    <td><code>objects.screen1</code> の直接参照を <code>eez_compat.h</code> の <code>ui_Screen1</code> マクロ経由に修正。共用コードからデザイン別構造体への直接依存を解消。</td>
+  </tr>
+  <tr class="done">
+    <td>2</td>
+    <td class="resolved">解消</td>
+    <td class="loc">eez003/ui/eez_compat.h</td>
+    <td>eez003 に存在しない17個のウィジェットマクロを <code>((lv_obj_t *)NULL)</code> にマップ。使用側の NULL チェックにより安全にスキップされる。</td>
+  </tr>
+  <tr class="done">
+    <td>3</td>
+    <td class="resolved">解消</td>
+    <td class="loc">eez001 &amp; eez002 の ui_dashboard.c</td>
+    <td><code>get_var_rpm()</code> / <code>set_var_rpm()</code> のスタブ実装を追加。<code>vars.h</code> の宣言に対応し、リンクエラーを防止。</td>
+  </tr>
+</table>
+
+</body>
+</html>
