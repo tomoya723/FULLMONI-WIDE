@@ -39,14 +39,17 @@ if (-not (Test-Path (Join-Path $designDir 'ui_binding'))) {
     exit 1
 }
 
-# --- Remove existing junctions ---
+# --- Remove existing junctions / directories ---
 foreach ($junc in @($uiJunction, $ubJunction)) {
     if (Test-Path $junc) {
         $item = Get-Item $junc -Force
         if ($item.LinkType -eq 'Junction') {
             cmd /c "rmdir `"$junc`"" 2>$null
+        } elseif ($item.PSIsContainer) {
+            Write-Warning "$junc is a regular directory. Removing to replace with junction."
+            Remove-Item $junc -Recurse -Force
         } else {
-            Write-Error "$junc exists but is not a junction. Aborting."
+            Write-Error "$junc exists but is not a directory or junction. Aborting."
             exit 1
         }
     }
@@ -58,6 +61,12 @@ $ubTarget = Join-Path $designDir 'ui_binding'
 
 cmd /c "mklink /J `"$uiJunction`" `"$uiTarget`""
 cmd /c "mklink /J `"$ubJunction`" `"$ubTarget`""
+
+# --- Sync build subdir.mk files for active design ---
+$syncScript = Join-Path $repoRoot 'tools\sync_ui_subdir_mk.ps1'
+if (Test-Path $syncScript) {
+    & $syncScript -RepoRoot $repoRoot
+}
 
 # --- Update variant_id.h ---
 $variantMap = @{
