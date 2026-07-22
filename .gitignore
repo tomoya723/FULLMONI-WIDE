@@ -91,3 +91,7 @@ HostApp/FULLMONI-WIDE-Terminal/publish/
 HostApp/FULLMONI-WIDE-Desktop/.gradle/
 
 /.metadata/
+
+# Python
+__pycache__/
+*.pyc
