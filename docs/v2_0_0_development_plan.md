@@ -40,6 +40,51 @@
 
 > リモート枝の削除は不可逆のため、実行前に個別確認する。
 
+### Phase 0 想定結果
+
+現状 **リモート 14 ブランチ** → 整理後は **実質 3〜4 本** に集約される見込み。
+
+```
+14本 → 残す4本（main / dev_LVGL_EEZ / dev_EPSdrvPLSgen / 作業枝）
+      + 取込後クローズ2本（claude/lvgl-eez-pr-release / dev_dbcupdate）
+      + 削除7本
+      + このプラン枝1本（claude/repository-dev-status-lqyz0j：処遇要判断）
+```
+
+**残す（3〜4本）**
+
+| ブランチ | 役割 |
+|---|---|
+| main | リリース済み安定版（v2.0.0 マージ先） |
+| dev_LVGL_EEZ | ★ 唯一の統合ベース（v2.0.0 開発本流） |
+| dev_EPSdrvPLSgen | chaketek 独自ライン（別管理・対象外） |
+| （作業用の一時枝） | 実装時に dev_LVGL_EEZ から切る feature 枝（随時） |
+
+**ベースへ取り込んでからクローズ（2本）**
+
+| ブランチ | 処置 |
+|---|---|
+| claude/lvgl-eez-pr-release-8ifkfd | チェックリスト doc を dev_LVGL_EEZ へ取込み → 削除 |
+| dev_dbcupdate (PR #110) | GroundSpeed LSB=0.1 修正だけ拾う → PR クローズ・削除 |
+
+**削除（7本）**
+
+| ブランチ | 削除理由 |
+|---|---|
+| dev_LVGL | dev_LVGL_EEZ に完全内包 |
+| feature/eez-flow-integration | 廃案 |
+| chore/remove-desktop-tool | main にマージ済み |
+| test-aw003 | 旧 aw 系・1年放置（+110 / −148） |
+| dev_dataregister_refactoring | 旧 pre-LVGL（#24 は新ベースで再実施） |
+| devenv_docupdate | 旧・大幅遅延（−88）※内容確認後 |
+| feature/android-ui-refresh | 旧・大幅遅延（−67）※内容確認後 |
+
+**Phase 0 実行前の要判断ポイント（3点）**
+
+1. `devenv_docupdate` / `feature/android-ui-refresh` に拾うべき差分（+2）が無いかの内容確認 → 無ければ削除。
+2. `dev_dbcupdate` の GroundSpeed LSB=0.1 修正を取り込む前提でよいか（実バグ修正のため推奨）。
+3. 本プラン文書 `docs/v2_0_0_development_plan.md` を dev_LVGL_EEZ 側へ移すか（新ベースで参照しやすくなる）。
+
 ---
 
 ## Phase 1. v2.0.0 を出せる状態にする（リリースブロッカー優先）
