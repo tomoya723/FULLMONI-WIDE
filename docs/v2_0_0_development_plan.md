@@ -16,7 +16,7 @@
 ### 枝の親子関係
 - `dev_LVGL` ⊂ `dev_LVGL_EEZ` ⊂ `claude/lvgl-eez-pr-release-8ifkfd`（差分はリリースチェックリスト doc 1コミットのみ）
 - `feature/eez-flow-integration`（EEZ Flow 統合, +24）は別系統・未統合 → **廃案・削除予定**
-- `dev_EPSdrvPLSgen`（#115, +1）は別系統・未統合
+- `dev_EPSdrvPLSgen`（#115, +1）は **chaketek 独自開発**。当面 main 統合予定なし → 別枝で維持
 
 ---
 
@@ -30,7 +30,7 @@
 | claude/lvgl-eez-pr-release-8ifkfd | +38 / −3 | 差分はチェックリスト doc のみ → ベースへ取込みクローズ |
 | dev_LVGL | +11 / −3 | dev_LVGL_EEZ に完全内包 → **削除** |
 | feature/eez-flow-integration | +24 / −3 | **廃案・削除予定**（v2.0.0 に含めない） |
-| dev_EPSdrvPLSgen | +1 / −3 | #115。v2.0.0 後に dev_LVGL_EEZ へ rebase 統合 |
+| dev_EPSdrvPLSgen | +1 / −3 | #115。**chaketek 独自開発**。当面 main 統合予定なし → 別枝で維持（整理・削除の対象外） |
 | dev_dbcupdate (PR #110) | +2 / −7 | GroundSpeed LSB=0.1 修正だけ拾ってベースへ、PR クローズ |
 | chore/remove-desktop-tool | merged 済 | **削除** |
 | test-aw003 | +110 / −148 | 旧 aw 系・1年放置 → 削除 / アーカイブ |
@@ -82,7 +82,7 @@
 
 ### E. 機能追加（v2.1 以降へ）
 - **#59** ウィンカー制御（鼓動ウィンカー、要 DI/DO ハード）
-- **#115** EPS 駆動パルス生成（枝 `dev_EPSdrvPLSgen` あり）
+- **#115** EPS 駆動パルス生成 — chaketek 独自開発（枝 `dev_EPSdrvPLSgen`）。当面 main 統合予定なし、本プランの対象外として別管理
 - **#40** 平均燃費計算
 - **#32** 空燃比計算値オーバーフロー対応
 - **#35** スイッチ操作で実装する低レベル操作（Trip / 輝度 / 時計 / ピークホールド）
