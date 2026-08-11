@@ -34,7 +34,7 @@ Windows/AndroidホストアプリとFULLMONI-WIDE本体の通信を、USB直結�
 
 Windows側の改修コストが支配的なため、SPPを採用する。
 CYW43439はデュアルモード（Classic + BLE）なので、将来iOS対応が必要になった場合は
-**同一ハードウェアのままBLE(NUS)サービスを追加**できる（[将来拡張](#将来拡張)参照）。
+**同一ハードウェアのままBLE(NUS)サービスを追加**できる（[iOS対応（Phase 5: BLE併設）](#ios対応phase-5-ble併設)参照）。
 
 ### ブリッジMCU: Raspberry Pi Pico 2 W を採用
 
@@ -270,9 +270,11 @@ interface SerialTransport {
 | Phase | 内容 | 完了条件 |
 |-------|------|----------|
 | **1. スループット実証** | Pico 2 W + BTstack SPPサーバ + TinyUSB CDCホストの疎通。ループバック/実機でスループット・RTT実測 | Windows/AndroidからBT経由でパラメータコンソールが操作できる。実効速度の実測値取得 |
-| **2. ブリッジFW完成** | リングバッファ・フロー制御・再列挙バッファリング・ペアリング時間窓・LED実装 | fwupdate 10回連続成功、起動画像read/write成功（Windows無改修で） |
+| **2. ブリッジFW完成** | リングバッファ・フロー制御・再列挙バッファリング・ペアリング時間窓・LED実装。中継ロジックは**トランスポート非依存**に実装する（Phase 5aのBLE追加に備える） | fwupdate 10回連続成功、起動画像read/write成功（Windows無改修で） |
 | **3. Androidトランスポート抽象化** | `SerialTransport` 導入 + `BluetoothSppTransport` 実装 + UI追加 | Android実機で全機能（コンソール/CAN設定/FW更新/画像転送）成功 |
 | **4. 製品化検討** | 専用キャリアPCB（12V入力DC/DC統載）、ケース、リポジトリへ `BridgeDevice/` ディレクトリ追加 | 車載実装例の公開 |
+| **5a. ブリッジFWへBLE追加（iOS対応・前半）** | BTstackにBLE NUS互換GATTサービスを追加しSPPと併存。汎用BLEターミナルアプリで疎通・スループット実測 | iPhoneからBLE経由でパラメータコンソールが操作できる。BLE実効速度の実測値取得 |
+| **5b. iOSアプリ開発（iOS対応・後半）** | Swift + CoreBluetooth のNUSクライアント実装。Android版の画面・ロジック構成を移植 | iPhone実機で全機能（コンソール/CAN設定/FW更新/画像転送）成功 |
 
 リポジトリ構成（Phase 2以降）:
 
@@ -299,11 +301,54 @@ BridgeDevice/
 6. **セキュリティ**: 電源投入61秒後に新規ペアリングが拒否されること
 7. **長時間**: コンソール接続24時間放置でリンク維持（またはLED表示通りの自動再接続）
 
+## iOS対応（Phase 5: BLE併設）
+
+iOSはBT Classic SPPを一般アプリに開放していない（MFi認証プログラム加入＋認証チップが
+必要で、OSSプロジェクトには非現実的）。一方、BLEはCoreBluetoothで自由に使えるため、
+**iOS対応 = BLE対応**となる。CYW43439はデュアルモード（Classic + BLE）のため、
+**ブリッジハードウェアは不変のまま**ファームウェア追加のみで対応できる。本体（RX72N）も従来通り一切不変。
+
+### 方式
+
+- **GATTサービス**: Nordic UART Service（NUS）互換
+  （Service UUID `6E400001-B5A3-F393-E0A9-E50E24DCCA9E`、
+  RX Characteristic = ホスト→ブリッジ Write、TX Characteristic = ブリッジ→ホスト Notify）。
+  TX/RXの2キャラクタリスティックで双方向バイトストリームを構成する。
+- **SPPとの併存**: BTstackはデュアルモード対応のため、既存SPPサーバと並行して
+  BLEアドバタイズを常時行う。Windows/AndroidはSPP、iPhoneはBLEと接続方式を使い分ける。
+- **同時接続**: SPP/BLE合わせて**1本のみ**（既存仕様を踏襲）。一方が接続中は他方の接続を拒否する。
+- **ペアリング**: NUS自体は暗号化必須ではないが、SPPと同じセキュリティポリシーを適用する
+  （電源投入後60秒の受付時間窓をBLEアドバタイズのconnectable制御で実現）。
+- **中継ロジック**: リングバッファ・フロー制御・再列挙バッファはPhase 2で
+  トランスポート非依存に実装しておき、BLE側は入出力の差し替えのみとする。
+
+### フロー制御（SPPとの最大の実装差分）
+
+RFCOMMと異なり、BLE Notificationにはアプリ層のクレジット制御がない。
+
+| 方向 | 制御方法 |
+|------|----------|
+| ホスト→ブリッジ（Write） | 通常は Write Without Response を使い、bt→usbバッファ残量が閾値を下回ったら **Write with Response に切り替えさせる**（NUSクレジット拡張が使えない環境向けの定石）。iOSアプリ側はバッファ閾値通知（後述の診断用Characteristicまたは応答遅延）で送信ペースを調整 |
+| ブリッジ→ホスト（Notify） | `att_server_request_can_send_now_event` によるcan-send-nowフローに従い、スタックの送信キューが空いた分だけ送る。usb→btバッファ満杯時はUSB側IN転送を止める（SPPと同じバックプレッシャ） |
+
+### スループット見込み
+
+BLEの実効速度は接続パラメータのネゴシエーション結果に依存する。
+iPhone（2M PHY + Data Length Extension対応）で条件が良ければ実効50〜90KB/s
+（SPPを上回る場合もある）、悪条件でも10KB/s台。FW更新232KBは最悪条件でも20秒強で実用範囲。
+Phase 5aで実測し、プロトコル透過性テーブルのBLE版を追記する。
+
+### iOSアプリ
+
+- Swift + CoreBluetooth によるNUSクライアントとして新規開発。
+- プロトコルは既存のテキストコンソール＋バイナリ転送そのままのため、
+  Android版（Kotlin/Compose）の画面構成・サービス層ロジックを移植する。
+- **バックグラウンド制約**: iOSのBLEバックグラウンド実行制限があるため、
+  FW更新・画像転送中は画面を開いたままにする運用とする（README記載）。
+- リポジトリ配置: `HostApp/FULLMONI-WIDE-iOS/`
+
 ## 将来拡張
 
-- **BLE併設（iOS対応）**: CYW43439はデュアルモードのため、BTstackでSPPと並行して
-  BLE NUS（Nordic UART Service互換）を広告可能。iOSアプリ開発時にブリッジFWへ追加する。
-  ホストプロトコルは同一バイトストリームのため、トランスポート追加のみで対応可能。
 - **ブリッジ自身の無線書き換え**: BTstack経由でPicoのフラッシュを更新するDFU機能
   （優先度低。当面はUSBのBOOTSELで書き換え）。
 - **診断チャネル**: 2本目のRFCOMMチャネルでブリッジのログ・統計（バッファ使用率、
