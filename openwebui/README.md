@@ -265,3 +265,103 @@ Measure-Command {
     -Headers @{ Authorization = "Bearer $key" } -ContentType 'application/json' -Body $body
 }
 ```
+
+---
+
+## 7. 「検索が不十分」の件(未解決 / 原因候補を特定)
+
+前回の修正は**誤発火を止めただけ**で、検索結果の中身には一切触れていない。
+上流ソースを読んだ範囲で、既定値のままだと確実にボトルネックになる箇所が 3 つある。
+`backend/open_webui/config.py` の既定値:
+
+| 設定 | 既定値 | 効き方 |
+|---|---|---|
+| `RAG_TOP_K` (`rag.top_k`) | **3** | 全ページを合わせて **チャンク 3 個だけ**がモデルに渡る |
+| `CHUNK_SIZE` / `CHUNK_OVERLAP` | 1000 / 100 | 上と合わせて実質 **約 3,000 文字**しかコンテキストに入らない |
+| `WEB_SEARCH_RESULT_COUNT` (`web.search.result_count`) | **3** | 検索エンジンから取る URL が 3 件 |
+| `WEB_LOADER_ENGINE` (`web.loader.engine`) | `''` = `SafeWebBaseLoader` | aiohttp + BeautifulSoup。**JS 実行なし** |
+
+「ページ本文が取れていない」ように見える主因はこの 2 系統のどちらか:
+
+1. **本文はある程度取れているが、top_k=3 で削られてモデルに届いていない**
+   → `RAG_TOP_K` を 8〜12 に上げる。または管理者パネル → ドキュメント →
+   **「埋め込みと取得をバイパス (Bypass Embedding and Retrieval)」** を ON にすると、
+   取得したページ本文を丸ごとコンテキストに入れる
+   (`routers/retrieval.py:2911-2925`。`BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL`)。
+   27B に長文を食わせる余裕があるならこちらのほうが素直。
+
+2. **そもそもページのロードに失敗して黙って捨てられている**
+   `get_web_loader()` は `continue_on_failure=True` で走り
+   (`retrieval/web/utils.py:1015-1050`)、失敗した URL は `docs` に入らない。
+   その後 `urls = [doc.metadata.get('source') for doc in docs ...]` で
+   **ロードできた URL だけに絞り込まれる** (`routers/retrieval.py:2904-2909`)。
+   403 を返すサイトや JS レンダリングのサイトは全滅する。
+   → `docker logs open-webui` に出るロードエラーを確認。多いなら
+   `WEB_LOADER_ENGINE=playwright` + `PLAYWRIGHT_WS_URL`(別コンテナ)を検討。
+
+**切り分け方**: 「N件のソースを取得」の N と、`web.search.result_count` の値を比べる。
+N が設定値より明らかに少ない → (2)。N は足りているのに回答が薄い → (1)。
+
+---
+
+## 8. 「Open WebUI が遅い / TTFT が長い」件(未解決 / 最有力の仮説)
+
+**`TASK_MODEL` が未設定だと、補助タスクが全部 27B に飛ぶ。**
+
+`utils/task.py:16-27` の `get_task_model_id()` は、`TASK_MODEL` が空なら
+`task_model_id = default_model_id`、つまりチャットで選んでいるモデルをそのまま使う。
+そして `config.py:2308-2315` の既定値は:
+
+| タスク | 既定 |
+|---|---|
+| `ENABLE_TITLE_GENERATION` | **True** |
+| `ENABLE_TAGS_GENERATION` | **True** |
+| `ENABLE_FOLLOW_UP_GENERATION` | **True** |
+| `ENABLE_SEARCH_QUERY_GENERATION` | **True** |
+| `ENABLE_AUTOCOMPLETE_GENERATION` | False |
+
+つまり検索 ON の 1 送信で 27B への呼び出しが最大 **5 回**発生する
+(検索クエリ生成 → 本チャット → タイトル → タグ → フォローアップ)。
+
+llama-server を既定の `-np 1`(並列スロット 1)で動かしている場合、これらは
+**直列にキューイングされる**。前のターンのタイトル/タグ/フォローアップ生成が終わるまで
+次のターンの本チャットが始まらないので、体感 TTFT がそのぶん伸びる。
+「本チャット自体の prompt eval は速いのに待たされる」ならこれが原因。
+
+### 検索 ON のときの実際の待ち行列
+
+```
+[1] 検索クエリ生成      : 27B 往復 (記憶入りの messages 込み)
+[2] 検索 API            : SearXNG/Brave 等
+[3] ページ取得          : SafeWebBaseLoader, 同時 10 (web.loader.concurrent_requests)
+[4] チャンク + 埋め込み  : all-MiniLM-L6-v2 を open-webui コンテナ内の CPU で実行
+[5] 取得 (top_k=3)
+[6] 本チャット          : 27B 往復  ← ここでやっと最初のトークン
+```
+
+`RAG_EMBEDDING_ENGINE` の既定値は `''`(= SentenceTransformers をコンテナ内で実行)、
+モデルは `sentence-transformers/all-MiniLM-L6-v2` (`config.py:996-1002`)。
+GPU ではなく **open-webui コンテナの CPU** で回るので、[4] も無視できない。
+
+### 効く順に手を打つ
+
+1. **検索クエリ生成を OFF**(§4-a)。[1] が丸ごと消える。副次的に記憶混入も直る。
+2. **タイトル/タグ/フォローアップ生成を OFF**、または `TASK_MODEL` に小さいモデル
+   (別ポートの llama-server に 1.5B〜3B) を指定する。キュー詰まりが消える。
+3. **llama-server の並列スロットを増やす** (`-np 2` 以上)。VRAM と相談。
+4. **埋め込みをバイパス**(§7-1)。[4][5] が消える。ただし [6] の prompt tokens は増える。
+
+### 測ってほしいもの
+
+`prompt eval time` の行を、1 送信につき**出てくる全部**拾ってほしい。
+1 送信で何行出るかがそのまま「27B を何回叩いているか」になる。
+
+| ケース | 期待される prompt eval の行数 |
+|---|---|
+| 検索 OFF・既存チャット | 3〜4 (本チャット + タグ + フォローアップ) |
+| 検索 OFF・新規チャット | 4〜5 (+ タイトル) |
+| 検索 ON | 上記 + 1 (クエリ生成) |
+
+§4-a と上記 2 を適用後は **本チャット 1 行だけ**になるはず。
+ここまで測れれば、残った遅さが llama-server 側(モデル/量子化/オフロード)なのか
+Open WebUI 側なのか、はっきり切り分けられる。
