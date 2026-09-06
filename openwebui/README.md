@@ -722,3 +722,106 @@ OFF にした効果**であり、文字数上限は無関係だった。この�
 現状の legacy でも、クエリ生成が `{"queries": []}` を返せば検索はスキップされるので、
 実質「必要なときだけ検索」にはなっている。判定 1 往復ぶんのコストを払っているだけ。
 **今回は legacy のままとする判断をした。**
+
+---
+
+## 15. llama-server 起動スクリプトと sparkDash（付随して直したもの）
+
+Open WebUI 本体とは別系統だが、同じ母艦の同じ調査中に出たので併せて記録する。
+
+### 15-1. `30-run-server.ps1` の既定値
+
+セッション中は `-UBatch 512 -TensorSplit 5,2` を**毎回コマンドラインで渡していた**だけで、
+スクリプトの既定値は変えていなかった。引数なしで起動すると元に戻る状態だったので、
+`param()` の既定値を実測値に合わせた。
+
+| 項目 | 変更前 | 変更後 |
+|---|---|---|
+| `$UBatch` | 256 | **512** |
+| `$TensorSplit` | `@("2","1")` | **`@("5","2")`** |
+
+`-ub` はスクリプトのコメントどおり「語彙 248k のロジットバッファがこれに比例」する。
+512 で約 508MB、1024 で約 1GB。VRAM に余裕がないため 1024 は 385→339 tok/s と逆に遅くなる。
+**512 が最適**。
+
+#### ハマったこと: `param()` 内のコメントで次の行を飲む
+
+```powershell
+    [int]$UBatch = 512,          # 物理バッチ。…
+                                 # 実測 512 が最速。…    [switch]$Tailscale,
+```
+
+`#` から行末までがコメントなので、**`[switch]$Tailscale,` がパラメータ定義から消える**。
+`-Tailscale` を付けて起動すると「パラメータ名 'Tailscale' に一致するパラメータが
+見つかりません」になる。コメントを複数行にするときは、次のパラメータを必ず独立行に置く。
+
+### 15-2. sparkDash が `Invalid API Key` を出し続けた件
+
+llama-server のコンソールが 2 秒ごとに `unauthorized: Invalid API Key` で埋まり、
+`print_timing` が読めなくなっていた。
+
+**原因: 同じ llama-server (:8080) を 2 つの Spark から監視していた。**
+
+`config/sparks-secrets.json`:
+
+```json
+"llmApiKeys": {
+  "ryzen-v100":   "…",
+  "ryzen-1080ti": "…"
+}
+```
+
+API キーは `llmApiKeys[sparkId][port]` と **Spark ごと × ポートごと**に保管される
+(`server/collectors/LlmProbe.js` の `_apiKey()`)。V100 側だけ直しても 1080Ti 側が
+古いキーで叩き続けるため、直したつもりが再発しているように見えていた。
+2 秒ごとに複数本エラーが出ていたのは、プローブが 2 本走っていたから。
+
+#### 正しい対処
+
+**Edit Spark → 「LLM monitoring」のチェックを外す。**
+
+`server/sparks/SparkMonitor.js:146` が
+`const ports = this._llmMonitoringEnabled() ? this._llmPorts() : []`
+なので、これだけでその Spark の LLM プローブが完全に止まる。GPU 監視は影響を受けない。
+
+LLM カードの `× Remove` は**使わないこと**。この操作で Spark ごと消えて、
+1080Ti のタブと GPU 監視まで失った（`+` から GPU index 1 で作り直して復旧）。
+
+llama-server は tensor-split で 2 枚にまたがる 1 プロセスなので、LLM サービスは
+「V100 のもの」でも「1080Ti のもの」でもなく**ホストのもの**。登録は 1 つが正しい。
+
+#### 切り分けに使えた知識
+
+**表示ラベルで状態が分かる**（`LlmProbe.js:1336-1341`）:
+
+| 表示 | 意味 |
+|---|---|
+| `Bad API key` | キーが**保存されていて**、401/403 で拒否された |
+| `Auth required` | キーが保存されていない（または復号に失敗して消えた） |
+
+「Bad API key」が出ている時点で、保存経路や暗号化ストアの故障ではなく
+**値の不一致**だと確定できる。
+
+**このビルドの llama.cpp の認証免除エンドポイントは `/health` だけ**:
+
+```powershell
+$key = '<バナーの値>'
+foreach ($p in '/health','/v1/models','/props','/slots','/metrics') {
+  try {
+    $r = Invoke-WebRequest "http://100.87.81.4:8080$p" -Headers @{Authorization="Bearer $key"} -UseBasicParsing
+    "{0,-12} -> {1}" -f $p, $r.StatusCode
+  } catch { "{0,-12} -> {1}" -f $p, $_.Exception.Response.StatusCode.value__ }
+}
+```
+
+正しいキーでの結果: `/health` `/v1/models` `/props` `/slots` が 200、
+`/metrics` は 501（`--metrics` 未指定なだけで認証エラーではない）。
+キー無しだと `/health` 以外すべて 401。**サーバ側とクライアント側のどちらが悪いかを
+一発で切り分けられる**ので、この 5 行は残しておく価値がある。
+
+#### 秘密の保管場所（参考）
+
+- `config/sparks-secrets.json` — AES-256-GCM の暗号文
+- `config/.secrets-key` — 暗号鍵（`SPARKDASH_SECRETS_KEY` 環境変数があればそちらが優先）
+- 復号に失敗した場合はキーが読み込まれず「Auth required」表示になるため、
+  「Bad API key」が出ているなら鍵ファイルや config ボリュームの問題ではない
