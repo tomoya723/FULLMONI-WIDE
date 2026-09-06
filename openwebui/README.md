@@ -439,3 +439,111 @@ Open WebUI 経由だと、この接頭辞が壊れる要因が 3 つある。
 - llama-server を `-np 2` 以上にしてスロットを分ける
   (llama.cpp はスロット選択に LCP 類似度を使うので、会話用と補助タスク用に自然と分かれる)
 - `--cache-reuse N` を付けて、接頭辞の途中が欠けても再利用できるようにする
+
+---
+
+## 10. C(プロンプトキャッシュ破壊)確定後の手順
+
+C の要因は §9 の 1〜3 のどれか、または複数同時。**二分探索で1回ずつ潰す。**
+毎回「同じチャットに短い発言を2回連投して、2回目の `prompt eval` の N を見る」で判定する。
+
+### 手順 1: 補助タスクを全部 OFF にして測る
+
+管理者パネル → 設定 → インターフェースで以下を全部 OFF:
+
+- タイトル生成 (`task.title.enable`)
+- タグ生成 (`task.tags.enable`)
+- フォローアップ生成 (`task.follow_up.enable`)
+- 検索クエリ生成 (`task.query.search.enable`)
+
+→ **N が小さくなった → 要因は §9-3(スロットのKVキャッシュ上書き)で確定。**
+   手順 3 へ。
+→ **N が変わらない → 要因は §9-1 か §9-2。** 手順 2 へ。
+
+### 手順 2: プロンプトの先頭が毎回変わっていないか
+
+**2-a. システムプロンプトを確認**
+
+管理者パネル → モデル → `qwen3.8-27b` のシステムプロンプト、および
+設定 → 一般 のデフォルトシステムプロンプトに
+`{{CURRENT_TIME}}` / `{{CURRENT_DATETIME}}` が入っていないか見る。
+
+入っていたら消す。日付が要るなら `{{CURRENT_DATE}}` に落とす
+(こちらは `%Y-%m-%d` なので 1 日 1 回しか変わらない)。
+`{{CURRENT_TIME}}` は `%I:%M:%S %p` で **秒まで**入る (`utils/task.py:85-93`)。
+
+**2-b. 記憶 Filter を一時的に無効化して測る**
+
+モデル設定から `memory_file_filter` のチェックを外して 2 回連投。
+
+→ N が小さくなった → **記憶注入が先頭で毎回変わっている**。下の「記憶注入の直し方」へ。
+→ 変わらない → 2-a のシステムプロンプト側。
+
+### 手順 3: 恒久対処
+
+#### (a) 補助タスクを別モデルに逃がす ※ハマりどころあり
+
+補助タスクを全部 OFF のままでもいいが、タイトルくらいは欲しいなら
+`TASK_MODEL` に小さいモデル(別ポートの llama-server で 1.5B〜3B)を割り当てる。
+
+**注意: 設定欄が 2 つあり、llama-server の場合は「外部」側でないと効かない。**
+
+`utils/task.py:16-27`:
+
+```python
+def get_task_model_id(default_model_id, task_model, task_model_external, models):
+    task_model_id = default_model_id
+    if models.get(task_model_id, {}).get('connection_type') == 'local':
+        if task_model and task_model in models:
+            task_model_id = task_model            # ← TASK_MODEL
+    else:
+        if task_model_external and task_model_external in models:
+            task_model_id = task_model_external   # ← TASK_MODEL_EXTERNAL
+    return task_model_id
+```
+
+`connection_type` の既定値は接続の種類で決まる (`routers/openai.py:734`, `routers/ollama.py:424`):
+
+| 接続 | 既定の `connection_type` | 効く設定 |
+|---|---|---|
+| OpenAI 互換 (= llama-server) | `external` | **`TASK_MODEL_EXTERNAL`**(外部モデル用タスクモデル) |
+| Ollama | `local` | `TASK_MODEL`(ローカルモデル用タスクモデル) |
+
+llama-server を OpenAI 互換接続として登録しているなら、
+**`TASK_MODEL` 側にいくら入れても無視される。**「外部モデル用タスクモデル」に入れること。
+(接続設定で connection_type を Local に切り替えている場合は逆になるので、
+ 効かなかったらもう一方を試す)
+
+#### (b) llama-server 側
+
+- `-np 2` 以上にしてスロットを分ける。llama.cpp はスロット選択に LCP 類似度を使うので、
+  会話用と補助タスク用が自然と別スロットに落ち着く。
+  **ただし `-np` はコンテキストを分割する**(スロットあたり `n_ctx / np`)ので、
+  `--ctx-size` も併せて増やすこと。VRAM と相談。
+- `--cache-reuse N` を付ける。接頭辞の途中が変わっても、後続チャンクを
+  コンテキストシフトで再利用できるようになる。§9-1/§9-2 の緩和に効く。
+
+#### (c) 記憶注入の直し方 — 「変わるものは後ろへ」
+
+`process_chat_payload()` は **DB から会話履歴をロードした後に** inlet を呼ぶ
+(`utils/middleware.py` の `load_messages_from_db` → `filter_type='inlet'` の順)。
+inlet の注入は DB に保存されないので、毎ターン
+
+```
+[system] + [DB から復元した履歴] + [記憶注入]
+```
+
+が組み立て直される。ここで **記憶を先頭(index 0 の system メッセージ)に入れると、
+内容が少しでも揺れた瞬間に共通接頭辞がゼロになる。**
+
+対策は 2 つ。どちらかでよい。
+
+1. **注入位置を末尾に move する** — `add_or_update_system_message()` のような
+   index 0 への挿入をやめ、`body["messages"][-1]` (最後のユーザー発言) の content に
+   前置き/後置きする。`[system] + [履歴]` の接頭辞が固定されるのでキャッシュが効く。
+2. **注入内容を完全に決定的にする** — 記憶ファイルの読み込み順を固定し、
+   タイムスタンプ・件数・「現在時刻」などの揺れる要素を一切入れない。
+   毎回バイト単位で同一なら index 0 のままでも接頭辞として再利用される。
+
+1 のほうが確実。2 は「記憶ファイルを編集した直後の 1 回だけキャッシュミス」で済むので、
+記憶を頻繁に書き換えないなら 2 でも実用上問題ない。
