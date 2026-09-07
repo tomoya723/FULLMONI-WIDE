@@ -24,7 +24,8 @@ param(
     [switch]$Consolidate,
     [switch]$NoConsolidate,
     [switch]$DryRun,
-    [switch]$Verbose2
+    [switch]$Verbose2,
+    [int]$Probe = 0
 )
 
 $ErrorActionPreference = "Stop"
@@ -71,6 +72,7 @@ if ($Consolidate)   { $argsList += "--consolidate" }
 if ($NoConsolidate) { $argsList += "--no-consolidate" }
 if ($DryRun)        { $argsList += "--dry-run" }
 if ($Verbose2)      { $argsList += "--verbose" }
+if ($Probe -gt 0)   { $argsList += @("--probe", $Probe) }
 
 Write-Log "開始: $python $script (window=${WindowHours}h)"
 

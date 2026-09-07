@@ -517,6 +517,57 @@ def consolidate(llama: Llama, memory_dir: Path, dry_run: bool, force: bool) -> b
     return True
 
 
+# --------------------------------------------------------------------------- 診断
+
+def probe(chats: List[dict], n: int) -> int:
+    """チャット JSON の構造を表示する。messages_of が読めているかの切り分け用。"""
+    total_chars = 0
+    empty = 0
+    for c in chats:
+        got = messages_of(c.get("chat") or {})
+        chars = sum(len(t) for _, t in got)
+        total_chars += chars
+        if chars == 0:
+            empty += 1
+
+    log(f"チャット {len(chats)} 件 / 抽出できた本文 合計 {total_chars} 文字 / 本文ゼロ {empty} 件")
+    log(f"--- 直近 {min(n, len(chats))} 件の構造 ---")
+
+    for c in chats[-n:]:
+        obj = c.get("chat") or {}
+        print()
+        print(f"■ {c.get('title') or '(無題)'}  [{c.get('id', '')[:8]}]")
+        print(f"   トップレベルのキー: {sorted(obj.keys())}")
+
+        m = obj.get("messages")
+        print(f"   chat.messages          : {type(m).__name__}"
+              + (f" / {len(m)} 件" if hasattr(m, "__len__") else ""))
+
+        hist = obj.get("history")
+        h = hist.get("messages") if isinstance(hist, dict) else None
+        print(f"   chat.history.messages  : {type(h).__name__}"
+              + (f" / {len(h)} 件" if hasattr(h, "__len__") else ""))
+
+        # 生のメッセージ1件の形を見る（role と content の型）
+        raw = None
+        if isinstance(m, list) and m:
+            raw = m[0]
+        elif isinstance(h, dict) and h:
+            raw = next(iter(h.values()))
+        elif isinstance(h, list) and h:
+            raw = h[0]
+        if isinstance(raw, dict):
+            print(f"   生メッセージのキー     : {sorted(raw.keys())}")
+            print(f"   role={raw.get('role')!r} content の型={type(raw.get('content')).__name__}")
+
+        got = messages_of(obj)
+        chars = sum(len(t) for _, t in got)
+        print(f"   messages_of -> {len(got)} 件 / {chars} 文字")
+        if got:
+            print(f"   先頭: {got[0][1][:120]}")
+    return 0
+
+
 # --------------------------------------------------------------------------- メイン
 
 def main() -> int:
@@ -543,6 +594,13 @@ def main() -> int:
     ap.add_argument("--dry-run", action="store_true", help="書き込まず結果を表示するだけ")
     ap.add_argument("--force", action="store_true", help="統合の縮小ガードを無視する")
     ap.add_argument("-v", "--verbose", action="store_true")
+    ap.add_argument(
+        "--probe",
+        type=int,
+        default=0,
+        metavar="N",
+        help="診断モード: 直近 N 件のチャットの構造を表示して終了（推論もファイル更新も行わない）",
+    )
     args = ap.parse_args()
 
     _VERBOSE = args.verbose
@@ -574,6 +632,9 @@ def main() -> int:
 
     if not args.include_archived:
         chats = [c for c in chats if not c.get("archived")]
+
+    if args.probe:
+        return probe(chats, args.probe)
 
     if not chats:
         log("新しいチャットは無し")
