@@ -1004,3 +1004,21 @@ Start-ScheduledTask  -TaskName QwenMemoryDigest    # 手動で今すぐ
 Get-ScheduledTaskInfo -TaskName QwenMemoryDigest   # 前回の結果
 Get-Content .\logs\digest_2026-09-07.log -Encoding UTF8 -Tail 40
 ```
+
+### 稼働確認（2026-09-07）
+
+タスクスケジューラ経由での実行を `Start-ScheduledTask` で確認済み。手で叩くのとは
+プロセスコンテキストが違うため、`python` / `docker` / ユーザー環境変数 `LLAMA_API_KEY`
+がタスクからも見えることをここで確かめている。
+
+```
+LastTaskResult : 0
+NextRunTime    : 2026/09/08 3:10:00
+
+[13:13:26] 開始: …python.exe … (window=24h)
+[13:13:26] 対象: 2026-09-07 11:17 以降に更新されたチャット
+[13:13:26] 新しいチャットは無し
+[13:13:27] 終了コード: 0
+```
+
+ログに文字化けが無いことで、`.ps1` の BOM 付与が効いていることも同時に確認できる。
