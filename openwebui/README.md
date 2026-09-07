@@ -955,3 +955,52 @@ messages_of -> 1 件 / 28 文字
 
 ここでも「推測でキー名を決め打ちしない」が効いた。構造を表示させるまで、
 `chat["messages"]` が空でないのに中身が1件だけ、という形は想像できなかった。
+
+### 実測結果（2026-09-07 初回導入）
+
+| 段階 | 実測 |
+|---|---|
+| 対象 | チャット 57 件（過去30日）、会話本文 35,112 文字 |
+| 抽出 | 3 バッチ（18,852 / 24,141 / 9,512 文字）、所要 **80 秒** |
+| 抽出結果 | 新しい事実 **19 件** |
+| 統合 | `profile.md` 2,200 字 / `projects.md` 1,844 字、所要 **63 秒** |
+
+抽出できた事実の例（設計どおりカテゴリ分けされている）:
+
+```
+- [profile] 更新: 所在地は埼玉県（宮城県仙台市出身）（旧: 記載なし）
+- [profile] 所属: NONSAPO-GmbH（ノンサポ電子）
+- [project] FULLMONI-Legacy: サードパーティECUのCAN通信に対応したオープン
+           ハードウェアのデジタルメーターモジュール（3.5インチTFT液晶、
+           CPU: ルネサス H8SX1655、CAN 2.0B、RS232C、タッチパネル対応）
+- [project] NAロードスター: モアパワー化（NA8C + BP-VET）のため MoTeC を使用
+- [project] llama-server の tensor-split は 5,2（旧: 2,1）
+- [project] prefill 速度は 364〜385 tok/s、decode 速度は 26.5〜33.0 tok/s
+```
+
+設計どおりに動いた点:
+
+- **矛盾する事実は `更新: …（旧: …）` の形で出る**（tensor-split 2,1 → 5,2）
+- **一時的な話題（天気の問い合わせなど）は抽出されない**
+- 統合後も既存の記憶が全部残った。応答ルール（J.A.R.V.I.S.）、
+  「Continue の Built-in Tools と Fusion ツールは同時に有効にしない」、
+  CUDA OOM の回避策、`sparkDash_new` の作業フォルダ、Voron 2.4、Scan2Solid、
+  PPA-CF ブラケット、いずれも消えていない
+
+統合で見つかった不具合（修正済み）:
+
+- 初版のプロンプトはファイル間の整合を指示していなかったため、
+  `projects.md` の tensor-split が 5,2 に更新されても
+  `profile.md` の母艦セクションが 2,1 のまま取り残された。
+  「同じ設定値が両方に現れる場合は新しいほうに揃える」を明示して解消。
+
+### 運用
+
+Windows タスクスケジューラに `QwenMemoryDigest` として毎日 03:10 で登録。
+初回は 30 日分・57 件を一括処理したが、通常運用は窓 24 時間なのでこの負荷にはならない。
+
+```powershell
+Start-ScheduledTask  -TaskName QwenMemoryDigest    # 手動で今すぐ
+Get-ScheduledTaskInfo -TaskName QwenMemoryDigest   # 前回の結果
+Get-Content .\logs\digest_2026-09-07.log -Encoding UTF8 -Tail 40
+```
