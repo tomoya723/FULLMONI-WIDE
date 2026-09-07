@@ -144,7 +144,14 @@ def main() -> int:
     ap.add_argument("--id", required=True, help="function テーブルの id")
     ap.add_argument("--container", default=DEFAULT_CONTAINER)
     ap.add_argument("--db-path", default=DEFAULT_DB_PATH)
-    ap.add_argument("--valves", default="", help='上書きする Valves の JSON 文字列 (例: \'{"debug":true}\')')
+    ap.add_argument("--valves", default="", help='上書きする Valves の JSON 文字列')
+    ap.add_argument(
+        "--valves-file",
+        default="",
+        help="上書きする Valves を書いた JSON ファイル。"
+             "PowerShell からネイティブコマンドを呼ぶと JSON 文字列の二重引用符が"
+             "剥がれるため、こちらを使うこと",
+    )
     ap.add_argument("--backup-dir", default="", help="バックアップ先 (既定: スクリプトと同じ場所の backups/)")
     ap.add_argument("--dry-run", action="store_true", help="差分だけ表示して更新しない")
     ap.add_argument("--no-restart", action="store_true",
@@ -165,11 +172,20 @@ def main() -> int:
         b64.write_text(base64.b64encode(content.encode("utf-8")).decode("ascii"), encoding="utf-8")
 
         valves_file = "-"
-        if args.valves:
+        raw_valves = args.valves
+        if args.valves_file:
+            vf = Path(args.valves_file)
+            if not vf.is_file():
+                log("エラー: --valves-file が無い:", vf)
+                return 2
+            raw_valves = vf.read_text(encoding="utf-8")
+
+        if raw_valves.strip():
             try:
-                parsed = json.loads(args.valves)
+                parsed = json.loads(raw_valves)
             except json.JSONDecodeError as e:
-                log("エラー: --valves が JSON として読めない:", e)
+                log("エラー: Valves が JSON として読めない:", e)
+                log("  受け取った値:", repr(raw_valves))
                 return 2
             vp = tmp / "valves.json"
             vp.write_text(json.dumps(parsed, ensure_ascii=False), encoding="utf-8")

@@ -28,9 +28,12 @@ $script = Join-Path $here "deploy_filter.py"
 
 # 反映する Filter: function テーブルの id -> ローカルの .py
 # id が違う場合は -List で実際の id を確認してからここを直す
+# Id は DB の実値。-List で確認済み (2026-09-07):
+#   force_web_search / memory_file_filter
+# 記憶フィルタの id は memory_file_injector ではなく memory_file_filter
 $targets = @(
-    @{ Id = "force_web_search";    File = Join-Path $root "force_web_search.py";    Valves = '{"debug":true}' },
-    @{ Id = "memory_file_injector"; File = Join-Path $root "memory_file_injector.py"; Valves = "" }
+    @{ Id = "force_web_search";   File = Join-Path $root "force_web_search.py";     Valves = @{ debug = $true } },
+    @{ Id = "memory_file_filter"; File = Join-Path $root "memory_file_injector.py"; Valves = $null }
 )
 
 $python = $null
@@ -64,7 +67,13 @@ try {
         Write-Host "=== $($t.Id) ===" -ForegroundColor Cyan
 
         $a = @($script, "--file", $t.File, "--id", $t.Id, "--container", $Container)
-        if ($t.Valves) { $a += @("--valves", $t.Valves) }
+        if ($t.Valves) {
+            # PowerShell からネイティブコマンドに JSON 文字列を渡すと二重引用符が
+            # 剥がれて {debug:true} になる。一時ファイル経由で渡して回避する
+            $vf = Join-Path $env:TEMP ("owui_valves_{0}.json" -f $t.Id)
+            [IO.File]::WriteAllText($vf, ($t.Valves | ConvertTo-Json -Compress), [Text.UTF8Encoding]::new($false))
+            $a += @("--valves-file", $vf)
+        }
         if ($DryRun)   { $a += "--dry-run" }
         # 再起動は最後に1回だけで足りるので、個別実行では抑止する
         $a += "--no-restart"
