@@ -919,3 +919,15 @@ C を選んだ理由:
   週1の統合結果は時々目視で確認する。バックアップから戻せる
 
 詳細な使い方は `openwebui/memory_digest/README.md`。
+
+### 追記: PowerShell 5.1 と BOM
+
+`.ps1` を **BOM なし UTF-8** で保存すると、PowerShell 5.1 は日本語 Windows 上で
+それを Shift-JIS として読む。結果、スクリプト内の日本語リテラルが化ける
+（実例: `終了コード: 0` が `邸ゆコ・さ 綢シ綢・ 0` になった）。
+
+**`.ps1` は UTF-8 BOM 付きで保存すること。** これは §5 に書いた
+「PowerShell 5.1 でファイルを書き換えるときは `[IO.File]` の UTF8 読み書きを使う」
+と同じ話の裏返しで、*書く側* にも BOM が要るという点が抜けていた。
+ログファイルも `[Text.UTF8Encoding]::new($true)` で作り、
+`Get-Content` がそのまま読めるようにしてある。

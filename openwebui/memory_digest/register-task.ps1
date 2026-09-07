@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   memory_digest を Windows タスクスケジューラに毎晩実行として登録する。
 

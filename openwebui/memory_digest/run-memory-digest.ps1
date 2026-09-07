@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   memory_digest.py を母艦で実行するラッパー。Windows タスクスケジューラから呼ぶ想定。
 
@@ -39,7 +39,7 @@ $logFile = Join-Path $logDir ("digest_{0:yyyy-MM-dd}.log" -f (Get-Date))
 function Write-Log([string]$msg) {
     $line = "[{0:yyyy-MM-dd HH:mm:ss}] {1}" -f (Get-Date), $msg
     Write-Host $line
-    [IO.File]::AppendAllText($logFile, $line + "`r`n", [Text.UTF8Encoding]::new($false))
+    [IO.File]::AppendAllText($logFile, $line + "`r`n", [Text.UTF8Encoding]::new($true))
 }
 
 # ---- python を探す
