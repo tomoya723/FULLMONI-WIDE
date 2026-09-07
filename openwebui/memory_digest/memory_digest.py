@@ -190,47 +190,78 @@ def _clean(text: str) -> str:
     return text
 
 
+def _branch_from_history(hist: dict) -> List[dict]:
+    """history.messages（分岐ツリー）から、表示中の枝を古い順で取り出す。
+
+    Open WebUI は currentId が指す葉から parentId を辿った経路を画面に出している。
+    currentId が無い版のために timestamp 順のフォールバックも持つ。
+    """
+    raw = hist.get("messages")
+    if isinstance(raw, list):
+        return [m for m in raw if isinstance(m, dict)]
+    if not isinstance(raw, dict) or not raw:
+        return []
+
+    cur = hist.get("currentId") or hist.get("current_id")
+    if cur and cur in raw:
+        chain: List[dict] = []
+        seen = set()
+        node = cur
+        while node and node in raw and node not in seen:
+            seen.add(node)
+            m = raw[node]
+            if isinstance(m, dict):
+                chain.append(m)
+            node = m.get("parentId") or m.get("parent_id") if isinstance(m, dict) else None
+        chain.reverse()
+        if chain:
+            return chain
+
+    return sorted(
+        (m for m in raw.values() if isinstance(m, dict)),
+        key=lambda m: m.get("timestamp") or 0,
+    )
+
+
+def _content_text(content: Any) -> str:
+    """content が文字列でない版（マルチモーダルの配列）にも対応する。"""
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        return "\n".join(
+            p.get("text", "")
+            for p in content
+            if isinstance(p, dict) and p.get("type") == "text"
+        )
+    return ""
+
+
 def messages_of(chat_obj: dict) -> List[Tuple[str, str]]:
     """Open WebUI の chat カラムから (role, content) のリストを取り出す。
 
     版によって形が違う:
-      - chat["messages"]                     : 配列（表示中の枝）
-      - chat["history"]["messages"]          : id -> message の辞書（全枝）
-    前者を優先し、無ければ後者を作成順に並べる。
+      - chat["history"]["messages"] : id -> message の分岐ツリー（本体）
+      - chat["messages"]            : 配列。版によっては先頭1件しか入っていない
+
+    どちらか件数の多いほうを採る。実測（2026-09 時点の構成）では
+    chat["messages"] が 1 件しか無く、history 側に 6 件入っていた。
     """
-    msgs = chat_obj.get("messages")
-    if isinstance(msgs, list) and msgs:
-        seq = msgs
-    else:
-        hist = chat_obj.get("history") or {}
-        raw = hist.get("messages")
-        if isinstance(raw, dict):
-            seq = sorted(raw.values(), key=lambda m: m.get("timestamp") or 0)
-        elif isinstance(raw, list):
-            seq = raw
-        else:
-            seq = []
+    hist = chat_obj.get("history")
+    from_hist = _branch_from_history(hist) if isinstance(hist, dict) else []
+
+    flat = chat_obj.get("messages")
+    from_flat = [m for m in flat if isinstance(m, dict)] if isinstance(flat, list) else []
+
+    seq = from_hist if len(from_hist) >= len(from_flat) else from_flat
 
     out: List[Tuple[str, str]] = []
     for m in seq:
-        if not isinstance(m, dict):
-            continue
         role = m.get("role") or ""
-        content = m.get("content")
-        if not isinstance(content, str):
-            # マルチモーダル（配列）の場合は text 部分だけ拾う
-            if isinstance(content, list):
-                content = "\n".join(
-                    p.get("text", "") for p in content if isinstance(p, dict) and p.get("type") == "text"
-                )
-            else:
-                content = ""
-        content = _clean(content)
-        if not content:
-            continue
         if role not in ("user", "assistant"):
             continue
-        out.append((role, content))
+        content = _clean(_content_text(m.get("content")))
+        if content:
+            out.append((role, content))
     return out[-MAX_MESSAGES_PER_CHAT:]
 
 
@@ -562,6 +593,8 @@ def probe(chats: List[dict], n: int) -> int:
 
         got = messages_of(obj)
         chars = sum(len(t) for _, t in got)
+        print(f"   採用した枝            : {len(_branch_from_history(hist) if isinstance(hist, dict) else [])} 件 (history) "
+              f"vs {len(m) if isinstance(m, list) else 0} 件 (messages)")
         print(f"   messages_of -> {len(got)} 件 / {chars} 文字")
         if got:
             print(f"   先頭: {got[0][1][:120]}")
