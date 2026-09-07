@@ -51,6 +51,8 @@ try {
     }
 
     $restarted = $false
+    $applied = 0
+    $missing = 0
     foreach ($t in $targets) {
         if ($Only -and $t.Id -ne $Only) { continue }
         if (-not (Test-Path $t.File)) {
@@ -68,7 +70,24 @@ try {
         $a += "--no-restart"
 
         & $python @a
-        if ($LASTEXITCODE -ne 0) { throw "$($t.Id) の反映に失敗 (終了コード $LASTEXITCODE)" }
+        switch ($LASTEXITCODE) {
+            0 { $applied++ }
+            2 {
+                # id が DB に無い。上に候補一覧が出ているので、止めずに次へ進む
+                $missing++
+                Write-Host "→ この id は DB に無いので飛ばした。上の一覧から正しい id を確認し、" -ForegroundColor Yellow
+                Write-Host "  deploy-filters.ps1 の `$targets を直すこと" -ForegroundColor Yellow
+            }
+            default { throw "$($t.Id) の反映に失敗 (終了コード $LASTEXITCODE)" }
+        }
+    }
+
+    Write-Host ""
+    Write-Host "反映 $applied 件 / id 不一致 $missing 件" -ForegroundColor Cyan
+
+    if ($applied -eq 0) {
+        Write-Host "何も更新していないので再起動しない" -ForegroundColor Yellow
+        return
     }
 
     if (-not $DryRun -and -not $NoRestart) {
