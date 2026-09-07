@@ -33,7 +33,19 @@ $script = Join-Path $here "deploy_filter.py"
 # 記憶フィルタの id は memory_file_injector ではなく memory_file_filter
 $targets = @(
     @{ Id = "force_web_search";   File = Join-Path $root "force_web_search.py";     Valves = @{ debug = $true } },
-    @{ Id = "memory_file_filter"; File = Join-Path $root "memory_file_injector.py"; Valves = $null }
+    # max_chars_total が 1500 だったため profile.md の途中で打ち切られ、
+    # projects.md が 1 文字も注入されていなかった (2026-09-07 に判明)。
+    # 統合後の実サイズは profile 2,200 字 / projects 1,844 字。余裕を見て 12,000。
+    # inbox.md も対象に含める。含めないと夜間バッチが追記した新事実が
+    # 週 1 の統合まで最大 7 日間読まれない。
+    @{ Id = "memory_file_filter"; File = Join-Path $root "memory_file_injector.py";
+       Valves = @{
+           files              = "profile.md,projects.md,inbox.md"
+           web_search_files   = "profile.md,projects.md,inbox.md"
+           max_chars_per_file = 8000
+           max_chars_total    = 12000
+           debug              = $true
+       } }
 )
 
 $python = $null
