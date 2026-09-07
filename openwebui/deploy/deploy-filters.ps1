@@ -102,11 +102,24 @@ try {
     if (-not $DryRun -and -not $NoRestart) {
         Write-Host ""
         Write-Host "コンテナを再起動する ..." -ForegroundColor Cyan
-        docker restart $Container | Out-Null
-        for ($i = 0; $i -lt 40; $i++) {
-            Start-Sleep -Seconds 3
-            docker exec $Container python -c "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8080/health',timeout=3);print('ok')" 2>$null | Out-Null
-            if ($LASTEXITCODE -eq 0) { $restarted = $true; break }
+        # ネイティブコマンドの stderr は $ErrorActionPreference="Stop" 下で
+        # 終了エラーに変換される。再起動直後はまだ応答できず stderr が出るのが
+        # 正常なので、この区間だけ Continue にしてホスト側から確認する
+        $prevEap = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
+        try {
+            docker restart $Container | Out-Null
+            for ($i = 0; $i -lt 40; $i++) {
+                Start-Sleep -Seconds 3
+                try {
+                    $r = Invoke-WebRequest "http://127.0.0.1:3000/health" -UseBasicParsing -TimeoutSec 3
+                    if ($r.StatusCode -eq 200) { $restarted = $true; break }
+                } catch {
+                    # まだ起動中。次の周回で再試行する
+                }
+            }
+        } finally {
+            $ErrorActionPreference = $prevEap
         }
         if ($restarted) {
             Write-Host "Open WebUI 復帰を確認した" -ForegroundColor Green
