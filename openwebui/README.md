@@ -825,3 +825,97 @@ foreach ($p in '/health','/v1/models','/props','/slots','/metrics') {
 - `config/.secrets-key` — 暗号鍵（`SPARKDASH_SECRETS_KEY` 環境変数があればそちらが優先）
 - 復号に失敗した場合はキーが読み込まれず「Auth required」表示になるため、
   「Bad API key」が出ているなら鍵ファイルや config ボリュームの問題ではない
+
+---
+
+## 16. 記憶の自動蓄積（夜間バッチ / `memory_digest/`）
+
+### きっかけ
+
+「Open WebUI のセッションの中で蓄積された情報を自動で記録やナレッジ登録できないか」。
+現行の `memory_file_injector.py` は**「記憶して」と明示的に言ったときだけ**抽出推論を
+走らせる方式（§4）なので、言い忘れた事実は残らない。
+
+### 検討した3案と選択
+
+| 案 | 内容 | 判定 |
+|---|---|---|
+| A | Filter の `outlet` で毎ターン抽出 | ✗ 応答のたびに抽出推論が走り会話が遅くなる。さらに LocalMind 経由では `outlet` が呼ばれない（§12）ので取りこぼす |
+| B | 明示トリガ（現行） | △ 確実だが言い忘れると残らない。**廃止せず併用する** |
+| **C** | **夜間バッチで Open WebUI の DB から抽出** | **採用** |
+
+C を選んだ理由:
+
+1. **会話速度に一切影響しない。** 推論は寝ている間にまとめて走る
+2. **ブラウザ由来の会話をすべて拾える。** 言い忘れが無くなる
+3. **`inbox.md` 肥大化問題（§13 の残課題）を同時に潰せる。** 週1で `profile.md` /
+   `projects.md` へ統合し `inbox.md` を空にする運用が組み込める
+
+### 調べた事実（推測で決め打ちしていない）
+
+`docker exec` / `docker inspect` で実際に確認した結果:
+
+| 項目 | 実測値 |
+|---|---|
+| DB | `/app/backend/data/webui.db` — SQLite、WAL モード（`webui.db-wal` 3.3 MB, `-shm` 32 KB が存在） |
+| DB のマウント形態 | **named volume** `open-webui` → `/var/lib/docker/volumes/open-webui/_data`。**ホスト（Windows）から直接は触れない** |
+| memory のマウント形態 | **bind mount** `C:\Users\tomoy\Git\qwen38-1080ti\memory` → `/app/memory`。**ホストから直接書ける** |
+| `chat` テーブルの列 | `id, user_id, title, created_at, updated_at, share_id, archived, chat, pinned, meta, folder_id, tasks, summary, last_read_at, current_message_id, variables, timer_at` |
+| チャット件数 | 57 |
+
+この2つのマウント形態の違いがそのまま実装方針を決めた
+— **DB は `docker exec` 経由で読み、`memory/` はホストから直接書く**。
+
+### 実装
+
+`openwebui/memory_digest/` に3ファイル:
+
+| ファイル | 役割 |
+|---|---|
+| `memory_digest.py` | 本体。標準ライブラリのみ（母艦に pip 不要） |
+| `run-memory-digest.ps1` | 母艦用ラッパー。Docker 生存確認 + UTF-8 ログ出力 |
+| `register-task.ps1` | Windows タスクスケジューラへの登録／解除 |
+
+処理の流れ:
+
+```
+1. llama-server /v1/models で生存確認 → 落ちていれば何もせず終了（深夜にエラーを積まない）
+2. コンテナ内で webui.db を mode=ro で開き、直近 N 時間に更新されたチャットを JSON 化
+   → docker cp で回収（docker exec の stdout は Windows で日本語が壊れるため経由しない）
+3. state ファイルの last_chat_updated_at より新しいものだけを対象にする
+4. 既存の profile/projects/inbox を「既知の事実」としてプロンプトに同梱し、
+   llama-server に「新しく分かった事実だけ」を箇条書きで出させる
+5. memory/ をバックアップしてから inbox.md に日付見出しで追記
+6. 7日ごとに inbox.md を profile.md / projects.md へ統合（JSON で全文を返させる）
+```
+
+### 事故を起こさないための設計
+
+記憶ファイルの**上書き**は事故が怖いので、多重に止める:
+
+- 書き込み前に必ず `memory/.backup/YYYY-MM-DD_HHMMSS/` へ全 `.md` を退避（14世代保持）
+- 統合結果が既存の**半分未満に縮んだら中止**（`--force` で解除）
+- モデル出力が JSON として解釈できなければ**何も書かずに中止**
+- 毎晩の処理は `inbox.md` への**追記のみ**。既存ファイルには触らない
+- DB は `mode=ro`。発行するのは `SELECT` だけで Open WebUI は止めない
+- `--dry-run` で書き込まずに内容だけ確認できる
+
+### 検証
+
+抽出スクリプトと本体ロジックはサンプル DB を作って通してある。確認した点:
+
+- `updated_at` が秒／ミリ秒どちらでも正しく正規化される（版差対策）
+- `chat["messages"]`（配列）と `chat["history"]["messages"]`（辞書）の両形式を読める
+- マルチモーダルの `content` が配列の場合に text 部分だけ拾う
+- `<think>` ブロックと `[1]` 形式の引用マーカーを落とす
+- 縮小ガードが実際に上書きを止める（`profile.md` が 35→1 文字になるケースで中止を確認）
+
+### 制約
+
+- **LocalMind 経由の会話はバッチにも見えない。** `chat_id` が空だと Open WebUI は
+  永続化しない（§12）。DB に無いものは抽出できない。スマホの会話も残したいなら
+  PWA 版 Open WebUI を使うこと（§15 以降で導入済み）
+- 抽出は 27B のローカルモデルなので取りこぼしや粒度のばらつきがある。
+  週1の統合結果は時々目視で確認する。バックアップから戻せる
+
+詳細な使い方は `openwebui/memory_digest/README.md`。
