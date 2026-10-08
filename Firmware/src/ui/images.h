@@ -7,7 +7,9 @@
 extern "C" {
 #endif
 
-/* eez003 uses a subset of images (no tachometer backgrounds) */
+extern const lv_img_dsc_t img_ui_img_back6_png;
+extern const lv_img_dsc_t img_ui_img_marker_red_bar_80x7s_png;
+extern const lv_img_dsc_t img_ui_img_marker_red_bar_20x7s_png;
 extern const lv_img_dsc_t img_ui_img_fmw_op0_png;
 extern const lv_img_dsc_t img_ui_img_fuel1_png;
 extern const lv_img_dsc_t img_ui_img_fuel2_png;
@@ -20,6 +22,9 @@ extern const lv_img_dsc_t img_ui_img_ws_batterywarning_png;
 extern const lv_img_dsc_t img_ui_img_ws_breakwarning_png;
 extern const lv_img_dsc_t img_ui_img_ws_beltwarning_png;
 extern const lv_img_dsc_t img_ui_img_ws_fuelcheck_png;
+extern const lv_img_dsc_t img_ui_img_w_back_png;
+extern const lv_img_dsc_t img_ui_img_back7_png;
+extern const lv_img_dsc_t img_ui_img_back5_png;
 
 #ifndef EXT_IMG_DESC_T
 #define EXT_IMG_DESC_T
@@ -29,7 +34,7 @@ typedef struct _ext_img_desc_t {
 } ext_img_desc_t;
 #endif
 
-extern const ext_img_desc_t images[12];
+extern const ext_img_desc_t images[18];
 
 #ifdef __cplusplus
 }

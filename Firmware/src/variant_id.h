@@ -5,8 +5,8 @@
 #ifndef VARIANT_ID_H_
 #define VARIANT_ID_H_
 
-#define BUILD_VARIANT_ID "aw003"
-#define BUILD_VARIANT_STRING "VARIANT:aw003"
-#define BUILD_DESIGN_ID "eez003"
+#define BUILD_VARIANT_ID "aw002"
+#define BUILD_VARIANT_STRING "VARIANT:aw002"
+#define BUILD_DESIGN_ID "eez002"
 
 #endif /* VARIANT_ID_H_ */

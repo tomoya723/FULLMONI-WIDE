@@ -50,5 +50,6 @@
     ],
     "files.readonlyInclude": {
         "**/linker_script.ld": true
-    }
+    },
+    "cmake.sourceDirectory": "C:/Users/chake/Documents/GitHub/FULLMONI-WIDE/Firmware/src/lvgl"
 }

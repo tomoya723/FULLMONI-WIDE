@@ -1,8 +1,10 @@
 /*
- * ui_dashboard.h — eez003 (Prodrive)
+ * ui_dashboard.h
  *
- * Data binding layer between g_CALC_data and LVGL widgets + fan tachometer.
+ * Data binding layer between g_CALC_data and SLS-generated UI widgets.
+ * This file is hand-written; the SLS-generated ui/ directory is kept separate.
  */
+
 #ifndef UI_DASHBOARD_H
 #define UI_DASHBOARD_H
 
@@ -12,13 +14,17 @@ extern "C" {
 
 #include <stdint.h>
 
-/* Initialize dashboard: load screen, set bar ranges, attach fan tachometer */
+/* Initialize dashboard: load screen, set bar ranges, hide all warnings */
 void ui_dashboard_create(void);
 
 /* Update all widgets from g_CALC_data / g_CALC_data_sm (call every frame) */
 void ui_dashboard_update(void);
 
-/* Show notification overlay */
+/* Show notification overlay (warning message, HOST ACCESS, etc.)
+ *   msg          : text to display (NULL or "" to hide)
+ *   accent_color : RGB888 (枠・文字色, e.g. 0xFF0000=赤警告, 0x00AA00=緑HOST ACCESS)
+ *                  背景は常に黒 (HUDスタイル)
+ */
 void ui_dashboard_set_notify(const char *msg, uint32_t accent_color);
 
 /* Hide notification overlay */

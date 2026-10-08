@@ -48,6 +48,10 @@
 
 /* --- Info labels --- */
 #define ui_LblAFR               (objects.ui_lbl_afr)
+#define ui_LblLambdaB1          (objects.ui_lbl_lambda_b1)
+#define ui_LblLambdaB2          (objects.ui_lbl_lambda_b2)
+#define ui_LblDiffB1            (objects.ui_lbl_diff_b1)
+#define ui_LblDiffB2            (objects.ui_lbl_diff_b2)
 #define ui_LblTrip              (objects.ui_lbl_trip)
 #define ui_LblODO               (objects.ui_lbl_odo)
 #define ui_LblTIME              (objects.ui_lbl_time)

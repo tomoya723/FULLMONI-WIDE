@@ -102,6 +102,10 @@ typedef struct {
 	float num5;
 	float num6;
 	float af;
+	float lambda_bank1;
+	float lambda_bank2;
+	float diff_bank1;
+	float diff_bank2;
 	float rev;
 	float rev_angle;
 	float bt;

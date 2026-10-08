@@ -344,7 +344,7 @@ namespace FullmoniTerminal
             {
                 _canFields.Add(new CanFieldItem
                 {
-                    Index = i + 1,
+                    Index = i,
                     Enabled = false,
                     Channel = 0,
                     StartByte = 0,
@@ -449,6 +449,7 @@ namespace FullmoniTerminal
                 if (idx >= 0 && idx < _canFields.Count)
                 {
                     var field = _canFields[idx];
+                    field.Index = idx;  // Indexを確実に同期
                     field.Channel = int.Parse(match.Groups[2].Value);
                     field.StartByte = int.Parse(match.Groups[3].Value);
                     field.ByteCount = int.Parse(match.Groups[4].Value);
@@ -600,6 +601,8 @@ namespace FullmoniTerminal
                 "NUM5" => 6,     // CAN_TARGET_NUM5 (油圧)
                 "NUM6" => 7,     // CAN_TARGET_NUM6 (バッテリー)
                 "SPEED" => 8,    // CAN_TARGET_SPEED
+                "LA_BANK1" => 9, // CAN_TARGET_LAMBDA_BANK1
+                "LA_BANK2" => 10,// CAN_TARGET_LAMBDA_BANK2
                 _ => 255         // CAN_TARGET_NONE
             };
         }
@@ -731,7 +734,8 @@ namespace FullmoniTerminal
         private bool _warnHighEnabled;
         private string _warnHigh = "---";
 
-        public int Index { get => _index; set { _index = value; OnPropertyChanged(nameof(Index)); } }
+        public int Index { get => _index; set { _index = value; OnPropertyChanged(nameof(Index)); OnPropertyChanged(nameof(DisplayIndex)); } }
+        public int DisplayIndex => _index + 1;  // UI表示用 (1ベース)
         public bool Enabled { get => _enabled; set { _enabled = value; OnPropertyChanged(nameof(Enabled)); } }
         public int Channel { get => _channel; set { _channel = value; OnPropertyChanged(nameof(Channel)); } }
         public int StartByte { get => _startByte; set { _startByte = value; OnPropertyChanged(nameof(StartByte)); } }

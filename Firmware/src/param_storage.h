@@ -88,6 +88,8 @@ typedef struct __attribute__((packed)) {
 #define CAN_TARGET_NUM5     6       /* ID_VAR_05: 油圧 */
 #define CAN_TARGET_NUM6     7       /* ID_VAR_06: バッテリー電圧 */
 #define CAN_TARGET_SPEED    8       /* ID_VAR_SPEED: 車速 */
+#define CAN_TARGET_LAMBDA_BANK1  9  /* Lambda Bank1 (A/F) */
+#define CAN_TARGET_LAMBDA_BANK2  10 /* Lambda Bank2 (A/F) */
 #define CAN_TARGET_NONE     255     /* 未割当 */
 
 /* ============================================================

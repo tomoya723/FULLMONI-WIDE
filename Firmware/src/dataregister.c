@@ -188,6 +188,12 @@ static void process_can_fields(void)
         case CAN_TARGET_AF:
             g_CALC_data.af = value;
             break;
+        case CAN_TARGET_LAMBDA_BANK1:
+            g_CALC_data.lambda_bank1 = value;
+            break;
+        case CAN_TARGET_LAMBDA_BANK2:
+            g_CALC_data.lambda_bank2 = value;
+            break;
         case CAN_TARGET_NUM1:  /* 水温 */
             g_CALC_data.num1 = value;
             break;
@@ -279,6 +285,15 @@ void data_store(void)
 
 	/* Issue #65: CAN設定に基づく汎用変換処理 */
 	process_can_fields();
+
+	/* Lambda Bank差分比率計算 (DiffBank = LambdaBank / AF) */
+	if (g_CALC_data.af > 0.0f) {
+		g_CALC_data.diff_bank1 = g_CALC_data.lambda_bank1 / g_CALC_data.af;
+		g_CALC_data.diff_bank2 = g_CALC_data.lambda_bank2 / g_CALC_data.af;
+	} else {
+		g_CALC_data.diff_bank1 = 0.0f;
+		g_CALC_data.diff_bank2 = 0.0f;
+	}
 
 	// battery voltage
 //	g_CALC_data.bt = ((g_CALC_data.AD6 * 198) / 4096) / 10; // Vref = 3.3V

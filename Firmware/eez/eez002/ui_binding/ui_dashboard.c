@@ -281,6 +281,18 @@ void ui_dashboard_update(void)
         int32_t av = (int32_t)(af + 0.5f);
         lv_label_set_text_fmt(ui_LblAFR, "%2d.%1d", av / 10, av % 10);
     }
+    /* Lambda Bank1/2: A/F比 (e.g. 14.7) / DiffBank: 比率 (e.g. 1.02) */
+    {
+        int32_t v;
+        v = (int32_t)(g_CALC_data.lambda_bank1 + 0.5f);
+        lv_label_set_text_fmt(ui_LblLambdaB1, "%2d.%1d", v / 10, v % 10);
+        v = (int32_t)(g_CALC_data.lambda_bank2 + 0.5f);
+        lv_label_set_text_fmt(ui_LblLambdaB2, "%2d.%1d", v / 10, v % 10);
+        v = (int32_t)(g_CALC_data.diff_bank1 * 100.0f + 0.5f);
+        lv_label_set_text_fmt(ui_LblDiffB1, "%1d.%02d", v / 100, v % 100);
+        v = (int32_t)(g_CALC_data.diff_bank2 * 100.0f + 0.5f);
+        lv_label_set_text_fmt(ui_LblDiffB2, "%1d.%02d", v / 100, v % 100);
+    }
     /* Speed: integer km/h */
     lv_label_set_text_fmt(ui_LblSPD, "%3d", (int)sp);
     /* TIME: pre-formatted string "%2x:%02x" (HH:MM BCD) from dataregister.c */

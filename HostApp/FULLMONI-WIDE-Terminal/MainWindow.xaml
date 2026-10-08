@@ -736,7 +736,7 @@
                                         </Style>
                                     </DataGrid.ColumnHeaderStyle>
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="30" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="#" Binding="{Binding DisplayIndex}" Width="30" IsReadOnly="True"/>
                                         <DataGridTemplateColumn Header="EN" Width="35">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>

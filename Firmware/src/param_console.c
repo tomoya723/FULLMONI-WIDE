@@ -281,8 +281,10 @@ static void cmd_trip_reset(void)
 
 /* ターゲット変数名テーブル */
 static const char *target_var_names[] = {
-    "REV", "AF", "NUM1", "NUM2", "NUM3", "NUM4", "NUM5", "NUM6", "SPEED"
+    "REV", "AF", "NUM1", "NUM2", "NUM3", "NUM4", "NUM5", "NUM6", "SPEED",
+    "LA_BANK1", "LA_BANK2"
 };
+#define TARGET_VAR_NAMES_COUNT  (sizeof(target_var_names) / sizeof(target_var_names[0]))
 
 /* CAN設定一覧表示 */
 static void cmd_can_list(void)
@@ -305,11 +307,11 @@ static void cmd_can_list(void)
     }
 
     param_console_print("\r\n-- Fields (16) --\r\n");
-    param_console_print("No CH Byte Len Type End Var    Off  Mul   Div  Dsh Name    Unit WLo  Lo WHi    Hi\r\n");
+    param_console_print("No CH Byte Len Type End Var      Off  Mul   Div  Dsh Name    Unit WLo  Lo WHi    Hi\r\n");
     for (i = 0; i < CAN_FIELD_MAX; i++) {
         CAN_Field_t *f = &g_can_config.fields[i];
 
-        const char *var_name = (f->target_var < 9) ? target_var_names[f->target_var] : "---";
+        const char *var_name = (f->target_var < TARGET_VAR_NAMES_COUNT) ? target_var_names[f->target_var] : "---";
 
         /* 閾値表示用文字列を準備 (float対応) */
         char lo_str[12], hi_str[12];
@@ -328,7 +330,7 @@ static void cmd_can_list(void)
         const char *name_out = (f->name[0] != '\0') ? f->name : "-";
         const char *unit_out = (f->unit[0] != '\0') ? f->unit : "-";
 
-        param_console_printf("%2d %2d   %d   %d   %c    %c   %-5s %4d %5d %5d  %d  %-7s %-4s %c %6s %c %6s\r\n",
+        param_console_printf("%2d %2d   %d   %d   %c    %c   %-8s %4d %5d %5d  %d  %-7s %-4s %c %6s %c %6s\r\n",
                             i, f->channel, f->start_byte, f->byte_count,
                             f->data_type ? 'S' : 'U',
                             f->endian ? 'L' : 'B',
