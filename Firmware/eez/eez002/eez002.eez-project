@@ -1795,6 +1795,61 @@
                   "recolor": false
                 },
                 {
+                  "objID": "20e44571-756a-4cf3-d16e-8e035bed9ab7",
+                  "type": "LVGLLabelWidget",
+                  "left": -164,
+                  "top": -10,
+                  "width": 22,
+                  "height": 18,
+                  "customInputs": [],
+                  "customOutputs": [],
+                  "style": {
+                    "objID": "429b4b6b-05fe-48bf-ba14-fcfbbc92d0c7",
+                    "useStyle": "default",
+                    "conditionalStyles": [],
+                    "childStyles": []
+                  },
+                  "hiddenInEditor": false,
+                  "timeline": [],
+                  "eventHandlers": [],
+                  "identifier": "ui_LblAFR_8",
+                  "leftUnit": "px",
+                  "topUnit": "px",
+                  "widthUnit": "content",
+                  "heightUnit": "content",
+                  "children": [],
+                  "widgetFlags": "",
+                  "hiddenFlagType": "literal",
+                  "clickableFlagType": "literal",
+                  "flagScrollbarMode": "",
+                  "flagScrollDirection": "",
+                  "scrollSnapX": "",
+                  "scrollSnapY": "",
+                  "checkedStateType": "literal",
+                  "disabledStateType": "literal",
+                  "states": "",
+                  "localStyles": {
+                    "objID": "3b5dac0d-9bf3-449b-9ff0-f476fa04c5e9",
+                    "definition": {
+                      "MAIN": {
+                        "DEFAULT": {
+                          "align": "RIGHT_MID",
+                          "text_align": "CENTER",
+                          "text_font": "ui_font_FontHUDmid",
+                          "text_color": "#FFFFFF",
+                          "width": 10193
+                        }
+                      }
+                    }
+                  },
+                  "group": "",
+                  "groupIndex": 0,
+                  "text": "B2",
+                  "textType": "literal",
+                  "longMode": "CLIP",
+                  "recolor": false
+                },
+                {
                   "objID": "75543f09-4122-44a6-fbae-17dfee030094",
                   "type": "LVGLLabelWidget",
                   "left": 9,
@@ -2228,7 +2283,7 @@
                 "conditionalStyles": [],
                 "childStyles": []
               },
-              "hiddenInEditor": true,
+              "hiddenInEditor": false,
               "timeline": [],
               "eventHandlers": [],
               "identifier": "ui_ContainerTelltale",
@@ -2252,7 +2307,7 @@
                     "conditionalStyles": [],
                     "childStyles": []
                   },
-                  "hiddenInEditor": true,
+                  "hiddenInEditor": false,
                   "timeline": [],
                   "eventHandlers": [],
                   "identifier": "ui_ImgTelltale",
@@ -2302,7 +2357,7 @@
                     "conditionalStyles": [],
                     "childStyles": []
                   },
-                  "hiddenInEditor": true,
+                  "hiddenInEditor": false,
                   "timeline": [],
                   "eventHandlers": [],
                   "identifier": "ui_ImgWarnMaster",
@@ -2357,7 +2412,7 @@
                     "conditionalStyles": [],
                     "childStyles": []
                   },
-                  "hiddenInEditor": true,
+                  "hiddenInEditor": false,
                   "timeline": [],
                   "eventHandlers": [],
                   "identifier": "ui_ImgWarnOilPress",
@@ -2412,7 +2467,7 @@
                     "conditionalStyles": [],
                     "childStyles": []
                   },
-                  "hiddenInEditor": true,
+                  "hiddenInEditor": false,
                   "timeline": [],
                   "eventHandlers": [],
                   "identifier": "ui_ImgWarnWaterCold",
@@ -2467,7 +2522,7 @@
                     "conditionalStyles": [],
                     "childStyles": []
                   },
-                  "hiddenInEditor": true,
+                  "hiddenInEditor": false,
                   "timeline": [],
                   "eventHandlers": [],
                   "identifier": "ui_ImgWarnWaterHot",
@@ -2522,7 +2577,7 @@
                     "conditionalStyles": [],
                     "childStyles": []
                   },
-                  "hiddenInEditor": true,
+                  "hiddenInEditor": false,
                   "timeline": [],
                   "eventHandlers": [],
                   "identifier": "ui_ImgWarnExhaust",
@@ -2577,7 +2632,7 @@
                     "conditionalStyles": [],
                     "childStyles": []
                   },
-                  "hiddenInEditor": true,
+                  "hiddenInEditor": false,
                   "timeline": [],
                   "eventHandlers": [],
                   "identifier": "ui_ImgWarnBattery",
@@ -2632,7 +2687,7 @@
                     "conditionalStyles": [],
                     "childStyles": []
                   },
-                  "hiddenInEditor": true,
+                  "hiddenInEditor": false,
                   "timeline": [],
                   "eventHandlers": [],
                   "identifier": "ui_ImgWarnBrake",
@@ -2687,7 +2742,7 @@
                     "conditionalStyles": [],
                     "childStyles": []
                   },
-                  "hiddenInEditor": true,
+                  "hiddenInEditor": false,
                   "timeline": [],
                   "eventHandlers": [],
                   "identifier": "ui_ImageWarnBelt",
@@ -2742,7 +2797,7 @@
                     "conditionalStyles": [],
                     "childStyles": []
                   },
-                  "hiddenInEditor": true,
+                  "hiddenInEditor": false,
                   "timeline": [],
                   "eventHandlers": [],
                   "identifier": "ui_ImgWarnFuel",
@@ -2925,61 +2980,6 @@
               },
               "group": "",
               "groupIndex": 0
-            },
-            {
-              "objID": "20e44571-756a-4cf3-d16e-8e035bed9ab7",
-              "type": "LVGLLabelWidget",
-              "left": -164,
-              "top": -10,
-              "width": 22,
-              "height": 18,
-              "customInputs": [],
-              "customOutputs": [],
-              "style": {
-                "objID": "429b4b6b-05fe-48bf-ba14-fcfbbc92d0c7",
-                "useStyle": "default",
-                "conditionalStyles": [],
-                "childStyles": []
-              },
-              "hiddenInEditor": false,
-              "timeline": [],
-              "eventHandlers": [],
-              "identifier": "ui_LblAFR_8",
-              "leftUnit": "px",
-              "topUnit": "px",
-              "widthUnit": "content",
-              "heightUnit": "content",
-              "children": [],
-              "widgetFlags": "",
-              "hiddenFlagType": "literal",
-              "clickableFlagType": "literal",
-              "flagScrollbarMode": "",
-              "flagScrollDirection": "",
-              "scrollSnapX": "",
-              "scrollSnapY": "",
-              "checkedStateType": "literal",
-              "disabledStateType": "literal",
-              "states": "",
-              "localStyles": {
-                "objID": "3b5dac0d-9bf3-449b-9ff0-f476fa04c5e9",
-                "definition": {
-                  "MAIN": {
-                    "DEFAULT": {
-                      "align": "RIGHT_MID",
-                      "text_align": "CENTER",
-                      "text_font": "ui_font_FontHUDmid",
-                      "text_color": "#FFFFFF",
-                      "width": 10193
-                    }
-                  }
-                }
-              },
-              "group": "",
-              "groupIndex": 0,
-              "text": "B2",
-              "textType": "literal",
-              "longMode": "CLIP",
-              "recolor": false
             }
           ],
           "widgetFlags": "",

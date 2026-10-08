@@ -46,6 +46,7 @@ typedef struct _objects_t {
     lv_obj_t *ui_bar_fuel;
     lv_obj_t *ui_lbl_diff_b1;
     lv_obj_t *ui_lbl_lambda_b1;
+    lv_obj_t *ui_lbl_afr_8;
     lv_obj_t *ui_lbl_afr_3;
     lv_obj_t *ui_lbl_afr_4;
     lv_obj_t *ui_lbl_afr_7;
@@ -66,7 +67,6 @@ typedef struct _objects_t {
     lv_obj_t *ui_img_warn_fuel;
     lv_obj_t *ui_notify_box;
     lv_obj_t *ui_notify_label;
-    lv_obj_t *ui_lbl_afr_8;
 } objects_t;
 
 extern objects_t objects;

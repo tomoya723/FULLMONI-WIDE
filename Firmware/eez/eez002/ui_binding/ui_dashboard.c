@@ -10,15 +10,16 @@
  *   RPM=9000 → angle = 3600 (360.0°)  but arc ends at 0°=360° so needle aligns with arc end
  *
  * Warning thresholds:
- *   Water temp  : ≥ 105°C → show ui_ImgWarnWater
+ *   Water temp  : ≥ 100°C → show ui_ImgWarnWater
  *   IAT         : ≥  60°C → (no dedicated icon, future use)
  *   Oil temp    : ≥ 130°C → (no dedicated icon, future use)
- *   Oil press   : ≤  50   → show ui_ImgWarnOilPress
+ *   Oil press   : ≤ 150kPa (内部値15, decimal_shift込) → show ui_ImgWarnOilPress
  *   Battery     : ≤ 11.5V (115 in 0.1V) → show ui_ImgWarnBattery
  *   Exhaust     : AD3 ≤ 100 (active-low) → show ui_ImgWarnExhaust
  *   Brake       : AD2 ≤ 100 (active-low) → show ui_ImgWarnBrake
  *   Belt        : AD4 ≤ 150 (active-low, #issue8) → show ui_ImageWarnBelt
- *   Master      : any of the above (except water cold) → show ui_ImgWarnMaster
+ *   Master      : any of the above (except water cold, belt, brake*) → show ui_ImgWarnMaster
+ *                 (*brake = side-brake + fluid shared signal; excluded since side-brake is routine)
  *   Fuel        : fuel_per < 5% → show / fuel_per > 10% → hide (hysteresis)
  */
 
@@ -55,7 +56,7 @@ extern unsigned int gear_pos;
 /* --- Warning thresholds --------------------------------------------------- */
 #define WARN_WATER_TEMP_COLD  60    /* °C: これ以下は冷間警告（青表示） */
 #define WARN_WATER_TEMP_HOT   100   /* °C: これ以上は過熱警告（通常色表示） */
-#define WARN_OIL_PRESS_LO     50
+#define WARN_OIL_PRESS_LO     15   /* 内部値 (decimal_shift込, 表示1.5=150kPa相当) */
 #define WARN_BATT_LO          115   /* 0.1V = 11.5V */
 #define WARN_FUEL_SHOW        5     /* %: これ未満で燃料警告点灯 */
 #define WARN_FUEL_HIDE        10    /* %: これ超で燃料警告消灯（ヒステリシス） */
@@ -334,9 +335,9 @@ void ui_dashboard_update(void)
         if (fuel_per > (float)WARN_FUEL_HIDE)      { s_warn_fuel = false; }
         else if (fuel_per < (float)WARN_FUEL_SHOW) { s_warn_fuel = true;  }
         bool warn_fuel       = s_warn_fuel;
-        /* 冷間警告はマスター警告に含めない（過熱のみ） */
+        /* 冷間警告・ブレーキ(サイドブレーキ連動のため常用)はマスター警告に含めない */
         bool warn_master     = warn_water_hot || warn_oilpress || warn_batt ||
-                               warn_exhaust || warn_brake || warn_fuel;
+                               warn_exhaust || warn_fuel;
 
         set_visible(ui_ImgWarnMaster,    warn_master);
         set_visible(ui_ImgWarnWaterCold, warn_water_cold);
