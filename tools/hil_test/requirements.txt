@@ -1,0 +1,8 @@
+python-can>=4.6.1
+cantools>=39.4.0
+opencv-python>=4.10.0
+pillow>=11.0.0
+pyyaml>=6.0
+# VLM判定は Claude Code CLI (`claude` コマンド) をサブプロセス呼び出しするため、
+# anthropic SDK / ANTHROPIC_API_KEY は不要。`claude` がPATHに通っていてログイン
+# 済みであること (vlm_check.py参照)。

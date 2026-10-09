@@ -27,6 +27,7 @@
 #include "lvgl/lvgl.h"
 #include "ui/screens.h"
 #include "ui/eez_compat.h"
+#include "ui/ui.h"
 #include "dataregister.h"
 #include "ui_dashboard.h"
 
@@ -63,6 +64,35 @@ extern unsigned int gear_pos;
 #define WARN_BRAKE_ADC_LO     100   /* raw ADC: これ以下でブレーキ液警告 (active-low) */
 #define WARN_EXHAUST_ADC_LO   100   /* raw ADC: これ以下で排気温警告 (active-low) */
 #define WARN_BELT_ADC_LO      150   /* raw ADC: これ以下でシートベルト警告 (active-low, #issue8) */
+
+/* --- TRACK screen (Screen1_1) ---------------------------------------------- */
+/* trackmode_screen_design/layout.json: redlineRpm=7500, colors.red/track */
+#define TRACK_RPM_REDLINE     7500u
+#define TRACK_COLOR_NORMAL    0xFFFFFF
+#define TRACK_COLOR_REDLINE   0xFF4149
+
+/* --- 暫定: 起動時にTRACK画面を直接表示 (HIL ClosedLoopテスト用) ------------
+ * tools/hil_test は人間がPD0 SWを操作できない前提のため、起動直後から
+ * Screen1_1を見せたい。有効化中はPD0 SW監視を止め、オープニング/テルテール
+ * も即スキップしてTRACK画面をそのまま表示する。
+ * 描画テストが終わったら 0 に戻し、通常の起動(Screen1)+SW切り替え経路に戻すこと。 */
+#define TRACK_MODE_BOOT_OVERRIDE  1
+
+/* --- TRACK screen switch: PD0, 外部プルアップ, Low-Active ------------------ */
+/* 連続 TRACK_SW_DEBOUNCE_COUNT 回 (約30ms周期のui_dashboard_update呼び出しで
+ * ~90ms) 同じレベルが続いたら確定させるカウンタ式デバウンス */
+#define TRACK_SW_DEBOUNCE_COUNT  3u
+static bool    s_track_mode        = false; /* true = Screen1_1 (TRACK) 表示中 */
+#if !TRACK_MODE_BOOT_OVERRIDE
+static bool    s_track_sw_raw_prev = false;
+static uint8_t s_track_sw_count    = 0;
+
+static inline bool track_switch_is_active(void)
+{
+    /* Low-Active: ピンLowでTRACKモードSW ON */
+    return (PORTD.PIDR.BIT.B0 == 0);
+}
+#endif /* !TRACK_MODE_BOOT_OVERRIDE */
 
 /* --- Startup telltale ----------------------------------------------------- */
 /* 法規要件: 起動直後に全警告灯を一定時間点灯しインジケータの動作確認を行う */
@@ -171,6 +201,15 @@ void ui_dashboard_create(void)
     s_rpm_peak      = 0;
     s_peak_falling  = false;
     s_peak_hold_start = lv_tick_get();
+
+#if TRACK_MODE_BOOT_OVERRIDE
+    /* オープニング/テルテールをスキップしてTRACK画面(Screen1_1)を即表示 */
+    set_visible(objects.ui_container_opening_1,  false);
+    set_visible(objects.ui_container_dashboard_1, true);
+    s_telltale_done = true;
+    s_track_mode    = true;
+    loadScreen(SCREEN_ID_SCREEN1_1);
+#endif
 }
 
 /* -------------------------------------------------------------------------- */
@@ -198,6 +237,26 @@ void ui_dashboard_clear_notify(void)
 /* -------------------------------------------------------------------------- */
 void ui_dashboard_update(void)
 {
+#if !TRACK_MODE_BOOT_OVERRIDE
+    /* --- TRACK画面切り替え (PD0 SW) ---------------------------------------- */
+    /* デバウンス確定後、要求状態と現在表示中の画面が食い違っていれば切り替える */
+    {
+        bool raw = track_switch_is_active();
+        if (raw == s_track_sw_raw_prev) {
+            if (s_track_sw_count < TRACK_SW_DEBOUNCE_COUNT) {
+                s_track_sw_count++;
+            }
+        } else {
+            s_track_sw_raw_prev = raw;
+            s_track_sw_count    = 1;
+        }
+        if (s_track_sw_count >= TRACK_SW_DEBOUNCE_COUNT && raw != s_track_mode) {
+            s_track_mode = raw;
+            loadScreen(s_track_mode ? SCREEN_ID_SCREEN1_1 : SCREEN_ID_SCREEN1);
+        }
+    }
+#endif /* !TRACK_MODE_BOOT_OVERRIDE */
+
     /* --- Startup telltale / Opening period check ----------------------- */
     /* テルテール中は全ウィジェット更新をスキップ（全灯状態を維持）*/
     if (!s_telltale_done) {
@@ -260,27 +319,40 @@ void ui_dashboard_update(void)
 
     /* --- RPM label --------------------------------------------------------- */
     lv_label_set_text_fmt(ui_LblRPM, "%5u", rpm);
+    /* TRACK screen: RPM number + bar (redline color above TRACK_RPM_REDLINE) */
+    lv_label_set_text_fmt(objects.ui_lbl_rpm_1, "%4u", rpm);
+    lv_bar_set_value(objects.ui_bar_rpm_1, (int32_t)rpm, LV_ANIM_OFF);
+    lv_obj_set_style_bg_color(objects.ui_bar_rpm_1,
+        lv_color_hex((rpm >= TRACK_RPM_REDLINE) ? TRACK_COLOR_REDLINE : TRACK_COLOR_NORMAL),
+        LV_PART_INDICATOR);
 
     /* --- Sensor labels ----------------------------------------------------- */
     lv_label_set_text_fmt(ui_LblWaterTemp, "%3d", (int)num1);
     lv_label_set_text_fmt(ui_LblIAT,       "%3d", (int)num2);
     lv_label_set_text_fmt(ui_LblOilTemp,   "%3d", (int)num3);
     lv_label_set_text_fmt(ui_LblMAP,       "%3d", (int)num4);
+    /* TRACK screen: same °C values, no unit conversion needed */
+    lv_label_set_text_fmt(objects.ui_lbl_water_temp_1, "%3d", (int)num1);
+    lv_label_set_text_fmt(objects.ui_lbl_oil_temp_1,   "%3d", (int)num3);
     /* 油圧: CAN変換後の内部値は decimal_shift=1 で10倍 (39→3.9) */
     {
         int32_t op = (int32_t)(num5 + 0.5f);
         lv_label_set_text_fmt(ui_LblOilPress, "%2d.%1d", op / 10, op % 10);
+        /* TRACK screen: plain kPa (num5 x100kPa-decimal-shift-10 → kPa = num5*10) */
+        lv_label_set_text_fmt(objects.ui_lbl_oil_press_1, "%4d", (int32_t)(num5 * 10.0f + 0.5f));
     }
     /* Battery: %f not supported by LVGL tiny_printf; use integer arithmetic */
     {
         int32_t bv = (int32_t)(bt * 10.0f + 0.5f);   /* e.g. 12.5V → 125 */
         lv_label_set_text_fmt(ui_LblBattery, "%2d.%1d", bv / 10, bv % 10);
+        lv_label_set_text_fmt(objects.ui_lbl_battery_1, "%2d.%1d", bv / 10, bv % 10);
     }
     /* AFR: same %f restriction; 1 decimal (e.g. 14.7) */
     /* CAN変換後の内部値は decimal_shift=1 で10倍 (147.0→14.7) */
     {
         int32_t av = (int32_t)(af + 0.5f);
         lv_label_set_text_fmt(ui_LblAFR, "%2d.%1d", av / 10, av % 10);
+        lv_label_set_text_fmt(objects.ui_lbl_afr_1, "%2d.%1d", av / 10, av % 10);
     }
     /* Lambda Bank1/2: A/F比 (e.g. 14.7) / DiffBank: 比率 (e.g. 1.02) */
     {
@@ -296,8 +368,10 @@ void ui_dashboard_update(void)
     }
     /* Speed: integer km/h */
     lv_label_set_text_fmt(ui_LblSPD, "%3d", (int)sp);
+    lv_label_set_text_fmt(objects.ui_lbl_spd_1, "%3d", (int)sp);
     /* TIME: pre-formatted string "%2x:%02x" (HH:MM BCD) from dataregister.c */
     lv_label_set_text(ui_LblTIME, (const char *)g_CALC_data.str_time);
+    lv_label_set_text(objects.ui_lbl_time_1, (const char *)g_CALC_data.str_time);
     /* ODO: integer km (double → int32) */
     lv_label_set_text_fmt(ui_LblODO, "%6d", (int32_t)odo);
     /* Trip: 1 decimal km (e.g. 123.4) */
@@ -321,6 +395,7 @@ void ui_dashboard_update(void)
     /* battery bar: use 0.1V integer (bt * 10) */
     lv_bar_set_value(ui_BarBattery,   (int32_t)(bt * 10.0f), LV_ANIM_OFF);
     lv_bar_set_value(ui_BarFUEL,      (int32_t)fuel_per,     LV_ANIM_OFF);
+    lv_bar_set_value(objects.ui_bar_fuel_1, (int32_t)fuel_per, LV_ANIM_OFF);
 
     /* --- Warning icons ----------------------------------------------------- */
     {
@@ -348,6 +423,17 @@ void ui_dashboard_update(void)
         set_visible(ui_ImgWarnBrake,     warn_brake);
         set_visible(ui_ImageWarnBelt,    warn_belt);
         set_visible(ui_ImgWarnFuel,      warn_fuel);
+
+        /* TRACK screen: identical telltale strip, same warn_* triggers as Screen1 */
+        set_visible(objects.ui_img_warn_master_1,     warn_master);
+        set_visible(objects.ui_img_warn_water_cold_1, warn_water_cold);
+        set_visible(objects.ui_img_warn_water_hot_1,  warn_water_hot);
+        set_visible(objects.ui_img_warn_oil_press_1,  warn_oilpress);
+        set_visible(objects.ui_img_warn_battery_1,    warn_batt);
+        set_visible(objects.ui_img_warn_exhaust_1,    warn_exhaust);
+        set_visible(objects.ui_img_warn_brake_1,      warn_brake);
+        set_visible(objects.ui_image_warn_belt_1,     warn_belt);
+        set_visible(objects.ui_img_warn_fuel_1,       warn_fuel);
     }
 
 }

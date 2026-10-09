@@ -1,0 +1,285 @@
+{
+  "screen": {
+    "width": 1198,
+    "height": 381,
+    "coordinateSystem": "LCD top-left; pixels; right and bottom exclusive"
+  },
+  "boxes": {
+    "lcd": {
+      "x": 0,
+      "y": 0,
+      "width": 1198,
+      "height": 381
+    },
+    "telltale": {
+      "x": 0,
+      "y": 0,
+      "width": 35,
+      "height": 381
+    },
+    "dashboard": {
+      "x": 35,
+      "y": 0,
+      "width": 1163,
+      "height": 381
+    },
+    "heading": {
+      "x": 59,
+      "y": 13,
+      "width": 1115,
+      "height": 25
+    },
+    "tachometer": {
+      "x": 59,
+      "y": 44,
+      "width": 1115,
+      "height": 68
+    },
+    "rpmBar": {
+      "x": 59,
+      "y": 82,
+      "width": 1115,
+      "height": 30
+    },
+    "rpmNumber": {
+      "x": 65,
+      "y": 130,
+      "width": 125.266,
+      "height": 40
+    },
+    "speed": {
+      "x": 366,
+      "y": 106,
+      "width": 501,
+      "height": 112
+    },
+    "clock": {
+      "x": 1076.406,
+      "y": 130,
+      "width": 92.594,
+      "height": 41
+    },
+    "event": {
+      "x": 851,
+      "y": 179,
+      "width": 323,
+      "height": 42
+    },
+    "health": {
+      "x": 59,
+      "y": 227,
+      "width": 1115,
+      "height": 99
+    },
+    "oilPressure": {
+      "x": 59,
+      "y": 228,
+      "width": 371.656,
+      "height": 98
+    },
+    "oilTemperature": {
+      "x": 430.656,
+      "y": 228,
+      "width": 371.672,
+      "height": 98
+    },
+    "waterTemperature": {
+      "x": 802.328,
+      "y": 228,
+      "width": 371.656,
+      "height": 98
+    },
+    "footer": {
+      "x": 35,
+      "y": 326,
+      "width": 1163,
+      "height": 55
+    },
+    "fuel": {
+      "x": 64,
+      "y": 341.5,
+      "width": 541.438,
+      "height": 25
+    },
+    "fuelBar": {
+      "x": 159.141,
+      "y": 344.5,
+      "width": 381.688,
+      "height": 19
+    },
+    "afr": {
+      "x": 605.438,
+      "y": 334.5,
+      "width": 276.25,
+      "height": 39
+    },
+    "voltage": {
+      "x": 881.688,
+      "y": 334.5,
+      "width": 287.297,
+      "height": 39
+    }
+  },
+  "typography": {
+    ".nt-mode": {
+      "fontSize": "24px",
+      "lineHeight": "25px",
+      "fontWeight": "700",
+      "fontFamily": "Arial, Helvetica, sans-serif"
+    },
+    ".nt-tach-unit": {
+      "fontSize": "22px",
+      "lineHeight": "25px",
+      "fontWeight": "500",
+      "fontFamily": "Arial, Helvetica, sans-serif"
+    },
+    ".nt-scale span": {
+      "fontSize": "32px",
+      "lineHeight": "34px",
+      "fontWeight": "700",
+      "fontFamily": "Arial, Helvetica, sans-serif"
+    },
+    ".nt-red-tick": {
+      "fontSize": "21px",
+      "lineHeight": "25px",
+      "fontWeight": "700",
+      "fontFamily": "Arial, Helvetica, sans-serif"
+    },
+    ".nt-rpm-value": {
+      "fontSize": "36px",
+      "lineHeight": "40px",
+      "fontWeight": "500",
+      "fontFamily": "Arial, Helvetica, sans-serif"
+    },
+    ".nt-speed-value": {
+      "fontSize": "112px",
+      "lineHeight": "112px",
+      "fontWeight": "700",
+      "fontFamily": "Arial, Helvetica, sans-serif"
+    },
+    ".nt-clock": {
+      "fontSize": "37px",
+      "lineHeight": "41px",
+      "fontWeight": "500",
+      "fontFamily": "Arial, Helvetica, sans-serif"
+    },
+    ".nt-label": {
+      "fontSize": "23px",
+      "lineHeight": "25px",
+      "fontWeight": "700",
+      "fontFamily": "Arial, Helvetica, sans-serif"
+    },
+    ".nt-pressure-value": {
+      "fontSize": "61px",
+      "lineHeight": "68px",
+      "fontWeight": "700",
+      "fontFamily": "Arial, Helvetica, sans-serif"
+    },
+    ".nt-event-subject": {
+      "fontSize": "24px",
+      "lineHeight": "28px",
+      "fontWeight": "700",
+      "fontFamily": "Arial, Helvetica, sans-serif"
+    },
+    ".nt-event-state": {
+      "fontSize": "31px",
+      "lineHeight": "34px",
+      "fontWeight": "700",
+      "fontFamily": "Arial, Helvetica, sans-serif"
+    },
+    ".nt-status-label": {
+      "fontSize": "22px",
+      "lineHeight": "25px",
+      "fontWeight": "700",
+      "fontFamily": "Arial, Helvetica, sans-serif"
+    },
+    ".nt-status-value": {
+      "fontSize": "35px",
+      "lineHeight": "39px",
+      "fontWeight": "500",
+      "fontFamily": "Arial, Helvetica, sans-serif"
+    },
+    ".nt-endpoint": {
+      "fontSize": "19px",
+      "lineHeight": "22px",
+      "fontWeight": "500",
+      "fontFamily": "Arial, Helvetica, sans-serif"
+    }
+  },
+  "colors": {
+    "background": "#000000",
+    "foreground": "#FFFFFF",
+    "secondary": "#D3D3D3",
+    "separator": "#393939",
+    "track": "#252525",
+    "footer": "#101010",
+    "redZone": "#761C22",
+    "red": "#FF4149",
+    "criticalBackground": "#B31822",
+    "caution": "#FFD245",
+    "shift": "#62E4FF"
+  },
+  "presets": [
+    {
+      "id": "normal",
+      "event": "",
+      "screenshot": "previews/normal.png"
+    },
+    {
+      "id": "shift",
+      "event": "SHIFT",
+      "screenshot": "previews/shift.png"
+    },
+    {
+      "id": "redline",
+      "event": "OVER REV",
+      "screenshot": "previews/redline.png"
+    },
+    {
+      "id": "pressure",
+      "event": "OIL PRESS LOW",
+      "screenshot": "previews/pressure.png"
+    },
+    {
+      "id": "oil",
+      "event": "OIL TEMP HIGH",
+      "screenshot": "previews/oil.png"
+    },
+    {
+      "id": "water",
+      "event": "WATER TEMP HIGH",
+      "screenshot": "previews/water.png"
+    },
+    {
+      "id": "fuel",
+      "event": "",
+      "screenshot": "previews/fuel.png"
+    },
+    {
+      "id": "voltage",
+      "event": "VOLT LOW",
+      "screenshot": "previews/voltage.png"
+    },
+    {
+      "id": "afr",
+      "event": "AFR CHECK",
+      "screenshot": "previews/afr.png"
+    },
+    {
+      "id": "missing",
+      "event": "OIL PRESS NO DATA",
+      "screenshot": "previews/missing.png"
+    },
+    {
+      "id": "combined",
+      "event": "OIL PRESS LOW",
+      "screenshot": "previews/combined.png"
+    }
+  ],
+  "warningThresholds": {
+    "redlineRpm": 7500,
+    "shiftRpmExample": 7000,
+    "otherThresholds": null,
+    "note": "Presets are design examples, not a warning evaluator."
+  }
+}

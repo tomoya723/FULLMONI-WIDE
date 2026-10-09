@@ -1,0 +1,165 @@
+<div id="na8-track-handoff">
+  <div class="viz-controls">
+    <label class="form-label">表示パターン
+      <select class="form-select" id="na8-scene" aria-controls="na8-lcd">
+        <option value="normal">通常</option><option value="shift">シフト通知（仮7000rpm）</option>
+        <option value="redline">レッドゾーン（7500rpm以降）</option><option value="pressure">油圧低下</option>
+        <option value="oil">油温注意</option><option value="water">水温異常</option>
+        <option value="fuel">燃料少</option><option value="voltage">電圧低下</option>
+        <option value="afr">AFR注意（追加の表示例）</option><option value="missing">油圧センサー欠測</option>
+        <option value="combined">複数警告（油圧・水温・燃料）</option>
+      </select>
+    </label>
+    <label class="form-check"><input class="form-check-input" id="na8-guide" type="checkbox"><span class="form-check-label">左35pxの確認用ガイド</span></label>
+  </div>
+  <div class="viz-row"><span class="text-small">1198 × 381 px ／ 左35 × 381 px：テルテール予約領域</span></div>
+  <div class="nt-stage viz-dotted-background">
+    <div class="nt-fit">
+      <div id="na8-lcd" class="nt-lcd" role="img" aria-label="NA8 Track画面">
+        <div class="nt-rail" aria-hidden="true"><span>35 px</span></div>
+        <div class="nt-dash">
+          <div class="nt-heading" aria-hidden="true"><span class="nt-mode">TRACK</span><span class="nt-tach-unit">x1000rpm</span></div>
+          <div class="nt-tach" aria-hidden="true">
+            <div class="nt-scale"><span style="left:0%">0</span><span style="left:12.5%">1</span><span style="left:25%">2</span><span style="left:37.5%">3</span><span style="left:50%">4</span><span style="left:62.5%">5</span><span style="left:75%">6</span><span style="left:87.5%">7</span><span class="nt-red-tick" style="left:93.75%">7.5</span><span style="left:100%">8</span></div>
+            <div class="nt-rpm-track"><div class="nt-red-zone"></div><div class="nt-rpm-fill"></div><div class="nt-rpm-red-fill"></div><div class="nt-rpm-tip"></div></div>
+          </div>
+          <div class="nt-rpm"><span class="nt-rpm-value">5500</span><span class="nt-unit">rpm</span></div>
+          <div class="nt-speed"><span class="nt-speed-value">124</span><span class="nt-unit">km/h</span></div>
+          <div class="nt-clock">14:32</div>
+          <div class="nt-event"><span class="nt-event-subject"></span><span class="nt-event-state"></span></div>
+          <div class="nt-health">
+            <div class="nt-metric nt-pressure"><span class="nt-label">OIL PRESS</span><div class="nt-reading"><span class="nt-pressure-value">400</span><span class="nt-unit">kPa</span></div></div>
+            <div class="nt-metric nt-oil"><span class="nt-label">OIL TEMP</span><div class="nt-reading"><span class="nt-oil-value">110</span><span class="nt-unit">°C</span></div></div>
+            <div class="nt-metric nt-water"><span class="nt-label">WATER TEMP</span><div class="nt-reading"><span class="nt-water-value">92</span><span class="nt-unit">°C</span></div></div>
+          </div>
+          <div class="nt-status">
+            <div class="nt-fuel"><span class="nt-status-label">FUEL</span><div class="nt-fuel-gauge"><span class="nt-endpoint">E</span><div class="nt-fuel-track"><div class="nt-fuel-fill"></div><span class="nt-fuel-low"></span></div><span class="nt-endpoint">F</span></div></div>
+            <div class="nt-afr"><span class="nt-status-label">AFR</span><span class="nt-afr-value nt-status-value">12.8</span></div>
+            <div class="nt-voltage"><span class="nt-status-label">VOLT</span><span class="nt-voltage-value nt-status-value">14.1</span><span class="nt-status-unit">V</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="text-small" role="status" aria-live="polite" id="na8-scene-caption">通常表示</div>
+</div>
+<style>
+/* LCD coordinates are native pixels. Scaling is applied only by the preview. */
+#na8-track-handoff .nt-stage{padding:16px 0;width:100%;}
+#na8-track-handoff .nt-fit{position:relative;width:100%;max-width:1198px;aspect-ratio:1198/381;margin:0 auto;overflow:hidden;}
+#na8-track-handoff .nt-lcd{--nt-bg:#000;--nt-fg:#fff;--nt-secondary:#d3d3d3;--nt-line:#393939;--nt-track:#252525;--nt-red:#ff4149;--nt-red-bg:#b31822;--nt-amber:#ffd245;--nt-shift:#62e4ff;position:absolute;top:0;left:0;width:1198px;height:381px;background:var(--nt-bg);color:var(--nt-fg);font-family:Arial,Helvetica,sans-serif;font-variant-numeric:tabular-nums;transform-origin:top left;overflow:hidden;}
+#na8-track-handoff .nt-lcd *{box-sizing:border-box;}
+#na8-track-handoff .nt-rail{position:absolute;left:0;top:0;width:35px;height:381px;background:#000;overflow:hidden;}
+#na8-track-handoff .nt-rail span{display:none;}
+#na8-track-handoff .nt-lcd.nt-guide .nt-rail{background:#182d40;border-right:1px dashed #87bbec;}
+#na8-track-handoff .nt-lcd.nt-guide .nt-rail span{display:block;position:absolute;top:169px;left:10px;writing-mode:vertical-rl;color:#d7edff;font:500 14px/16px Arial,sans-serif;}
+#na8-track-handoff .nt-dash{position:absolute;left:35px;top:0;width:1163px;height:381px;background:var(--nt-bg);overflow:hidden;}
+#na8-track-handoff .nt-heading{position:absolute;left:24px;top:13px;width:1115px;height:25px;display:flex;justify-content:space-between;align-items:flex-start;white-space:nowrap;}
+#na8-track-handoff .nt-mode{font-size:24px;font-weight:700;line-height:25px;letter-spacing:1px;}
+#na8-track-handoff .nt-tach-unit{font-size:22px;font-weight:500;line-height:25px;color:var(--nt-secondary);}
+#na8-track-handoff .nt-tach{position:absolute;left:24px;top:44px;width:1115px;height:68px;}
+#na8-track-handoff .nt-scale{position:relative;height:38px;}
+#na8-track-handoff .nt-scale span{position:absolute;top:0;transform:translateX(-50%);font-size:32px;font-weight:700;line-height:34px;color:var(--nt-secondary);}
+#na8-track-handoff .nt-scale span:first-child{transform:none;}
+#na8-track-handoff .nt-scale span:last-child{transform:translateX(-100%);}
+#na8-track-handoff .nt-scale .nt-red-tick{font-size:21px;line-height:25px;top:6px;color:var(--nt-red);}
+#na8-track-handoff .nt-rpm-track{position:relative;height:30px;background:var(--nt-track);}
+#na8-track-handoff .nt-red-zone{position:absolute;left:93.75%;right:0;top:0;bottom:0;background:#761c22;}
+#na8-track-handoff .nt-rpm-fill{position:absolute;left:0;top:0;height:30px;width:68.75%;background:var(--nt-fg);}
+#na8-track-handoff .nt-rpm-red-fill{position:absolute;left:93.75%;top:0;height:30px;width:0;background:var(--nt-red);}
+#na8-track-handoff .nt-rpm-tip{position:absolute;left:68.75%;top:0;height:30px;width:8px;transform:translateX(-100%);background:var(--nt-fg);}
+#na8-track-handoff .nt-rpm{position:absolute;left:30px;top:130px;display:flex;align-items:baseline;gap:9px;white-space:nowrap;}
+#na8-track-handoff .nt-rpm-value{font-size:36px;font-weight:500;line-height:40px;}
+#na8-track-handoff .nt-unit{font-size:23px;line-height:25px;font-weight:400;color:var(--nt-secondary);white-space:nowrap;}
+#na8-track-handoff .nt-rpm .nt-unit{font-size:21px;}
+#na8-track-handoff .nt-speed{position:absolute;left:331px;top:106px;width:501px;height:112px;display:flex;justify-content:center;align-items:baseline;gap:12px;white-space:nowrap;}
+#na8-track-handoff .nt-speed-value{font-size:112px;font-weight:700;line-height:112px;letter-spacing:-3px;}
+#na8-track-handoff .nt-clock{position:absolute;right:29px;top:130px;font-size:37px;line-height:41px;font-weight:500;white-space:nowrap;}
+#na8-track-handoff .nt-event{position:absolute;right:24px;top:179px;width:323px;height:42px;display:flex;justify-content:center;align-items:center;gap:9px;padding:3px 5px;text-align:center;white-space:nowrap;}
+#na8-track-handoff .nt-event-subject{font-size:24px;font-weight:700;line-height:28px;color:var(--nt-secondary);}
+#na8-track-handoff .nt-event-state{font-size:31px;font-weight:700;line-height:34px;}
+#na8-track-handoff .nt-event-state:empty{display:none;}
+#na8-track-handoff .nt-health{position:absolute;left:24px;top:227px;width:1115px;height:99px;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--nt-line);}
+#na8-track-handoff .nt-metric{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:0 9px;min-width:0;}
+#na8-track-handoff .nt-label{font-size:23px;font-weight:700;line-height:25px;color:var(--nt-secondary);white-space:nowrap;}
+#na8-track-handoff .nt-reading{display:flex;align-items:baseline;gap:9px;white-space:nowrap;}
+#na8-track-handoff .nt-reading>span:first-child{min-width:3ch;text-align:right;font-size:61px;font-weight:700;line-height:68px;letter-spacing:-1px;}
+#na8-track-handoff .nt-reading .nt-unit{font-size:19px;line-height:21px;}
+#na8-track-handoff .nt-status{position:absolute;left:0;top:326px;width:1163px;height:55px;padding:0 29px;display:grid;grid-template-columns:49% 25% 26%;align-items:center;background:#101010;border-top:1px solid var(--nt-line);}
+#na8-track-handoff .nt-status-label{font-size:22px;font-weight:700;line-height:25px;color:var(--nt-secondary);white-space:nowrap;}
+#na8-track-handoff .nt-status-value{font-size:35px;font-weight:500;line-height:39px;white-space:nowrap;}
+#na8-track-handoff .nt-status-unit{font-size:20px;font-weight:400;line-height:23px;color:var(--nt-secondary);}
+#na8-track-handoff .nt-fuel{display:flex;align-items:center;gap:17px;padding-right:45px;min-width:0;}
+#na8-track-handoff .nt-fuel-gauge{display:flex;align-items:center;gap:8px;flex:1;min-width:0;}
+#na8-track-handoff .nt-endpoint{font-size:19px;font-weight:500;line-height:22px;color:var(--nt-secondary);}
+#na8-track-handoff .nt-fuel-track{position:relative;height:19px;flex:1;background:var(--nt-track);}
+#na8-track-handoff .nt-fuel-fill{height:100%;width:62.5%;background:var(--nt-fg);}
+#na8-track-handoff .nt-fuel-low{position:absolute;left:40%;top:50%;transform:translateY(-50%);font-size:16px;font-weight:700;line-height:18px;letter-spacing:1px;}
+#na8-track-handoff .nt-afr,#na8-track-handoff .nt-voltage{display:flex;align-items:baseline;gap:13px;white-space:nowrap;}
+#na8-track-handoff .nt-voltage{justify-content:flex-end;gap:8px;}
+#na8-track-handoff .nt-voltage .nt-status-label{margin-right:5px;}
+#na8-track-handoff .nt-critical{background:var(--nt-red-bg);}
+#na8-track-handoff .nt-critical .nt-label,#na8-track-handoff .nt-critical .nt-unit,#na8-track-handoff .nt-critical .nt-event-subject{color:var(--nt-fg);}
+#na8-track-handoff .nt-caution{background:var(--nt-amber);color:#000;}
+#na8-track-handoff .nt-caution .nt-label,#na8-track-handoff .nt-caution .nt-unit,#na8-track-handoff .nt-caution .nt-event-subject{color:#000;}
+#na8-track-handoff .nt-footer-warning .nt-status-label,#na8-track-handoff .nt-footer-warning .nt-status-value,#na8-track-handoff .nt-footer-warning .nt-status-unit,#na8-track-handoff .nt-footer-warning .nt-endpoint,#na8-track-handoff .nt-footer-warning .nt-fuel-low{color:var(--nt-amber);}
+#na8-track-handoff .nt-footer-warning .nt-fuel-fill{background:var(--nt-amber);}
+#na8-track-handoff .nt-shifting .nt-event-subject{color:var(--nt-shift);font-size:39px;line-height:41px;}
+#na8-track-handoff .nt-overrev .nt-event-subject{color:var(--nt-red);font-size:37px;line-height:40px;}
+</style>
+<script>
+(()=>{
+ const root=document.getElementById('na8-track-handoff');
+ const lcd=root.querySelector('.nt-lcd'),fit=root.querySelector('.nt-fit');
+ const picker=root.querySelector('#na8-scene'),guide=root.querySelector('#na8-guide');
+ const base={rpm:5500,speed:124,clock:'14:32',pressure:'400',oil:'110',water:'92',fuel:62.5,afr:12.8,voltage:14.1,subject:'',status:'',type:'',marks:{}};
+ // Presets demonstrate appearance. They are NOT a sensor/engine warning evaluator.
+ const scenes={
+  normal:{label:'通常表示'},
+  shift:{label:'SHIFT表示例：7000rpmは仮設定',rpm:7200,subject:'SHIFT',type:'nt-shifting'},
+  redline:{label:'7500rpm以降の表示例',rpm:7700,subject:'OVER REV',type:'nt-overrev'},
+  pressure:{label:'油圧低下：検出条件・数値は仮',pressure:'80',subject:'OIL PRESS',status:'LOW',type:'nt-critical',marks:{pressure:'nt-critical'}},
+  oil:{label:'油温注意：検出条件・数値は仮',oil:'125',subject:'OIL TEMP',status:'HIGH',type:'nt-caution',marks:{oil:'nt-caution'}},
+  water:{label:'水温異常：検出条件・数値は仮',water:'115',subject:'WATER TEMP',status:'HIGH',type:'nt-critical',marks:{water:'nt-critical'}},
+  fuel:{label:'燃料少：残量8%は表示例',fuel:8,marks:{fuel:'nt-footer-warning'}},
+  voltage:{label:'電圧低下：検出条件・数値は仮',voltage:11.5,subject:'VOLT',status:'LOW',type:'nt-caution',marks:{voltage:'nt-footer-warning'}},
+  afr:{label:'AFR注意：追加の表示例・判定条件は未定',afr:16.5,subject:'AFR',status:'CHECK',type:'nt-caution',marks:{afr:'nt-footer-warning'}},
+  missing:{label:'油圧欠測：ゼロではなく --- を表示',pressure:'---',subject:'OIL PRESS',status:'NO DATA',type:'nt-caution',marks:{pressure:'nt-caution'}},
+  combined:{label:'優先表示の提案：油圧を主警告、水温と燃料も各欄で表示',rpm:7200,pressure:'80',water:'115',fuel:8,subject:'OIL PRESS',status:'LOW',type:'nt-critical',marks:{pressure:'nt-critical',water:'nt-critical',fuel:'nt-footer-warning'}}
+ };
+ const state={scene:'normal',guide:false};
+ function savedApply(saved){
+  const s=saved?.modelContent?.na8Handoff;if(!s)return;
+  if(Object.hasOwn(scenes,s.scene))state.scene=s.scene;
+  if(typeof s.guide==='boolean')state.guide=s.guide;
+ }
+ function fitScreen(){lcd.style.transform='scale('+Math.min(1,fit.clientWidth/1198)+')';}
+ function render(save=false){
+  const s={...base,...scenes[state.scene]},percent=s.rpm/8000*100;
+  picker.value=state.scene;guide.checked=state.guide;lcd.classList.toggle('nt-guide',state.guide);
+  for(const key of ['rpm','speed','pressure','oil','water'])root.querySelector('.nt-'+key+'-value').textContent=s[key];
+  root.querySelector('.nt-clock').textContent=s.clock;
+  root.querySelector('.nt-afr-value').textContent=s.afr.toFixed(1);
+  root.querySelector('.nt-voltage-value').textContent=s.voltage.toFixed(1);
+  root.querySelector('.nt-rpm-fill').style.width=Math.min(percent,93.75)+'%';
+  root.querySelector('.nt-rpm-red-fill').style.width=Math.max(0,percent-93.75)+'%';
+  const tip=root.querySelector('.nt-rpm-tip');tip.style.left=percent+'%';tip.style.display=s.rpm?'block':'none';
+  tip.style.background=s.rpm>=7500?'var(--nt-red)':s.rpm>=7000?'var(--nt-shift)':'var(--nt-fg)';
+  root.querySelectorAll('.nt-metric,.nt-fuel,.nt-afr,.nt-voltage').forEach(n=>n.classList.remove('nt-critical','nt-caution','nt-footer-warning'));
+  for(const [metric,style] of Object.entries(s.marks))root.querySelector('.nt-'+metric).classList.add(style);
+  root.querySelector('.nt-event').className='nt-event '+s.type;
+  root.querySelector('.nt-event-subject').textContent=s.subject;
+  root.querySelector('.nt-event-state').textContent=s.status;
+  root.querySelector('.nt-fuel-fill').style.width=s.fuel+'%';
+  root.querySelector('.nt-fuel-low').textContent=s.marks.fuel?'LOW':'';
+  root.querySelector('#na8-scene-caption').textContent=s.label;
+  lcd.setAttribute('aria-label','TRACK. Left 35 pixels reserved for telltales. '+s.rpm+'rpm, '+s.speed+'km/h, '+s.clock+', oil pressure '+s.pressure+'kPa, oil temperature '+s.oil+' degrees C, water temperature '+s.water+' degrees C, fuel '+s.fuel+' percent, AFR '+s.afr+', supply voltage '+s.voltage+'V. '+s.subject+' '+s.status);
+  if(save&&window.openai?.setWidgetState)window.openai.setWidgetState({modelContent:{na8Handoff:{...state}},privateContent:null}).catch(()=>{});
+ }
+ picker.addEventListener('change',()=>{state.scene=picker.value;render(true);});
+ guide.addEventListener('change',()=>{state.guide=guide.checked;render(true);});
+ savedApply(window.openai?.widgetState);render();fitScreen();
+ new ResizeObserver(fitScreen).observe(fit);
+ window.addEventListener('openai:set_globals',e=>{savedApply(e.detail?.globals?.widgetState);render();});
+})();
+</script>

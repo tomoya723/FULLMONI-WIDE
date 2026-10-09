@@ -1,0 +1,16 @@
+# Needs calibration once the camera jig is physically set up:
+#   1. Run `python tools/hil_test/calibrate.py --design eez002` and check
+#      test-results/eez002/calibration.png.
+#   2. Fill in crop: [x, y, w, h] (pixels in the *rotated* frame, i.e. after
+#      `rotate` below is applied) so the saved image is just the LCD, to keep
+#      VLM prompts focused and cheap.
+# device_index: which /dev/videoN or DirectShow device the USB camera enumerates as
+# (0 is usually the first camera Windows sees -- change if a laptop webcam
+# also exists and gets picked instead of the USB camera)
+device_index: 0
+width: 1920
+height: 1080
+warmup_frames: 10
+# カメラが上に180度回転した状態で固定されているため補正 (2026-10-09確認)
+rotate: 180
+crop: null

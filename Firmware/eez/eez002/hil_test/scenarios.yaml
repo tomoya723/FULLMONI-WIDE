@@ -1,0 +1,89 @@
+# TRACK mode (Screen1_1) is switched by the physical PD0 SW, not reachable
+# over CAN, so these scenarios only exercise the default Screen1 dashboard.
+#
+# Battery/VOLT (ui_LblBattery) and the Brake/Exhaust/Belt warning icons are
+# NOT driven by CAN at all -- they read AD6/AD2/AD3/AD4 analog inputs
+# directly (see Firmware/src/ui_binding/ui_dashboard.c). This rig can't
+# exercise them; a bench power supply / switch jig would be needed instead.
+#
+# Signal keys are "MessageName.SignalName" from debug_env/fullmoni_MX5_can.dbc,
+# values are physical engineering units (°C, kPa, rpm, AFR, ...) -- cantools
+# encodes them, and the firmware's multiplier/divisor/decimal_shift reproduce
+# the same physical value on screen (verified against param_storage.c's
+# default field table as of 2026-10-09).
+
+can:
+  dbc: ../../../../debug_env/fullmoni_MX5_can.dbc
+  interface: pcan
+  channel: PCAN_USBBUS1
+  bitrate: 500000
+  frame_period_s: 0.02   # 50Hz
+  settle_s: 2.0           # hold each scenario this long before capture
+
+scenarios:
+  - id: normal
+    description: "基準シナリオ: 正常運転値、警告灯すべて消灯"
+    signals:
+      DataFrame1.RPM: 3000
+      DataFrame1.ManifolePressure: 95.0
+      DataFrame1.IntakeAirTemperature: 25.0
+      DataFrame2.EngineTemp: 85.0
+      DataFrame2.Lambda1: 14.7
+      DataFrame3.OilTemp: 90.0
+      DataFrame4.OilPressure: 400.0
+    expect: |
+      RPM表示が約3000、水温表示が約85、AFR表示が約14.7、油圧表示が約400 kPa(「4.0」のような
+      x100kPa略式ではなく実kPa値)であること。マスターウォーニング・油圧警告灯・水温警告灯の
+      いずれも消灯していること(テルテールは左端35px内にすべて収まっていること)。
+
+  - id: oil_press_low_regression
+    description: "回帰テスト: 油圧400kPa(正常値)でも誤って警告が出ないこと(decimal_shift未適用バグの修正確認)"
+    base: normal
+    signals:
+      DataFrame4.OilPressure: 400.0
+    expect: |
+      油圧表示は約400 kPa。油圧警告灯とマスターウォーニングは点灯していないこと
+      (このシナリオは以前、誤って両方点灯してしまうバグがあった)。
+
+  - id: oil_press_actually_low
+    description: "油圧が実際に低い(100kPa)場合は警告が正しく点灯することの確認(しきい値が緩すぎないかの健全性チェック)"
+    base: normal
+    signals:
+      DataFrame4.OilPressure: 100.0
+    expect: |
+      油圧表示は約100 kPa。RPMが0より大きいため油圧警告灯とマスターウォーニングが点灯していること。
+
+  - id: water_hot
+    description: "水温過熱(105°C)でWATER HOT警告とマスターウォーニングが点灯すること"
+    base: normal
+    signals:
+      DataFrame2.EngineTemp: 105.0
+    expect: |
+      水温表示は約105。水温過熱(赤系)の警告灯とマスターウォーニングが点灯していること。
+
+  - id: water_cold
+    description: "回帰テスト: 水温が低い(冷間, 40°C)場合、水温Cold警告灯は点灯するがマスターウォーニングは点灯しないこと"
+    base: normal
+    signals:
+      DataFrame2.EngineTemp: 40.0
+    expect: |
+      水温表示は約40。水温Cold(冷間、青系)の警告灯は点灯しているが、マスターウォーニングは
+      点灯していないこと(冷間はマスター警告の対象外という仕様)。
+
+  - id: values_sanity
+    description: "各数値表示の書式崩れがないかの健全性チェック(3桁RPM等)"
+    # 注: IATは実際は負値もありうる(ファームウェア側はdata_type=1で符号付き解釈)が、
+    # このDBCのIntakeAirTemperature/EngineTemp/OilTemp信号定義が符号無し("+")になっており
+    # 負値を素直にエンコードできない(cantoolsがレンジ外として拒否する)。DBC側の符号属性が
+    # ファームウェアの解釈と食い違っている可能性があるので別途確認推奨。ここでは正値のみ使用。
+    signals:
+      DataFrame1.RPM: 850
+      DataFrame1.ManifolePressure: 101.3
+      DataFrame1.IntakeAirTemperature: 5.0
+      DataFrame2.EngineTemp: 70.0
+      DataFrame2.Lambda1: 10.0
+      DataFrame3.OilTemp: 60.0
+      DataFrame4.OilPressure: 250.0
+    expect: |
+      RPM表示が約850、水温表示が約70、AFR表示が約10.0、油圧表示が約250 kPaであること。
+      桁あふれや文字の重なりがないこと。警告灯はすべて消灯していること。

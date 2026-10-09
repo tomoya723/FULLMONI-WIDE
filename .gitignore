@@ -78,6 +78,10 @@ pr_body.md
 # Test release folder (local testing)
 test-release/
 
+# HIL test run output (captures, verdicts, reports) - tools/hil_test/
+test-results/
+__pycache__/
+
 # Visual Studio user-specific files
 **/.vs/
 
