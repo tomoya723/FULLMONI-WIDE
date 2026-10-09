@@ -1,4 +1,5 @@
 using System.IO;
+using System.IO.Ports;
 
 namespace FullmoniTerminal.Services;
 
@@ -335,6 +336,12 @@ public class FirmwareUpdateService
             }
 
             // ファームウェアデータをストリーミング送信（中間ACKなし）
+            // Bootloaderはフラッシュ書き込み1回(128byte)ごとにXON/XOFFを送ってくる
+            // (boot_loader.c参照)。接続は通常Handshake.Noneのままなので、この区間だけ
+            // XOnXoffに切り替えて取りこぼしを防ぐ。他の用途(imgwrite/imgread等)の
+            // バイナリ転送は0x11/0x13がデータに含まれうるため常時には適用しない。
+            Log("フロー制御をXOnXoffに切り替え");
+            _serialService.SetHandshake(Handshake.XOnXOff);
             UpdateStatus($"転送中: 0/{totalBytes:N0} bytes");
             ProgressChanged?.Invoke(this, PhaseTransferStart); // 20%
             var sentBytes = 0;
@@ -419,6 +426,7 @@ public class FirmwareUpdateService
         }
         finally
         {
+            _serialService.SetHandshake(Handshake.None);
             _serialService.DataReceived -= DataReceivedHandler;
         }
     }

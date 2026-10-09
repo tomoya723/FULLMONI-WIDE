@@ -104,11 +104,17 @@ public class SerialPortService : IDisposable
                 DataBits = 8,
                 Parity = Parity.None,
                 StopBits = StopBits.One,
-                Handshake = Handshake.None,     // USB CDC ではフロー制御不要
+                // Handshake.None がデフォルト。Bootloaderはフラッシュ書き込み毎にXON/XOFFを
+                // 送ってくるので、FirmwareUpdateServiceが転送区間だけSetHandshake(XOnXoff)に
+                // 切り替える（常時XOnXoffにするとimgwrite/imgread等の他バイナリ転送のデータに
+                // 含まれる0x11/0x13を誤って制御文字として解釈してしまうため避けている）。
+                Handshake = Handshake.None,
                 DtrEnable = true,               // DTRを有効化（USB CDCで受信有効化に必要な場合がある）
                 RtsEnable = true,               // RTSも有効化
                 ReadTimeout = 500,
-                WriteTimeout = 5000,            // ファームウェア転送用に長めに設定
+                // 4KBチャンク1回につきフラッシュ書き込み(128byte単位)起因のXOFF一時停止が
+                // 最大32回分累積しうるため、Write()全体のタイムアウトは余裕を持たせる
+                WriteTimeout = 60000,
                 WriteBufferSize = 65536,        // 書き込みバッファを大きく（64KB）
                 ReadBufferSize = 524288,        // 読み込みバッファを大きく（512KB）- 画像転送用
                 ReceivedBytesThreshold = 1,     // 1バイトでもあればイベント発火
@@ -199,6 +205,21 @@ public class SerialPortService : IDisposable
         catch (Exception ex)
         {
             ErrorOccurred?.Invoke(this, $"Send error: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// フロー制御方式を変更する（接続中でも変更可能）。
+    /// Bootloaderはフラッシュ書き込み1回ごとにXON/XOFFを送ってくるため、
+    /// ファームウェア転送中だけ<see cref="System.IO.Ports.Handshake.XOnXOff"/>に切り替える用途を想定。
+    /// imgwrite/imgread等の他のバイナリ転送はデータに0x11/0x13が含まれうるため、
+    /// 常時XOnXoffにはせず、必要な区間だけ切り替えて元に戻すこと。
+    /// </summary>
+    public void SetHandshake(Handshake handshake)
+    {
+        if (_serialPort?.IsOpen == true)
+        {
+            _serialPort.Handshake = handshake;
         }
     }
 

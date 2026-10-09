@@ -27,8 +27,22 @@ def upload_firmware(port, firmware_path, baudrate=115200):
         return False
 
     try:
-        ser = serial.Serial(port, baudrate, timeout=2, write_timeout=5)
-        print(f"Connected to {port}")
+        # Bootloader (boot_loader.c) implements XON(0x11)/XOFF(0x13) software flow
+        # control: it sends XOFF when its ring buffer passes BL_XOFF_THRESHOLD (4KB),
+        # and additionally sends XOFF/XON around *every single* flash write (interrupts
+        # are disabled during the write, so it can't receive). For a ~2MB image that's
+        # thousands of XOFF/XON pairs over the transfer. xonxoff=True makes pyserial/
+        # the OS driver pause transmission on XOFF and resume on XON automatically;
+        # without it (as before) those bytes were sent but never honored, so large
+        # images could silently overrun the bootloader's buffer and flash corrupted
+        # data while still reporting a "successful" transfer.
+        #
+        # write_timeout applies to a whole ser.write() call, and each 16KB chunk below
+        # contains ~128 flash-write-sized XOFF/XON pauses -- their cumulative stall time
+        # can run several seconds, so give it plenty of headroom (observed: hit the old
+        # 5s limit around 95% through a ~1.9MB image).
+        ser = serial.Serial(port, baudrate, timeout=2, write_timeout=60, xonxoff=True)
+        print(f"Connected to {port} (XON/XOFF flow control enabled)")
         time.sleep(0.5)
 
         # 既存のデータをフラッシュ
