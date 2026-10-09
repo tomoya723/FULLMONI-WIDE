@@ -57,7 +57,8 @@ extern unsigned int gear_pos;
 /* --- Warning thresholds --------------------------------------------------- */
 #define WARN_WATER_TEMP_COLD  60    /* °C: これ以下は冷間警告（青表示） */
 #define WARN_WATER_TEMP_HOT   100   /* °C: これ以上は過熱警告（通常色表示） */
-#define WARN_OIL_PRESS_LO     15   /* 内部値 (decimal_shift込, 表示1.5=150kPa相当) */
+#define WARN_OIL_PRESS_LO     12   /* 内部値 (decimal_shift込, 表示1.2=120kPa相当) */
+#define WARN_OIL_TEMP_HIGH    130   /* °C: これ以上で油温警告 (TRACK画面のみ、Screen1は未実装のまま) */
 #define WARN_BATT_LO          115   /* 0.1V = 11.5V */
 #define WARN_FUEL_SHOW        5     /* %: これ未満で燃料警告点灯 */
 #define WARN_FUEL_HIDE        10    /* %: これ超で燃料警告消灯（ヒステリシス） */
@@ -70,6 +71,12 @@ extern unsigned int gear_pos;
 #define TRACK_RPM_REDLINE     7500u
 #define TRACK_COLOR_NORMAL    0xFFFFFF
 #define TRACK_COLOR_REDLINE   0xFF4149
+
+/* trackmode_screen_design/layout.json colors: criticalBackground/caution */
+#define TRACK_COLOR_WARN_RED      0xB31822
+#define TRACK_COLOR_WARN_YELLOW   0xFFD245
+#define TRACK_COLOR_TEXT_BLACK    0x000000
+#define TRACK_COLOR_LABEL_GRAY    0xD3D3D3  /* デフォルトのラベル色 (secondary) */
 
 /* --- 暫定: 起動時にTRACK画面を直接表示 (HIL ClosedLoopテスト用) ------------
  * tools/hil_test は人間がPD0 SWを操作できない前提のため、起動直後から
@@ -410,6 +417,7 @@ void ui_dashboard_update(void)
         if (fuel_per > (float)WARN_FUEL_HIDE)      { s_warn_fuel = false; }
         else if (fuel_per < (float)WARN_FUEL_SHOW) { s_warn_fuel = true;  }
         bool warn_fuel       = s_warn_fuel;
+        bool warn_oiltemp    = (num3 >= (float)WARN_OIL_TEMP_HIGH);  /* TRACK画面のみで使用 */
         /* 冷間警告・ブレーキ(サイドブレーキ連動のため常用)はマスター警告に含めない */
         bool warn_master     = warn_water_hot || warn_oilpress || warn_batt ||
                                warn_exhaust || warn_fuel;
@@ -434,6 +442,41 @@ void ui_dashboard_update(void)
         set_visible(objects.ui_img_warn_brake_1,      warn_brake);
         set_visible(objects.ui_image_warn_belt_1,     warn_belt);
         set_visible(objects.ui_img_warn_fuel_1,       warn_fuel);
+
+        /* TRACK screen: trackmode_screen_design/previews のセル背景反転表示。
+         * 各warn_*はScreen1と同じ判定を流用(油温のみTRACK専用の新規判定)。
+         * AFRは対象外(デザイン上は提案段階のため見送り)。 */
+        lv_obj_set_style_bg_opa(objects.ui_panel_oil_press_warn_1,
+            warn_oilpress ? 255 : 0, LV_PART_MAIN);
+        lv_obj_set_style_bg_opa(objects.ui_panel_oil_temp_warn_1,
+            warn_oiltemp ? 255 : 0, LV_PART_MAIN);
+        lv_obj_set_style_bg_opa(objects.ui_panel_water_temp_warn_1,
+            warn_water_hot ? 255 : 0, LV_PART_MAIN);
+
+        /* OIL TEMP: 黄背景時は黒文字 (他2つは赤背景に白文字のままでよい) */
+        {
+            uint32_t c = warn_oiltemp ? TRACK_COLOR_TEXT_BLACK : TRACK_COLOR_NORMAL;
+            lv_obj_set_style_text_color(objects.ui_lbl_oil_temp_cap_1, lv_color_hex(c), LV_PART_MAIN);
+            lv_obj_set_style_text_color(objects.ui_lbl_oil_temp_1,     lv_color_hex(c), LV_PART_MAIN);
+            lv_obj_set_style_text_color(objects.ui_lbl_oil_temp_cap_2, lv_color_hex(c), LV_PART_MAIN);
+        }
+
+        /* FUEL: ラベル・バー・「LOW」表示を黄色に */
+        {
+            uint32_t cap_color = warn_fuel ? TRACK_COLOR_WARN_YELLOW : TRACK_COLOR_LABEL_GRAY;
+            lv_obj_set_style_text_color(objects.ui_lbl_fuel_cap_1, lv_color_hex(cap_color), LV_PART_MAIN);
+            lv_obj_set_style_bg_color(objects.ui_bar_fuel_1,
+                lv_color_hex(warn_fuel ? TRACK_COLOR_WARN_YELLOW : TRACK_COLOR_NORMAL), LV_PART_INDICATOR);
+            lv_obj_set_style_text_opa(objects.ui_lbl_fuel_low_1, warn_fuel ? 255 : 0, LV_PART_MAIN);
+            lv_obj_set_style_text_color(objects.ui_lbl_fuel_low_1, lv_color_hex(TRACK_COLOR_WARN_YELLOW), LV_PART_MAIN);
+        }
+
+        /* VOLT: ラベル・数値を黄色に */
+        {
+            uint32_t color = warn_batt ? TRACK_COLOR_WARN_YELLOW : TRACK_COLOR_NORMAL;
+            lv_obj_set_style_text_color(objects.ui_lbl_volt_cap_1, lv_color_hex(warn_batt ? TRACK_COLOR_WARN_YELLOW : TRACK_COLOR_LABEL_GRAY), LV_PART_MAIN);
+            lv_obj_set_style_text_color(objects.ui_lbl_battery_1,  lv_color_hex(color), LV_PART_MAIN);
+        }
     }
 
 }

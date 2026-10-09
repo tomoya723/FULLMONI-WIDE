@@ -1,10 +1,23 @@
-# TRACK mode (Screen1_1) is switched by the physical PD0 SW, not reachable
-# over CAN, so these scenarios only exercise the default Screen1 dashboard.
+# Which screen is on-screen (Screen1 vs TRACK/Screen1_1) depends on the PD0 SW
+# state, or on TRACK_MODE_BOOT_OVERRIDE in ui_dashboard.c forcing TRACK at boot
+# (used for closed-loop testing without touching the SW -- check which is
+# currently flashed before relying on exact wording below). The "expect" text
+# here describes the TRACK screen's conventions (actual-kPa oil pressure,
+# e.g. "400 kPa"); Screen1 instead shows the abbreviated "x100kPa" form
+# (e.g. "4.0") for the same physical value -- adjust the oil-pressure wording
+# if testing against Screen1 specifically. Everything else (RPM/water/AFR/oil
+# temp numbers, warning telltale behavior) reads the same on both screens.
 #
-# Battery/VOLT (ui_LblBattery) and the Brake/Exhaust/Belt warning icons are
-# NOT driven by CAN at all -- they read AD6/AD2/AD3/AD4 analog inputs
-# directly (see Firmware/src/ui_binding/ui_dashboard.c). This rig can't
-# exercise them; a bench power supply / switch jig would be needed instead.
+# Battery/VOLT (ui_LblBattery), FUEL, and the Brake/Exhaust/Belt warning icons
+# are NOT driven by CAN at all -- they read AD6/AD2/AD3/AD4/fuel-sender analog
+# inputs directly (see Firmware/src/ui_binding/ui_dashboard.c). On the current
+# bench rig the supply reads ~9.1V (below WARN_BATT_LO=11.5V) and no fuel
+# sender is connected (reads ~0%), so warn_batt and warn_fuel -- and therefore
+# warn_master, which ORs them in -- are ALWAYS on regardless of CAN content
+# (confirmed empirically 2026-10-10: a scenario phrased as "warn_master off"
+# always failed until this was accounted for). Every scenario's "expect" below
+# assumes this bench state; a real 12V+ supply and a connected/simulated fuel
+# sender would be needed to test "all warnings off" for real.
 #
 # Signal keys are "MessageName.SignalName" from debug_env/fullmoni_MX5_can.dbc,
 # values are physical engineering units (°C, kPa, rpm, AFR, ...) -- cantools
@@ -16,7 +29,10 @@ can:
   dbc: ../../../../debug_env/fullmoni_MX5_can.dbc
   interface: pcan
   channel: PCAN_USBBUS1
-  bitrate: 500000
+  # Firmware/src/can.c: active CAN0_TSEG1/TSEG2/BRP block is the 1Mbps one
+  # (the 500kbps #defines right above it are commented out). Confirmed with
+  # the user 2026-10-10 after the first HIL run went bus-off at 500k.
+  bitrate: 1000000
   frame_period_s: 0.02   # 50Hz
   settle_s: 2.0           # hold each scenario this long before capture
 
@@ -33,8 +49,9 @@ scenarios:
       DataFrame4.OilPressure: 400.0
     expect: |
       RPM表示が約3000、水温表示が約85、AFR表示が約14.7、油圧表示が約400 kPa(「4.0」のような
-      x100kPa略式ではなく実kPa値)であること。マスターウォーニング・油圧警告灯・水温警告灯の
-      いずれも消灯していること(テルテールは左端35px内にすべて収まっていること)。
+      x100kPa略式ではなく実kPa値)であること。油圧警告灯・水温警告灯(Cold/Hotとも)は消灯して
+      いること。バッテリー警告灯・燃料警告灯・マスターウォーニングはベンチ電源(約9.1V)と
+      燃料センサー未接続(0%)の影響で点灯したままでよい(このシナリオの判定対象外)。
 
   - id: oil_press_low_regression
     description: "回帰テスト: 油圧400kPa(正常値)でも誤って警告が出ないこと(decimal_shift未適用バグの修正確認)"
@@ -42,16 +59,22 @@ scenarios:
     signals:
       DataFrame4.OilPressure: 400.0
     expect: |
-      油圧表示は約400 kPa。油圧警告灯とマスターウォーニングは点灯していないこと
-      (このシナリオは以前、誤って両方点灯してしまうバグがあった)。
+      油圧表示は約400 kPa。油圧警告灯は点灯していないこと(このシナリオは以前、油圧が
+      正常値でも誤って点灯してしまうバグがあった — decimal_shift未適用バグの回帰確認)。
+      マスターウォーニングはベンチ電源・燃料センサー未接続の影響で点灯したままでよい
+      (油圧警告灯さえ消灯していれば、このシナリオとしては合格)。
 
   - id: oil_press_actually_low
-    description: "油圧が実際に低い(100kPa)場合は警告が正しく点灯することの確認(しきい値が緩すぎないかの健全性チェック)"
+    description: "油圧が実際に低い(100kPa、新しきい値120kPa未満)場合は警告が正しく点灯することの確認(しきい値が緩すぎないかの健全性チェック)"
     base: normal
     signals:
       DataFrame4.OilPressure: 100.0
     expect: |
-      油圧表示は約100 kPa。RPMが0より大きいため油圧警告灯とマスターウォーニングが点灯していること。
+      油圧表示は約100 kPa。RPMが0より大きく、かつ120kPaしきい値未満のため油圧警告灯が点灯して
+      いること。TRACK画面(Screen1_1)の場合はOIL PRESSのセル背景が赤(#B31822)になり文字が白
+      表示になっていること(新しい背景反転デザイン)。Screen1の場合はアイコン点灯のみで背景反転は
+      ない。マスターウォーニングは油圧警告に加え、ベンチ電源・燃料センサー未接続の影響でも
+      点灯している。
 
   - id: water_hot
     description: "水温過熱(105°C)でWATER HOT警告とマスターウォーニングが点灯すること"
@@ -60,6 +83,21 @@ scenarios:
       DataFrame2.EngineTemp: 105.0
     expect: |
       水温表示は約105。水温過熱(赤系)の警告灯とマスターウォーニングが点灯していること。
+      TRACK画面(Screen1_1)の場合はWATER TEMPのセル背景が赤(#B31822)になり文字が白表示に
+      なっていること(新しい背景反転デザイン)。Screen1の場合はアイコン点灯のみで背景反転は
+      ない。
+
+  - id: oil_temp_high
+    description: "油温過熱(140°C、新しきい値130°C以上)でOIL TEMPセルの背景反転警告が点灯すること(新規実装)"
+    base: normal
+    signals:
+      DataFrame3.OilTemp: 140.0
+    expect: |
+      油温表示は約140。TRACK画面(Screen1_1)の場合はOIL TEMPのセル背景が黄(#FFD245)になり
+      文字が黒表示になっていること(新規実装の油温警告、しきい値130°C)。Screen1には油温の
+      背景反転警告は実装されていない(アイコンや数値表示自体に変化はなくてよい)。マスター
+      ウォーニングはベンチ電源・燃料センサー未接続の影響で点灯したままでよい(油温警告は
+      マスターウォーニングのOR条件には含まれない仕様のため、このシナリオの判定対象外)。
 
   - id: water_cold
     description: "回帰テスト: 水温が低い(冷間, 40°C)場合、水温Cold警告灯は点灯するがマスターウォーニングは点灯しないこと"
@@ -67,8 +105,10 @@ scenarios:
     signals:
       DataFrame2.EngineTemp: 40.0
     expect: |
-      水温表示は約40。水温Cold(冷間、青系)の警告灯は点灯しているが、マスターウォーニングは
-      点灯していないこと(冷間はマスター警告の対象外という仕様)。
+      水温表示は約40。水温Cold(冷間、青系)の警告灯が点灯していること。水温Hot(赤系)の警告灯は
+      消灯していること。マスターウォーニングはベンチ電源・燃料センサー未接続の影響で点灯した
+      ままでよい(冷間そのものはマスター警告の対象外という仕様だが、このシナリオではそれを
+      マスター警告の点灯/消灯だけから判定できない)。
 
   - id: values_sanity
     description: "各数値表示の書式崩れがないかの健全性チェック(3桁RPM等)"
@@ -86,4 +126,6 @@ scenarios:
       DataFrame4.OilPressure: 250.0
     expect: |
       RPM表示が約850、水温表示が約70、AFR表示が約10.0、油圧表示が約250 kPaであること。
-      桁あふれや文字の重なりがないこと。警告灯はすべて消灯していること。
+      桁あふれや文字の重なりがないこと。油圧警告灯・水温警告灯(Cold/Hotとも)は消灯して
+      いること。バッテリー警告灯・燃料警告灯・マスターウォーニングはベンチ電源・燃料センサー
+      未接続の影響で点灯したままでよい(このシナリオの判定対象外)。

@@ -70,6 +70,9 @@ typedef struct _objects_t {
     lv_obj_t *ui_notify_box;
     lv_obj_t *ui_notify_label;
     lv_obj_t *ui_container_dashboard_1;
+    lv_obj_t *ui_panel_oil_press_warn_1;
+    lv_obj_t *ui_panel_oil_temp_warn_1;
+    lv_obj_t *ui_panel_water_temp_warn_1;
     lv_obj_t *ui_lbl_rpm_1;
     lv_obj_t *ui_lbl_water_temp_1;
     lv_obj_t *ui_lbl_oil_temp_1;
@@ -89,6 +92,7 @@ typedef struct _objects_t {
     lv_obj_t *ui_lbl_fuel_f_1;
     lv_obj_t *ui_lbl_afr_cap_1;
     lv_obj_t *ui_lbl_volt_cap_1;
+    lv_obj_t *ui_lbl_fuel_low_1;
     lv_obj_t *ui_rpm_8;
     lv_obj_t *ui_rpm_7;
     lv_obj_t *ui_rpm_6;
