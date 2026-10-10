@@ -41,7 +41,7 @@ def upload_firmware(port, firmware_path, baudrate=115200):
         # contains ~128 flash-write-sized XOFF/XON pauses -- their cumulative stall time
         # can run several seconds, so give it plenty of headroom (observed: hit the old
         # 5s limit around 95% through a ~1.9MB image).
-        ser = serial.Serial(port, baudrate, timeout=2, write_timeout=60, xonxoff=True)
+        ser = serial.Serial(port, baudrate, timeout=2, write_timeout=180, xonxoff=True)
         print(f"Connected to {port} (XON/XOFF flow control enabled)")
         time.sleep(0.5)
 
@@ -92,14 +92,46 @@ def upload_firmware(port, firmware_path, baudrate=115200):
         print(f"Size ACK received. Starting streaming transfer...")
 
         # ストリーミングモード - 中間ACKなしで高速転送
-        # チャンクサイズ (16KB = ホスト側送信単位)
-        chunk_size = 16 * 1024
+        # チャンクサイズ: 4KB (16KBだと1回のwrite()にXOFF一時停止が最大128回分
+        # 累積しうる。実機で95%前後にWrite timeoutが再現したため縮小)
+        chunk_size = 4 * 1024
         sent = 0
         start_time = time.time()
+        write_timed_out = False
+        MAX_CHUNK_RETRIES = 5
 
         for i in range(0, len(firmware_data), chunk_size):
             chunk = firmware_data[i:i+chunk_size]
-            ser.write(chunk)
+            # write_timeoutに達した場合、pyserialはそのwrite()で書けなかった
+            # 残りバイトを送出せず例外を投げる(= このチャンクの一部または全部が
+            # 欠落する)。以前は「どうせOS側バッファ経由で送出される」とみなして
+            # breakしていたが、実機で本当に末尾~28KBが欠落する事例を確認したため、
+            # 同じチャンクを再送してから先に進む(安全側に倒す)。
+            for attempt in range(1, MAX_CHUNK_RETRIES + 1):
+                t0 = time.time()
+                try:
+                    ser.write(chunk)
+                    break
+                except serial.SerialTimeoutException:
+                    dt = time.time() - t0
+                    # デバイス側が何かエラー文字列等を返していないか確認 (非ブロッキング)
+                    pending = b''
+                    try:
+                        if ser.in_waiting:
+                            pending = ser.read(ser.in_waiting)
+                    except Exception:
+                        pass
+                    extra = f" device said: {pending!r}" if pending else ""
+                    if attempt == MAX_CHUNK_RETRIES:
+                        print(f"\nWrite timeout at {sent / file_size * 100:.1f}% "
+                              f"({sent:,}/{file_size:,} bytes) after {MAX_CHUNK_RETRIES} retries "
+                              f"on the same chunk ({dt:.1f}s this attempt) - aborting (firmware incomplete on device).{extra}")
+                        write_timed_out = True
+                    else:
+                        print(f"\nWrite timeout at {sent / file_size * 100:.1f}% "
+                              f"({dt:.1f}s this attempt) - retrying chunk ({attempt}/{MAX_CHUNK_RETRIES})...{extra}")
+            if write_timed_out:
+                break
             sent += len(chunk)
 
             # 進捗表示
@@ -112,22 +144,42 @@ def upload_firmware(port, firmware_path, baudrate=115200):
             # 小さな遅延でUSBバッファを安定化
             time.sleep(0.01)
 
+        if write_timed_out:
+            # チャンク再送を使い切ってもなお書けなかった = 実機で欠落を確認済み
+            # (以前は「どうせ届く」とみなして続行していたが、転送が末尾~28KB
+            # 欠けたまま再起動不能になる事例があった)。ここで止めて明示的に失敗
+            # とする。デバイス側はブートローダーの入力待ちで止まっているはずなので、
+            # 電源再投入してから再実行すること。
+            print("Firmware transfer incomplete - aborting. "
+                  "Power-cycle the device and retry (it is likely stuck in the bootloader).")
+            ser.close()
+            return False
+
         print("\n\nWaiting for completion message...")
 
         # 完了メッセージを待つ (最大30秒)
         ser.timeout = 30
         response = b''
-        while True:
-            data = ser.read(1)
-            if not data:
-                break
-            response += data
-            if b'Done' in response or b'ERR' in response:
-                # 残りを読む
-                time.sleep(0.3)
-                if ser.in_waiting:
-                    response += ser.read(ser.in_waiting)
-                break
+        try:
+            while True:
+                data = ser.read(1)
+                if not data:
+                    break
+                response += data
+                if b'Done' in response or b'ERR' in response:
+                    # 残りを読む
+                    time.sleep(0.3)
+                    if ser.in_waiting:
+                        response += ser.read(ser.in_waiting)
+                    break
+        except (serial.SerialException, OSError) as e:
+            # Bootloaderは成功後、応答を送ってから自分でソフトリセットしてアプリに
+            # ジャンプする。そのリセットでUSB CDCが瞬断/再列挙され、読み取り中の
+            # ser.read()がWindows側のClearCommError等で例外を投げることがある
+            # (実機確認: この経路でも転送自体は正常完了していたケースがある)。
+            # なのでここでは即failにせず、inconclusiveとして completion message
+            # なしの警告扱いに倒す。
+            print(f"\n(Device likely reset/re-enumerated during completion wait: {e})")
 
         if response:
             print(f"Response: {response.decode('utf-8', errors='replace')}")
@@ -139,7 +191,7 @@ def upload_firmware(port, firmware_path, baudrate=115200):
             ser.close()
             return False
         else:
-            print("Warning: No completion message received")
+            print("Warning: No completion message received (device may have reset already - verify visually)")
 
         elapsed = time.time() - start_time
         speed = (file_size / 1024) / elapsed if elapsed > 0 else 0

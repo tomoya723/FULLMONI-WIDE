@@ -803,9 +803,9 @@ void create_screen_screen1_1() {
                     // ui_PanelOilPressWarn_1
                     lv_obj_t *obj = lv_obj_create(parent_obj);
                     objects.ui_panel_oil_press_warn_1 = obj;
-                    lv_obj_set_pos(obj, -244, 55);
-                    lv_obj_set_size(obj, 244, 78);
-                    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE|LV_OBJ_FLAG_CLICK_FOCUSABLE|LV_OBJ_FLAG_SCROLLABLE|LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC|LV_OBJ_FLAG_SCROLL_MOMENTUM|LV_OBJ_FLAG_SCROLL_WITH_ARROW);
+                    lv_obj_set_pos(obj, -244, 53);
+                    lv_obj_set_size(obj, 244, 76);
+                    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE|LV_OBJ_FLAG_CLICK_FOCUSABLE|LV_OBJ_FLAG_GESTURE_BUBBLE|LV_OBJ_FLAG_PRESS_LOCK|LV_OBJ_FLAG_SCROLLABLE|LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC|LV_OBJ_FLAG_SCROLL_MOMENTUM|LV_OBJ_FLAG_SCROLL_WITH_ARROW|LV_OBJ_FLAG_SNAPPABLE);
                     lv_obj_set_style_align(obj, LV_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_border_width(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_radius(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -820,9 +820,9 @@ void create_screen_screen1_1() {
                     // ui_PanelOilTempWarn_1
                     lv_obj_t *obj = lv_obj_create(parent_obj);
                     objects.ui_panel_oil_temp_warn_1 = obj;
-                    lv_obj_set_pos(obj, 0, 55);
-                    lv_obj_set_size(obj, 244, 78);
-                    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE|LV_OBJ_FLAG_CLICK_FOCUSABLE|LV_OBJ_FLAG_SCROLLABLE|LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC|LV_OBJ_FLAG_SCROLL_MOMENTUM|LV_OBJ_FLAG_SCROLL_WITH_ARROW);
+                    lv_obj_set_pos(obj, 0, 53);
+                    lv_obj_set_size(obj, 244, 76);
+                    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE|LV_OBJ_FLAG_CLICK_FOCUSABLE|LV_OBJ_FLAG_GESTURE_BUBBLE|LV_OBJ_FLAG_PRESS_LOCK|LV_OBJ_FLAG_SCROLLABLE|LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC|LV_OBJ_FLAG_SCROLL_MOMENTUM|LV_OBJ_FLAG_SCROLL_WITH_ARROW|LV_OBJ_FLAG_SNAPPABLE);
                     lv_obj_set_style_align(obj, LV_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_border_width(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_radius(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -837,9 +837,9 @@ void create_screen_screen1_1() {
                     // ui_PanelWaterTempWarn_1
                     lv_obj_t *obj = lv_obj_create(parent_obj);
                     objects.ui_panel_water_temp_warn_1 = obj;
-                    lv_obj_set_pos(obj, 244, 55);
-                    lv_obj_set_size(obj, 244, 78);
-                    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE|LV_OBJ_FLAG_CLICK_FOCUSABLE|LV_OBJ_FLAG_SCROLLABLE|LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC|LV_OBJ_FLAG_SCROLL_MOMENTUM|LV_OBJ_FLAG_SCROLL_WITH_ARROW);
+                    lv_obj_set_pos(obj, 244, 53);
+                    lv_obj_set_size(obj, 244, 76);
+                    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE|LV_OBJ_FLAG_CLICK_FOCUSABLE|LV_OBJ_FLAG_GESTURE_BUBBLE|LV_OBJ_FLAG_PRESS_LOCK|LV_OBJ_FLAG_SCROLLABLE|LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC|LV_OBJ_FLAG_SCROLL_MOMENTUM|LV_OBJ_FLAG_SCROLL_WITH_ARROW|LV_OBJ_FLAG_SNAPPABLE);
                     lv_obj_set_style_align(obj, LV_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_border_width(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_radius(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -908,7 +908,7 @@ void create_screen_screen1_1() {
                     lv_obj_set_style_text_font(obj, &ui_font_ui_font_612_50, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_width(obj, 100, LV_PART_MAIN | LV_STATE_DEFAULT);
-                    lv_label_set_text(obj, "400");
+                    lv_label_set_text(obj, "0");
                 }
                 {
                     // ui_LblBattery_1
@@ -1299,9 +1299,24 @@ void create_screen_screen1_1() {
                     lv_label_set_text(obj, "rpm");
                 }
                 {
+                    // ui_LINE_upper
                     lv_obj_t *obj = lv_line_create(parent_obj);
-                    objects.obj0 = obj;
+                    objects.ui_line_upper = obj;
                     lv_obj_set_pos(obj, 3, 143);
+                    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+                    static lv_point_t line_points[] = {
+                        { 0, 0 },
+                        { 755, 0 }
+                    };
+                    lv_line_set_points(obj, line_points, 2);
+                    lv_obj_set_style_line_width(obj, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_line_color(obj, lv_color_hex(0xff5c5c5c), LV_PART_MAIN | LV_STATE_DEFAULT);
+                }
+                {
+                    // ui_LINE_Lower
+                    lv_obj_t *obj = lv_line_create(parent_obj);
+                    objects.ui_line_lower = obj;
+                    lv_obj_set_pos(obj, 2, 219);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     static lv_point_t line_points[] = {
                         { 0, 0 },
@@ -1565,19 +1580,6 @@ void create_screen_screen1_1() {
                     lv_label_set_text(obj, "000");
                 }
             }
-        }
-        {
-            lv_obj_t *obj = lv_line_create(parent_obj);
-            objects.obj1 = obj;
-            lv_obj_set_pos(obj, 40, 214);
-            lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-            static lv_point_t line_points[] = {
-                { 0, 0 },
-                { 755, 0 }
-            };
-            lv_line_set_points(obj, line_points, 2);
-            lv_obj_set_style_line_width(obj, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_line_color(obj, lv_color_hex(0xff5c5c5c), LV_PART_MAIN | LV_STATE_DEFAULT);
         }
     }
     

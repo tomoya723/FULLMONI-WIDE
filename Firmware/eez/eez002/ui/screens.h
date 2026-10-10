@@ -92,7 +92,6 @@ typedef struct _objects_t {
     lv_obj_t *ui_lbl_fuel_f_1;
     lv_obj_t *ui_lbl_afr_cap_1;
     lv_obj_t *ui_lbl_volt_cap_1;
-    lv_obj_t *ui_lbl_fuel_low_1;
     lv_obj_t *ui_rpm_8;
     lv_obj_t *ui_rpm_7;
     lv_obj_t *ui_rpm_6;
@@ -105,10 +104,12 @@ typedef struct _objects_t {
     lv_obj_t *ui_bar_rpm_1;
     lv_obj_t *ui_lbl_spd_cap;
     lv_obj_t *ui_lbl_rpm_cap_1;
-    lv_obj_t *obj0;
+    lv_obj_t *ui_line_upper;
+    lv_obj_t *ui_line_lower;
     lv_obj_t *ui_lbl_oil_press_cap_2;
     lv_obj_t *ui_lbl_oil_temp_cap_2;
     lv_obj_t *ui_lbl_water_temp_cap_2;
+    lv_obj_t *ui_lbl_fuel_low_1;
     lv_obj_t *ui_container_opening_1;
     lv_obj_t *ui_img_opening_1;
     lv_obj_t *ui_container_telltale_1;
@@ -124,7 +125,6 @@ typedef struct _objects_t {
     lv_obj_t *ui_img_warn_fuel_1;
     lv_obj_t *ui_notify_box_1;
     lv_obj_t *ui_notify_label_1;
-    lv_obj_t *obj1;
 } objects_t;
 
 extern objects_t objects;
