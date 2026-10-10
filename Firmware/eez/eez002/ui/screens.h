@@ -110,6 +110,7 @@ typedef struct _objects_t {
     lv_obj_t *ui_lbl_oil_temp_cap_2;
     lv_obj_t *ui_lbl_water_temp_cap_2;
     lv_obj_t *ui_lbl_fuel_low_1;
+    lv_obj_t *ui_rpm_9;
     lv_obj_t *ui_container_opening_1;
     lv_obj_t *ui_img_opening_1;
     lv_obj_t *ui_container_telltale_1;
