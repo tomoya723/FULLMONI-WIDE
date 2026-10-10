@@ -3722,7 +3722,6 @@
                         "DEFAULT": {
                           "radius": 0,
                           "bg_opa": 255,
-                          "bg_img_src": "ui_img_fuel1_png",
                           "bg_color": "#ffffff"
                         }
                       }
