@@ -83,16 +83,20 @@ extern unsigned int gear_pos;
  * Screen1_1を見せたい。有効化中はPD0 SW監視を止め、オープニング/テルテール
  * も即スキップしてTRACK画面をそのまま表示する。
  * 描画テストが終わったら 0 に戻し、通常の起動(Screen1)+SW切り替え経路に戻すこと。 */
-#define TRACK_MODE_BOOT_OVERRIDE  1
+#define TRACK_MODE_BOOT_OVERRIDE  0
 
-/* --- TRACK screen switch: PD0, 外部プルアップ, Low-Active ------------------ */
+/* --- TRACK screen switch: PD0, 外部プルアップ, Low-Active -----------------
+ * キーSW(モーメンタリ想定)の押下エッジでScreen1⇔TRACK(Screen1_1)をトグル。
+ * デフォルトはScreen1、押すたびにTRACK→Screen1→TRACK...と切り替わる。
+ * レベル(押しっぱなし/離しっぱなし)では反応しない。 */
 /* 連続 TRACK_SW_DEBOUNCE_COUNT 回 (約30ms周期のui_dashboard_update呼び出しで
  * ~90ms) 同じレベルが続いたら確定させるカウンタ式デバウンス */
 #define TRACK_SW_DEBOUNCE_COUNT  3u
 static bool    s_track_mode        = false; /* true = Screen1_1 (TRACK) 表示中 */
 #if !TRACK_MODE_BOOT_OVERRIDE
-static bool    s_track_sw_raw_prev = false;
-static uint8_t s_track_sw_count    = 0;
+static bool    s_track_sw_raw_prev   = false;
+static uint8_t s_track_sw_count      = 0;
+static bool    s_track_sw_debounced  = false; /* 直近で確定したSWレベル */
 
 static inline bool track_switch_is_active(void)
 {
@@ -245,8 +249,7 @@ void ui_dashboard_clear_notify(void)
 void ui_dashboard_update(void)
 {
 #if !TRACK_MODE_BOOT_OVERRIDE
-    /* --- TRACK画面切り替え (PD0 SW) ---------------------------------------- */
-    /* デバウンス確定後、要求状態と現在表示中の画面が食い違っていれば切り替える */
+    /* --- TRACK画面切り替え (PD0 SW、押下エッジでトグル) --------------------- */
     {
         bool raw = track_switch_is_active();
         if (raw == s_track_sw_raw_prev) {
@@ -257,9 +260,13 @@ void ui_dashboard_update(void)
             s_track_sw_raw_prev = raw;
             s_track_sw_count    = 1;
         }
-        if (s_track_sw_count >= TRACK_SW_DEBOUNCE_COUNT && raw != s_track_mode) {
-            s_track_mode = raw;
-            loadScreen(s_track_mode ? SCREEN_ID_SCREEN1_1 : SCREEN_ID_SCREEN1);
+        if (s_track_sw_count >= TRACK_SW_DEBOUNCE_COUNT && raw != s_track_sw_debounced) {
+            s_track_sw_debounced = raw;
+            if (raw) {
+                /* 非アクティブ→アクティブ(押下)エッジでのみトグル。離す動作には反応しない */
+                s_track_mode = !s_track_mode;
+                loadScreen(s_track_mode ? SCREEN_ID_SCREEN1_1 : SCREEN_ID_SCREEN1);
+            }
         }
     }
 #endif /* !TRACK_MODE_BOOT_OVERRIDE */
