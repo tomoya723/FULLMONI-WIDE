@@ -27,6 +27,9 @@
 /** タコ: 上限クリップ [rpm] */
 #define TACHO_MAX_RPM           (5000u)
 
+/** 車速: 上限クリップ [km/h]（EPSアシスト力低下による違和感防止） */
+#define SPEED_MAX_KMH           (30.0f)
+
 /** ベースタイマー周波数 [Hz]  (10kHz = 100µs 周期) */
 #define PULSE_OUT_TIMER_HZ      (10000u)
 
@@ -74,6 +77,7 @@ void pulse_out_set_tacho(uint16_t rpm);
  * @brief 車速パルス周波数を更新する
  *
  * @param kmh  車速 [km/h]（0.0f でパルス停止）
+ *             SPEED_MAX_KMH 超は SPEED_MAX_KMH にクリップ。
  */
 void pulse_out_set_speed(float kmh);
 

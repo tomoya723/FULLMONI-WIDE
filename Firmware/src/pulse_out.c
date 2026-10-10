@@ -162,6 +162,12 @@ void pulse_out_set_speed(float kmh)
         return;
     }
 
+    /* 上限クリップ（EPSアシスト力低下による違和感防止） */
+    if (kmh > SPEED_MAX_KMH)
+    {
+        kmh = SPEED_MAX_KMH;
+    }
+
     /*
      * f_speed    = kmh * PULSE_PER_KM / 3600       [Hz]
      * half_count = PULSE_OUT_TIMER_HZ / (2 * f_speed)
